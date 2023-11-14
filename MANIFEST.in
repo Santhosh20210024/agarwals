@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include agarwals *.css
+recursive-include agarwals *.csv
+recursive-include agarwals *.html
+recursive-include agarwals *.ico
+recursive-include agarwals *.js
+recursive-include agarwals *.json
+recursive-include agarwals *.md
+recursive-include agarwals *.png
+recursive-include agarwals *.py
+recursive-include agarwals *.svg
+recursive-include agarwals *.txt
+recursive-exclude agarwals *.pyc
