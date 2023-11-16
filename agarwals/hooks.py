@@ -63,7 +63,7 @@ app_license = "MIT"
 # Installation
 # ------------
 
-# before_install = "agarwals.install.before_install"
+# before_install = "agarwals.utils.create_folders.folder_structure_creation"
 # after_install = "agarwals.install.after_install"
 
 # Uninstallation
@@ -77,7 +77,12 @@ app_license = "MIT"
 # To set up dependencies/integrations with other apps
 # Name of the app being installed is passed as an argument
 
-# before_app_install = "agarwals.utils.before_app_install"
+
+# Agarwals  Integration Setup
+before_app_install = "agarwals.utils.create_folders.folder_structure_creation"
+
+
+
 # after_app_install = "agarwals.utils.after_app_install"
 
 # Integration Cleanup
