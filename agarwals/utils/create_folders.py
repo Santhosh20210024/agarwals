@@ -1,9 +1,14 @@
 import frappe
+import os
+from frappe.utils import get_site_name
 
 # Required Agarwals Folders
 ROOT_FOLDER = 'Home/DrAgarwals' 
 PARENT_FOLDERS_LIST = ['Upload','Processing','Processed','Backup']
-SUB_FOLDERS_LIST = ['Bank','Debtor Payments','Claimbook','Bills']
+SUB_FOLDERS_LIST = ['Bank','Debtor_Payments','Claimbook','Bills']
+
+# For Production:  get_site_name(frappe.local.request.host)
+SITE_PATH = os.getcwd() + "/site.local" + "/private/files/"
 
 # Examples
 BANK_LIST = ['HDFC','KKBK','KOTAK']
@@ -38,26 +43,44 @@ Sample File Doctype Output
 
 def folder_structure_creation():
     print("Folder Structure Initialization")
+
+    # Agarwals directory
+    if not os.path.exists(SITE_PATH + ROOT_FOLDER.split("/")[1]):
+        os.mkdir(SITE_PATH + ROOT_FOLDER.split("/")[1])
+
     if ROOT_FOLDER not in get_folders_list():
         create_new_folder(ROOT_FOLDER.split("/")[1], ROOT_FOLDER.split("/")[0])
     
-    # Just move and process
+    # Parent Folders at both places
     for parent_folder_item in PARENT_FOLDERS_LIST:
-        # check exists:
         create_new_folder(parent_folder_item, ROOT_FOLDER)
+        if not os.path.exists(SITE_PATH + ROOT_FOLDER.split("/")[1] + "/" + parent_folder_item):
+            os.mkdir(SITE_PATH + ROOT_FOLDER.split("/")[1]+ "/" + parent_folder_item)
 
+    # Sub folders
     for sub_folder_item in SUB_FOLDERS_LIST:
 
         upload_dir = ROOT_FOLDER + "/" + PARENT_FOLDERS_LIST[0]
         create_new_folder(sub_folder_item, upload_dir)
-    
+
+        if not os.path.exists(SITE_PATH + ROOT_FOLDER.split("/")[1] + "/" + PARENT_FOLDERS_LIST[0] + "/" + sub_folder_item):
+            os.mkdir(SITE_PATH + ROOT_FOLDER.split("/")[1]+ "/" + PARENT_FOLDERS_LIST[0] + "/" + sub_folder_item)
+
         if sub_folder_item == "Bank":
             for bank_item in BANK_LIST:
                 create_new_folder(bank_item, upload_dir + "/" + sub_folder_item)
 
-        if sub_folder_item == "Debtor Payments":
+                if not os.path.exists(SITE_PATH + ROOT_FOLDER.split("/")[1] + "/" + PARENT_FOLDERS_LIST[0] + "/" + sub_folder_item + "/" + bank_item):
+                    os.mkdir(SITE_PATH + ROOT_FOLDER.split("/")[1] + "/" + PARENT_FOLDERS_LIST[0] + "/" + sub_folder_item + "/" + bank_item)
+
+        if sub_folder_item == "Debtor_Payments":
             for tpa_item in TPA_LIST:
                 create_new_folder(tpa_item, upload_dir + "/" + sub_folder_item)
+                
+                if not os.path.exists(SITE_PATH + ROOT_FOLDER.split("/")[1] + "/" + PARENT_FOLDERS_LIST[0] + "/" + sub_folder_item + "/" + tpa_item):
+                    os.mkdir(SITE_PATH + ROOT_FOLDER.split("/")[1] + "/" + PARENT_FOLDERS_LIST[0] + "/" + sub_folder_item + "/" + tpa_item)
+
+
     print("Folder Structure Completed")
 
 #Uninsallation file delete
