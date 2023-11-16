@@ -79,7 +79,7 @@ app_license = "MIT"
 
 
 # Agarwals  Integration Setup
-before_app_install = "agarwals.utils.create_folders.folder_structure_creation"
+before_install = "agarwals.utils.create_folders.folder_structure_creation"
 
 
 
