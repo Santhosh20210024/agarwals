@@ -1,5 +1,5 @@
 import frappe
-import pandas
+# import pandas
 from frappe.model.document import Document
 
 class FileUpload(Document):
