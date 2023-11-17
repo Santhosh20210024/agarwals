@@ -41,12 +41,8 @@ function show_hide_fields(frm) {
 
     if (selected_value === 'Bank Statement') {
         frm.toggle_display(['bank_account', 'upload'], true);
-		frm.set_df_property('bank_account', 'reqd', 1);
-		frm.set_df_property('debtor', 'reqd', 0);
     } else if (selected_value === 'Debtor Statement') {
         frm.toggle_display(['debtor', 'upload'], true);
-		frm.set_df_property('bank_account', 'reqd', 0);
-		frm.set_df_property('debtor', 'reqd', 1);
     } else if (selected_value === 'Bill'){
         frm.toggle_display(['upload'], true);
     } else if (selected_value === 'ClaimBook'){
@@ -69,7 +65,6 @@ var set_css = function (frm)
 	// bank Account
 	document.querySelectorAll("[data-fieldname='bank_account']")[1].style.height ="40px";
     document.querySelectorAll("[data-fieldname='bank_account']")[1].style.width ="300px";
-	// document.querySelectorAll("[data-fieldname='bank_account']")[1].style.fontWeight ="bold";
 
 	// debtor
 	document.querySelectorAll("[data-fieldname='debtor']")[1].style.height ="40px";
