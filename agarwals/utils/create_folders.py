@@ -8,7 +8,7 @@ PARENT_FOLDERS_LIST = ['Upload','InProcessing','Processed','Backup']
 SUB_FOLDERS_LIST = ['Bank','Debtor_Payments','Claimbook','Bills']
 
 # For Production:  get_site_name(frappe.local.request.host)
-SITE_PATH = os.getcwd() + "/ga.site" + "/private/files/"
+SITE_PATH = os.getcwd() + "/agarwals.com" + "/private/files/"
 
 # Examples
 BANK_LIST = ['HDFC','KKBK','KOTAK']

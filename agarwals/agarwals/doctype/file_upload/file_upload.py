@@ -75,7 +75,7 @@ class FileUpload(Document):
 
 		if self.type == "Bill":
 
-			dis_folder = "Home/DrAgarwals/Upload/Bills/"
+			dis_folder = "Home/DrAgarwals/Upload/Bills"
 			bill_upload_path = frappe.get_doc("File",fetch_corresponding_file_doc[0])
 			bill_upload_path.folder = dis_folder
 			bill_upload_path.file_url = "/private/files/DrAgarwals/Upload/Bills/" + file_name
@@ -87,15 +87,19 @@ class FileUpload(Document):
 			bill_upload_path.save()
 
 		if self.type == "ClaimBook":
-			print("=============",self.type)
-			dis_folder = "Home/DrAgarwals/Upload/Claimbook/"
-			bill_upload_path = frappe.get_doc("File",fetch_corresponding_file_doc[0])
-			bill_upload_path.folder = dis_folder
-			bill_upload_path.file_url = "/private/files/DrAgarwals/Upload/Claimbook/" + file_name
+
+			dis_folder = "Home/DrAgarwals/Upload/Claimbook"
+			claim_upload_path = frappe.get_doc("File",fetch_corresponding_file_doc[0])
+			claim_upload_path.folder = dis_folder
+			claim_upload_path.file_url = "/private/files/DrAgarwals/Upload/Claimbook/" + file_name
 
 			self.upload = "/private/files/DrAgarwals/Upload/Claimbook/" + file_name
 
 			os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/Claimbook/" + file_name)
+
+			claim_upload_path.save()
+
 			
-			bill_upload_path.save()
+			
+			
 
