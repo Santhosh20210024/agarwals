@@ -4,11 +4,11 @@ from frappe.utils import get_site_name
 
 # Required Agarwals Folders
 ROOT_FOLDER = 'Home/DrAgarwals' 
-PARENT_FOLDERS_LIST = ['Upload','Processing','Processed','Backup']
+PARENT_FOLDERS_LIST = ['Upload','InProcessing','Processed','Backup']
 SUB_FOLDERS_LIST = ['Bank','Debtor_Payments','Claimbook','Bills']
 
 # For Production:  get_site_name(frappe.local.request.host)
-SITE_PATH = os.getcwd() + "/site.local" + "/private/files/"
+SITE_PATH = os.getcwd() + "/ga.site" + "/private/files/"
 
 # Examples
 BANK_LIST = ['HDFC','KKBK','KOTAK']

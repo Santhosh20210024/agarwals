@@ -37,16 +37,16 @@ function show_hide_fields(frm) {
     var selected_value = frm.doc.type;
 
     // Hide all fields initially
-    frm.toggle_display(['bank_account', 'debtor', 'upload'], false);
+    frm.toggle_display(['bank_account', 'debtor', 'upload','remarks'], false);
 
     if (selected_value === 'Bank Statement') {
-        frm.toggle_display(['bank_account', 'upload'], true);
+        frm.toggle_display(['bank_account', 'upload', 'remarks'], true);
     } else if (selected_value === 'Debtor Statement') {
-        frm.toggle_display(['debtor', 'upload'], true);
+        frm.toggle_display(['debtor', 'upload', 'remarks'], true);
     } else if (selected_value === 'Bill'){
-        frm.toggle_display(['upload'], true);
+        frm.toggle_display(['upload','remarks'], true);
     } else if (selected_value === 'ClaimBook'){
-        frm.toggle_display(['upload'], true);
+        frm.toggle_display(['upload','remarks'], true);
     }
     
 }
