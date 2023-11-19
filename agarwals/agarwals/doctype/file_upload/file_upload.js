@@ -70,4 +70,9 @@ var set_css = function (frm)
 	document.querySelectorAll("[data-fieldname='debtor']")[1].style.height ="40px";
     document.querySelectorAll("[data-fieldname='debtor']")[1].style.width ="300px";
 
+    //remarks
+    // debtor
+	// document.querySelectorAll("[data-fieldname='remarks']")[1].style.height ="40px";
+    document.querySelectorAll("[data-fieldname='remarks']")[1].style.width ="400px";
+    document.querySelectorAll("[data-fieldname='upload']")[1].style.fontWeight ="bold";    
     }
