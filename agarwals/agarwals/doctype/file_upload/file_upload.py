@@ -11,7 +11,7 @@ class FileUpload(Document):
 		file_doc = frappe.get_list("File",filters={'file_name':file_name},pluck='name')
 		return file_name, file_doc
 
-	# validation based on types, upload
+	# validation based on types, Extract
 	def validate_fields(self):
 		if self.type == None or self.type == "":
 			frappe.throw("Select Type")
@@ -22,7 +22,7 @@ class FileUpload(Document):
 				if self.bank_account == None:
 					frappe.throw("Select Bank Account")
 				if self.upload == None:
-					frappe.throw("Should Upload File")
+					frappe.throw("Should Extract File")
 
 			if self.type == "Debtor Statement":
 				if self.debtor == None:
@@ -69,53 +69,53 @@ class FileUpload(Document):
 			if self.type == "Bank Statement":
 				
 				# Doc Update Process
-				dis_folder = "Home/DrAgarwals/Upload/Bank/" + self.bank_account
+				dis_folder = "Home/DrAgarwals/Extract/Bank/" + self.bank_account
 				bank_upload_path = frappe.get_doc("File",file_doc[0])
 				bank_upload_path.folder = dis_folder
-				bank_upload_path.file_url = "/private/files/DrAgarwals/Upload/Bank/" + self.bank_account + "/" + file_name
+				bank_upload_path.file_url = "/private/files/DrAgarwals/Extract/Bank/" + self.bank_account + "/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Bank/" + self.bank_account + "/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Bank/" + self.bank_account + "/" + file_name
 				
 				# local disk move option
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/Bank/" + self.bank_account + "/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/Bank/" + self.bank_account + "/" + file_name)
 				
 				bank_upload_path.save()
 
 			if self.type == "Debtor Statement":
 				
-				dis_folder = "Home/DrAgarwals/Upload/Debtor_Payments/" + self.debtor
+				dis_folder = "Home/DrAgarwals/Extract/Debtor_Payment/" + self.debtor
 				debtor_upload_path = frappe.get_doc("File",file_doc[0])
 				debtor_upload_path.folder = dis_folder
-				debtor_upload_path.file_url = "/private/files/DrAgarwals/Upload/debtor_Payments/" + self.debtor + "/" + file_name
+				debtor_upload_path.file_url = "/private/files/DrAgarwals/Extract/debtor_Payment/" + self.debtor + "/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Debtor_Payments/" + self.debtor + "/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Debtor_Payment/" + self.debtor + "/" + file_name
 
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/debtor_Payments/" + self.debtor + "/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/debtor_Payment/" + self.debtor + "/" + file_name)
 				
 				debtor_upload_path.save()
 
 			if self.type == "Bill":
 
-				dis_folder = "Home/DrAgarwals/Upload/Bills"
+				dis_folder = "Home/DrAgarwals/Extract/Bill"
 				bill_upload_path = frappe.get_doc("File",file_doc[0])
 				bill_upload_path.folder = dis_folder
-				bill_upload_path.file_url = "/private/files/DrAgarwals/Upload/Bills/" + file_name
+				bill_upload_path.file_url = "/private/files/DrAgarwals/Extract/Bill/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Bills/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Bill/" + file_name
 
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/Bills/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/Bill/" + file_name)
 				
 				bill_upload_path.save()
 
 			if self.type == "ClaimBook":
 
-				dis_folder = "Home/DrAgarwals/Upload/Claimbook"
+				dis_folder = "Home/DrAgarwals/Extract/Claimbook"
 				claim_upload_path = frappe.get_doc("File",file_doc[0])
 				claim_upload_path.folder = dis_folder
-				claim_upload_path.file_url = "/private/files/DrAgarwals/Upload/Claimbook/" + file_name
+				claim_upload_path.file_url = "/private/files/DrAgarwals/Extract/Claimbook/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Claimbook/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Claimbook/" + file_name
 
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/Claimbook/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/Claimbook/" + file_name)
 
 				claim_upload_path.save()

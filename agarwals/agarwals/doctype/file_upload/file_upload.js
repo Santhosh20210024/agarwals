@@ -13,7 +13,6 @@
 frappe.ui.form.on('File Upload', {
 	refresh: function (frm) {
 
-        
         frm.fields_dict['type'].df.onchange = function () {
             show_hide_fields(frm);
         };
