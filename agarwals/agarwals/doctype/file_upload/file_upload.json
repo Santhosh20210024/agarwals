@@ -9,8 +9,8 @@
  "field_order": [
   "type",
   "bank_account",
+  "bank",
   "debtor",
-  "remarks",
   "upload"
  ],
  "fields": [
@@ -43,14 +43,15 @@
    "label": "Upload"
   },
   {
-   "fieldname": "remarks",
-   "fieldtype": "Small Text",
-   "label": "Remarks"
+   "fetch_from": "bank_account.bank",
+   "fieldname": "bank",
+   "fieldtype": "Data",
+   "label": "Bank"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-17 10:41:00.755738",
+ "modified": "2023-11-21 16:16:42.044729",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File Upload",

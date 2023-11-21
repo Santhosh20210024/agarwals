@@ -38,10 +38,10 @@ function show_hide_fields(frm) {
     var selected_value = frm.doc.type;
 
     // Hide all fields initially
-    frm.toggle_display(['bank_account', 'debtor', 'upload','remarks'], false);
+    frm.toggle_display(['bank_account', 'debtor', 'upload','remarks','bank'], false);
 
     if (selected_value === 'Bank Statement') {
-        frm.toggle_display(['bank_account', 'upload', 'remarks'], true);
+        frm.toggle_display(['bank_account', 'bank', 'upload', 'remarks'], true);
     } else if (selected_value === 'Debtor Statement') {
         frm.toggle_display(['debtor', 'upload', 'remarks'], true);
     } else if (selected_value === 'Bill'){
@@ -66,6 +66,9 @@ var set_css = function (frm)
 	// bank Account
 	document.querySelectorAll("[data-fieldname='bank_account']")[1].style.height ="40px";
     document.querySelectorAll("[data-fieldname='bank_account']")[1].style.width ="300px";
+
+    document.querySelectorAll("[data-fieldname='bank']")[1].style.height ="40px";
+    document.querySelectorAll("[data-fieldname='bank']")[1].style.width ="300px";
 
 	// debtor
 	document.querySelectorAll("[data-fieldname='debtor']")[1].style.height ="40px";
