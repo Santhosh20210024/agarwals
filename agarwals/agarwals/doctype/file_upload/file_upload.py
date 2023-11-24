@@ -13,6 +13,7 @@ class FileUpload(Document):
 		file_doc = frappe.get_list("File",filters={'file_name':file_name},pluck='name')
 		return file_name, file_doc
 
+
 	# validation based on types, Extract
 	def validate_fields(self):
 		if self.type == None or self.type == "":
@@ -38,10 +39,12 @@ class FileUpload(Document):
 		
 
 	def validate(self):
-		self.status = "Open"
+		# self.status = "Open"
 		self.validate_fields()
 		self.validate_file()
-		self.process_file_attachment()
+		# if self.status
+		if self.status == "Open":
+			self.process_file_attachment()
 
 	# Validate file extension and existence 
 	def validate_file(self):
@@ -124,14 +127,14 @@ class FileUpload(Document):
 				claim_upload_path.save()
 
 
-
+# Copy_Files_Operation
 def copy_files():
-	# try:
-		file_upload_docs = frappe.get_list("File Upload",filters={'status':'Open'},pluck="upload")
+	try:
+		file_upload_docs = frappe.get_list("File Upload",filters={'status':'Open'},fields=["upload","name"])
 		for every_file in file_upload_docs:
 		# Starting process
 		
-			extract_file_name = frappe.get_list("File",filters={'file_url':every_file},pluck="name")[0]
+			extract_file_name = frappe.get_list("File",filters={'file_url':every_file["upload"]},pluck="name")[0]
 			extract_file_doc = frappe.get_doc("File",extract_file_name)
 			
 			transformed_file_doc = frappe.copy_doc(extract_file_doc)
@@ -147,26 +150,36 @@ def copy_files():
 			transformed_file_doc.set("folder",transformed_file_folder)
 			transformed_file_doc.save()
 
-			file_doc = frappe.get_doc("File Upload",every_file)
+			file_doc = frappe.get_doc("File Upload",every_file["name"])
 			file_doc.status = "Transformed"
 			file_doc.transformed_file_url = transformed_file_doc.file_url
 			file_doc.save()
 
-	# 	return "Success"
-	# except:
-	# 	return "Error in Transformation"
+		return "Success"
+	except:
+		return "Error in Transformation"
 
 
 # For Custom Operation testing
 @frappe.whitelist()
 def bank_entry_operation():
 	return copy_files()
+	# Need to transform accordingly
 
 @frappe.whitelist()
 def loading():
-	transformed_files = frappe.get_list('File Upload',filters={'status':'Transformed'},fields=['bank','bank_account','transformed_file_url'])
+	transformed_files = frappe.get_list('File Upload',filters={'status':'Transformed'},fields=['bank','bank_account','transformed_file_url','name'])
 	for every_file in transformed_files:
 		bank = every_file.bank
 		bank_account = every_file.bank_account
 		transformed_file_url = every_file.transformed_file_url
 		import_bank_statement(bank = bank,bank_account = bank_account,attached_file= transformed_file_url)
+
+		file_doc = frappe.get_doc("File Upload",every_file["name"])
+		file_doc.status = "Loaded"
+		file_doc.save()
+	return "Success"
+	
+
+
+	

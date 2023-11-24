@@ -1,15 +1,3 @@
-// Copyright (c) 2023, Agarwals and contributors
-// For license information, please see license.txt
-
-
-
-// App Created Modiftion done
-// Toggle Part Done
-// File Storage
-// Email Notification
-
-
-
 frappe.ui.form.on('File Upload', {
 	refresh: function (frm) {
 
@@ -72,7 +60,6 @@ var set_css = function (frm)
 
     //remarks
     // debtor
-	// document.querySelectorAll("[data-fieldname='remarks']")[1].style.height ="40px";
     document.querySelectorAll("[data-fieldname='remarks']")[1].style.width ="400px";
     document.querySelectorAll("[data-fieldname='upload']")[1].style.fontWeight ="bold";    
     }

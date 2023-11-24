@@ -6,10 +6,10 @@ from frappe.utils import get_site_name
 PROJECT_FOLDER = "DrAgarwals"
 ROOT_FOLDER = 'Home/DrAgarwals' 
 PARENT_FOLDERS_LIST = ['Extract', 'Transform']
-SUB_FOLDERS_LIST = ['Bank', 'Payment Advice', 'Claimbook', 'Bill', 'Error']
+SUB_FOLDERS_LIST = ['Bank', 'Payment_Advice', 'Claimbook', 'Bill', 'Error']
 
 # For Production:  get_site_name(frappe.local.request.host)
-SITE_PATH = "/" +os.getcwd() + "/agarwals.com" + "/private/files/"
+SITE_PATH = os.getcwd() + "/agarwals.com" + "/private/files/"
 
 # Examples
 # BANK_LIST = ['HDFC','KKBK','KOTAK']

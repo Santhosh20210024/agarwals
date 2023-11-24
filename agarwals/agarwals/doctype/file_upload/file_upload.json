@@ -51,11 +51,12 @@
    "label": "Remarks"
   },
   {
+   "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
    "hidden": 1,
    "label": "Status",
-   "options": "Open\nTransformed\nDone"
+   "options": "Open\nIn Progress\nCompleted"
   },
   {
    "fieldname": "transformed_file_url",
@@ -72,7 +73,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-21 19:14:06.240069",
+ "modified": "2023-11-22 09:38:42.606364",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File Upload",
@@ -93,5 +94,14 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Blue",
+   "title": "In Progress"
+  },
+  {
+   "color": "Green",
+   "title": "Completed"
+  }
+ ]
 }
