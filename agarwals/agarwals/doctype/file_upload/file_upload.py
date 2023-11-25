@@ -2,6 +2,8 @@ import frappe
 import os
 from frappe.model.document import Document
 from agarwals.utils.create_folders import SITE_PATH
+from agarwals.utils.import_bank_statement import import_bank_statement
+import shutil
 
 
 class FileUpload(Document):
@@ -11,7 +13,8 @@ class FileUpload(Document):
 		file_doc = frappe.get_list("File",filters={'file_name':file_name},pluck='name')
 		return file_name, file_doc
 
-	# validation based on types, upload
+
+	# validation based on types, Extract
 	def validate_fields(self):
 		if self.type == None or self.type == "":
 			frappe.throw("Select Type")
@@ -22,7 +25,7 @@ class FileUpload(Document):
 				if self.bank_account == None:
 					frappe.throw("Select Bank Account")
 				if self.upload == None:
-					frappe.throw("Should Upload File")
+					frappe.throw("Should Extract File")
 
 			if self.type == "Debtor Statement":
 				if self.debtor == None:
@@ -36,9 +39,12 @@ class FileUpload(Document):
 		
 
 	def validate(self):
+		# self.status = "Open"
 		self.validate_fields()
 		self.validate_file()
-		self.process_file_attachment()
+		# if self.status
+		if self.status == "Open":
+			self.process_file_attachment()
 
 	# Validate file extension and existence 
 	def validate_file(self):
@@ -51,8 +57,8 @@ class FileUpload(Document):
 			# frappe.db.commit()
 			frappe.throw("Upload excel file formats only")
 		
-		if file_doc and frappe.get_doc("File",file_doc[0]).folder != 'Home':
-			frappe.throw("File is already present. The name should be unique. ")
+		# if file_doc and frappe.get_doc("File",file_doc[0]).folder != 'Home':
+		# 	frappe.throw("File is already present. The name should be unique. ")
 
 
 	def check_valid_bank_file(self):
@@ -69,53 +75,111 @@ class FileUpload(Document):
 			if self.type == "Bank Statement":
 				
 				# Doc Update Process
-				dis_folder = "Home/DrAgarwals/Upload/Bank/" + self.bank_account
+				dis_folder = "Home/DrAgarwals/Extract/Bank"
 				bank_upload_path = frappe.get_doc("File",file_doc[0])
 				bank_upload_path.folder = dis_folder
-				bank_upload_path.file_url = "/private/files/DrAgarwals/Upload/Bank/" + self.bank_account + "/" + file_name
+				bank_upload_path.file_url = "/private/files/DrAgarwals/Extract/Bank/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Bank/" + self.bank_account + "/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Bank/" + file_name
 				
 				# local disk move option
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/Bank/" + self.bank_account + "/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/Bank/"  + file_name)
 				
 				bank_upload_path.save()
 
 			if self.type == "Debtor Statement":
 				
-				dis_folder = "Home/DrAgarwals/Upload/Debtor_Payments/" + self.debtor
+				dis_folder = "Home/DrAgarwals/Extract/Payment Advice"
 				debtor_upload_path = frappe.get_doc("File",file_doc[0])
 				debtor_upload_path.folder = dis_folder
-				debtor_upload_path.file_url = "/private/files/DrAgarwals/Upload/debtor_Payments/" + self.debtor + "/" + file_name
+				debtor_upload_path.file_url = "/private/files/DrAgarwals/Extract/Payment Advice/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Debtor_Payments/" + self.debtor + "/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Payment Advice/"+ file_name
 
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/debtor_Payments/" + self.debtor + "/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/Payment Advice/" + file_name)
 				
 				debtor_upload_path.save()
 
 			if self.type == "Bill":
 
-				dis_folder = "Home/DrAgarwals/Upload/Bills"
+				dis_folder = "Home/DrAgarwals/Extract/Bill"
 				bill_upload_path = frappe.get_doc("File",file_doc[0])
 				bill_upload_path.folder = dis_folder
-				bill_upload_path.file_url = "/private/files/DrAgarwals/Upload/Bills/" + file_name
+				bill_upload_path.file_url = "/private/files/DrAgarwals/Extract/Bill/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Bills/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Bill/" + file_name
 
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/Bills/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/Bill/" + file_name)
 				
 				bill_upload_path.save()
 
 			if self.type == "ClaimBook":
 
-				dis_folder = "Home/DrAgarwals/Upload/Claimbook"
+				dis_folder = "Home/DrAgarwals/Extract/Claimbook"
 				claim_upload_path = frappe.get_doc("File",file_doc[0])
 				claim_upload_path.folder = dis_folder
-				claim_upload_path.file_url = "/private/files/DrAgarwals/Upload/Claimbook/" + file_name
+				claim_upload_path.file_url = "/private/files/DrAgarwals/Extract/Claimbook/" + file_name
 
-				self.upload = "/private/files/DrAgarwals/Upload/Claimbook/" + file_name
+				self.upload = "/private/files/DrAgarwals/Extract/Claimbook/" + file_name
 
-				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Upload/Claimbook/" + file_name)
+				os.rename(SITE_PATH +  file_name, SITE_PATH  + "DrAgarwals/Extract/Claimbook/" + file_name)
 
 				claim_upload_path.save()
+
+
+# Copy_Files_Operation
+def copy_files():
+	try:
+		file_upload_docs = frappe.get_list("File Upload",filters={'status':'Open'},fields=["upload","name"])
+		for every_file in file_upload_docs:
+		# Starting process
+		
+			extract_file_name = frappe.get_list("File",filters={'file_url':every_file["upload"]},pluck="name")[0]
+			extract_file_doc = frappe.get_doc("File",extract_file_name)
+			
+			transformed_file_doc = frappe.copy_doc(extract_file_doc)
+			transformed_file_url = transformed_file_doc.file_url.replace("Extract","Transform")
+			transformed_file_folder = transformed_file_doc.folder.replace("Extract","Transform")
+
+			extract_file_url_local = os.getcwd() + "/agarwals.com" + extract_file_doc.file_url
+			transformed_file_url_local = os.getcwd() + "/agarwals.com" + transformed_file_url
+
+			shutil.copy(extract_file_url_local,transformed_file_url_local)
+
+			transformed_file_doc.set("file_url",transformed_file_url)
+			transformed_file_doc.set("folder",transformed_file_folder)
+			transformed_file_doc.save()
+
+			file_doc = frappe.get_doc("File Upload",every_file["name"])
+			file_doc.status = "Transformed"
+			file_doc.transformed_file_url = transformed_file_doc.file_url
+			file_doc.save()
+
+		return "Success"
+	except:
+		return "Error in Transformation"
+
+
+# For Custom Operation testing
+@frappe.whitelist()
+def bank_entry_operation():
+	return copy_files()
+	# Need to transform accordingly
+
+@frappe.whitelist()
+def loading():
+	transformed_files = frappe.get_list('File Upload',filters={'status':'Transformed'},fields=['bank','bank_account','transformed_file_url','name'])
+	for every_file in transformed_files:
+		bank = every_file.bank
+		bank_account = every_file.bank_account
+		transformed_file_url = every_file.transformed_file_url
+		import_bank_statement(bank = bank,bank_account = bank_account,attached_file= transformed_file_url)
+
+		file_doc = frappe.get_doc("File Upload",every_file["name"])
+		file_doc.status = "Loaded"
+		file_doc.save()
+	return "Success"
+	
+
+
+	

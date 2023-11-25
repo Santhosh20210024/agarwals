@@ -11,6 +11,9 @@
   "bank_account",
   "bank",
   "debtor",
+  "remarks",
+  "status",
+  "transformed_file_url",
   "upload"
  ],
  "fields": [
@@ -43,6 +46,25 @@
    "label": "Upload"
   },
   {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Status",
+   "options": "Open\nIn Progress\nCompleted"
+  },
+  {
+   "fieldname": "transformed_file_url",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Transformed File Url"
+  },
+  {
    "fetch_from": "bank_account.bank",
    "fieldname": "bank",
    "fieldtype": "Data",
@@ -51,7 +73,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-21 16:16:42.044729",
+ "modified": "2023-11-22 09:38:42.606364",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File Upload",
@@ -72,5 +94,14 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Blue",
+   "title": "In Progress"
+  },
+  {
+   "color": "Green",
+   "title": "Completed"
+  }
+ ]
 }

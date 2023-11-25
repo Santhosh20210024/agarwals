@@ -81,7 +81,8 @@ app_license = "MIT"
 # Agarwals  Integration Setup
 before_install = "agarwals.utils.create_folders.folder_structure_creation"
 
-
+# Agarwals Deletion Setup
+# before_uninstall = "agarwals.utils.create_folders.folder_structure_deletion"
 
 # after_app_install = "agarwals.utils.after_app_install"
 
