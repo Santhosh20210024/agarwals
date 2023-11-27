@@ -2,7 +2,7 @@ import frappe
 import os
 from frappe.model.document import Document
 from agarwals.utils.create_folders import SITE_PATH
-from agarwals.utils.import_bank_statement import import_bank_statement
+from agarwals.utils.importation_and_doc_creation import import_bank_statement
 import shutil
 
 

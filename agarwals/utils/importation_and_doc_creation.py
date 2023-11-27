@@ -11,6 +11,19 @@ def import_bank_statement(bank_account,bank,attached_file):
         bank_import.set('import_file', attached_file)
         bank_import.save()
         bank_import.start_import()
-        return "File Successfully Imported"
-    except:
-        return "Failed to Import the File"
+        return "Success"
+    except Exception as e:
+        return e
+
+
+@frappe.whitelist()
+def create_sales_invoice(sales_invoice_field_and_value):
+    try:
+        sales_invoice = frappe.new_doc('Sales Invoice')
+        for field, value in sales_invoice_field_and_value.items():
+            sales_invoice.set(field, value)
+        sales_invoice.save()
+        sales_invoice.submit()
+        return "Success"
+    except Exception as e:
+        return e
