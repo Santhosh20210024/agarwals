@@ -1,3 +1,5 @@
+import json
+
 import frappe
 @frappe.whitelist()
 def import_bank_statement(bank_account,bank,attached_file):
@@ -15,15 +17,37 @@ def import_bank_statement(bank_account,bank,attached_file):
     except Exception as e:
         return e
 
+@frappe.whitelist()
+def import_job():
+    doctype = "Debtors Report"
+    import_type = "Insert New Records"
+    file_url = "/private/files/demo_debtor2.xlsx"
+    data_import_mapping_doc = frappe.get_doc("Data Import Mapping",doctype)
+    template = data_import_mapping_doc.template
+    data_import_doc = frappe.new_doc("Data Import")
+    data_import_doc.set('reference_doctype', doctype)
+    data_import_doc.set('import_type', import_type)
+    data_import_doc.set('import_file', file_url)
+    data_import_doc.save()
+    frappe.db.set_value("Data Import", data_import_doc.name, 'template_options', template)
+    frappe.db.commit()
+    data_import_doc.start_import()
+
+
 
 @frappe.whitelist()
 def create_sales_invoice(sales_invoice_field_and_value):
-    try:
-        sales_invoice = frappe.new_doc('Sales Invoice')
-        for field, value in sales_invoice_field_and_value.items():
-            sales_invoice.set(field, value)
-        sales_invoice.save()
-        sales_invoice.submit()
-        return "Success"
-    except Exception as e:
-        return e
+    sales_invoice_existing = True if len(
+        frappe.get_list("Sales Invoice", filters={'name': sales_invoice_field_and_value['name']})) != 0 else False
+    if not sales_invoice_existing:
+        try:
+            sales_invoice = frappe.new_doc('Sales Invoice')
+            for field, value in sales_invoice_field_and_value.items():
+                sales_invoice.set(field, value)
+            sales_invoice.save()
+            sales_invoice.submit()
+            return "Success"
+        except Exception as e:
+            return e
+    else:
+        print("Sales Invoice Already Exist")

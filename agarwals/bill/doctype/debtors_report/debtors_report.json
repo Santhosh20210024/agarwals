@@ -31,7 +31,8 @@
   "due_amount",
   "refund",
   "claim_amount",
-  "claim_amount_due"
+  "claim_amount_due",
+  "hash_value"
  ],
  "fields": [
   {
@@ -39,6 +40,12 @@
    "fieldtype": "Link",
    "label": "Entity",
    "options": "Entity"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "label": "Region",
+   "options": "Region"
   },
   {
    "fieldname": "branch",
@@ -81,6 +88,12 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "\nRAISED\nCANCELLED"
+  },
+  {
+   "depends_on": "eval: doc.status == \"CANCELLED\"",
+   "fieldname": "cancelled_date",
+   "fieldtype": "Datetime",
+   "label": "Cancelled Date"
   },
   {
    "fieldname": "claim_details_sb",
@@ -153,23 +166,17 @@
    "label": "Claim Amount Due"
   },
   {
-   "depends_on": "eval: doc.status == \"CANCELLED\"",
-   "fieldname": "cancelled_date",
-   "fieldtype": "Datetime",
-   "label": "Cancelled Date"
-  },
-  {
-   "fieldname": "region",
-   "fieldtype": "Link",
-   "label": "Region",
-   "options": "Region"
+   "fieldname": "hash_value",
+   "fieldtype": "Read Only",
+   "hidden": 1,
+   "label": "Hash Value"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-27 12:06:36.507801",
+ "modified": "2023-11-28 14:39:59.756681",
  "modified_by": "Administrator",
- "module": "Agarwals",
+ "module": "Bill",
  "name": "Debtors Report",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
