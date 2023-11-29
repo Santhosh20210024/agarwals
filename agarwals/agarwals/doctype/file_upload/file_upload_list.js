@@ -35,7 +35,7 @@ frappe.listview_settings['File Upload'] = {
 
         var load = function(){
             frappe.call({
-                method:"agarwals.agarwals.doctype.file_upload.file_upload.loading",
+                method:"agarwals.agarwals.utils.loading_process.loading",
                 callback:function(r){
                     if(r.message != "Success"){
                         frappe.throw("Error While Loading the File")

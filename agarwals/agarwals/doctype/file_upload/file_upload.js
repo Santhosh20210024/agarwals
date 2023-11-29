@@ -1,65 +1,29 @@
 frappe.ui.form.on('File Upload', {
 	refresh: function (frm) {
-
-        frm.fields_dict['type'].df.onchange = function () {
-            show_hide_fields(frm);
-        };
-        
-        show_hide_fields(frm);
 		set_css(frm)
     },
 	reload: function (frm) {
-
-        frm.fields_dict['type'].df.onchange = function () {
-            show_hide_fields(frm);
-        };
-        
-        show_hide_fields(frm);
 		set_css(frm)
     }
 });
 
 
-// Function to show/hide fields based on dropdown value
-function show_hide_fields(frm) {
-    var selected_value = frm.doc.type;
+// Need to refactor later
+var set_css = function (frm){
+    //debtor_report_upload
+    document.querySelectorAll("[data-fieldname='debtor_report_upload']")[1].style.backgroundColor ="black";
+    document.querySelectorAll("[data-fieldname='debtor_report_upload']")[1].style.color ="white";  
 
-    // Hide all fields initially
-    frm.toggle_display(['bank_account', 'debtor', 'upload','remarks', 'bank'], false);
+    //claimbook_upload
+    document.querySelectorAll("[data-fieldname='claimbook_upload']")[1].style.backgroundColor ="black";
+    document.querySelectorAll("[data-fieldname='claimbook_upload']")[1].style.color ="white";  
 
-    if (selected_value === 'Bank Statement') {
-        frm.toggle_display(['bank_account', 'upload', 'remarks', 'bank'], true);
-    } else if (selected_value === 'Debtor Statement') {
-        frm.toggle_display(['debtor', 'upload', 'remarks'], true);
-    } else if (selected_value === 'Bill'){
-        frm.toggle_display(['upload','remarks'], true);
-    } else if (selected_value === 'ClaimBook'){
-        frm.toggle_display(['upload','remarks'], true);
-    }
-    
+    //settlement_advice_upload
+    document.querySelectorAll("[data-fieldname='settlement_advice_upload']")[1].style.backgroundColor ="black";
+    document.querySelectorAll("[data-fieldname='settlement_advice_upload']")[1].style.color ="white";  
+
+    //bank_statement_upload
+    document.querySelectorAll("[data-fieldname='bank_statement_upload']")[1].style.backgroundColor ="black";
+    document.querySelectorAll("[data-fieldname='bank_statement_upload']")[1].style.color ="white";  
+
 }
-
-var set_css = function (frm)
-    {
-	
-	// Dropdown Icon
-	document.querySelector('div.select-icon').style.display = "none"
-
-	// Type Styling
-    document.querySelectorAll("[data-fieldname='type']")[1].style.height ="40px";
-    document.querySelectorAll("[data-fieldname='type']")[1].style.width ="300px";
-	document.querySelectorAll("[data-fieldname='type']")[1].style.fontWeight ="bold";
-	
-	// bank Account
-	document.querySelectorAll("[data-fieldname='bank_account']")[1].style.height ="40px";
-    document.querySelectorAll("[data-fieldname='bank_account']")[1].style.width ="300px";
-
-	// debtor
-	document.querySelectorAll("[data-fieldname='debtor']")[1].style.height ="40px";
-    document.querySelectorAll("[data-fieldname='debtor']")[1].style.width ="300px";
-
-    //remarks
-    // debtor
-    document.querySelectorAll("[data-fieldname='remarks']")[1].style.width ="400px";
-    document.querySelectorAll("[data-fieldname='upload']")[1].style.fontWeight ="bold";    
-    }
