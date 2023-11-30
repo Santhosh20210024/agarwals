@@ -1,19 +1,11 @@
 import frappe
 import os
-import shutil
-
 from frappe.model.document import Document
-from agarwals.utils.create_folders import SITE_PATH
-<<<<<<< HEAD
 from agarwals.utils.importation_and_doc_creation import import_bank_statement
 import shutil
-
-=======
-from agarwals.utils.import_bank_statement import import_bank_statement
 from agarwals.utils.doc_meta_util import get_doc_fields
 from agarwals.utils.file_util import construct_file_url
 from agarwals.utils.path_data import HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH,PROJECT_FOLDER
->>>>>>> 2aee0547a211f51ce0faecff5c3e3a6f7e471d57
 
 class FileUpload(Document):
 
