@@ -28,14 +28,14 @@ class FileUpload(Document):
 	
 	def validate_hash_content(self,file_doc_id):
 		file_doc = frappe.get_doc('File',file_doc_id)
-		print("=====",file_doc)
 		file_content_hash = file_doc.content_hash
 		if file_content_hash:
 			file_doc = frappe.get_list("File", filters={'content_hash':file_content_hash},pluck='name',order_by='creation DESC')
 			if len(file_doc) > 1:
 				frappe.delete_doc("File", file_doc[0])
 				frappe.db.commit()
-				frappe.throw('Uploading already exist file with same content')
+				self.upload = None
+				frappe.throw('Duplicate File Error: The file being uploaded already exists. Please check.')
 				return
 
 	
@@ -45,7 +45,7 @@ class FileUpload(Document):
 			if file_doc_id != 'Home' and file_name.split(".")[-1].lower() != 'xlsx':
 				frappe.delete_doc("File", file_doc_id)
 				frappe.db.commit()
-				frappe.throw("Upload excel file formats only")
+				frappe.throw("Please upload files in Excel format only (XLSX).")
 				return
 			self.validate_hash_content(file_doc_id)
 				
@@ -72,6 +72,7 @@ class FileUpload(Document):
 	def update_list_view(self):
 		self.type = self.uploaded_field.replace("_upload", "")
 		self.file_name = str(self.get(self.uploaded_field)).split("/")[-1]
+		self.set(str(self.uploaded_field).replace('_upload','_uploaded'), self.file_name)
 	    
 	def validate(self):
 		self.uploaded_field = self.get_uploaded_field()
