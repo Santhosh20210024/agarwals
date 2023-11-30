@@ -18,6 +18,7 @@
   "bedtype",
   "status",
   "cancelled_date",
+  "consultant",
   "claim_details_sb",
   "claim_id",
   "payer",
@@ -42,10 +43,10 @@
    "options": "Entity"
   },
   {
+   "fetch_from": "branch.parent_cost_center",
    "fieldname": "region",
-   "fieldtype": "Link",
-   "label": "Region",
-   "options": "Region"
+   "fieldtype": "Data",
+   "label": "Region"
   },
   {
    "fieldname": "branch",
@@ -170,11 +171,16 @@
    "fieldtype": "Read Only",
    "hidden": 1,
    "label": "Hash Value"
+  },
+  {
+   "fieldname": "consultant",
+   "fieldtype": "Data",
+   "label": "Consultant"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-28 14:39:59.756681",
+ "modified": "2023-11-30 11:28:28.432028",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Debtors Report",
