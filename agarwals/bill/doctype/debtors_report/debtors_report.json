@@ -21,8 +21,11 @@
   "consultant",
   "claim_details_sb",
   "claim_id",
-  "payer",
   "claim_status",
+  "column_break_notl",
+  "category",
+  "payer",
+  "tpa",
   "amount_section",
   "bill_amount",
   "discount",
@@ -33,7 +36,14 @@
   "refund",
   "claim_amount",
   "claim_amount_due",
-  "hash_value"
+  "hash_value",
+  "physical_submission_details_section",
+  "column_break_fvwc",
+  "verified",
+  "column_break_xpfe",
+  "submission_date",
+  "column_break_ahot",
+  "final_submission_date"
  ],
  "fields": [
   {
@@ -176,11 +186,60 @@
    "fieldname": "consultant",
    "fieldtype": "Data",
    "label": "Consultant"
+  },
+  {
+   "fieldname": "column_break_notl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "fieldname": "tpa",
+   "fieldtype": "Data",
+   "label": "TPA"
+  },
+  {
+   "fieldname": "physical_submission_details_section",
+   "fieldtype": "Section Break",
+   "label": "Physical Submission Details"
+  },
+  {
+   "fieldname": "submission_date",
+   "fieldtype": "Datetime",
+   "label": "Submission Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ahot",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "final_submission_date",
+   "fieldtype": "Datetime",
+   "label": "Final Submission Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_fvwc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_xpfe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "verified",
+   "fieldtype": "Check",
+   "label": "Verified"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-30 11:28:28.432028",
+ "modified": "2023-11-30 15:42:35.292837",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Debtors Report",
