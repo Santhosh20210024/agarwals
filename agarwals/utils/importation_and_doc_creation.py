@@ -51,3 +51,15 @@ def create_sales_invoice(sales_invoice_field_and_value):
             return e
     else:
         print("Sales Invoice Already Exist")
+
+
+@frappe.whitelist()
+def create_physical_claim_submission(bill_no_array):
+    try:
+        physical_claim_submission = frappe.new_doc("Physical Claim Submission")
+        print(bill_no_array)
+        physical_claim_submission.set('bill_list', bill_no_array)
+        physical_claim_submission.save()
+        return ["Success",physical_claim_submission.name]
+    except Exception as e:
+        return e

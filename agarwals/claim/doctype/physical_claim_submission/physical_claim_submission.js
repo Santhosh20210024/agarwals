@@ -11,5 +11,6 @@
 		var isoStringIST = currentDateTimeIST.toISOString().replace('T', ' ').slice(0, 19)
 
 		frm.set_value('submission_date',isoStringIST)
+
  	},
  });
