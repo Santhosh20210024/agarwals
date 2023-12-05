@@ -1,0 +1,329 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-11-30 15:08:14.268098",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "hospital",
+  "preauth_claim_id",
+  "mrn",
+  "doctor",
+  "department",
+  "case_id",
+  "first_name",
+  "tpa_name",
+  "insurance_company_name",
+  "tpa_member_id",
+  "insurance_policy_number",
+  "is_bulk_closure",
+  "al_number",
+  "cl_number",
+  "doa",
+  "dod",
+  "room_type",
+  "final_bill_number",
+  "final_bill_date",
+  "final_bill_amount",
+  "claim_amount",
+  "current_request_type",
+  "current_workflow_state",
+  "current_state_time",
+  "claim_submitted_date",
+  "reconcilled_status",
+  "utr_number",
+  "paid_on_date",
+  "requested_amount",
+  "approved_amount",
+  "provisional_bill_amount",
+  "settled_amount",
+  "patient_payable",
+  "patient_paid",
+  "tds_amount",
+  "tpa_shortfall_amount",
+  "forwarded_to_claims_date",
+  "courier_vendor",
+  "tracking_number",
+  "sent_date",
+  "received_date",
+  "preauth_submitted_date_time",
+  "is_admitted",
+  "visit_type",
+  "case_closed_in_preauth",
+  "unique_id",
+  "sub_date",
+  "remarks",
+  "file_size"
+ ],
+ "fields": [
+  {
+   "fieldname": "hospital",
+   "fieldtype": "Data",
+   "label": "Hospital"
+  },
+  {
+   "fieldname": "preauth_claim_id",
+   "fieldtype": "Data",
+   "label": "Preauth Claim ID"
+  },
+  {
+   "fieldname": "mrn",
+   "fieldtype": "Data",
+   "label": "MRN"
+  },
+  {
+   "fieldname": "doctor",
+   "fieldtype": "Data",
+   "label": "Doctor"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department"
+  },
+  {
+   "fieldname": "case_id",
+   "fieldtype": "Data",
+   "label": "Case ID"
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name"
+  },
+  {
+   "fieldname": "tpa_name",
+   "fieldtype": "Data",
+   "label": "TPA Name"
+  },
+  {
+   "fieldname": "insurance_company_name",
+   "fieldtype": "Data",
+   "label": "Insurance Company Name"
+  },
+  {
+   "fieldname": "tpa_member_id",
+   "fieldtype": "Data",
+   "label": "TPA Member ID"
+  },
+  {
+   "fieldname": "insurance_policy_number",
+   "fieldtype": "Data",
+   "label": "Insurance Policy Number"
+  },
+  {
+   "fieldname": "is_bulk_closure",
+   "fieldtype": "Data",
+   "label": "Is Bulk Closure"
+  },
+  {
+   "fieldname": "al_number",
+   "fieldtype": "Data",
+   "label": "AL Number"
+  },
+  {
+   "fieldname": "cl_number",
+   "fieldtype": "Data",
+   "label": "CL Number"
+  },
+  {
+   "fieldname": "doa",
+   "fieldtype": "Data",
+   "label": "DOA"
+  },
+  {
+   "fieldname": "dod",
+   "fieldtype": "Data",
+   "label": "DOD"
+  },
+  {
+   "fieldname": "room_type",
+   "fieldtype": "Data",
+   "label": "Room Type"
+  },
+  {
+   "fieldname": "final_bill_number",
+   "fieldtype": "Data",
+   "label": "Final Bill Number"
+  },
+  {
+   "fieldname": "final_bill_date",
+   "fieldtype": "Data",
+   "label": "Final Bill Date"
+  },
+  {
+   "fieldname": "final_bill_amount",
+   "fieldtype": "Data",
+   "label": "Final Bill Amount"
+  },
+  {
+   "fieldname": "claim_amount",
+   "fieldtype": "Data",
+   "label": "Claim Amount"
+  },
+  {
+   "fieldname": "current_request_type",
+   "fieldtype": "Data",
+   "label": "Current Request Type"
+  },
+  {
+   "fieldname": "current_workflow_state",
+   "fieldtype": "Data",
+   "label": "Current WorkFlow State"
+  },
+  {
+   "fieldname": "current_state_time",
+   "fieldtype": "Data",
+   "label": "Current State Time"
+  },
+  {
+   "fieldname": "claim_submitted_date",
+   "fieldtype": "Data",
+   "label": "Claim Submitted Date"
+  },
+  {
+   "fieldname": "reconcilled_status",
+   "fieldtype": "Data",
+   "label": "Reconcilled Status"
+  },
+  {
+   "fieldname": "utr_number",
+   "fieldtype": "Data",
+   "label": "UTR Number"
+  },
+  {
+   "fieldname": "paid_on_date",
+   "fieldtype": "Data",
+   "label": "Paid On Date"
+  },
+  {
+   "fieldname": "requested_amount",
+   "fieldtype": "Data",
+   "label": "Requested Amount"
+  },
+  {
+   "fieldname": "approved_amount",
+   "fieldtype": "Data",
+   "label": "Approved Amount"
+  },
+  {
+   "fieldname": "provisional_bill_amount",
+   "fieldtype": "Data",
+   "label": "Provisional Bill Amount"
+  },
+  {
+   "fieldname": "settled_amount",
+   "fieldtype": "Data",
+   "label": "Settled Amount"
+  },
+  {
+   "fieldname": "patient_payable",
+   "fieldtype": "Data",
+   "label": "Patient Payable"
+  },
+  {
+   "fieldname": "patient_paid",
+   "fieldtype": "Data",
+   "label": "Patient Paid"
+  },
+  {
+   "fieldname": "tds_amount",
+   "fieldtype": "Data",
+   "label": "TDS Amount"
+  },
+  {
+   "fieldname": "tpa_shortfall_amount",
+   "fieldtype": "Data",
+   "label": "TPA Shortfall Amount"
+  },
+  {
+   "fieldname": "forwarded_to_claims_date",
+   "fieldtype": "Data",
+   "label": "Forwarded To Claims Date"
+  },
+  {
+   "fieldname": "courier_vendor",
+   "fieldtype": "Data",
+   "label": "Courier Vendor"
+  },
+  {
+   "fieldname": "tracking_number",
+   "fieldtype": "Data",
+   "label": "Tracking Number"
+  },
+  {
+   "fieldname": "sent_date",
+   "fieldtype": "Data",
+   "label": "Sent Date"
+  },
+  {
+   "fieldname": "received_date",
+   "fieldtype": "Data",
+   "label": "Received Date"
+  },
+  {
+   "fieldname": "preauth_submitted_date_time",
+   "fieldtype": "Data",
+   "label": "Preauth Submitted Date Time"
+  },
+  {
+   "fieldname": "is_admitted",
+   "fieldtype": "Data",
+   "label": "Is Admitted"
+  },
+  {
+   "fieldname": "visit_type",
+   "fieldtype": "Data",
+   "label": "Visit Type"
+  },
+  {
+   "fieldname": "case_closed_in_preauth",
+   "fieldtype": "Data",
+   "label": "Case Closed In Preauth"
+  },
+  {
+   "fieldname": "unique_id",
+   "fieldtype": "Data",
+   "label": "Unique ID"
+  },
+  {
+   "fieldname": "sub_date",
+   "fieldtype": "Data",
+   "label": "Sub Date"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "file_size",
+   "fieldtype": "Data",
+   "label": "File Size"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-11-30 18:39:39.960384",
+ "modified_by": "Administrator",
+ "module": "Claim",
+ "name": "ClaimBook",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

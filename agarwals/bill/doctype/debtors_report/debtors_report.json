@@ -1,0 +1,206 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:bill_no",
+ "creation": "2023-11-25 15:34:55.327779",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "region",
+  "branch",
+  "bill_no",
+  "bill_date",
+  "column_break_kire",
+  "mrn",
+  "patient_name",
+  "bedtype",
+  "status",
+  "cancelled_date",
+  "consultant",
+  "claim_details_sb",
+  "claim_id",
+  "payer",
+  "claim_status",
+  "amount_section",
+  "bill_amount",
+  "discount",
+  "net_amount",
+  "paid_amount",
+  "column_break_ogdr",
+  "due_amount",
+  "refund",
+  "claim_amount",
+  "claim_amount_due",
+  "hash_value"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Entity",
+   "options": "Entity"
+  },
+  {
+   "fetch_from": "branch.parent_cost_center",
+   "fieldname": "region",
+   "fieldtype": "Data",
+   "label": "Region"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "bill_no",
+   "fieldtype": "Data",
+   "label": "Bill Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "bill_date",
+   "fieldtype": "Datetime",
+   "label": "Bill Date"
+  },
+  {
+   "fieldname": "column_break_kire",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mrn",
+   "fieldtype": "Data",
+   "label": "MRN"
+  },
+  {
+   "fieldname": "patient_name",
+   "fieldtype": "Data",
+   "label": "Patient Name"
+  },
+  {
+   "fieldname": "bedtype",
+   "fieldtype": "Data",
+   "label": "Bed Type"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nRAISED\nCANCELLED"
+  },
+  {
+   "depends_on": "eval: doc.status == \"CANCELLED\"",
+   "fieldname": "cancelled_date",
+   "fieldtype": "Datetime",
+   "label": "Cancelled Date"
+  },
+  {
+   "fieldname": "claim_details_sb",
+   "fieldtype": "Section Break",
+   "label": "Claim Details"
+  },
+  {
+   "fieldname": "claim_id",
+   "fieldtype": "Data",
+   "label": "Claim ID"
+  },
+  {
+   "fieldname": "payer",
+   "fieldtype": "Data",
+   "label": "Payer"
+  },
+  {
+   "fieldname": "claim_status",
+   "fieldtype": "Select",
+   "label": "Claim Status",
+   "options": "\nFull Due\nNo Due\nPartial Due\n\\N"
+  },
+  {
+   "fieldname": "amount_section",
+   "fieldtype": "Section Break",
+   "label": "Amount"
+  },
+  {
+   "fieldname": "bill_amount",
+   "fieldtype": "Currency",
+   "label": "Bill Amount"
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Currency",
+   "label": "Discount"
+  },
+  {
+   "fieldname": "net_amount",
+   "fieldtype": "Currency",
+   "label": "Net Amount"
+  },
+  {
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount"
+  },
+  {
+   "fieldname": "column_break_ogdr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "due_amount",
+   "fieldtype": "Currency",
+   "label": "Due Amount"
+  },
+  {
+   "fieldname": "refund",
+   "fieldtype": "Currency",
+   "label": "Refund"
+  },
+  {
+   "fieldname": "claim_amount",
+   "fieldtype": "Currency",
+   "label": "Claim Amount"
+  },
+  {
+   "fieldname": "claim_amount_due",
+   "fieldtype": "Currency",
+   "label": "Claim Amount Due"
+  },
+  {
+   "fieldname": "hash_value",
+   "fieldtype": "Read Only",
+   "hidden": 1,
+   "label": "Hash Value"
+  },
+  {
+   "fieldname": "consultant",
+   "fieldtype": "Data",
+   "label": "Consultant"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-11-30 11:28:28.432028",
+ "modified_by": "Administrator",
+ "module": "Bill",
+ "name": "Debtors Report",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

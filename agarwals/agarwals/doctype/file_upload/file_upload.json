@@ -1,9 +1,10 @@
 {
  "actions": [],
+ "allow_copy": 1,
  "allow_rename": 1,
  "autoname": "format:AGR-FILE-{######} ",
  "creation": "2023-11-14 16:49:50.663474",
- "default_view": "List",
+ "default_view": "Report",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -12,17 +13,20 @@
   "debtor_report_title",
   "debtor_report_date",
   "debtor_report_upload",
+  "debtor_report_uploaded",
   "debtor_report_remarks",
   "claimbook_tab",
   "claimbook_title",
   "claimbook_date",
   "claimbook_upload",
+  "claimbook_uploaded",
   "claimbook_remarks",
   "settlement_advice_tab",
   "settlement_advice_title",
   "settlement_advice_date",
-  "tpa_type",
+  "payer_type",
   "settlement_advice_upload",
+  "settlement_advice_uploaded",
   "settlement_advice_remarks",
   "bank_statement_tab",
   "bank_statement_title",
@@ -31,6 +35,7 @@
   "bank",
   "transformed_file_url",
   "bank_statement_upload",
+  "bank_statement_uploaded",
   "bank_statement_remarks",
   "type_tab",
   "status",
@@ -40,7 +45,6 @@
  ],
  "fields": [
   {
-   "bold": 1,
    "fieldname": "bank_account",
    "fieldtype": "Link",
    "label": "Bank Account",
@@ -50,7 +54,7 @@
    "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
-   "label": "status",
+   "label": "Status",
    "options": "\nOpen\nIn Process\nProcessed\nError"
   },
   {
@@ -70,19 +74,12 @@
    "depends_on": "eval: !doc.claimbook_upload && !doc.settlement_advice_upload && !doc.bank_statement_upload",
    "fieldname": "debtor_report_tab",
    "fieldtype": "Tab Break",
-   "label": "Debtor Report"
+   "label": "Debtors Report"
   },
   {
    "fieldname": "claimbook_remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
-  },
-  {
-   "bold": 1,
-   "fieldname": "tpa_type",
-   "fieldtype": "Link",
-   "label": "Tpa",
-   "options": "Customer"
   },
   {
    "fieldname": "settlement_advice_remarks",
@@ -101,7 +98,7 @@
    "depends_on": "eval: !doc.debtor_report_upload && !doc.settlement_advice_upload && !doc.bank_statement_upload",
    "fieldname": "claimbook_tab",
    "fieldtype": "Tab Break",
-   "label": "Claimbook"
+   "label": "ClaimBook"
   },
   {
    "fieldname": "type_tab",
@@ -112,7 +109,7 @@
   {
    "fieldname": "type",
    "fieldtype": "Data",
-   "label": "type"
+   "label": "Type"
   },
   {
    "default": "now",
@@ -121,30 +118,29 @@
    "label": "Date"
   },
   {
-   "bold": 1,
+   "depends_on": "eval:doc.debtor_report_uploaded == null",
+   "fetch_from": ".",
    "fieldname": "debtor_report_upload",
    "fieldtype": "Attach",
-   "label": "Choose a file to upload"
+   "label": "Upload"
   },
   {
-   "bold": 1,
+   "depends_on": "eval:doc.claimbook_uploaded == null",
    "fieldname": "claimbook_upload",
    "fieldtype": "Attach",
-   "label": "Choose a file to upload"
+   "label": "Upload"
   },
   {
-   "bold": 1,
-   "depends_on": "eval:doc.tpa_type",
+   "depends_on": "eval:doc.payer_type && doc.settlement_advice_uploaded == null",
    "fieldname": "settlement_advice_upload",
    "fieldtype": "Attach",
-   "label": "Choose a file to upload"
+   "label": "Upload"
   },
   {
-   "bold": 1,
-   "depends_on": "eval:doc.bank_account\n",
+   "depends_on": "eval:doc.bank_account && doc.bank_statement_uploaded == null",
    "fieldname": "bank_statement_upload",
    "fieldtype": "Attach",
-   "label": "Choose a file to upload"
+   "label": "Upload"
   },
   {
    "bold": 1,
@@ -155,8 +151,9 @@
   },
   {
    "fieldname": "debtor_report_title",
-   "fieldtype": "Heading",
-   "label": "Debtor Report"
+   "fieldtype": "HTML",
+   "label": "Debtors Report",
+   "options": "<p style=\"font-size: 15px;\">Debtors Report</p>"
   },
   {
    "fieldname": "debtor_report_remarks",
@@ -166,19 +163,21 @@
   {
    "bold": 1,
    "fieldname": "claimbook_title",
-   "fieldtype": "Heading",
-   "label": "ClaimBook"
+   "fieldtype": "HTML",
+   "label": "ClaimBook",
+   "options": "<p style=\"font-size: 15px;\">ClaimBook</p>"
   },
   {
    "fieldname": "settlement_advice_title",
-   "fieldtype": "Heading",
-   "label": "Settlement Advice"
+   "fieldtype": "HTML",
+   "label": "Settlement Advice",
+   "options": "<p style=\"font-size: 15px;\">Settlement Advice</p>"
   },
   {
-   "bold": 1,
    "fieldname": "bank_statement_title",
-   "fieldtype": "Heading",
-   "label": "Bank Statement"
+   "fieldtype": "HTML",
+   "label": "Bank Statement",
+   "options": "<p style=\"font-size: 15px;\">Bank Statement</p>"
   },
   {
    "fieldname": "bank_statement_remarks",
@@ -186,7 +185,6 @@
    "label": "Remarks"
   },
   {
-   "bold": 1,
    "default": "now",
    "fieldname": "debtor_report_date",
    "fieldtype": "Date",
@@ -194,7 +192,6 @@
    "read_only": 1
   },
   {
-   "bold": 1,
    "default": "now",
    "fieldname": "claimbook_date",
    "fieldtype": "Date",
@@ -202,7 +199,6 @@
    "read_only": 1
   },
   {
-   "bold": 1,
    "default": "now",
    "fieldname": "settlement_advice_date",
    "fieldtype": "Date",
@@ -210,7 +206,6 @@
    "read_only": 1
   },
   {
-   "bold": 1,
    "default": "now",
    "fieldname": "bank_statement_date",
    "fieldtype": "Date",
@@ -221,11 +216,47 @@
    "fieldname": "file_name",
    "fieldtype": "Data",
    "label": "File name"
+  },
+  {
+   "depends_on": "eval:doc.debtor_report_upload != null",
+   "fieldname": "debtor_report_uploaded",
+   "fieldtype": "Data",
+   "label": "File",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.claimbook_upload != null",
+   "fieldname": "claimbook_uploaded",
+   "fieldtype": "Data",
+   "label": "File",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.settlement_advice_upload != null",
+   "fieldname": "settlement_advice_uploaded",
+   "fieldtype": "Data",
+   "label": "File",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.bank_statement_upload != null",
+   "fieldname": "bank_statement_uploaded",
+   "fieldtype": "Data",
+   "label": "File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payer_type",
+   "fieldtype": "Link",
+   "label": "Payer",
+   "options": "Customer"
   }
  ],
+ "force_re_route_to_default_view": 1,
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-28 14:17:34.034126",
+ "modified": "2023-12-05 00:54:26.668458",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File Upload",
