@@ -1,0 +1,81 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-12-05 18:11:50.036137",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "claim_no",
+  "utr_number",
+  "payer",
+  "claim_amount",
+  "tds_amount",
+  "source"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "claim_no",
+   "fieldtype": "Data",
+   "label": "Claim No"
+  },
+  {
+   "fieldname": "payer",
+   "fieldtype": "Link",
+   "label": "Payer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "claim_amount",
+   "fieldtype": "Data",
+   "label": "Claim Amount"
+  },
+  {
+   "fieldname": "tds_amount",
+   "fieldtype": "Data",
+   "label": "TDS Amount"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "label": "Source",
+   "options": "\nTPA\nSystem"
+  },
+  {
+   "fieldname": "utr_number",
+   "fieldtype": "Data",
+   "label": "UTR No"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-12-06 00:26:49.740652",
+ "modified_by": "Administrator",
+ "module": "Settlement",
+ "name": "Settlement Advice",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
