@@ -22,14 +22,14 @@ def tagging_payment_invoice_reference(payment_entry, invoice_no, allocated_amoun
     payment_entry.append('references', reference_item)
     return payment_entry
 
-def payment_entry_doc_creation(invoice_no, customer_name, claim_amount, bank_account, utr_number, date):
+def payment_entry_doc_creation(invoice_no, customer_name, settlement_amount, bank_account, utr_number, date):
     _payment_entry = frappe.new_doc('Payment Entry')
     _payment_entry.mode_of_payment = 'Bank Draft'
     _payment_entry.party_type = 'Customer'
     _payment_entry.party = customer_name
     _payment_entry.paid_from = 'Debtors - A'
     _payment_entry.paid_to = bank_account
-    _payment_entry.paid_amount = claim_amount
+    _payment_entry.paid_amount = settlement_amount
     _payment_entry.reference_no = utr_number
     _payment_entry.date = date
     _payment_entry.save()
@@ -39,7 +39,7 @@ def payment_entry_doc_creation(invoice_no, customer_name, claim_amount, bank_acc
         payment_entry.submit()
 
 def main_process():
-    bank_transactions = get_bank_transactions('reconciled') #1
+    bank_transactions = get_bank_transactions('reconciled') 
 
     for transaction in bank_transactions:
         corresponding_settlemet_advices  = frappe.db.get_list('Settlement Advice',filter={'utr_number':transaction.reference_number,'status':['!=','Closed']},fields='*')
