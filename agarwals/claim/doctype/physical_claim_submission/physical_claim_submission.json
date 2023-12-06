@@ -16,8 +16,7 @@
   {
    "fieldname": "submission_date",
    "fieldtype": "Datetime",
-   "label": "Submission Date",
-   "read_only": 1
+   "label": "Submission Date"
   },
   {
    "fieldname": "tpa",
@@ -54,7 +53,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-12-05 18:18:57.946457",
+ "modified": "2023-12-06 13:26:26.228250",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "Physical Claim Submission",

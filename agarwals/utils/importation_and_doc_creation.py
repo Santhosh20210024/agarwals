@@ -3,6 +3,7 @@ import json
 import frappe
 @frappe.whitelist()
 def import_bank_statement(bank_account,bank,attached_file):
+    #For Auto Importing Bank statement
     try:
         company = frappe.defaults.get_user_default('Company')
         bank_import = frappe.new_doc('Bank Statement Import')
@@ -18,10 +19,8 @@ def import_bank_statement(bank_account,bank,attached_file):
         return e
 
 @frappe.whitelist()
-def import_job():
-    doctype = "Debtors Report"
-    import_type = "Insert New Records"
-    file_url = "/private/files/demo_debtor2.xlsx"
+def import_job(doctype,import_type,file_url):
+    #For Auto Importing DocType
     data_import_mapping_doc = frappe.get_doc("Data Import Mapping",doctype)
     template = data_import_mapping_doc.template
     data_import_doc = frappe.new_doc("Data Import")
@@ -37,6 +36,7 @@ def import_job():
 
 @frappe.whitelist()
 def create_sales_invoice(sales_invoice_field_and_value):
+    #For creating Sales Invoice before saving debtors report
     sales_invoice_existing = True if len(
         frappe.get_list("Sales Invoice", filters={'name': sales_invoice_field_and_value['name']})) != 0 else False
     if not sales_invoice_existing:
@@ -55,6 +55,7 @@ def create_sales_invoice(sales_invoice_field_and_value):
 
 @frappe.whitelist()
 def create_physical_claim_submission(bill_no_array):
+    #For Creating Physical Claim Submission using Bulk Select and create from debtore report
     try:
         physical_claim_submission = frappe.new_doc("Physical Claim Submission")
         print(bill_no_array)
