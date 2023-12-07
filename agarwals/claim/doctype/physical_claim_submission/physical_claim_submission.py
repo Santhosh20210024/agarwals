@@ -10,7 +10,7 @@ class PhysicalClaimSubmission(Document):
 		#For Updating submission date in Debtors report
 		bill_no_array = self.bill_list
 		for bill_no in bill_no_array:
-			debtors_report = frappe.get_doc('Debtors Report',bill_no)
+			debtors_report = frappe.get_doc('Bill',bill_no)
 			debtors_report.set('submission_date',self.submission_date)
 			debtors_report.save()
 

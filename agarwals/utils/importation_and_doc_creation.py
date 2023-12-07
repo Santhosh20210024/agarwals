@@ -55,7 +55,7 @@ def create_sales_invoice(sales_invoice_field_and_value):
 
 @frappe.whitelist()
 def create_physical_claim_submission(bill_no_array):
-    #For Creating Physical Claim Submission using Bulk Select and create from debtore report
+    #For Creating Physical Claim Submission using Bulk Select and create from debtors report
     try:
         physical_claim_submission = frappe.new_doc("Physical Claim Submission")
         print(bill_no_array)

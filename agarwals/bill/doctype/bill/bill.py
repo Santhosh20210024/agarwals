@@ -6,7 +6,7 @@ from frappe.model.document import Document
 from agarwals.utils.importation_and_doc_creation import create_sales_invoice
 
 
-class DebtorsReport(Document):
+class Bill(Document):
 	def before_save(self):
 		#Sales Invoice creation before saving the debtors
 		if self.region == "Agarwals - A":
@@ -23,4 +23,5 @@ class DebtorsReport(Document):
 				return "Success"
 			else:
 				return creation_status
+
 

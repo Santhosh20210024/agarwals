@@ -13,13 +13,13 @@
    "fieldname": "bill_no",
    "fieldtype": "Link",
    "label": "Bill No",
-   "options": "Debtors Report"
+   "options": "Bill"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-11-30 12:37:19.629200",
+ "modified": "2023-12-06 14:26:56.619886",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "Claim Submission Bill",

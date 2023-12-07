@@ -242,7 +242,7 @@
  "modified": "2023-11-30 15:42:35.292837",
  "modified_by": "Administrator",
  "module": "Bill",
- "name": "Debtors Report",
+ "name": "Bill",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
