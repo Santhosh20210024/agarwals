@@ -11,6 +11,6 @@ def loading():
 		import_bank_statement(bank = bank,bank_account = bank_account,attached_file= transformed_file_url)
 
 		file_doc = frappe.get_doc("File Upload",every_file["name"])
-		file_doc.status = "Loaded"
+		file_doc.status = "Processed"
 		file_doc.save()
 	return "Success"

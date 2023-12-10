@@ -94,6 +94,8 @@ class FileUpload(Document):
 		self.set(str(self.uploaded_field).replace('_upload', '_uploaded'), self.file_name)
 	    
 	def validate(self):
+		if self.status != 'Open':
+			return
 		self.uploaded_field = self.get_uploaded_field()
 		if not self.uploaded_field:
 			frappe.throw('Please upload file')
