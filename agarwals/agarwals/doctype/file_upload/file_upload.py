@@ -6,6 +6,7 @@ import shutil
 from agarwals.utils.doc_meta_util import get_doc_fields
 from agarwals.utils.file_util import construct_file_url
 from agarwals.utils.path_data import HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER
+import re
 
 class FileUpload(Document):
 
@@ -138,3 +139,67 @@ class FileUpload(Document):
 # # 		return "Success"
 # # 	except:
 # # 		return "Error in Transformation"
+@frappe.whitelist()
+def validation():
+    bt_list = frappe.db.get_all("Bank Transaction",{"custom_is_verified":0}, ["description", "reference_number","name"])
+    for every_bt in bt_list:
+        description = every_bt.description
+        ref_no = every_bt.reference_number
+        if "NEFT.*CMS" in description or "CMS" in description:
+            reference_16 = splitup(description, ref_no, 16)
+            if reference_16 == description:
+                return splitup(description, ref_no, 13)			
+        if "NEFT" in description:
+            set_length = splitup(description, ref_no, 16)
+        elif "IMPS" in description:
+            splitup(description,ref_no, 12)
+        elif "RTGS"in description:
+            splitup(description,ref_no, 22)
+        elif "IFT" in description:
+            splitup(description, ref_no, 12)
+        return ref_no
+
+@frappe.whitelist()
+def utrvalidation(token):
+	alphanumeric_pattern = "^[A-Za-z0-9]+$"
+	numeric_pattern = "^[0-9]+$"
+	if (re.match(token, alphanumeric_pattern) or (token , numeric_pattern)):
+		return True
+
+@frappe.whitelist()
+def splitup(description, ref_no, length):
+    if "IMPS" in description:
+        re.sub("IMPS", "", description)
+    if len(description) < length:
+        return description
+    
+    
+    delimiters = "/, ,-,*,:"
+    d_split = delimiters.split(",")
+    for every_split in d_split:
+        initial_split =  description.split(every_split)
+        for every_initial_split in initial_split:
+            token = trim(initial_split[every_initial_split])
+            tlen = len(token)
+            if tlen == length and len(compress(token)) == length:
+                if token == ref_no:
+                    valid = utrvalidation(token)
+                    if valid == "True":
+                        return token
+    return ref_no
+
+@frappe.whitelist()
+def ltrim(s):
+    return re.sub(r'^[ \t\r\n]+', '', s)
+
+@frappe.whitelist()
+def rtrim(s):
+    return re.sub(r'[ \t\r\n]+$', '' , s)
+
+@frappe.whitelist()
+def trim(s):
+	return rtrim(ltrim(s))
+
+@frappe.whitelist()
+def compress(s):
+    return re.sub(r' +', '', s)
