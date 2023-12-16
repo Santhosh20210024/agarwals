@@ -1,59 +1,157 @@
-# bank transations -> settlement advices -> debtors -> payment entry
+# Bank Transations -> All Matched UTRs from settlement advices -> List of claimbook ( Claim ID ) -> List of Bill ( Bill No ) -> Journal Entry 
+
 import frappe
+from datetime import datetime
 
-def get_bank_transactions(skip_status):
-    bank_transactions_list = frappe.db.get_list('Bank Transaction',filters={'status':['!=',skip_status]}, fields="*")
-    return bank_transactions_list
+class BankTransactionWrapper():
+    def __init__(self, bank_transaction):
+        self.bank_transaction = bank_transaction
+        self.available_amount = bank_transaction.deposit
+        self.bank_account = frappe.db.get_value('Bank Account', self.bank_transaction.bank_account, 'account')
 
-# def get_settlement_advices(skip_status):
-#     settlement_advice_list = frappe.db.get_list('Settlement Advice',filters={'status':['!=',skip_status]}, fields=['name','status','claim_no','utr_number','claim_amount','tds_amount'])
-#     return settlement_advice_list
+    def process(self):
+        try:
+            advices  = frappe.db.sql("""
+                SELECT * FROM `tabSettlement Advice` WHERE utr_number = %(utr_number)s
+                """, values = { 'utr_number' : self.bank_transaction.reference_number }, as_dict = 1 )
+            
+            print(advices)
+            if len(advices) < 1:
+                return
+            
+            # entries = []
+            je = frappe.new_doc('Journal Entry')
+            je.accounts = []
 
-def get_debtors_report_details(claim_id):
-    corres_debtors_report = frappe.db.get_list('Debtors Report',filters={'claim_id':claim_id},fields="*")
-    return corres_debtors_report
+            for advice in advices:
+                if not (advice.claim_id or advice.bill_no):
+                    continue
+                if self.available_amount <= 0:
+                    break
+                
+                entry, tds_entry = self.create_payment_entry_item(advice)
+                if entry:
+                    je.append('accounts', entry)
+                    if tds_entry:
+                        je.extend('accounts', tds_entry)
+                else:
+                    continue
 
-def tagging_payment_invoice_reference(payment_entry, invoice_no, allocated_amount):
-    reference_item = {
-            'reference_doctype': 'Sales Invoice',
-            'reference_name': invoice_no,
-            'allocated_amount': allocated_amount
+            allocated_amount = self.bank_transaction.deposit - self.available_amount
+            asset_entry = {'account': self.bank_account, 'debit_in_account_currency': allocated_amount }
+            
+            je.append('accounts', asset_entry)
+            je.voucher_type = 'Journal Entry'
+            je.company = frappe.get_value("Global Defaults", None, "default_company")
+            je.posting_date = datetime.now()
+            je.cheque_no = advice['utr_number']
+            je.cheque_date = datetime.now()
+            je.submit()
+            frappe.db.commit()
+
+        except Exception as e:
+            print("Error:", e)
+
+    def get_claim(self, claim_id):
+        claims = frappe.db.sql("""
+        SELECT * FROM `tabClaimBook` WHERE cl_number = %(claim_id)s
+        """,values = { 'claim_id' : claim_id}, as_dict = 1)
+        
+        if len(claims) == 1:
+            return claims[0] #Claim
+        else:            
+            #if more than 1 claim found throw error    
+            pass
+           
+    def get_sales_invoice(self, bill_number):
+        sales_invoices = frappe.db.sql("""
+        SELECT * FROM `tabSales Invoice` WHERE name = %(name)s  
+        """,values = { 'name' : bill_number}, as_dict=1)
+
+        if len(sales_invoices) == 1:
+            return sales_invoices[0]
+        else:
+            frappe.throw("No Sales Invoice Found")
+
+        
+    def create_payment_entry_item(self, advice):
+    
+        if(self.available_amount <= 0):
+            return None
+
+        invoice_number = 0
+
+        if advice.bill_no:
+            invoice_number = advice.bill_no
+        else:
+            claim = self.get_claim(advice.claim_id)
+            if claim:
+                invoice_number = claim.final_bill_number
+        
+        if invoice_number:
+            sales_invoice = self.get_sales_invoice(invoice_number)
+        else:
+            return None
+
+        if self.available_amount >= advice.settlement_amount:
+            if advice.settlement_amount <= sales_invoice.outstanding_amount:
+                allocated_amount = advice.settlement_amount
+            else:
+                # ingore the wrong advice, log it or throw error
+                frappe.throw("Settlement Amount should be less than the Outstanding Amount for " + str(invoice_number))
+                pass
+        else:
+            allocated_amount = self.available_amount
+
+        self.available_amount = self.available_amount - allocated_amount
+        
+        entry = {
+            'account': 'Debtors - A',
+            'party_type': 'Customer',
+            'party': sales_invoice['customer'],
+            'credit_in_account_currency': allocated_amount,
+            'reference_type': 'Sales Invoice',
+            'reference_name': sales_invoice.name,
+            'reference_due_date': sales_invoice.posting_date
         }
-    payment_entry.append('references', reference_item)
-    return payment_entry
 
-def payment_entry_doc_creation(invoice_no, customer_name, settlement_amount, bank_account, utr_number, date):
-    _payment_entry = frappe.new_doc('Payment Entry')
-    _payment_entry.mode_of_payment = 'Bank Draft'
-    _payment_entry.party_type = 'Customer'
-    _payment_entry.party = customer_name
-    _payment_entry.paid_from = 'Debtors - A'
-    _payment_entry.paid_to = bank_account
-    _payment_entry.paid_amount = settlement_amount
-    _payment_entry.reference_no = utr_number
-    _payment_entry.date = date
-    _payment_entry.save()
+        if advice.tds_amount:
+            if advice.tds_amount > sales_invoice.outstanding_amount:
+                return
+            
+            tds_entry = [
+                {
+                'account': 'Debtors - A',
+                'party_type': 'Customer',
+                'party': sales_invoice['customer'],
+                'credit_in_account_currency': advice.tds_amount,
+                'reference_type': 'Sales Invoice',
+                'reference_name': sales_invoice.name,
+                'reference_due_date': sales_invoice.posting_date
+              },
+              {
+                'account': 'TDS Credits - A',
+                'party_type': 'Customer',
+                'party': sales_invoice['customer'],
+                'deposit_in_account_currency': advice.tds_amount,
+                'reference_type': 'Sales Invoice',
+                'reference_name': sales_invoice.name,
+                'reference_due_date': sales_invoice.posting_date
+            }
+            ]
 
-    if _payment_entry.name:
-        payment_entry = tagging_payment_invoice_reference(_payment_entry, invoice_no, claim_amount)
-        payment_entry.submit()
-
-def main_process():
-    bank_transactions = get_bank_transactions('reconciled') 
-
-    for transaction in bank_transactions:
-        corresponding_settlemet_advices  = frappe.db.get_list('Settlement Advice',filter={'utr_number':transaction.reference_number,'status':['!=','Closed']},fields='*')
-        for settlement_item in corresponding_settlemet_advices:
-                debtors_report_item = get_debtors_report_details(settlement_item['claim_no'])
-                if debtors_report_item.customer_name:
-                    payment_entry_doc_creation(debtors_report_item.name, debtors_report_item.customer_name, settlement_item['settlement_amount'], transaction.bank_account, transaction.reference_number, transaction.date)
-                    
-                    # Validate if the transaction amount matches the claim amount
-                    if transaction.amount >= settlement_item['claim_amount']:
-                        settlement_doc = frappe.get_doc('Settlement Advice', settlement_item['name'])
-                        settlement_doc.status = "Closed"
-                        settlement_doc.save()
+        return entry, tds_entry
+    
+        
+def get_unreconciled_bank_transactions():
+    return frappe.db.sql("""
+    SELECT * FROM `tabBank Transaction` WHERE status in ('unreconciled', 'pending')""", as_dict=1)
 
 @frappe.whitelist()
-def matching_process():
-    main_process()
+def create_payment_entries():
+    bank_transactions = get_unreconciled_bank_transactions()
+    for bank_transaction in bank_transactions:
+        print(bank_transaction.deposit)
+        if bank_transaction.deposit and bank_transaction.deposit > 0:
+            t = BankTransactionWrapper(bank_transaction)
+            t.process()
