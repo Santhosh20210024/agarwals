@@ -119,7 +119,7 @@ class BankTransactionWrapper():
 
         if advice.tds_amount:
             if advice.tds_amount > sales_invoice.outstanding_amount:
-                return
+                return entry, None
             
             tds_entry = [
                 {
@@ -140,8 +140,8 @@ class BankTransactionWrapper():
                 'user_remark': 'tds debits'
             }
             ]
-
-        return entry, tds_entry
+            return entry, tds_entry
+        return entry, None
     
         
 def get_unreconciled_bank_transactions():
