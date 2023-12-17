@@ -50,10 +50,10 @@ class BankTransactionWrapper():
             frappe.db.commit()
 
         except Exception as e:
-            n_doc = frappe.new_doc('toDo')
-            n_doc.description = str(e)
-            n_doc.save()
-            # print("Error:", e)
+            new_doc = frappe.new_doc('ToDo')
+            new_doc.description = str(e)
+            new_doc.save()
+            print("Error:", e)
 
     def get_claim(self, claim_id):
         claims = frappe.db.sql("""
