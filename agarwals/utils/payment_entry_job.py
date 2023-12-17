@@ -15,7 +15,7 @@ class BankTransactionWrapper():
                 SELECT * FROM `tabSettlement Advice` WHERE utr_number = %(utr_number)s
                 """, values = { 'utr_number' : self.bank_transaction.reference_number }, as_dict = 1 )
             
-            print(advices)
+            # print(advices)
             if len(advices) < 1:
                 return
             
@@ -50,7 +50,10 @@ class BankTransactionWrapper():
             frappe.db.commit()
 
         except Exception as e:
-            print("Error:", e)
+            n_doc = frappe.new_doc('toDo')
+            n_doc.description = str(e)
+            n_doc.save()
+            # print("Error:", e)
 
     def get_claim(self, claim_id):
         claims = frappe.db.sql("""
@@ -60,8 +63,7 @@ class BankTransactionWrapper():
         if len(claims) == 1:
             return claims[0] #Claim
         else:            
-            #if more than 1 claim found throw error    
-            pass
+            frappe.throw("More than one claim")
            
     def get_sales_invoice(self, bill_number):
         sales_invoices = frappe.db.sql("""
@@ -99,7 +101,7 @@ class BankTransactionWrapper():
             else:
                 # ingore the wrong advice, log it or throw error
                 frappe.throw("Settlement Amount should be less than the Outstanding Amount for " + str(invoice_number))
-                pass
+                
         else:
             allocated_amount = self.available_amount
 
@@ -136,9 +138,6 @@ class BankTransactionWrapper():
                 'party': sales_invoice['customer'],
                 'debit_in_account_currency': advice.tds_amount,
                 'user_remark': 'tds debits'
-                # 'reference_type': 'Sales Invoice',
-                # 'reference_name': sales_invoice.name,
-                # 'reference_due_date': sales_invoice.posting_date,
             }
             ]
 
@@ -153,7 +152,7 @@ def get_unreconciled_bank_transactions():
 def create_payment_entries():
     bank_transactions = get_unreconciled_bank_transactions()
     for bank_transaction in bank_transactions:
-        print(bank_transaction.deposit)
+        # print(bank_transaction.deposit)
         if bank_transaction.deposit and bank_transaction.deposit > 0:
             t = BankTransactionWrapper(bank_transaction)
             t.process()
