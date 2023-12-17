@@ -127,16 +127,18 @@ class BankTransactionWrapper():
                 'credit_in_account_currency': advice.tds_amount,
                 'reference_type': 'Sales Invoice',
                 'reference_name': sales_invoice.name,
-                'reference_due_date': sales_invoice.posting_date
+                'reference_due_date': sales_invoice.posting_date,
+                'user_remark': 'tds credits'
               },
               {
                 'account': 'TDS Credits - A',
                 'party_type': 'Customer',
                 'party': sales_invoice['customer'],
-                'deposit_in_account_currency': advice.tds_amount,
-                'reference_type': 'Sales Invoice',
-                'reference_name': sales_invoice.name,
-                'reference_due_date': sales_invoice.posting_date
+                'debit_in_account_currency': advice.tds_amount,
+                'user_remark': 'tds debits'
+                # 'reference_type': 'Sales Invoice',
+                # 'reference_name': sales_invoice.name,
+                # 'reference_due_date': sales_invoice.posting_date,
             }
             ]
 
