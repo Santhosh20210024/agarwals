@@ -1,8 +1,11 @@
-// Copyright (c) 2023, Agarwals and contributors
-// For license information, please see license.txt
-
- frappe.ui.form.on("Physical Claim Submission", {
- 	refresh(frm) {
-
- 	},
- });
+frappe.ui.form.on('Physical Claim Submission', {
+    refresh: function(frm) {
+        frm.fields_dict['bill_list'].get_query = function(doc, cdt, cdn) {
+            return {
+                filters: {
+                    verified: 1
+                }
+            };
+        };
+    }
+});

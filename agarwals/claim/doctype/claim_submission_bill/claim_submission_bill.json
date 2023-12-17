@@ -13,7 +13,7 @@
    "fieldname": "bill_no",
    "fieldtype": "Link",
    "label": "Bill No",
-   "options": "Bill"
+   "options": "Bill",
   }
  ],
  "index_web_pages_for_search": 1,
