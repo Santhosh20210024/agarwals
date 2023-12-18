@@ -19,7 +19,6 @@ class BankTransactionWrapper():
             if len(advices) < 1:
                 return
             
-            # entries = []
             je = frappe.new_doc('Journal Entry')
             je.accounts = []
 
@@ -43,9 +42,9 @@ class BankTransactionWrapper():
             je.append('accounts', asset_entry)
             je.voucher_type = 'Journal Entry'
             je.company = frappe.get_value("Global Defaults", None, "default_company")
-            je.posting_date = datetime.now()
+            je.posting_date = self.bank_transaction.date
+            je.cheque_date = self.bank_transaction.date
             je.cheque_no = advice['utr_number']
-            je.cheque_date = datetime.now()
             je.submit()
             frappe.db.commit()
 
@@ -61,7 +60,7 @@ class BankTransactionWrapper():
         """,values = { 'claim_id' : claim_id}, as_dict = 1)
         
         if len(claims) == 1:
-            return claims[0] #Claim
+            return claims[0]
         else:            
             frappe.throw("More than one claim")
            
@@ -73,7 +72,7 @@ class BankTransactionWrapper():
         if len(sales_invoices) == 1:
             return sales_invoices[0]
         else:
-            frappe.throw("No Sales Invoice Found")
+            frappe.throw("No Sales Invoice Found: " + str(bill_number))
 
         
     def create_payment_entry_item(self, advice):
@@ -99,7 +98,6 @@ class BankTransactionWrapper():
             if advice.settlement_amount <= sales_invoice.outstanding_amount:
                 allocated_amount = advice.settlement_amount
             else:
-                # ingore the wrong advice, log it or throw error
                 frappe.throw("Settlement Amount should be less than the Outstanding Amount for " + str(invoice_number))
                 
         else:
@@ -114,7 +112,8 @@ class BankTransactionWrapper():
             'credit_in_account_currency': allocated_amount,
             'reference_type': 'Sales Invoice',
             'reference_name': sales_invoice.name,
-            'reference_due_date': sales_invoice.posting_date
+            'reference_due_date': sales_invoice.posting_date,
+            'region': sales_invoice.region
         }
 
         if advice.tds_amount:
@@ -130,13 +129,15 @@ class BankTransactionWrapper():
                 'reference_type': 'Sales Invoice',
                 'reference_name': sales_invoice.name,
                 'reference_due_date': sales_invoice.posting_date,
-                'user_remark': 'tds credits'
+                'user_remark': 'tds credits',
+                'region': sales_invoice.region
               },
               {
                 'account': 'TDS Credits - A',
                 'party_type': 'Customer',
                 'party': sales_invoice['customer'],
                 'debit_in_account_currency': advice.tds_amount,
+                'region': sales_invoice.region
                 'user_remark': 'tds debits'
             }
             ]
