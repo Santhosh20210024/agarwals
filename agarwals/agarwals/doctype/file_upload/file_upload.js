@@ -29,4 +29,7 @@ var set_css = function (frm){
     document.querySelectorAll("[data-fieldname='bank_statement_upload']")[1].style.backgroundColor ="#2490EF";
     document.querySelectorAll("[data-fieldname='bank_statement_upload']")[1].style.color ="white";
 
+    //
+    document.querySelectorAll("[data-fieldname='physical_claim_upload']")[1].style.backgroundColor ="#2490EF";
+    document.querySelectorAll("[data-fieldname='physical_claim_upload']")[1].style.color ="white";
 }

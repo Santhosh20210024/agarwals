@@ -118,7 +118,7 @@ class BankTransactionWrapper():
 
         if advice.tds_amount:
             if advice.tds_amount > sales_invoice.outstanding_amount:
-                return entry,None
+                return entry, None
             
             tds_entry = [
                 {
@@ -137,8 +137,8 @@ class BankTransactionWrapper():
                 'party_type': 'Customer',
                 'party': sales_invoice['customer'],
                 'debit_in_account_currency': advice.tds_amount,
-                'user_remark': 'tds debits',
                 'region': sales_invoice.region
+                'user_remark': 'tds debits'
             }
             ]
             return entry, tds_entry
