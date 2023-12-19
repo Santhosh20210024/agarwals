@@ -13,6 +13,7 @@
   "payer_type",
   "bank_account",
   "upload",
+  "upload_url",
   "status"
  ],
  "fields": [
@@ -54,12 +55,18 @@
    "fieldtype": "Select",
    "hidden": 1,
    "label": "Status",
-   "options": "\nOpen\nIn Process\nProcessed\nError"
+   "options": "Open\nIn Process\nProcessed\nError"
+  },
+  {
+   "depends_on": "eval:doc.upload",
+   "fieldname": "upload_url",
+   "fieldtype": "Data",
+   "label": "Upload"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-19 20:40:10.042511",
+ "modified": "2023-12-20 00:14:45.360149",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File uploader",

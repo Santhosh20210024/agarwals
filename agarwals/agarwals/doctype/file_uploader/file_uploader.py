@@ -9,10 +9,11 @@ from agarwals.utils.path_data import HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, 
 import re
 
 class Fileuploader(Document):
-
+	# def __init__(self):
+	# 	self.fil
 	def get_file_doc_data(self):
-		file_name = str(self.get(self.upload)).split("/")[-1]
-		file_doc_id = frappe.get_list("File", filters={'file_url':self.get(self.upload)}, pluck='name')[0]
+		file_name = self.upload.split("/")[-1]
+		file_doc_id = frappe.get_list("File", filters={'file_url':self.upload}, pluck='name')[0]
 		return file_name, file_doc_id
 	
 	def get_uploaded_field(self):
@@ -84,26 +85,31 @@ class Fileuploader(Document):
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
 		file_doc.file_url = _file_url
-		self.set(self.upload, _file_url)
+		
+		self.set(self.upload_url, _file_url)
 
 		self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),construct_file_url(SITE_PATH, _file_url.lstrip('/') ))
 		file_doc.save()
 
-	def update_list_view(self):
-		self.type = self.upload.replace("_upload", "")
-		self.file_name = str(self.get(self.upload)).split("/")[-1]
-		self.set(str(self.upload).replace('_upload', '_uploaded'), self.file_name)
+	# def update_list_view(self):
+	# 	self.type = self.upload.replace("_upload", "")
+	# 	self.file_name = str(self.get(self.upload)).split("/")[-1]
+	# 	self.set(str(self.upload).replace('_upload', '_uploaded'), self.file_name)
 	    
 	def validate(self):
-		print("-----------",type(self.upload))
+		# print("-----------",type(self.upload))
+		
 		if self.status != 'Open':
 			return
-		if self.upload == None:
+		
+		# print(len(self.upload))
+
+		if self.upload == None or self.upload == '':
 			frappe.throw('Please upload file')
 
 		self.validate_file()
 		self.process_file_attachment()
-		self.update_list_view()
+		# self.update_list_view()
 		
 	def on_trash(self):
-		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0] , self.file_name))
+		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0] , self.upload.split("/")[-1]))
