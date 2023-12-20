@@ -59,8 +59,9 @@ class Fileuploader(Document):
 
 	def validate_file(self):
 		file_name, file_doc_id = self.get_file_doc_data()
+		file_type = frappe.get_value('File',file_doc_id,'file_type')
 		if file_doc_id:
-			if file_doc_id != 'Home' and file_name.split(".")[-1].lower() != 'xlsx':
+			if file_type != 'XLSX' and file_type != 'PDF':
 				frappe.delete_doc("File", file_doc_id)
 				frappe.db.commit()
 				
@@ -82,7 +83,6 @@ class Fileuploader(Document):
      
 		file_name,file_doc_id = self.get_file_doc_data()
 		_file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
-
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
 		file_doc.file_url = _file_url
@@ -90,7 +90,8 @@ class Fileuploader(Document):
 		self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),construct_file_url(SITE_PATH, _file_url.lstrip('/') ))
 		print("-------------------------  file url -----------------------------------",_file_url)
 		file_doc.save()
-		self.set("upload_url", _file_url)
+		self.set("upload",_file_url)
+		#self.set("upload_url", _file_url)
 		
 		
 
