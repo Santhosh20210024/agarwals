@@ -79,17 +79,20 @@ class Fileuploader(Document):
 			return
 
 	def process_file_attachment(self):
+     
 		file_name,file_doc_id = self.get_file_doc_data()
 		_file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
 
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
 		file_doc.file_url = _file_url
-		
-		self.set(self.upload_url, _file_url)
-
+		print("-------------------------  file url 1 -----------------------------------",_file_url)
 		self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),construct_file_url(SITE_PATH, _file_url.lstrip('/') ))
+		print("-------------------------  file url -----------------------------------",_file_url)
 		file_doc.save()
+		self.set("upload_url", _file_url)
+		
+		
 
 	# def update_list_view(self):
 	# 	self.type = self.upload.replace("_upload", "")

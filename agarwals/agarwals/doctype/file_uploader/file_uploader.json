@@ -3,7 +3,7 @@
  "allow_rename": 1,
  "autoname": "format:AGR-FILE-{######} ",
  "creation": "2023-12-19 19:02:36.060738",
- "default_view": "List",
+ "default_view": "Report",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -13,8 +13,8 @@
   "payer_type",
   "bank_account",
   "upload",
-  "upload_url",
-  "status"
+  "status",
+  "upload_url"
  ],
  "fields": [
   {
@@ -31,7 +31,7 @@
    "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement"
   },
   {
-   "depends_on": "eval:(doc.select_document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.select_document_type=='Bank Statement' && doc.bank_account != null) || (doc.select_document_type=='Claim Book') || (doc.select_document_type=='Debtors Report')",
+   "depends_on": "eval:(doc.select_document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.select_document_type=='Bank Statement' && doc.bank_account != null) || (doc.select_document_type=='Claim Book') || (doc.select_document_type=='Debtors Report') || doc.upload_url == null",
    "fieldname": "upload",
    "fieldtype": "Attach",
    "label": "Upload"
@@ -58,15 +58,16 @@
    "options": "Open\nIn Process\nProcessed\nError"
   },
   {
-   "depends_on": "eval:doc.upload",
    "fieldname": "upload_url",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Upload"
   }
  ],
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-20 00:14:45.360149",
+ "modified": "2023-12-20 10:35:58.189813",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File uploader",
