@@ -1,347 +1,107 @@
 {
-    "actions": [],
-    "allow_copy": 1,
-    "allow_rename": 1,
-    "autoname": "format:AGR-FILE-{######} ",
-    "creation": "2023-11-14 16:49:50.663474",
-    "default_view": "Report",
-    "doctype": "DocType",
-    "editable_grid": 1,
-    "engine": "InnoDB",
-    "field_order": [
-     "debtor_report_tab",
-     "debtor_report_title",
-     "debtor_report_date",
-     "debtor_report_upload",
-     "debtor_report_uploaded",
-     "debtor_report_remarks",
-     "claimbook_tab",
-     "claimbook_title",
-     "claimbook_date",
-     "claimbook_upload",
-     "claimbook_uploaded",
-     "claimbook_remarks",
-     "settlement_advice_tab",
-     "settlement_advice_title",
-     "settlement_advice_date",
-     "payer_type",
-     "settlement_advice_upload",
-     "settlement_advice_uploaded",
-     "settlement_advice_remarks",
-     "bank_statement_tab",
-     "bank_statement_title",
-     "bank_statement_date",
-     "bank_account",
-     "bank",
-     "transformed_file_url",
-     "bank_statement_upload",
-     "bank_statement_uploaded",
-     "bank_statement_remarks",
-     "type_tab",
-     "status",
-     "type",
-     "file_name",
-     "date",
-     "physical_claim_submission_tab",
-     "physical_claim_submission_title",
-     "submission_date",
-     "tpa",
-     "physical_claim_upload",
-     "physical_claim_uploaded",
-     "physical_claim_remarks"
-    ],
-    "fields": [
-     {
-      "fieldname": "bank_account",
-      "fieldtype": "Link",
-      "label": "Bank Account",
-      "options": "Bank Account"
-     },
-     {
-      "default": "Open",
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "Status",
-      "options": "\nOpen\nIn Process\nProcessed\nError"
-     },
-     {
-      "fieldname": "transformed_file_url",
-      "fieldtype": "Data",
-      "hidden": 1,
-      "label": "Transformed File Url"
-     },
-     {
-      "fieldname": "bank",
-      "fieldtype": "Data",
-      "hidden": 1,
-      "label": "Bank"
-     },
-     {
-      "bold": 1,
-      "depends_on": "eval: !doc.claimbook_upload && !doc.settlement_advice_upload && !doc.bank_statement_upload && !doc.physical_claim_upload\r\n",
-      "fieldname": "debtor_report_tab",
-      "fieldtype": "Tab Break",
-      "label": "Debtors Report"
-     },
-     {
-      "fieldname": "claimbook_remarks",
-      "fieldtype": "Small Text",
-      "label": "Remarks"
-     },
-     {
-      "fieldname": "settlement_advice_remarks",
-      "fieldtype": "Small Text",
-      "label": "Remarks"
-     },
-     {
-      "depends_on": "eval: !doc.claimbook_upload && !doc.settlement_advice_upload && !doc.debtor_report_upload && !doc.physical_claim_upload",
-      "fieldname": "bank_statement_tab",
-      "fieldtype": "Tab Break",
-      "label": "Bank Statement"
-     },
-     {
-      "bold": 1,
-      "default": "ClaimBook",
-      "depends_on": "eval: !doc.debtor_report_upload && !doc.settlement_advice_upload && !doc.bank_statement_upload && !doc.physical_claim_upload",
-      "fieldname": "claimbook_tab",
-      "fieldtype": "Tab Break",
-      "label": "ClaimBook"
-     },
-     {
-      "fieldname": "type_tab",
-      "fieldtype": "Tab Break",
-      "hidden": 1,
-      "label": "Type"
-     },
-     {
-      "fieldname": "type",
-      "fieldtype": "Data",
-      "label": "Type"
-     },
-     {
-      "default": "now",
-      "fieldname": "date",
-      "fieldtype": "Date",
-      "label": "Date"
-     },
-     {
-      "depends_on": "eval:doc.debtor_report_uploaded == null",
-      "fetch_from": ".",
-      "fieldname": "debtor_report_upload",
-      "fieldtype": "Attach",
-      "label": "Upload"
-     },
-     {
-      "depends_on": "eval:doc.claimbook_uploaded == null",
-      "fieldname": "claimbook_upload",
-      "fieldtype": "Attach",
-      "label": "Upload"
-     },
-     {
-      "depends_on": "eval:doc.payer_type && doc.settlement_advice_uploaded == null",
-      "fieldname": "settlement_advice_upload",
-      "fieldtype": "Attach",
-      "label": "Upload"
-     },
-     {
-      "depends_on": "eval:doc.bank_account && doc.bank_statement_uploaded == null",
-      "fieldname": "bank_statement_upload",
-      "fieldtype": "Attach",
-      "label": "Upload"
-     },
-     {
-      "bold": 1,
-      "depends_on": "eval: !doc.claimbook_upload && !doc.debtor_report_upload && !doc.bank_statement_upload && !doc.physical_claim_upload",
-      "fieldname": "settlement_advice_tab",
-      "fieldtype": "Tab Break",
-      "label": "Settlement Advice"
-     },
-     {
-      "fieldname": "debtor_report_title",
-      "fieldtype": "HTML",
-      "label": "Debtors Report",
-      "options": "<p style=\"font-size: 15px;\">Debtors Report</p>"
-     },
-     {
-      "fieldname": "debtor_report_remarks",
-      "fieldtype": "Small Text",
-      "label": "Remarks"
-     },
-     {
-      "bold": 1,
-      "fieldname": "claimbook_title",
-      "fieldtype": "HTML",
-      "label": "ClaimBook",
-      "options": "<p style=\"font-size: 15px;\">ClaimBook</p>"
-     },
-     {
-      "fieldname": "settlement_advice_title",
-      "fieldtype": "HTML",
-      "label": "Settlement Advice",
-      "options": "<p style=\"font-size: 15px;\">Settlement Advice</p>"
-     },
-     {
-      "fieldname": "bank_statement_title",
-      "fieldtype": "HTML",
-      "label": "Bank Statement",
-      "options": "<p style=\"font-size: 15px;\">Bank Statement</p>"
-     },
-     {
-      "fieldname": "bank_statement_remarks",
-      "fieldtype": "Small Text",
-      "label": "Remarks"
-     },
-     {
-      "default": "now",
-      "fieldname": "debtor_report_date",
-      "fieldtype": "Date",
-      "label": "Date",
-      "read_only": 1
-     },
-     {
-      "default": "now",
-      "fieldname": "claimbook_date",
-      "fieldtype": "Date",
-      "label": "Date",
-      "read_only": 1
-     },
-     {
-      "default": "now",
-      "fieldname": "settlement_advice_date",
-      "fieldtype": "Date",
-      "label": "Date",
-      "read_only": 1
-     },
-     {
-      "default": "now",
-      "fieldname": "bank_statement_date",
-      "fieldtype": "Date",
-      "label": "Date",
-      "read_only": 1
-     },
-     {
-      "fieldname": "file_name",
-      "fieldtype": "Data",
-      "label": "File name"
-     },
-     {
-      "depends_on": "eval:doc.debtor_report_upload != null",
-      "fieldname": "debtor_report_uploaded",
-      "fieldtype": "Data",
-      "label": "File",
-      "read_only": 1
-     },
-     {
-      "depends_on": "eval:doc.claimbook_upload != null",
-      "fieldname": "claimbook_uploaded",
-      "fieldtype": "Data",
-      "label": "File",
-      "read_only": 1
-     },
-     {
-      "depends_on": "eval:doc.settlement_advice_upload != null",
-      "fieldname": "settlement_advice_uploaded",
-      "fieldtype": "Data",
-      "label": "File",
-      "read_only": 1
-     },
-     {
-      "depends_on": "eval:doc.bank_statement_upload != null",
-      "fieldname": "bank_statement_uploaded",
-      "fieldtype": "Data",
-      "label": "File",
-      "read_only": 1
-     },
-     {
-      "fieldname": "payer_type",
-      "fieldtype": "Link",
-      "label": "Payer",
-      "options": "Customer"
-     },
-     {
-      "depends_on": "eval: !doc.claimbook_upload && !doc.settlement_advice_upload && !doc.debtor_report_upload && !doc.bank_statement_upload",
-      "fieldname": "physical_claim_submission_tab",
-      "fieldtype": "Tab Break",
-      "label": "Physical Claim Submission"
-     },
-     {
-      "fieldname": "submission_date",
-      "fieldtype": "Date",
-      "label": "Submission Date"
-     },
-     {
-      "fieldname": "tpa",
-      "fieldtype": "Link",
-      "label": "Payer",
-      "options": "Customer"
-     },
-     {
-      "depends_on": "eval:doc.submission_date && doc.tpa && doc.physical_claim_uploaded == null",
-      "fieldname": "physical_claim_upload",
-      "fieldtype": "Attach",
-      "label": "Upload"
-     },
-     {
-      "fieldname": "physical_claim_submission_title",
-      "fieldtype": "HTML",
-      "label": "Physical Claim Submission",
-      "options": "<p style=\"font-size: 15px;\">Physical Claim Submission</p>"
-     },
-     {
-      "depends_on": "eval:doc.physical_claim_upload != null",
-      "fieldname": "physical_claim_uploaded",
-      "fieldtype": "Data",
-      "label": "File",
-      "read_only": 1
-     },
-     {
-      "fieldname": "physical_claim_remarks",
-      "fieldtype": "Small Text",
-      "label": "Remarks"
-     }
-    ],
-    "force_re_route_to_default_view": 1,
-    "hide_toolbar": 1,
-    "index_web_pages_for_search": 1,
-    "links": [],
-    "modified": "2023-12-11 04:05:51.912478",
-    "modified_by": "Administrator",
-    "module": "Agarwals",
-    "name": "File Upload",
-    "naming_rule": "Expression",
-    "owner": "Administrator",
-    "permissions": [
-     {
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "System Manager",
-      "share": 1,
-      "write": 1
-     }
-    ],
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": [
-     {
-      "color": "Yellow",
-      "title": "In Process"
-     },
-     {
-      "color": "Red",
-      "title": "Error"
-     },
-     {
-      "color": "Blue",
-      "title": "Open"
-     },
-     {
-      "color": "Green",
-      "title": "Processed"
-     }
-    ]
-   }
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:AGR-FILE-{######} ",
+ "creation": "2023-12-19 19:02:36.060738",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "select_document_type",
+  "payer_type",
+  "bank_account",
+  "upload",
+  "status",
+  "upload_url",
+  "document_reference"
+ ],
+ "fields": [
+  {
+   "bold": 1,
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "select_document_type",
+   "fieldtype": "Select",
+   "label": "Select Document Type",
+   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement",
+   "read_only_depends_on": "eval:doc.upload_url !=null"
+  },
+  {
+   "depends_on": "eval:(doc.select_document_type=='Settlement Advice' && doc.payer_type !=null && doc.upload_url == null) || (doc.select_document_type=='Bank Statement' && doc.bank_account != null && doc.upload_url == null) || (doc.select_document_type=='Claim Book' && doc.upload_url == null) || (doc.select_document_type=='Debtors Report' && doc.upload_url == null)",
+   "fieldname": "upload",
+   "fieldtype": "Attach",
+   "label": "Upload"
+  },
+  {
+   "depends_on": "eval:doc.select_document_type=='Settlement Advice'",
+   "fieldname": "payer_type",
+   "fieldtype": "Link",
+   "label": "Payer",
+   "options": "Customer",
+   "read_only_depends_on": "eval:doc.upload_url != null"
+  },
+  {
+   "depends_on": "eval:doc.select_document_type=='Bank Statement'",
+   "fieldname": "bank_account",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Bank Account",
+   "read_only_depends_on": "eval:doc.upload_url != null"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Status",
+   "options": "Open\nIn Process\nProcessed\nError"
+  },
+  {
+   "bold": 1,
+   "depends_on": "eval:doc.upload != null",
+   "fieldname": "upload_url",
+   "fieldtype": "Data",
+   "label": "Upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "document_reference",
+   "fieldtype": "Table",
+   "label": "Document Reference",
+   "options": "Reference Table"
+  }
+ ],
+ "hide_toolbar": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-12-20 20:57:00.273673",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "File upload",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
