@@ -9,6 +9,7 @@
  "field_order": [
   "company",
   "region",
+  "cost_center",
   "branch",
   "bill_no",
   "bill_date",
@@ -43,7 +44,8 @@
   "column_break_xpfe",
   "submission_date",
   "column_break_ahot",
-  "final_submission_date"
+  "final_submission_date",
+  "invoice"
  ],
  "fields": [
   {
@@ -53,7 +55,6 @@
    "options": "Entity"
   },
   {
-   "fetch_from": "branch.parent_cost_center",
    "fieldname": "region",
    "fieldtype": "Data",
    "label": "Region"
@@ -62,7 +63,7 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
-   "options": "Cost Center"
+   "options": "Branch"
   },
   {
    "fieldname": "bill_no",
@@ -197,6 +198,7 @@
    "label": "Category"
   },
   {
+   "fetch_from": "payer.payer_final_name",
    "fieldname": "tpa",
    "fieldtype": "Data",
    "label": "TPA"
@@ -235,11 +237,29 @@
    "fieldname": "verified",
    "fieldtype": "Check",
    "label": "Verified"
+  },
+  {
+   "fieldname": "invoice",
+   "fieldtype": "Link",
+   "label": "Invoice",
+   "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2023-11-30 15:42:35.292837",
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "Sales Invoice",
+   "link_fieldname": "name"
+  }
+ ],
+ "modified": "2023-12-20 19:57:27.755237",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",

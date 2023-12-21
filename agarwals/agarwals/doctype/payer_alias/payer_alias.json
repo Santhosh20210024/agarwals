@@ -2,28 +2,33 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "field:region",
- "creation": "2023-11-25 16:17:45.428469",
+ "creation": "2023-12-20 02:02:19.313890",
+ "default_view": "List",
  "doctype": "DocType",
+ "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "region"
+  "payer_name",
+  "payer_final_name"
  ],
  "fields": [
   {
-   "fieldname": "region",
+   "fieldname": "payer_name",
    "fieldtype": "Data",
-   "label": "Region",
-   "unique": 1
+   "label": "Payer Name"
+  },
+  {
+   "fieldname": "payer_final_name",
+   "fieldtype": "Data",
+   "label": "Payer Final Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-20 00:58:09.901349",
+ "modified": "2023-12-20 10:03:11.293878",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "Region",
- "naming_rule": "By fieldname",
+ "name": "Payer Alias",
  "owner": "Administrator",
  "permissions": [
   {
