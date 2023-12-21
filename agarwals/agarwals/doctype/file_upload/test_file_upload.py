@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestFileUpload(FrappeTestCase):
+class TestFileupload(FrappeTestCase):
 	pass

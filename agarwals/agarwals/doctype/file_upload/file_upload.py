@@ -8,11 +8,12 @@ from agarwals.utils.file_util import construct_file_url
 from agarwals.utils.path_data import HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER
 import re
 
-class FileUpload(Document):
-
+class Fileupload(Document):
+	# def __init__(self):
+	# 	self.fil
 	def get_file_doc_data(self):
-		file_name = str(self.get(self.uploaded_field)).split("/")[-1]
-		file_doc_id = frappe.get_list("File", filters={'file_url':self.get(self.uploaded_field)}, pluck='name')[0]
+		file_name = self.upload.split("/")[-1]
+		file_doc_id = frappe.get_list("File", filters={'file_url':self.upload}, pluck='name')[0]
 		return file_name, file_doc_id
 	
 	def get_uploaded_field(self):
@@ -43,7 +44,7 @@ class FileUpload(Document):
 				
 				# Delete the files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-				self.set(str(self.uploaded_field), '')
+				self.set(str(self.upload), '')
 				frappe.throw('Duplicate File Error: The file being uploaded already exists. Please check.')
 				return
 		
@@ -58,8 +59,9 @@ class FileUpload(Document):
 
 	def validate_file(self):
 		file_name, file_doc_id = self.get_file_doc_data()
+		file_type = frappe.get_value('File',file_doc_id,'file_type')
 		if file_doc_id:
-			if file_doc_id != 'Home' and file_name.split(".")[-1].lower() != 'xlsx':
+			if file_type != 'XLSX' and file_type != 'PDF':
 				frappe.delete_doc("File", file_doc_id)
 				frappe.db.commit()
 				
@@ -78,128 +80,41 @@ class FileUpload(Document):
 			return
 
 	def process_file_attachment(self):
+     
 		file_name,file_doc_id = self.get_file_doc_data()
 		_file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
-
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
 		file_doc.file_url = _file_url
-		self.set(self.uploaded_field, _file_url)
-
+		print("-------------------------  file url 1 -----------------------------------",_file_url)
 		self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),construct_file_url(SITE_PATH, _file_url.lstrip('/') ))
+		print("-------------------------  file url -----------------------------------",_file_url)
 		file_doc.save()
+		self.set("upload",_file_url)
+		self.set("upload_url",_file_url)
+		#self.set("upload_url", _file_url)
+		
+		
 
-	def update_list_view(self):
-		self.type = self.uploaded_field.replace("_upload", "")
-		self.file_name = str(self.get(self.uploaded_field)).split("/")[-1]
-		self.set(str(self.uploaded_field).replace('_upload', '_uploaded'), self.file_name)
+	# def update_list_view(self):
+	# 	self.type = self.upload.replace("_upload", "")
+	# 	self.file_name = str(self.get(self.upload)).split("/")[-1]
+	# 	self.set(str(self.upload).replace('_upload', '_uploaded'), self.file_name)
 	    
 	def validate(self):
+		# print("-----------",type(self.upload))
+		
 		if self.status != 'Open':
 			return
-		self.uploaded_field = self.get_uploaded_field()
-		if not self.uploaded_field:
+		
+		# print(len(self.upload))
+
+		if self.upload == None or self.upload == '':
 			frappe.throw('Please upload file')
 
 		self.validate_file()
 		self.process_file_attachment()
-		self.update_list_view()
+		# self.update_list_view()
 		
 	def on_trash(self):
-		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0] , self.file_name))
-
-# # # Copy_Files_Operation
-# # def copy_files():
-# # 	try:
-# # 		file_upload_docs = frappe.get_list("File Upload",filters={'status':'Open'},fields=["upload","name"])
-# # 		for every_file in file_upload_docs:
-# # 		# Starting process
-		
-# # 			extract_file_name = frappe.get_list("File",filters={'file_url':every_file["upload"]},pluck="name")[0]
-# # 			extract_file_doc = frappe.get_doc("File",extract_file_name)
-			
-# # 			transformed_file_doc = frappe.copy_doc(extract_file_doc)
-# # 			transformed_file_url = transformed_file_doc.file_url.replace("Extract","Transform")
-# # 			transformed_file_folder = transformed_file_doc.folder.replace("Extract","Transform")
-
-# # 			extract_file_url_local = os.getcwd() + "/agarwals.com" + extract_file_doc.file_url
-# # 			transformed_file_url_local = os.getcwd() + "/agarwals.com" + transformed_file_url
-
-# # 			shutil.copy(extract_file_url_local,transformed_file_url_local)
-
-# # 			transformed_file_doc.set("file_url",transformed_file_url)
-# # 			transformed_file_doc.set("folder",transformed_file_folder)
-# # 			transformed_file_doc.save()
-
-# # 			file_doc = frappe.get_doc("File Upload",every_file["name"])
-# # 			file_doc.status = "Transformed"
-# # 			file_doc.transformed_file_url = transformed_file_doc.file_url
-# # 			file_doc.save()
-
-# # 		return "Success"
-# # 	except:
-# # 		return "Error in Transformation"
-@frappe.whitelist()
-def validation():
-    bt_list = frappe.db.get_all("Bank Transaction",{"custom_is_verified":0}, ["description", "reference_number","name"])
-    for every_bt in bt_list:
-        description = every_bt.description
-        ref_no = every_bt.reference_number
-        if "NEFT.*CMS" in description or "CMS" in description:
-            reference_16 = splitup(description, ref_no, 16)
-            if reference_16 == description:
-                return splitup(description, ref_no, 13)			
-        if "NEFT" in description:
-            set_length = splitup(description, ref_no, 16)
-        elif "IMPS" in description:
-            splitup(description,ref_no, 12)
-        elif "RTGS"in description:
-            splitup(description,ref_no, 22)
-        elif "IFT" in description:
-            splitup(description, ref_no, 12)
-        return ref_no
-
-@frappe.whitelist()
-def utrvalidation(token):
-	alphanumeric_pattern = "^[A-Za-z0-9]+$"
-	numeric_pattern = "^[0-9]+$"
-	if (re.match(token, alphanumeric_pattern) or (token , numeric_pattern)):
-		return True
-
-@frappe.whitelist()
-def splitup(description, ref_no, length):
-    if "IMPS" in description:
-        re.sub("IMPS", "", description)
-    if len(description) < length:
-        return description
-    
-    
-    delimiters = "/, ,-,*,:"
-    d_split = delimiters.split(",")
-    for every_split in d_split:
-        initial_split =  description.split(every_split)
-        for every_initial_split in initial_split:
-            token = trim(initial_split[every_initial_split])
-            tlen = len(token)
-            if tlen == length and len(compress(token)) == length:
-                if token == ref_no:
-                    valid = utrvalidation(token)
-                    if valid == "True":
-                        return token
-    return ref_no
-
-@frappe.whitelist()
-def ltrim(s):
-    return re.sub(r'^[ \t\r\n]+', '', s)
-
-@frappe.whitelist()
-def rtrim(s):
-    return re.sub(r'[ \t\r\n]+$', '' , s)
-
-@frappe.whitelist()
-def trim(s):
-	return rtrim(ltrim(s))
-
-@frappe.whitelist()
-def compress(s):
-    return re.sub(r' +', '', s)
+		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0] , self.upload.split("/")[-1]))
