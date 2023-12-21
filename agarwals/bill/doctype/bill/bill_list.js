@@ -25,7 +25,7 @@ frappe.listview_settings['Bill'] = {
 
 		listview.page.add_inner_button('Create Sales Invoice', () => {
             frappe.call({
-					method: "agarwals.utils.sales_invoice_creation.create_sales_invoice",
+					method: "agarwals.utils.sales_invoice_creation.create_sales_background_job",
 					callback: function(r){
 						var return_msg = r.message
 						console.log(return_msg)

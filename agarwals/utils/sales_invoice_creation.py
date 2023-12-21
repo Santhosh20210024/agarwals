@@ -1,9 +1,18 @@
 import frappe
+
+
 @frappe.whitelist()
-def create_sales_invoice():
+def create_sales_background_job():
+    bills = frappe.db.get_list('Bill',filters = {'status':'RAISED','invoice':''},fields='*')
+    
+    for i in range(0, len(bills), 20):
+        frappe.enqueue(create_sales_invoice, queue='long', is_async=True, timeout=18000, bills=bills[i:i + 20])
+
+
+
+def create_sales_invoice(bills):
     print('Job Started')
     try:
-        bills = frappe.db.get_list('Bill',filters = {'status':'RAISED','invoice':''},fields='*')
         for bill in bills:
             try:
                 sales_invoice_existing = True if len(
