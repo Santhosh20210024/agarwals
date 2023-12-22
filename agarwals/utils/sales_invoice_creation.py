@@ -23,6 +23,7 @@ def create_sales_invoice(bills):
                     sales_invoice.set('bill_no', bill.bill_no)
                     sales_invoice.set('entity', bill.company)
                     sales_invoice.set('region', bill.region)
+                    sales_invoice.set('branch',bill.branch)
                     sales_invoice.set('cost_center', bill.cost_center)
                     sales_invoice.set('items', sales_invoice_item)
                     sales_invoice.set('customer', bill.tpa)
