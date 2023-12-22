@@ -21,12 +21,12 @@ def create_sales_invoice(bills):
                     sales_invoice = frappe.new_doc('Sales Invoice')
                     sales_invoice_item = [{'item_code': 'Claim', 'rate': bill.claim_amount, 'qty': 1}]
                     sales_invoice.set('bill_no', bill.bill_no)
+                    sales_invoice.set('customer', bill.tpa)
                     sales_invoice.set('entity', bill.company)
                     sales_invoice.set('region', bill.region)
                     sales_invoice.set('branch',bill.branch)
                     sales_invoice.set('cost_center', bill.cost_center)
                     sales_invoice.set('items', sales_invoice_item)
-                    sales_invoice.set('customer', bill.tpa)
                     sales_invoice.set('set_posting_time',1)
                     sales_invoice.set('posting_date', bill.bill_date)
                     sales_invoice.set('due_date', bill.bill_date)
