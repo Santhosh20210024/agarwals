@@ -25,7 +25,7 @@ def splitter(total_claimbook_url):
 
     # reading inut as data frame
     total_claimbook_df = pd.read_excel(TOTAL_CLAIMBOOK) 
-    existing_claimbook_in_db = pd.DataFrame(db=frappe.db.get_list('ClaimBook',fields=columns_to_be_hashed,as_list=True))    # input from database
+    existing_claimbook_in_db = pd.DataFrame(frappe.db.get_list('ClaimBook',fields=columns_to_be_hashed,as_list=True),columns=columns_to_be_hashed)    # input from database
 
 
     joined_df = total_claimbook_df.merge(existing_claimbook_in_db,left_on='unique_id',right_on='unique_id',how='left',indicator=True,suffixes=('', '_x')) # merging the total claim book and db claim book with total claim book on left
