@@ -4,10 +4,10 @@ import frappe
 @frappe.whitelist()
 def create_sales_background_job(n):
     bills = frappe.db.get_list('Bill',filters = {'status':'RAISED','invoice':''},fields='*')
+    n = int(n)
     
     for i in range(0, len(bills), n):
         frappe.enqueue(create_sales_invoice, queue='long', is_async=True, timeout=18000, bills=bills[i:i + n])
-
 
 
 def create_sales_invoice(bills):
