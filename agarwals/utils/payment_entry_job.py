@@ -14,43 +14,43 @@ class BankTransactionWrapper():
             advices  = frappe.db.sql("""
                 SELECT * FROM `tabSettlement Advice` WHERE utr = %(utr_number)s
                 GROUP BY utr HAVING count(utr) == 1""", values = { 'utr_number' : self.bank_transaction.reference_number }, as_dict = 1 )
-            23370347412
             if len(advices) < 1:
                 return
             
-            je = frappe.new_doc('Journal Entry')
-            tds_je = frappe.new_doc('Journal Entry')
-            je.accounts = []
-            tds_je.accounts = []
-            
-            for advice in advices:
-                if not (advice.claim_id or advice.bill_no):
-                    continue
-                if self.available_amount <= 0:
-                    break
+            if len(advices) == 1:
+                je = frappe.new_doc('Journal Entry')
+                tds_je = frappe.new_doc('Journal Entry')
+                je.accounts = []
+                tds_je.accounts = []
                 
-                entry, tds_entry = self.create_payment_entry_item(advice)
-                if entry:
-                    je.append('accounts', entry)
-                    if tds_entry:
-                        tds_je.append('accounts', tds_entry)
-                else:
-                    continue
+                for advice in advices:
+                    if not (advice.claim_id or advice.bill_no):
+                        continue
+                    if self.available_amount <= 0:
+                        break
+                    
+                    entry, tds_entry = self.create_payment_entry_item(advice)
+                    if entry:
+                        je.append('accounts', entry)
+                        if tds_entry:
+                            tds_je.append('accounts', tds_entry)
+                    else:
+                        continue
 
-            allocated_amount = self.bank_transaction.deposit - self.available_amount
-            asset_entry = {'account': self.bank_account, 'debit_in_account_currency': allocated_amount }
-            
-            je.append('accounts', asset_entry)
-            je.voucher_type = 'Journal Entry'
-            je.company = frappe.get_value("Global Defaults", None, "default_company")
-            je.posting_date = self.bank_transaction.date
-            je.cheque_date = self.bank_transaction.date
-            je.cheque_no = advice['utr_number']
-            je.name = self.bank_transaction.reference_number
-            je.submit()
-            self.create_tds_entry(tds_je)
-            self.set_transaction_reference(je.name, allocated_amount)
-            frappe.db.commit()
+                allocated_amount = self.bank_transaction.deposit - self.available_amount
+                asset_entry = {'account': self.bank_account, 'debit_in_account_currency': allocated_amount }
+                
+                je.append('accounts', asset_entry)
+                je.voucher_type = 'Journal Entry'
+                je.company = frappe.get_value("Global Defaults", None, "default_company")
+                je.posting_date = self.bank_transaction.date
+                je.cheque_date = self.bank_transaction.date
+                je.cheque_no = advice['utr_number']
+                je.name = self.bank_transaction.reference_number
+                je.submit()
+                self.create_tds_entry(tds_je)
+                self.set_transaction_reference(je.name, allocated_amount)
+                frappe.db.commit()
 
         except Exception as e:
             new_doc = frappe.new_doc('ToDo')
