@@ -169,7 +169,7 @@ class BankTransactionWrapper():
             ]
             # self.create_tds_entry(advice['utr_number'],tds_entry)
             return entry, tds_entry
-        return entry, tds_entry
+        return entry, None
     
         
 def get_unreconciled_bank_transactions():
