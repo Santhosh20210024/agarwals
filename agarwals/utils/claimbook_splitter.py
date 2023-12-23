@@ -4,6 +4,7 @@ import frappe
 import tempfile
 import shutil
 from agarwals.utils.path_data import SITE_PATH
+from datetime import date
 
 columns_to_be_hashed = ['Hospital', 'preauth_claim_id', 'mrn', 'doctor', 'department', 'case_id', 'first_name',
                         'tpa_name', 'insurance_company_name', 'tpa_member_id', 'insurance_policy_number',
@@ -77,8 +78,6 @@ def splitter(claim):
 
     # convert the dataframe to excel and save it in particular directory
     return updated_df, new_claimbook_df
-    # updated_df.to_excel(UPDATED_CLAIMBOOK, index=False)
-    # new_claimbook_df.to_excel(NEW_CLAIMBOOK, index = False)
 
 
 @frappe.whitelist()
@@ -96,10 +95,10 @@ def data_feeder(**kwargs):
         claim['utrno'] = claim.loc[:, 'utr_number']
         formatted_utr = format_utr(claim)
         updated_df, new_claimbook_df = splitter(formatted_utr)
+        file_name=every_list.upload.split("/")[-1]
+        write_file_insert_record(updated_df,f"update_{file_name}",every_list.name)
+        write_file_insert_record(new_claimbook_df,f"new_{file_name}",every_list.name)
 
-
-# pd.options.display.float_format = '{:,.0f}'.format
-# pd.set_option('display.max_colwidth', 200)
 
 def remove_x(item):
     if "XXXXXXX" in str(item):
@@ -138,7 +137,8 @@ def format_utr(df):
     return df
 
 
-def file_folder_update(df,filename):
+def write_file_insert_record(df,filename, parent_field_id):
+    filename = "file_sample_test.xlsx"
     is_private = 1
     file_url = f"{SITE_PATH}/private/files/{filename}"
     folder = "Home/DrAgarwals/Transform"
@@ -149,11 +149,20 @@ def file_folder_update(df,filename):
 
         shutil.copy(excel_file_path, file_url)
 
-    frappe.get_doc({
-        "doctype": "File",
-        "file_name": filename,
-        "folder": folder,
-        "file_url": f'http:/{file_url}',
-        "is_private": is_private
-    }).insert()
+        frappe.get_doc({
+            "doctype": "File",
+            "file_name": filename,
+            "folder": folder,
+            "file_url": excel_file_path,
+            "is_private": is_private
+        }).insert()
+        
+    doc = frappe.get_doc("File upload",parent_field_id)
+    doc.append("document_reference", {
+        "date": date.today(),
+        "document_type": doc.document_type,
+        "status": "In Process",
+        "file_url": file_url,
+    })
+    doc.save(ignore_permissions=True)
     
