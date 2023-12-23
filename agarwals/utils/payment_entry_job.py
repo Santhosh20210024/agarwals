@@ -82,7 +82,7 @@ class BankTransactionWrapper():
         
     def get_claim(self, claim_id):
         claims = frappe.db.sql("""
-        SELECT * FROM `tabClaimBook` WHERE cl_number = %(claim_id)s
+        SELECT * FROM `tabClaimBook` WHERE al_number = %(claim_id)s
         """,values = { 'claim_id' : claim_id}, as_dict = 1)
         
         if len(claims) == 1:
@@ -192,7 +192,3 @@ def create_payment_entries():
     chunk_size = 1000
     for i in range(0, len(bank_transactions), chunk_size):
         frappe.enqueue(batch_operation, queue='long', is_async=True, timeout=18000, chunk = bank_transactions[i:i + chunk_size])
-
-
-
-
