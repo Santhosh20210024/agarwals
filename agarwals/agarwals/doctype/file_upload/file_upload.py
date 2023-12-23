@@ -41,11 +41,15 @@ class Fileupload(Document):
 			if len(file_hash_doc) > 1:
 				frappe.delete_doc("File", file_hash_doc[0])
 				frappe.db.commit()
-				
 				# Delete the files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				self.set(str(self.upload), '')
+				frappe.publish_realtime(event="Errorbox", message="error")
+				self.set("upload",'')
 				frappe.throw('Duplicate File Error: The file being uploaded already exists. Please check.')
+				return 
+			else:
+				frappe.publish_realtime(event="Errorbox", message="no error")
 				return
 		
 		# Verify the same file with different hash content
@@ -64,11 +68,14 @@ class Fileupload(Document):
 			if file_type != 'XLSX' and file_type != 'PDF':
 				frappe.delete_doc("File", file_doc_id)
 				frappe.db.commit()
-				
 				# Delete the shell files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
+				frappe.publish_realtime(event="Errorbox", message="error")
 				frappe.throw("Please upload files in Excel format only (XLSX).")
+				self.set(str(self.upload), '')
 				return
+			else:
+				frappe.publish_realtime(event="Errorbox", message="no error")									
 			self.validate_hash_content(file_name, file_doc_id)
 				
 	def move_shell_file(self, source, destination):
@@ -86,35 +93,20 @@ class Fileupload(Document):
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
 		file_doc.file_url = _file_url
-		print("-------------------------  file url 1 -----------------------------------",_file_url)
 		self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),construct_file_url(SITE_PATH, _file_url.lstrip('/') ))
-		print("-------------------------  file url -----------------------------------",_file_url)
 		file_doc.save()
 		self.set("upload",_file_url)
 		self.set("upload_url",_file_url)
-		#self.set("upload_url", _file_url)
 		
-		
-
-	# def update_list_view(self):
-	# 	self.type = self.upload.replace("_upload", "")
-	# 	self.file_name = str(self.get(self.upload)).split("/")[-1]
-	# 	self.set(str(self.upload).replace('_upload', '_uploaded'), self.file_name)
-	    
 	def validate(self):
-		# print("-----------",type(self.upload))
 		
 		if self.status != 'Open':
 			return
-		
-		# print(len(self.upload))
-
 		if self.upload == None or self.upload == '':
 			frappe.throw('Please upload file')
 
 		self.validate_file()
 		self.process_file_attachment()
-		# self.update_list_view()
-		
+
 	def on_trash(self):
 		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0] , self.upload.split("/")[-1]))
