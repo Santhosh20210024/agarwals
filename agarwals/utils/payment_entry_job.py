@@ -12,9 +12,9 @@ class BankTransactionWrapper():
         try:
             self.bank_account = frappe.db.get_value('Bank Account', self.bank_transaction.bank_account, 'account')
             advices  = frappe.db.sql("""
-                SELECT * FROM `tabSettlement Advice` WHERE utr_number = %(utr_number)s
-                """, values = { 'utr_number' : self.bank_transaction.reference_number }, as_dict = 1 )
-            
+                SELECT * FROM `tabSettlement Advice` WHERE utr = %(utr_number)s
+                GROUP BY utr HAVING count(utr) == 1""", values = { 'utr_number' : self.bank_transaction.reference_number }, as_dict = 1 )
+            23370347412
             if len(advices) < 1:
                 return
             
