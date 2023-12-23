@@ -60,12 +60,12 @@ class BankTransactionWrapper():
 
     def create_tds_entry(self, tds_je):
         name_ref = self.bank_transaction.reference_number or self.bank_transaction.name
-        tds_je.name = name_ref + "-" + "TDS"
+        tds_je.name = str(name_ref) + "-" + "TDS"
         tds_je.voucher_type = 'Journal Entry'
         tds_je.company = frappe.get_value("Global Defaults", None, "default_company")
         tds_je.posting_date = self.bank_transaction.date
         tds_je.cheque_date = self.bank_transaction.date
-        tds_je.cheque_no = name_ref
+        tds_je.cheque_no = str(name_ref)
         tds_je.submit()
 
         
@@ -120,9 +120,9 @@ class BankTransactionWrapper():
         else:
             return None
 
-        if self.available_amount >= advice.settlement_amount:
-            if advice.settlement_amount <= sales_invoice.outstanding_amount:
-                allocated_amount = advice.settlement_amount
+        if self.available_amount >= advice.settled_amount:
+            if advice.settled_amount <= sales_invoice.outstanding_amount:
+                allocated_amount = advice.settled_amount
             else:
                 frappe.throw("Settlement Amount should be less than the Outstanding Amount for " + str(invoice_number))
                 
@@ -170,7 +170,10 @@ class BankTransactionWrapper():
             # self.create_tds_entry(advice['utr_number'],tds_entry)
             return entry, tds_entry
         return entry, None
-    
+
+def batch_operation(chunk):
+    for record in chunk:
+        record.process()
         
 def get_unreconciled_bank_transactions():
     return frappe.db.sql("""
@@ -184,17 +187,12 @@ def create_payment_entries():
     for bank_transaction in unreconciled_bank_transactions:
         if bank_transaction.deposit and bank_transaction.deposit > 0:
             t = BankTransactionWrapper(bank_transaction)
-            # t.process()
             bank_transactions.append(t)
 
     chunk_size = 1000
     for i in range(0, len(bank_transactions), chunk_size):
         frappe.enqueue(batch_operation, queue='long', is_async=True, timeout=18000, chunk = bank_transactions[i:i + chunk_size])
 
-
-def batch_operation(chunk):
-    for record in chunk:
-        record.process()
 
 
 
