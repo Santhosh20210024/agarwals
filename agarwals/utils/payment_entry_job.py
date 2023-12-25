@@ -181,9 +181,9 @@ class BankTransactionWrapper():
 
 def batch_operation(chunk):
     for record in chunk:
-        # transaction = frappe.get_doc("Bank Transaction", record)
-        # t = BankTransactionWrapper(transaction)
-        record.process()
+        transaction = frappe.get_doc("Bank Transaction", record)
+        t = BankTransactionWrapper(transaction)
+        t.process()
         
 def get_unreconciled_bank_transactions():
     return frappe.db.sql("""
@@ -195,9 +195,9 @@ def create_payment_entries():
 
     bank_transactions = []
     for bank_transaction in unreconciled_bank_transactions:
-            t = BankTransactionWrapper(bank_transaction)
-            # bank_transactions.append(bank_transaction.name)
-            bank_transaction.append(t)
+            # t = BankTransactionWrapper(bank_transaction)
+            bank_transactions.append(bank_transaction.name)
+            # bank_transaction.append(t)
 
     chunk_size = 1000
     for i in range(0, len(bank_transactions), chunk_size):
