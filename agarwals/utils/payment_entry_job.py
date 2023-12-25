@@ -21,7 +21,7 @@ class BankTransactionWrapper():
             if len(advices) < 1:
                 return
             
-            if len(advices) == 1:
+            if len(advices) > 1:
                 je = frappe.new_doc('Journal Entry')
                 tds_je = frappe.new_doc('Journal Entry')
                 je.accounts = []
@@ -43,7 +43,6 @@ class BankTransactionWrapper():
 
                 allocated_amount = self.bank_transaction.deposit - self.available_amount
                 asset_entry = {'account': self.bank_account, 'debit_in_account_currency': allocated_amount }
-                # je.accounts = bank_accounts
                 je.append('accounts', asset_entry)
                 je.voucher_type = 'Journal Entry'
                 je.company = frappe.get_value("Global Defaults", None, "default_company")
@@ -53,9 +52,9 @@ class BankTransactionWrapper():
                 je.bank_reference = self.bank_transaction.name
                 je.name = self.bank_transaction.reference_number
                 je.submit()
+                self.set_transaction_reference(je.name, allocated_amount)
                 if tds_je.accounts != None and len(tds_je.accounts) > 0:
                     self.create_tds_entry(tds_je)
-                self.set_transaction_reference(je.name, allocated_amount)
                 frappe.db.commit()
 
         except Exception as e:
@@ -65,15 +64,18 @@ class BankTransactionWrapper():
             new_doc.save()
 
     def create_tds_entry(self, tds_je):
-        name_ref = self.bank_transaction.reference_number or self.bank_transaction.name
-        tds_je.name = str(name_ref) + "-" + "TDS"
-        tds_je.voucher_type = 'Journal Entry'
-        tds_je.company = frappe.get_value("Global Defaults", None, "default_company")
-        tds_je.posting_date = self.bank_transaction.date
-        tds_je.cheque_date = self.bank_transaction.date
-        tds_je.bank_reference = self.bank_transaction.name
-        tds_je.cheque_no = str(name_ref)
-        tds_je.submit()
+        try:
+            name_ref = self.bank_transaction.reference_number or self.bank_transaction.name
+            tds_je.name = str(name_ref) + "-" + "TDS"
+            tds_je.voucher_type = 'Journal Entry'
+            tds_je.company = frappe.get_value("Global Defaults", None, "default_company")
+            tds_je.posting_date = self.bank_transaction.date
+            tds_je.cheque_date = self.bank_transaction.date
+            tds_je.bank_reference = self.bank_transaction.name
+            tds_je.cheque_no = str(name_ref)
+            tds_je.submit()
+        except Exception as e:
+            frappe.throw('Error acquired during tds entry creation'+ str(e))
 
         
     def set_transaction_reference(self, je_name, allocated_amount):
@@ -179,9 +181,9 @@ class BankTransactionWrapper():
 
 def batch_operation(chunk):
     for record in chunk:
-        transaction = frappe.get_doc("Bank Transaction", record)
-        t = BankTransactionWrapper(transaction)
-        t.process()
+        # transaction = frappe.get_doc("Bank Transaction", record)
+        # t = BankTransactionWrapper(transaction)
+        record.process()
         
 def get_unreconciled_bank_transactions():
     return frappe.db.sql("""
@@ -193,7 +195,9 @@ def create_payment_entries():
 
     bank_transactions = []
     for bank_transaction in unreconciled_bank_transactions:
-            bank_transactions.append(bank_transaction.name)
+            t = BankTransactionWrapper(bank_transaction)
+            # bank_transactions.append(bank_transaction.name)
+            bank_transaction.append(t)
 
     chunk_size = 1000
     for i in range(0, len(bank_transactions), chunk_size):
