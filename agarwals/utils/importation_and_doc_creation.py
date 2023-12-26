@@ -30,7 +30,14 @@ def import_job(doctype,import_type,file_url):
     data_import_doc.save()
     frappe.db.set_value("Data Import", data_import_doc.name, 'template_options', template)
     frappe.db.commit()
-    data_import_doc.start_import()
+    try:
+        data_import_doc.start_import()
+    except Exception as e:
+        error_log = frappe.new_doc('Error Record Log')
+        error_log.set('doctype_name', 'Sales Invoice')
+        error_log.set('reference_name',bill.bill_no)
+        error_log.set('error_message', e)
+        error_log.save()
 
 
 
