@@ -25,7 +25,7 @@ def import_job(doctype,import_type,file_url=None):
     frappe.get_list("File Upload",filters={ 'status':'Open','type':type }, fields="*")
     if file_url == None:
         if doctype == 'Bill':
-            get_files.extend(frappe.get_list('File', filters={ 'status':'In process','document_type': 'Debtors Report'}))
+            get_files.extend(frappe.get_list('File', filters={ 'status':'In Process','document_type': 'Debtors Report'}))
 
         for file in get_files:
             data_import_mapping_doc = frappe.get_doc("Data Import Mapping",doctype)
