@@ -24,7 +24,7 @@ def import_job(doctype,import_type,file_url=None):
     get_files = []
     if file_url == None:
         if doctype == 'Bill':
-            get_files.extend(frappe.get_list('File upload', filters={ 'status':'In Process','document_type': 'Debtors Report'}))
+            get_files.extend(frappe.get_list('File upload', filters={ 'status':'In Process','document_type': 'Debtors Report'},fields="*"))
 
         for file in get_files:
             data_import_mapping_doc = frappe.get_doc("Data Import Mapping",doctype)
@@ -32,10 +32,11 @@ def import_job(doctype,import_type,file_url=None):
             data_import_doc = frappe.new_doc("Data Import")
             data_import_doc.set('reference_doctype', doctype)
             data_import_doc.set('import_type', import_type)
-            data_import_doc.set('import_file', frappe.get_value('File',file.name,file.file_url.split('/')[-1]))
+            import_file = frappe.get_value('File upload',file.name,'upload')
+            data_import_doc.set('import_file',str(import_file))
             data_import_doc.save()
             frappe.db.set_value("Data Import", data_import_doc.name, 'template_options', template)
-            frappe.db.commit()
+            # frappe.db.commit()
             try:
                 data_import_doc.start_import()
             except Exception as e:
