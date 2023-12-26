@@ -65,7 +65,7 @@ class Fileupload(Document):
 		file_name, file_doc_id = self.get_file_doc_data()
 		file_type = frappe.get_value('File',file_doc_id,'file_type')
 		if file_doc_id:
-			if file_type != 'XLSX' and file_type != 'PDF':
+			if file_type.upper() != 'XLSX' and file_type.upper() != 'PDF':
 				frappe.delete_doc("File", file_doc_id)
 				frappe.db.commit()
 				# Delete the shell files
