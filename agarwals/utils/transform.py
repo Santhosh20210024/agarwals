@@ -47,6 +47,6 @@ def modify_column_values(type, file_name):
 		workbook.save(file_name)
 	
 @frappe.whitelist()
-def transform(type):
-	responce_status = copy_files(type)
+def transform(document_type):
+	responce_status = copy_files(document_type)
 	return "Success"
