@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import frappe
+import dask.dataframe as dd
 import tempfile
 import shutil
 from agarwals.utils.path_data import SITE_PATH
@@ -91,13 +92,18 @@ def data_feeder(**kwargs):
         base_path = os.getcwd()
         site_path = frappe.get_site_path()[1:]
         claim_data = f"{base_path}{site_path}{every_list.upload}"
-        claim = format_utr(pd.read_excel(claim_data))
+        claim = format_utr(pd.read_excel(claim_data,engine='openpyxl'))
         claim['utrno'] = claim.loc[:, 'utr_number']
         formatted_utr = format_utr(claim)
         updated_df, new_claimbook_df = splitter(formatted_utr)
         file_name=every_list.upload.split("/")[-1]
-        write_file_insert_record(updated_df,f"update_{file_name}",every_list.name)
-        write_file_insert_record(new_claimbook_df,f"new_{file_name}",every_list.name)
+        if updated_df.empty==True:
+            write_file_insert_record(new_claimbook_df,f"new_{file_name}",every_list.name,upload_type="New")
+        elif new_claimbook_df.empty==True:
+            write_file_insert_record(updated_df,f"update_{file_name}",every_list.name,upload_type="Update")
+        else:
+            write_file_insert_record(updated_df,f"update_{file_name}",every_list.name,upload_type="Update")
+            write_file_insert_record(new_claimbook_df,f"new_{file_name}",every_list.name,upload_type="New")
 
 
 def remove_x(item):
@@ -137,11 +143,11 @@ def format_utr(df):
     return df
 
 
-def write_file_insert_record(df,filename, parent_field_id):
-    filename = "file_sample_test.xlsx"
+def write_file_insert_record(df,filename, parent_field_id,upload_type):
     is_private = 1
     file_url = f"{SITE_PATH}/private/files/{filename}"
     folder = "Home/DrAgarwals/Transform"
+    upload_type=upload_type
     # Create a temporary XLSX file
     with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmpfile:
         excel_file_path = tmpfile.name
@@ -153,16 +159,19 @@ def write_file_insert_record(df,filename, parent_field_id):
             "doctype": "File",
             "file_name": filename,
             "folder": folder,
-            "file_url": excel_file_path,
+            "file_url": "https://{file_url}",
             "is_private": is_private
         }).insert()
         
     doc = frappe.get_doc("File upload",parent_field_id)
+    doc.status="In Process"
     doc.append("document_reference", {
         "date": date.today(),
-        "document_type": doc.document_type,
+        "document_type": doc.select_document_type,
         "status": "In Process",
         "file_url": file_url,
+        "upload_type":upload_type,
     })
     doc.save(ignore_permissions=True)
+    doc.reload()
     
