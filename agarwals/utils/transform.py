@@ -7,13 +7,13 @@ from agarwals.utils.path_data import SITE_PATH
 
 def copy_files(type):
 	try:
-		file_upload_docs = frappe.get_list("File Upload",filters={ 'status':'Open','type':type }, fields="*")
+		file_upload_docs = frappe.get_list("File Upload",filters={ 'status':'Open','document_type':type }, fields="*")
 		if file_upload_docs:
 			for file_upload_item in file_upload_docs:
 				if file_upload_item.file_name:
 					file_doc = frappe.get_doc("File Upload",file_upload_item.name)
 					file_doc.status = "In Process"
-                    # file_doc.save()
+
 					extract_file_name = frappe.get_list("File",filters={'file_name':file_upload_item.file_name},pluck="name")[0]
 					extract_file_doc = frappe.get_doc("File",extract_file_name)
 					
@@ -38,7 +38,7 @@ def copy_files(type):
 	
 def modify_column_values(type, file_name):
 	workbook = openpyxl.load_workbook(file_name)
-	if type == "debtor_report":
+	if type == "Debtors Report":
 		sheet = workbook.active
 		column_letter = 'Branch'
 		for row in sheet[column_letter]:
@@ -49,5 +49,4 @@ def modify_column_values(type, file_name):
 @frappe.whitelist()
 def transform(type):
 	responce_status = copy_files(type)
-	# if responce_status == "Success":
 	return "Success"
