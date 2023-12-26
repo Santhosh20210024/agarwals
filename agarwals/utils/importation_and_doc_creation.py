@@ -19,24 +19,48 @@ def import_bank_statement(bank_account,bank,attached_file):
         return e
 
 @frappe.whitelist()
-def import_job(doctype,import_type,file_url):
+def import_job(doctype,import_type,file_url=None):
     #For Auto Importing DocType
-    data_import_mapping_doc = frappe.get_doc("Data Import Mapping",doctype)
-    template = data_import_mapping_doc.template
-    data_import_doc = frappe.new_doc("Data Import")
-    data_import_doc.set('reference_doctype', doctype)
-    data_import_doc.set('import_type', import_type)
-    data_import_doc.set('import_file', file_url)
-    data_import_doc.save()
-    frappe.db.set_value("Data Import", data_import_doc.name, 'template_options', template)
-    frappe.db.commit()
-    try:
-        data_import_doc.start_import()
-    except Exception as e:
-        error_log = frappe.new_doc('Error Record Log')
-        error_log.set('doctype_name', 'Sales Invoice')
-        error_log.set('error_message', e)
-        error_log.save()
+    get_files = []
+    frappe.get_list("File Upload",filters={ 'status':'Open','type':type }, fields="*")
+    if file_url == None:
+        if doctype == 'Bill':
+            get_files.extend(frappe.get_list('File', filters={ 'status':'In process','document_type': 'Debtors Report'}))
+
+        for file in get_files:
+            data_import_mapping_doc = frappe.get_doc("Data Import Mapping",doctype)
+            template = data_import_mapping_doc.template
+            data_import_doc = frappe.new_doc("Data Import")
+            data_import_doc.set('reference_doctype', doctype)
+            data_import_doc.set('import_type', import_type)
+            data_import_doc.set('import_file', frappe.get_value('File',file.name,file.file_url.split('/')[-1]))
+            data_import_doc.save()
+            frappe.db.set_value("Data Import", data_import_doc.name, 'template_options', template)
+            frappe.db.commit()
+            try:
+                data_import_doc.start_import()
+            except Exception as e:
+                error_log = frappe.new_doc('Error Record Log')
+                error_log.set('doctype_name', 'Sales Invoice')
+                error_log.set('error_message', e)
+                error_log.save()
+    else:
+        data_import_mapping_doc = frappe.get_doc("Data Import Mapping",doctype)
+        template = data_import_mapping_doc.template
+        data_import_doc = frappe.new_doc("Data Import")
+        data_import_doc.set('reference_doctype', doctype)
+        data_import_doc.set('import_type', import_type)
+        data_import_doc.set('import_file', frappe.get_value('File',file.name,file.file_url.split('/')[-1]))
+        data_import_doc.save()
+        frappe.db.set_value("Data Import", data_import_doc.name, 'template_options', template)
+        frappe.db.commit()
+        try:
+            data_import_doc.start_import()
+        except Exception as e:
+            error_log = frappe.new_doc('Error Record Log')
+            error_log.set('doctype_name', 'Sales Invoice')
+            error_log.set('error_message', e)
+            error_log.save()
 
 
 
