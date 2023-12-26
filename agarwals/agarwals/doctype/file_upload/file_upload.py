@@ -63,9 +63,10 @@ class Fileupload(Document):
 
 	def validate_file(self):
 		file_name, file_doc_id = self.get_file_doc_data()
-		file_type = frappe.get_value('File',file_doc_id,'file_type')
+		# file_type = frappe.get_value('File',file_doc_id,'file_type')
+		# get_file_name = frappe.get_doc('File', )
 		if file_doc_id:
-			if file_type.upper() != 'XLSX' and file_type.upper() != 'PDF':
+			if file_name.split('.')[-1].upper() != 'XLSX' and file_name.split('.')[-1].upper() != 'PDF':
 				frappe.delete_doc("File", file_doc_id)
 				frappe.db.commit()
 				# Delete the shell files
