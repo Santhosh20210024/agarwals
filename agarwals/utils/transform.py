@@ -10,31 +10,33 @@ def copy_files(type):
 		file_upload_docs = frappe.get_list("File Upload",filters={ 'status':'Open','document_type':type }, fields="*")
 		if file_upload_docs:
 			for file_upload_item in file_upload_docs:
-				if file_upload_item.file_name:
+				# file_upload_item = frappe.get_doc()
+				if file_upload_item.upload:
 					file_doc = frappe.get_doc("File Upload",file_upload_item.name)
 					file_doc.status = "In Process"
 
-					extract_file_name = frappe.get_list("File",filters={'file_name':file_upload_item.file_name},pluck="name")[0]
-					extract_file_doc = frappe.get_doc("File",extract_file_name)
-					
-					transformed_file_doc = frappe.copy_doc(extract_file_doc)
-					
-					transformed_file_url = transformed_file_doc.file_url.replace("Extract","Transform")
-					transformed_file_folder = transformed_file_doc.folder.replace("Extract","Transform")
-					
-					extract_file_url_local = SITE_PATH + extract_file_doc.file_url
-					transformed_file_url_local = SITE_PATH + transformed_file_url
-					shutil.copy(extract_file_url_local,transformed_file_url_local)
-					
-					transformed_file_doc.set("file_url",transformed_file_url)
-					transformed_file_doc.set("folder",transformed_file_folder)
-					transformed_file_doc.save()
-					file_doc.save()
-					modify_column_values(type, extract_file_url_local)
-					
+					extract_file_name = frappe.get_list("File",filters={'file_url':file_upload_item.upload},pluck="name")
+					for file in extract_file_name:
+						extract_file_doc = frappe.get_doc("File",file)
+						
+						transformed_file_doc = frappe.copy_doc(extract_file_doc)
+						
+						transformed_file_url = transformed_file_doc.file_url.replace("Extract","Transform")
+						transformed_file_folder = transformed_file_doc.folder.replace("Extract","Transform")
+						
+						extract_file_url_local = SITE_PATH + extract_file_doc.file_url
+						transformed_file_url_local = SITE_PATH + transformed_file_url
+						shutil.copy(extract_file_url_local,transformed_file_url_local)
+						
+						transformed_file_doc.set("file_url",transformed_file_url)
+						transformed_file_doc.set("folder",transformed_file_folder)
+						transformed_file_doc.save()
+						file_doc.save()
+						modify_column_values(type, extract_file_url_local)
+						
 			return "Success"
-	except:
-		return 
+	except Exception as e:
+		return e
 	
 def modify_column_values(type, file_name):
 	workbook = openpyxl.load_workbook(file_name)
@@ -48,5 +50,8 @@ def modify_column_values(type, file_name):
 	
 @frappe.whitelist()
 def transform(document_type):
-	responce_status = copy_files(document_type)
-	return "Success"
+	try:
+		responce_status = copy_files(document_type)
+		return "Success"
+	except Exception as e:
+		return e
