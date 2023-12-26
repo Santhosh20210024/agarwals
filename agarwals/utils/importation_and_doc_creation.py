@@ -35,7 +35,6 @@ def import_job(doctype,import_type,file_url):
     except Exception as e:
         error_log = frappe.new_doc('Error Record Log')
         error_log.set('doctype_name', 'Sales Invoice')
-        error_log.set('reference_name',bill.bill_no)
         error_log.set('error_message', e)
         error_log.save()
 
