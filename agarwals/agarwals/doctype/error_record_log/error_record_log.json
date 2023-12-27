@@ -1,29 +1,40 @@
 {
  "actions": [],
- "allow_import": 1,
  "allow_rename": 1,
- "autoname": "field:region",
- "creation": "2023-11-25 16:17:45.428469",
+ "creation": "2023-12-20 17:57:01.636625",
+ "default_view": "List",
  "doctype": "DocType",
+ "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "region"
+  "doctype_name",
+  "reference_name",
+  "error_message"
  ],
  "fields": [
   {
-   "fieldname": "region",
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "label": "Doctype Name",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Text",
+   "label": "Error Message"
+  },
+  {
+   "fieldname": "reference_name",
    "fieldtype": "Data",
-   "label": "Region",
-   "unique": 1
+   "label": "Reference Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-20 00:58:09.901349",
+ "modified": "2023-12-20 21:12:38.710573",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "Region",
- "naming_rule": "By fieldname",
+ "name": "Error Record Log",
  "owner": "Administrator",
  "permissions": [
   {
