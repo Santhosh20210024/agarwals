@@ -83,10 +83,9 @@ def splitter(claim):
 
 @frappe.whitelist()
 def data_feeder(**kwargs):
-    type = kwargs["status_document_type"]
-    status = kwargs["status"]
-    list_to_clean = frappe.db.get_all("File upload", filters={"select_document_type": type,
-                                                              "status": status},
+    type = kwargs["document_type"]
+    list_to_clean = frappe.db.get_all("File upload", filters={"document_type": type,
+                                                              "status": "Open"},
                                       fields=["upload", "name"])
     for every_list in list_to_clean:
         base_path = os.getcwd()
@@ -104,7 +103,7 @@ def data_feeder(**kwargs):
         else:
             write_file_insert_record(updated_df,f"update_{file_name}",every_list.name,upload_type="Update")
             write_file_insert_record(new_claimbook_df,f"new_{file_name}",every_list.name,upload_type="New")
-
+    return "Success"
 
 def remove_x(item):
     if "XXXXXXX" in str(item):
@@ -145,7 +144,7 @@ def format_utr(df):
 
 def write_file_insert_record(df,filename, parent_field_id,upload_type):
     is_private = 1
-    file_url = f"{SITE_PATH}/private/files/{filename}"
+    file_url = f"{SITE_PATH}/private/files/DrAgarwals/Transform/{filename}"
     folder = "Home/DrAgarwals/Transform"
     upload_type=upload_type
     # Create a temporary XLSX file
@@ -159,7 +158,7 @@ def write_file_insert_record(df,filename, parent_field_id,upload_type):
             "doctype": "File",
             "file_name": filename,
             "folder": folder,
-            "file_url": "https://{file_url}",
+            "file_url": f"/private/files/DrAgarwals/Transform/{filename}",
             "is_private": is_private
         }).insert()
         
@@ -169,7 +168,7 @@ def write_file_insert_record(df,filename, parent_field_id,upload_type):
         "date": date.today(),
         "document_type": doc.select_document_type,
         "status": "In Process",
-        "file_url": file_url,
+        "file_url": f"/private/files/DrAgarwals/Transform/{filename}",
         "upload_type":upload_type,
     })
     doc.save(ignore_permissions=True)
