@@ -83,10 +83,9 @@ def splitter(claim):
 
 @frappe.whitelist()
 def data_feeder(**kwargs):
-    type = kwargs["status_document_type"]
-    status = kwargs["status"]
-    list_to_clean = frappe.db.get_all("File upload", filters={"select_document_type": type,
-                                                              "status": status},
+    type = kwargs["document_type"]
+    list_to_clean = frappe.db.get_all("File upload", filters={"document_type": type,
+                                                              "status": "Open"},
                                       fields=["upload", "name"])
     for every_list in list_to_clean:
         base_path = os.getcwd()
@@ -104,6 +103,8 @@ def data_feeder(**kwargs):
         else:
             write_file_insert_record(updated_df,f"update_{file_name}",every_list.name,upload_type="Update")
             write_file_insert_record(new_claimbook_df,f"new_{file_name}",every_list.name,upload_type="New")
+    
+    return "Success"
 
 
 def remove_x(item):
@@ -167,7 +168,7 @@ def write_file_insert_record(df,filename, parent_field_id,upload_type):
     doc.status="In Process"
     doc.append("document_reference", {
         "date": date.today(),
-        "document_type": doc.select_document_type,
+        "document_type": doc.document_type,
         "status": "In Process",
         "file_url": file_url,
         "upload_type":upload_type,
