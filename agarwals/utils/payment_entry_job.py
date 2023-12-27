@@ -21,7 +21,7 @@ class BankTransactionWrapper():
             if len(advices) < 1:
                 return
             
-            if len(advices) > 1:
+            if len(advices) >= 1:
                 je = frappe.new_doc('Journal Entry')
                 tds_je = frappe.new_doc('Journal Entry')
                 je.accounts = []
