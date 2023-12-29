@@ -167,7 +167,6 @@ class BillTransformer(Transformer):
         super().__init__()
         self.file_type = 'Debtors Report'
         self.document_type = 'Bill'
-        self.hashing =
 
     def load_target_df(self):
         query = f"""
