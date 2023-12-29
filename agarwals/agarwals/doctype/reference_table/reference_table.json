@@ -8,47 +8,36 @@
   "date",
   "document_type",
   "status",
-  "file_url",
-  "upload_type"
+  "file_url"
  ],
  "fields": [
   {
    "fieldname": "date",
-   "fieldtype": "Date",
-   "label": "Date",
-   "read_only": 1
+   "fieldtype": "Datetime",
+   "label": "Date"
   },
   {
    "fieldname": "document_type",
    "fieldtype": "Select",
    "label": "Document Type",
-   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement",
-   "read_only": 1
+   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement"
   },
   {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nOpen\nIn Process\nProcessed\nError",
-   "read_only": 1
+   "options": "Open\nIn Process\nProcessed\nError"
   },
   {
    "fieldname": "file_url",
-   "fieldtype": "Attach",
-   "label": "file url",
-   "read_only": 1
-  },
-  {
-   "fieldname": "upload_type",
    "fieldtype": "Data",
-   "label": "Upload Type",
-   "read_only": 1
+   "label": "file url"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-12-26 21:56:20.094947",
+ "modified": "2023-12-27 21:56:26.011025",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Reference Table",

@@ -1,107 +1,59 @@
 import pandas as pd
 import os
 import json
+import frappe
+import shutil
+import tempfile
+from frappe.utils import now
+
+# from date import 
 # defining the path of the input and out put
-folder = 'C:/PROJECT/Agarwals/SettlementAdvice/Settlement_Dump_Procces/unprocesssed file/unknown/f2/'
-target_folder = 'C:/PROJECT/Agarwals/SettlementAdvice/Settlement_Dump_Procces/output/Total_uk2.xlsx'
+base_path = os.getcwd()
+site_path = frappe.get_site_path()[1:]
 
+# target_folder = 'C:/PROJECT/Agarwals/SettlementAdvice/Settlement_Dump_Procces/output/Total_uk2.xlsx'
+# SITE_PATH = ''
+@frappe.whitelist()
 def advice_transform():
-    json={"Mediassist India Tpa P Ltd":{"columns":{"Claim Number": "claim_id",
-                                    "Claimed Amount": "claim_amount",
-                                    "Cheque/ NEFT/ UTR No.":"utr_number",
-                                    "Settled Amount":"settled_amount",
-                                    "TDS Amount":"tds_amount","Claim Status":"claim_status","Payment Update Date":"paid_date"},"index_col":1},
-          "ICIC":{"Claim Number": "claim_id",
-                                    "Claim-Amount Claimed": "claim_amount",
-                                    "Claim-Cheque Number":"utr_number",
-                                    "Claim-Transferred Amt":"settled_amount",
-                                    "Claim-TDS Amt":"tds_amount",
-                                    "Claim-Status":"claim_status",
-                                    "Claim-Date Of Approval":"paid_date"},
-          "Star Health": {"Claim ID": "claim_id",
-                    "Claim Amount": "claim_amount",
-                    "UTR": "utr_number",
-                    "Claim Net Pay Amount": "settled_amount",
-                    "T.D.S.": "tds_amount",
-                    "Status Name": "claim_status",
-                    "Settlement Date": "paid_date"},
-          "bajaj": {"CLAIM NO": "claim_id",
-                    "NET AMOUNT": "claim_amount",
-                          "UTR NO": "utr_number",
-                          "GROSS AMOUNT": "settled_amount",
-                          "TDS AMOUNT": "tds_amount",
-                          "TRANSFER DATE": "paid_date"},
-          "Health India": {"CCN": "claim_id",
-                    "Intimated Amount": "claim_amount",
-                    "utrnumber": "utr_number",
-                    "SettledAmount": "settled_amount",
-                    "Claim Status":"claim_status",
-                    "utrdate": "paid_date"},
-          "MD India": {"CCNNumber": "claim_id",
-                           "Settled_Amount": "claim_amount",
-                           "Cheque_No": "utr_number",
-                           "Paid_Amount": "settled_amount",
-                           "TDS_Amount":"tds_amount",
-                           "cheque_date": "paid_date"},
-          "paramount": {"FIR": "claim_id",
-                           "AL_AMOUNT": "claim_amount",
-                           "UTR_NO": "utr_number",
-                           "AMOUNT_PAID": "settled_amount",
-                           "TDS_AMT":"tds_amount",
-                            "STATUS":"claim_status",
-                           "DT_OF_PAYMENT": "paid_date"},
-          "Rohini":{"Claim Number":"claim_id",
-                           "Claimed Amount": "claim_amount",
-                           "Map Cheque/NEFT Number": "utr_number",
-                           "Total Amount Paid": "settled_amount",
-                           "TDS amount":"tds_amount",
-                            "Final Status":"claim_status",
-                           "Map Cheque/NEFT Date": "paid_date"},
-          "uk2":{"CCNNumber":"claim_id",
-                          "UTR_No": "utr_number",
-                           "Approved Amount": "settled_amount",
-                           "UTR_Dt": "paid_date"},}
-    clm_vlaues=json["uk2"]
 
-
-    # Get the list of all files and directories
-    dir_list = os.listdir(folder)
-
-    print("Files and directories in '", folder, "' :")
-
-    # prints all files
-    # print(dir_list)
-    total_df=pd.DataFrame()
-    for file in dir_list:
-        print("File:", file )
-        if ".csv" in file.lower():
-            df = pd.read_csv(folder + file,usecols=["Claim Number","Claim-Amount Claimed","Claim-Cheque Number","Claim-Transferred Amt","Claim-TDS Amt","Claim-Status","Claim-Date Of Approval"])
-            # df = pd.read_csv(folder + file)
+    file_details = frappe.get_all("File upload",{"status":"Open", "select_document_type": "Settlement Advice"},"*")
+    for file in file_details:
+        file_link = file.upload
+        folder =  f"{base_path}{site_path}{file_link}"
+        customer_name = file.payer_type
+        parser_details = frappe.get_doc("Excel Parser",customer_name)
+        parser_mapping = parser_details.mapping
+        # mapper = parser_mapping
+        mapper = '''{"Claim Number": "claim_id","Claim Amt":"claimed_amount","Cheque Number":"utr_number","Settled Amount":"settled_amount","TDS Amount":"tds_amount","Claim Status":"claim_status","Status":"claim_status","start_from":"claim amout"}'''
+        new_mapper = {"Claim Number": "claim_id","Claim Amt":"claimed_amount","Cheque Number":"utr_number","Settled Amount":"settled_amount","TDS Amount":"tds_amount","Claim Status":"claim_status","Status":"claim_status","start_from":"claim amout"}
+        mapper_obj = json.loads(mapper)
+        # mapper_list = [new_mapper]
+        print("File:", file)
+        if ".csv" in file_link.lower():
+            df = pd.read_csv(folder,usecols=["Claim Number","Claim-Amount Claimed","Claim-Cheque Number","Claim-Transferred Amt","Claim-TDS Amt","Claim-Status","Claim-Date Of Approval"])
         else:
-            # df = pd.read_excel(folder + file,header=2)
-            df = pd.read_excel(folder + file)
+            df = pd.read_excel(folder)
+            for every_obj in mapper_obj:
+                for index, row in df.iterrows():
+                        if every_obj in row.values:
+                            print(row.values)
+                            header_row_index = index
+                            break
+                break
+        df = pd.read_excel(folder , header = int(header_row_index)+1)
         columns = df.columns.values
-        # if 'Sum of Settled Amount' in columns:
-        #     df = df.rename(columns = {'Sum of Settled Amount':'Settled Amount','Sum of TDS Amount':"TDS Amount","Sum of Claimed Amount":"Claimed Amount"})
-        print(df.columns)
-        df=df.rename(columns=clm_vlaues)
-        # df = df[df["claim_status"] == "Claim Paid"]
-        df = df[['claim_id','utr_number', 'settled_amount',"paid_date"]]
+        print(columns)
+        df = df.rename(columns = new_mapper)
+        df = df[['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount"]]
         # df = df[['claim_id', 'claim_amount', 'utr_number', 'settled_amount',"paid_date"]]
-        total_df=pd.concat([total_df,df],axis=0)
-
-    total_df.dropna()
-    print(sum(total_df['settled_amount']))
-    format_utr(total_df)
-    print(len(total_df))
-    total_df.to_excel(target_folder,index=False)
-
-    # print(total_df)
-    # print(sum(total_df['Settled Amount']))
-
-
-    #total_claimbook_df = pd.read_excel(TOTAL_CLAIMBOOK)
-    #existing_claimbook_in_db = pd.read_excel(EXISTING_CLAIMBOOK_IN_DB)
+        df.dropna()
+        new_df = format_utr(df)
+        write_file_insert_record(new_df, folder,file_details,"None" )
+    # print(sum(total_df['settled_amount']))
+    
+    # print(len(total_df))
+    
+    # new_total_df.to_excel(target_folder,index=False)
 
 
 def remove_x(item):
@@ -140,11 +92,11 @@ def format_utr(df):
 
     return df
 
-def write_file_insert_record(df,filename, parent_field_id,upload_type):
+def write_file_insert_record(df,filename, parent_list,upload_type):
     is_private = 1
-    file_url = f"{SITE_PATH}/private/files/{filename}"
+    file_url = filename
     folder = "Home/DrAgarwals/Transform"
-    upload_type=upload_type
+    upload_type = upload_type
     # Create a temporary XLSX file
     with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmpfile:
         excel_file_path = tmpfile.name
@@ -160,33 +112,34 @@ def write_file_insert_record(df,filename, parent_field_id,upload_type):
             "is_private": is_private
         }).insert()
         
-    doc = frappe.get_doc("File upload",parent_field_id)
-    doc.status="In Process"
-    doc.append("document_reference", {
-        "date": date.today(),
+    for every_parent in parent_list: 
+        doc = frappe.get_doc("File upload",every_parent.name)
+        doc.status="In Process"
+        doc.append("document_reference", {
+        "date": now(),
         "document_type": doc.select_document_type,
         "status": "In Process",
         "file_url": file_url,
-        "upload_type":upload_type,
-    })
-    doc.save(ignore_permissions=True)
-    doc.reload()
+        # "upload_type":upload_type,
+    	})
+        doc.save(ignore_permissions=True)
+        
+        doc.reload()
 
-advice_transform()
 
 
-@frappe.whitelist()
-def data_feeder(**kwargs):
-    type = kwargs["document_type"]
-    list_to_clean = frappe.db.get_all("File upload", filters={"document_type": type,
-                                                              "status": "Open"},
-                                      fields=["upload", "name"])
-    for every_list in list_to_clean:
-        base_path = os.getcwd()
-        site_path = frappe.get_site_path()[1:]
-        claim_data = f"{base_path}{site_path}{every_list.upload}"
-        claim = format_utr(pd.read_excel(claim_data,engine='openpyxl'))
-        claim['utrno'] = claim.loc[:, 'utr_number']
-        formatted_utr = format_utr(claim)
-        file_name=every_list.upload.split("/")[-1]
-        write_file_insert_record(formatted_utr,f"new_{file_name}",every_list.name,upload_type="New")
+
+# @frappe.whitelist()
+# def data_feeder(**kwargs):
+#     type = kwargs["document_type"]
+#     list_to_clean = frappe.db.get_all("File upload", filters={"status":"Open", "document_type": "Settlement Advice"},fields="*")
+#     for every_list in list_to_clean:
+#         base_path = os.getcwd()
+#         site_path = frappe.get_site_path()[1:]
+#         claim_data = f"{base_path}{site_path}{every_list.upload}"
+#         claim = format_utr(pd.read_excel(claim_data,engine='openpyxl'))
+#         claim['utrno'] = claim.loc[:, 'utr_number']
+#         # formatted_utr = format_utr(claim)
+#         df=advice_transform()
+#         file_name=every_list.upload.split("/")[-1]
+#         write_file_insert_record(df,f"new_{file_name}",every_list.name,upload_type="New")
