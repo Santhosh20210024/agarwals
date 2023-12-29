@@ -79,7 +79,7 @@ class Transformer():
         error_log.save()
 
     def write_excel(self, df, file_path, type):
-        file_path = file_path.replace('extract', 'transform').replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
+        file_path = file_path.replace('Extract', 'Transform').replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
         file_path_to_write = SITE_PATH + file_path
         df.to_excel(file_path_to_write, index=False)
         return file_path
@@ -91,7 +91,8 @@ class Transformer():
         file.set('is_private', IS_PRIVATE)
         file.set('folder', FOLDER_TRANSFORM)
         file.set('file_url', file_url)
-        file.save(ignore_permissions=True)
+        file.save()
+        frappe.db.set_value('File',file.name,'file_url',file_url)
 
     def insert_in_file_upload(self, file_url, file_upload_name, type):
         file_upload = frappe.get_doc('File upload', file_upload_name)
