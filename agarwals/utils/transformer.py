@@ -140,7 +140,7 @@ class Transformer():
             for file in files:
                 self.load_source_df(file)
                 if self.source_df.empty:
-                    self.log_error(self.document_type, file['name'], 'The File was Empty')
+                    self.log_error(self.document_type, file['name'], 'The File is Empty')
                     continue
 
                 if self.hashing == 1:
