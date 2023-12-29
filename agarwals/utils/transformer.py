@@ -147,7 +147,7 @@ class Transformer():
                 self.load_target_df()
                 if self.target_df.empty:
                     self.new_records = self.source_df
-                    self.move_to_transform(file, self.new_records, 'insert',False)
+                    self.move_to_transform(file, self.new_records, 'Insert',False)
 
                 else:
                     merged_df = self.left_join()
@@ -155,9 +155,9 @@ class Transformer():
                     existing_df = merged_df[merged_df['_merge'] == 'both']
                     self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
                         existing_df)
-                    self.move_to_transform(file, self.modified_records, 'update')
-                    self.move_to_transform(file, self.unmodified_records, 'skip')
-                    self.move_to_transform(file, self.new_records, 'insert')
+                    self.move_to_transform(file, self.modified_records, 'Update')
+                    self.move_to_transform(file, self.unmodified_records, 'Skip')
+                    self.move_to_transform(file, self.new_records, 'Insert')
 
             # Todo Call Loading process.
 
