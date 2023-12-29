@@ -105,11 +105,12 @@ class Transformer():
                            })
         file_upload.save(ignore_permissions=True)
 
-    def move_to_transform(self, file, df, type):
+    def move_to_transform(self, file, df, type, prune = True):
         if df.empty:
             return None
 
-        df = self.prune_columns(df)
+        if prune:
+            df = self.prune_columns(df)
         file_path = self.write_excel(df, file['upload'], type)
         self.create_file_record(file_path)
         self.insert_in_file_upload(file_path, file['name'], type)
@@ -134,7 +135,7 @@ class Transformer():
 
     def process(self):
         files = self.get_files_to_transform()
-        if len(files) > 0:
+        if files:
             for file in files:
                 self.load_source_df(file)
                 if self.source_df.empty:
@@ -146,6 +147,7 @@ class Transformer():
                 self.load_target_df()
                 if self.target_df.empty:
                     self.new_records = self.source_df
+                    self.move_to_transform(file, self.new_records, 'insert',False)
 
                 else:
                     merged_df = self.left_join()
@@ -155,7 +157,8 @@ class Transformer():
                         existing_df)
                     self.move_to_transform(file, self.modified_records, 'update')
                     self.move_to_transform(file, self.unmodified_records, 'skip')
-                self.move_to_transform(file, self.new_records, 'insert')
+                    self.move_to_transform(file, self.new_records, 'insert')
+
             # Todo Call Loading process.
 
 
@@ -164,6 +167,7 @@ class BillTransformer(Transformer):
         super().__init__()
         self.file_type = 'Debtors Report'
         self.document_type = 'Bill'
+        self.hashing =
 
     def load_target_df(self):
         query = f"""
