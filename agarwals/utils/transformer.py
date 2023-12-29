@@ -5,6 +5,7 @@ from agarwals.utils.path_data import SITE_PATH
 import frappe
 import openpyxl
 from datetime import date
+import hashlib
 
 FOLDER_TRANSFORM = "Home/DrAgarwals/Transform"
 IS_PRIVATE = 0
@@ -15,9 +16,12 @@ class Transformer():
         self.file_type = ''
         self.document_type = ''
         self.source_df = pd.DataFrame()
+        self.target_df = pd.DataFrame()
         self.new_records = pd.DataFrame()
         self.modified_records = pd.DataFrame()
         self.unmodified_records = pd.DataFrame()
+        self.file = ''
+        self.hashing = 0
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -25,24 +29,25 @@ class Transformer():
                         FROM 
                             `tabFile upload` 
                         WHERE 
-                            status = 'Open' AND document_type = '{self.file_type}'"""
+                            status = 'Open' AND document_type = '{self.file_type}'
+                            ORDER BY creation"""
         files = frappe.db.sql(file_query, as_dict=True)
         return files
 
     def get_columns_to_be_queried(self):
         return []
 
-    def get_target_df(self):
+    def load_target_df(self):
         return []
 
     def get_join_columns(self):
-        self.left_df_column = ''
-        self.right_df_column = ''
-        return self.left_df_column, self.right_df_column
+        left_df_column = ''
+        right_df_column = ''
+        return left_df_column, right_df_column
 
-    def left_join(self, left_df, right_df):
+    def left_join(self):
         left_on, right_on = self.get_join_columns()
-        merged_df = left_df.merge(right_df, left_on=left_on, right_on=right_on, how='left', indicator=True,
+        merged_df = self.source_df.merge(self.target_df, left_on=left_on, right_on=right_on, how='left', indicator=True,
                                   suffixes=('', '_x'))
         return merged_df
 
@@ -109,7 +114,7 @@ class Transformer():
         self.create_file_record(file_path)
         self.insert_in_file_upload(file_path, file['name'], type)
 
-    def read_file(self, file):
+    def load_source_df(self, file):
         if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
             self.source_df = pd.read_excel(SITE_PATH + file['upload'], engine='openpyxl')
         elif file['upload'].endswith('.csv'):
@@ -117,31 +122,50 @@ class Transformer():
         else:
             self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
 
+    def get_columns_to_hash(self):
+        return []
+
+    def hashing_job(self):
+        self.source_df['hash_column'] = ''
+        columns_to_hash = self.get_columns_to_hash()
+        for column in columns_to_hash:
+            self.source_df['hash_column'] = self.source_df['hash_column'].astype(str) + self.source_df[column].astype(str)
+        self.source_df['hash'] = self.source_df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+
     def process(self):
         files = self.get_files_to_transform()
-        for file in files:
-            self.read_file(file)
-            if self.source_df.empty:
-                self.log_error(self.document_type, file['name'], 'The File was Empty')
-                continue
+        if len(files) > 0:
+            for file in files:
+                self.load_source_df(file)
+                if self.source_df.empty:
+                    self.log_error(self.document_type, file['name'], 'The File was Empty')
+                    continue
 
-            target_df = self.get_target_df()
-            merged_df = self.left_join(self.source_df, target_df)
-            self.new_records = merged_df[merged_df['_merge'] == 'left_only']
-            existing_df = merged_df[merged_df['_merge'] == 'both']
-            self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(existing_df)
-            self.move_to_transform(file, self.new_records, 'insert')
-            self.move_to_transform(file, self.modified_records, 'update')
-            self.move_to_transform(file, self.unmodified_records, 'skip')
+                if self.hashing == 1:
+                    self.hashing_job()
+                self.load_target_df()
+                if self.target_df.empty:
+                    self.new_records = self.source_df
+
+                else:
+                    merged_df = self.left_join()
+                    self.new_records = merged_df[merged_df['_merge'] == 'left_only']
+                    existing_df = merged_df[merged_df['_merge'] == 'both']
+                    self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
+                        existing_df)
+                    self.move_to_transform(file, self.modified_records, 'update')
+                    self.move_to_transform(file, self.unmodified_records, 'skip')
+                self.move_to_transform(file, self.new_records, 'insert')
+            # Todo Call Loading process.
 
 
 class BillTransformer(Transformer):
     def __init__(self):
         super().__init__()
-        self.file_type = 'Debtor Report'
+        self.file_type = 'Debtors Report'
         self.document_type = 'Bill'
 
-    def get_target_df(self):
+    def load_target_df(self):
         query = f"""
                      SELECT 
                          name, status
@@ -149,13 +173,12 @@ class BillTransformer(Transformer):
                          `tab{self.document_type}`
                      """
         records = frappe.db.sql(query, as_dict=True)
-        records = pd.DataFrame(records)
-        return records
+        self.target_df = pd.DataFrame(records)
 
     def get_join_columns(self):
-        self.left_df_column = 'Bill No'
-        self.right_df_column = 'name'
-        return self.left_df_column, self.right_df_column
+        left_df_column = 'Bill No'
+        right_df_column = 'name'
+        return left_df_column, right_df_column
 
     def get_columns_to_prune(self):
         return ['name', '_merge', 'status_x']
@@ -169,3 +192,28 @@ class ClaimbookTransformer(Transformer):
         super().__init__()
         self.file_type = 'Claim Book'
         self.document_type = 'ClaimBook'
+        self.hashing = 1
+
+    def get_columns_to_hash(self):
+        return ['settled_amount','tds_amount']
+
+    def load_target_df(self):
+        query = f"""
+                      SELECT 
+                          name, hash
+                      FROM 
+                          `tab{self.document_type}`
+                      """
+        records = frappe.db.sql(query, as_dict=True)
+        self.target_df = pd.DataFrame(records)
+
+    def get_join_columns(self):
+        left_df_column = 'unique_id'
+        right_df_column = 'name'
+        return left_df_column, right_df_column
+
+    def get_columns_to_prune(self):
+        return ['name', '_merge','hash_x']
+
+    def get_columns_to_check(self):
+        return {'hash': 'hash_x'}
