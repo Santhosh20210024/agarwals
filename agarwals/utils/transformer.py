@@ -220,7 +220,7 @@ class ClaimbookTransformer(Transformer):
         self.hashing = 1
 
     def get_columns_to_hash(self):
-        return ['settled_amount','tds_amount']
+        return ['unique_id','settled_amount']
 
     def load_target_df(self):
         query = f"""
