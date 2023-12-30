@@ -9,14 +9,13 @@ import pandas as pd
 
 
 class Bill(Document):
-	pass
-	# def before_save(self):
-	# self.cost_center = self.branch + " - A"
-	# 	# Sales Invoice creation before saving the debtors
-	# 	if self.region == "Dr Agarwals Eye Hospital - A":
-	# 		self.region = self.cost_center
-	#
-	# 	self.region = self.region.replace(" - A", "")
+	def before_save(self):
+		self.cost_center = self.branch + " - A"
+		# # Sales Invoice creation before saving the debtors
+		# if self.region == "Dr Agarwals Eye Hospital - A":
+		# 	self.region = self.cost_center
+	
+		# self.region = self.region.replace(" - A", "")
 
 
 
