@@ -54,7 +54,7 @@ class Transformer():
     def prune_columns(self, df):
         columns_to_prune = self.get_columns_to_prune()
         for column in columns_to_prune:
-            df = df.loc[:df.columns != column]
+            df = df.loc[:,df.columns != column]
         return df
 
     def get_columns_to_prune(self):
@@ -79,7 +79,10 @@ class Transformer():
         error_log.save()
 
     def write_excel(self, df, file_path, type):
-        file_path = file_path.replace('Extract', 'Transform').replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
+        if type == 'Skip':
+            file_path = file_path.replace('Extract', 'Bin').replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
+        else:
+            file_path = file_path.replace('Extract', 'Transform').replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
         file_path_to_write = SITE_PATH + file_path
         df.to_excel(file_path_to_write, index=False)
         return file_path
@@ -176,8 +179,8 @@ class BillTransformer(Transformer):
                      FROM 
                          `tab{self.document_type}`
                      """
-        records = frappe.db.sql(query, as_dict=True)
-        self.target_df = pd.DataFrame(records)
+        records = frappe.db.sql(query, as_list=True)
+        self.target_df = pd.DataFrame(records,columns = ['name','status'])
 
     def get_join_columns(self):
         left_df_column = 'Bill No'
@@ -185,10 +188,10 @@ class BillTransformer(Transformer):
         return left_df_column, right_df_column
 
     def get_columns_to_prune(self):
-        return ['name', '_merge', 'status_x']
+        return ['name', '_merge', 'status']
 
     def get_columns_to_check(self):
-        return {'status': 'status_x'}
+        return {'Status': 'status'}
 
 
 class ClaimbookTransformer(Transformer):
