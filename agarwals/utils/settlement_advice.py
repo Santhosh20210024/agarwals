@@ -22,21 +22,23 @@ def advice_transform():
         folder =  f"{base_path}{site_path}{file_link}"
         customer_name = file.payer_type
         parser_details = frappe.get_doc("Excel Parser",customer_name)
-        parser_mapping = parser_details.mapping
-        # mapper = parser_mapping
-        mapper = '''{"Claim Number": "claim_id","Claim Amt":"claimed_amount","Cheque Number":"utr_number","Settled Amount":"settled_amount","TDS Amount":"tds_amount","Claim Status":"claim_status","Status":"claim_status","start_from":"claim amout"}'''
-        new_mapper = {"Claim Number": "claim_id","Claim Amt":"claimed_amount","Cheque Number":"utr_number","Settled Amount":"settled_amount","TDS Amount":"tds_amount","Claim Status":"claim_status","Status":"claim_status","start_from":"claim amout"}
-        mapper_obj = json.loads(mapper)
-        # mapper_list = [new_mapper]
+        mapper = parser_details.mapping
+        new_mapper = json.loads(mapper)
         print("File:", file)
         if ".csv" in file_link.lower():
             df = pd.read_csv(folder,usecols=["Claim Number","Claim-Amount Claimed","Claim-Cheque Number","Claim-Transferred Amt","Claim-TDS Amt","Claim-Status","Claim-Date Of Approval"])
         else:
             df = pd.read_excel(folder)
-            for every_obj in mapper_obj:
+            i = 1
+            for keys in new_mapper.keys():
                 for index, row in df.iterrows():
-                        if every_obj in row.values:
-                            print(row.values)
+                        if keys in row.index and i == 1:
+                            header_row_index = -1
+                            break
+                        i = 2
+                        
+                        if keys in row.values:
+                            print(row.index)
                             header_row_index = index
                             break
                 break
@@ -44,21 +46,22 @@ def advice_transform():
         columns = df.columns.values
         print(columns)
         df = df.rename(columns = new_mapper)
-        df = df[['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount"]]
-        # df = df[['claim_id', 'claim_amount', 'utr_number', 'settled_amount',"paid_date"]]
-        df.dropna()
-        new_df = format_utr(df)
-        write_file_insert_record(new_df, folder,file_details,"None", file.name )
-    # print(sum(total_df['settled_amount']))
-    
-    # print(len(total_df))
-    
-    # new_total_df.to_excel(target_folder,index=False)
+        print(df.columns)
+        if "claim_id" in df.columns and "utr_number" in df.columns:
+            df = df[['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount"]]
+            new_file_name = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/{file.name}'
+            df.dropna()
+            new_df = format_utr(df)
+            write_file_insert_record(new_df, folder,file_details,"None", new_file_name)
+        else:
+            folder = None
+            new_file_name = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/Error/{file.name}'
+            write_file_insert_record(df,folder, file_details, "None", new_file_name )
+
 def write_file_insert_record(df,filename, parent_list,upload_type, new_file_name):
     is_private = 1
-    folder = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/{new_file_name}'
     upload_type = upload_type
-    df.to_excel(folder, engine='openpyxl')
+    df.to_excel(new_file_name, engine='openpyxl')
     for every_parent in parent_list: 
         doc = frappe.get_doc("File upload",every_parent.name)
         doc.status="In Process"
@@ -66,7 +69,7 @@ def write_file_insert_record(df,filename, parent_list,upload_type, new_file_name
         "date": now(),
         "document_type": doc.select_document_type,
         "status": "In Process",
-        "file_url": folder,
+        "file_url": new_file_name,
         # "upload_type":upload_type,
     	})
         doc.save(ignore_permissions=True)
