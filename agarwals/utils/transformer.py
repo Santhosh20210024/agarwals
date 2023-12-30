@@ -8,6 +8,7 @@ from datetime import date
 import hashlib
 
 FOLDER_TRANSFORM = "Home/DrAgarwals/Transform"
+FOLDER_BIN = 'Home/DrAgarwals/Bin'
 IS_PRIVATE = 0
 
 
@@ -92,7 +93,10 @@ class Transformer():
         file = frappe.new_doc('File')
         file.set('file_name', file_name)
         file.set('is_private', IS_PRIVATE)
-        file.set('folder', FOLDER_TRANSFORM)
+        if 'Bin' in file_url:
+            file.set('folder', FOLDER_BIN)
+        else:
+            file.set('folder', FOLDER_TRANSFORM)
         file.set('file_url', file_url)
         file.save()
         frappe.db.set_value('File',file.name,'file_url',file_url)
