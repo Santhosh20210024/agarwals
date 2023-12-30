@@ -6,10 +6,10 @@ import frappe
 import openpyxl
 from datetime import date
 import hashlib
+from agarwals.utils.loader import Loader
 
-FOLDER_TRANSFORM = "Home/DrAgarwals/Transform"
-FOLDER_BIN = 'Home/DrAgarwals/Bin'
-IS_PRIVATE = 0
+FOLDER = "Home/DrAgarwals/"
+IS_PRIVATE = 1
 
 
 class Transformer():
@@ -46,11 +46,17 @@ class Transformer():
         right_df_column = ''
         return left_df_column, right_df_column
 
-    def left_join(self):
-        left_on, right_on = self.get_join_columns()
-        merged_df = self.source_df.merge(self.target_df, left_on=left_on, right_on=right_on, how='left', indicator=True,
-                                  suffixes=('', '_x'))
-        return merged_df
+    def left_join(self,file):
+        try:
+            left_on, right_on = self.get_join_columns()
+            merged_df = self.source_df.merge(self.target_df, left_on=left_on, right_on=right_on, how='left',
+                                             indicator=True,
+                                             suffixes=('', '_x'))
+            return merged_df
+
+        except Exception as e:
+            self.change_status('File upload', file['name'], 'Error')
+            self.log_error('File upload',file['name'],e)
 
     def prune_columns(self, df):
         columns_to_prune = self.get_columns_to_prune()
@@ -79,29 +85,23 @@ class Transformer():
         error_log.set('error_message', error_message)
         error_log.save()
 
-    def write_excel(self, df, file_path, type):
-        if type == 'Skip':
-            file_path = file_path.replace('Extract', 'Bin').replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
-        else:
-            file_path = file_path.replace('Extract', 'Transform').replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
+    def write_excel(self, df, file_path, type, target_folder):
+        file_path = file_path.replace('Extract', target_folder).replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
         file_path_to_write = SITE_PATH + file_path
         df.to_excel(file_path_to_write, index=False)
         return file_path
 
-    def create_file_record(self, file_url):
+    def create_file_record(self, file_url,folder):
         file_name = file_url.split('/')[-1]
         file = frappe.new_doc('File')
         file.set('file_name', file_name)
         file.set('is_private', IS_PRIVATE)
-        if 'Bin' in file_url:
-            file.set('folder', FOLDER_BIN)
-        else:
-            file.set('folder', FOLDER_TRANSFORM)
+        file.set('folder', FOLDER + folder)
         file.set('file_url', file_url)
         file.save()
         frappe.db.set_value('File',file.name,'file_url',file_url)
 
-    def insert_in_file_upload(self, file_url, file_upload_name, type):
+    def insert_in_file_upload(self, file_url, file_upload_name, type, status):
         file_upload = frappe.get_doc('File upload', file_upload_name)
         file_upload.append('transform',
                            {
@@ -109,19 +109,19 @@ class Transformer():
                                'document_type': self.document_type,
                                'type': type,
                                'file_url': file_url,
-                               'status': 'Open'
+                               'status': status
                            })
         file_upload.save(ignore_permissions=True)
 
-    def move_to_transform(self, file, df, type, prune = True):
+    def move_to_transform(self, file, df, type, folder, prune = True, status = 'Open'):
         if df.empty:
             return None
 
         if prune:
             df = self.prune_columns(df)
-        file_path = self.write_excel(df, file['upload'], type)
-        self.create_file_record(file_path)
-        self.insert_in_file_upload(file_path, file['name'], type)
+        file_path = self.write_excel(df, file['upload'], type,folder)
+        self.create_file_record(file_path,folder)
+        self.insert_in_file_upload(file_path, file['name'], type, status)
 
     def load_source_df(self, file):
         if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
@@ -130,6 +130,7 @@ class Transformer():
             self.source_df = pd.read_csv(SITE_PATH + file['upload'])
         else:
             self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
+            self.change_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
         return []
@@ -141,31 +142,40 @@ class Transformer():
             self.source_df['hash_column'] = self.source_df['hash_column'].astype(str) + self.source_df[column].astype(str)
         self.source_df['hash'] = self.source_df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
 
+    def change_status(self, doctype, name, status):
+        frappe.db.set_value(doctype,name,'status',status)
+
     def process(self):
         files = self.get_files_to_transform()
-        if files:
-            for file in files:
-                self.load_source_df(file)
-                if self.source_df.empty:
-                    self.log_error(self.document_type, file['name'], 'The File is Empty')
-                    continue
+        if files == []:
+            return None
+        for file in files:
+            self.change_status('File upload',file['name'],'In Process')
+            self.load_source_df(file)
+            if self.source_df.empty:
+                self.log_error(self.document_type, file['name'], 'The File is Empty')
+                self.change_status('File upload', file['name'], 'Error')
+                continue
 
-                if self.hashing == 1:
-                    self.hashing_job()
-                self.load_target_df()
-                if self.target_df.empty:
-                    self.new_records = self.source_df
-                    self.move_to_transform(file, self.new_records, 'Insert',False)
+            if self.hashing == 1:
+                self.hashing_job()
+            self.load_target_df()
+            if self.target_df.empty:
+                self.new_records = self.source_df
+                self.move_to_transform(file, self.new_records, 'Insert','Transform',False)
 
-                else:
-                    merged_df = self.left_join()
-                    self.new_records = merged_df[merged_df['_merge'] == 'left_only']
-                    existing_df = merged_df[merged_df['_merge'] == 'both']
-                    self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
-                        existing_df)
-                    self.move_to_transform(file, self.modified_records, 'Update')
-                    self.move_to_transform(file, self.unmodified_records, 'Skip')
-                    self.move_to_transform(file, self.new_records, 'Insert')
+            else:
+                merged_df = self.left_join(file)
+                self.new_records = merged_df[merged_df['_merge'] == 'left_only']
+                existing_df = merged_df[merged_df['_merge'] == 'both']
+                self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
+                    existing_df)
+                self.move_to_transform(file, self.modified_records, 'Update','Transform',True)
+                self.move_to_transform(file, self.unmodified_records, 'Skip','Bin',True, 'Skipped')
+                self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
+            loader = Loader(self.document_type)
+            loader.process()
+
 
             # Todo Call Loading process.
 
@@ -215,8 +225,8 @@ class ClaimbookTransformer(Transformer):
                       FROM 
                           `tab{self.document_type}`
                       """
-        records = frappe.db.sql(query, as_dict=True)
-        self.target_df = pd.DataFrame(records)
+        records = frappe.db.sql(query, as_list=True)
+        self.target_df = pd.DataFrame(records,columns=['name','hash'])
 
     def get_join_columns(self):
         left_df_column = 'unique_id'
