@@ -57,6 +57,7 @@ class Transformer():
         except Exception as e:
             self.change_status('File upload', file['name'], 'Error')
             self.log_error('File upload',file['name'],e)
+            return pd.DataFrame()
 
     def prune_columns(self, df):
         columns_to_prune = self.get_columns_to_prune()
@@ -144,6 +145,7 @@ class Transformer():
 
     def change_status(self, doctype, name, status):
         frappe.db.set_value(doctype,name,'status',status)
+        frappe.db.commit()
 
     def process(self):
         files = self.get_files_to_transform()
@@ -166,6 +168,8 @@ class Transformer():
 
             else:
                 merged_df = self.left_join(file)
+                if merged_df.empty:
+                    continue
                 self.new_records = merged_df[merged_df['_merge'] == 'left_only']
                 existing_df = merged_df[merged_df['_merge'] == 'both']
                 self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
