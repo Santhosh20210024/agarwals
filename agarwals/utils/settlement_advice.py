@@ -48,13 +48,30 @@ def advice_transform():
         # df = df[['claim_id', 'claim_amount', 'utr_number', 'settled_amount',"paid_date"]]
         df.dropna()
         new_df = format_utr(df)
-        write_file_insert_record(new_df, folder,file_details,"None" )
+        write_file_insert_record(new_df, folder,file_details,"None", file.name )
     # print(sum(total_df['settled_amount']))
     
     # print(len(total_df))
     
     # new_total_df.to_excel(target_folder,index=False)
-
+def write_file_insert_record(df,filename, parent_list,upload_type, new_file_name):
+    is_private = 1
+    folder = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/{new_file_name}'
+    upload_type = upload_type
+    df.to_excel(folder, engine='openpyxl')
+    for every_parent in parent_list: 
+        doc = frappe.get_doc("File upload",every_parent.name)
+        doc.status="In Process"
+        doc.append("document_reference", {
+        "date": now(),
+        "document_type": doc.select_document_type,
+        "status": "In Process",
+        "file_url": folder,
+        # "upload_type":upload_type,
+    	})
+        doc.save(ignore_permissions=True)
+        doc.reload()
+        
 
 def remove_x(item):
     if "XXXXXXX" in str(item):
@@ -92,39 +109,7 @@ def format_utr(df):
 
     return df
 
-def write_file_insert_record(df,filename, parent_list,upload_type):
-    is_private = 1
-    file_url = filename
-    folder = "Home/DrAgarwals/Transform"
-    upload_type = upload_type
-    # Create a temporary XLSX file
-    with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmpfile:
-        excel_file_path = tmpfile.name
-        df.to_excel(excel_file_path, index=False, engine='openpyxl')
 
-        shutil.copy(excel_file_path, file_url)
-
-        frappe.get_doc({
-            "doctype": "File",
-            "file_name": filename,
-            "folder": folder,
-            "file_url": "https://{file_url}",
-            "is_private": is_private
-        }).insert()
-        
-    for every_parent in parent_list: 
-        doc = frappe.get_doc("File upload",every_parent.name)
-        doc.status="In Process"
-        doc.append("document_reference", {
-        "date": now(),
-        "document_type": doc.select_document_type,
-        "status": "In Process",
-        "file_url": file_url,
-        # "upload_type":upload_type,
-    	})
-        doc.save(ignore_permissions=True)
-        
-        doc.reload()
 
 
 
