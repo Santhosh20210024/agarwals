@@ -348,12 +348,12 @@
   {
    "fieldname": "hash",
    "fieldtype": "Data",
-   "label": "Hash"
+   "label": "hash "
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-02 11:32:49.469811",
+ "modified": "2024-01-02 12:11:47.567560",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
