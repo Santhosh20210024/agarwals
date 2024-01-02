@@ -238,7 +238,7 @@ class ClaimbookTransformer(Transformer):
         return left_df_column, right_df_column
 
     def get_columns_to_prune(self):
-        return ['name', '_merge','hash_x']
+        return ['name', '_merge','hash_x','hash_column']
 
     def get_columns_to_check(self):
         return {'hash': 'hash_x'}

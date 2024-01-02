@@ -60,7 +60,8 @@
   "others_section",
   "sub_date",
   "remarks",
-  "file_size"
+  "file_size",
+  "hash"
  ],
  "fields": [
   {
@@ -341,11 +342,16 @@
    "fieldname": "amount_",
    "fieldtype": "Heading",
    "label": "Amount"
+  },
+  {
+   "fieldname": "hash",
+   "fieldtype": "Data",
+   "label": "Hash"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-17 18:17:47.921813",
+ "modified": "2024-01-02 11:16:27.657174",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
