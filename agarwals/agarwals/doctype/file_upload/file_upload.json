@@ -50,7 +50,7 @@
    "fieldtype": "Select",
    "hidden": 1,
    "label": "Status",
-   "options": "Open\nIn Process\nProcessed\nError"
+   "options": "Open\nIn Process\nPartially Loaded\nLoaded\nError"
   },
   {
    "bold": 1,
@@ -71,7 +71,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-29 12:36:51.554482",
+ "modified": "2024-01-02 12:45:50.844687",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",

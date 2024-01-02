@@ -147,6 +147,19 @@ class Transformer():
         frappe.db.set_value(doctype,name,'status',status)
         frappe.db.commit()
 
+    def change_status_using_child_table(self,file):
+        file_upload = frappe.get_doc('File upload',file['name'])
+        transform_file_status = []
+        for transform_record in file_upload.transform:
+            transform_file_status.append(transform_record['status'])
+        if "Error" in transform_file_status:
+            self.change_status('File upload', file['name'], 'Error')
+        elif "Partially Loaded" in transform_file_status:
+            self.change_status('File upload', file['name'], 'Partially Loaded')
+        else:
+            self.change_status('File upload', file['name'], 'Loaded')
+
+
     def process(self):
         files = self.get_files_to_transform()
         if files == []:
@@ -177,11 +190,9 @@ class Transformer():
                 self.move_to_transform(file, self.modified_records, 'Update','Transform',True)
                 self.move_to_transform(file, self.unmodified_records, 'Skip','Bin',True, 'Skipped')
                 self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
-            loader = Loader(self.document_type)
-            loader.process()
-
-
-            # Todo Call Loading process.
+                loader = Loader(self.document_type)
+                loader.process()
+                status = self.change_status_using_child_table(file)
 
 
 class BillTransformer(Transformer):
