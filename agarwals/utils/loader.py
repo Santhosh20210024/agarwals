@@ -38,11 +38,11 @@ class Loader():
         template = data_import_mapping.template
         data_import = frappe.new_doc("Data Import")
         data_import.set('reference_doctype', self.document_type)
+        data_import.set('name',file['name'])
         data_import.set('import_type', import_type)
         data_import.set('import_file', file['file_url'])
         data_import.save()
         frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
-        frappe.db.set_value("Data Import",data_import.name,'name',file['name'])
         data_import.start_import()
 
     def process(self):
