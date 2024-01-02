@@ -147,15 +147,25 @@ class Transformer():
         frappe.db.set_value(doctype,name,'status',status)
         frappe.db.commit()
 
-    def change_status_using_child_table(self,file):
+    def change_whole_status(self,file):
         file_upload = frappe.get_doc('File upload',file['name'])
-        transform_file_status = []
-        transform_files = file_upload.transform
-        for transform_record in transform_files:
-            transform_file_status.append(transform_record.status)
-        if "Error" in transform_file_status:
-            self.change_status('File upload', file['name'], 'Error')
-        elif "Partially Loaded" in transform_file_status:
+        transform_records_status = []
+        transform_records = file_upload.transform
+        for transform in transform_records:
+            transform_record = frappe.get_doc('Data Import',transform.name)
+            status = transform_record.status
+            if status == 'Not Started' and status == 'Error':
+                transform.status = 'Error'
+                transform_records_status.append(transform.status)
+            elif status == 'Partial Success':
+                transform.status = 'Partially Loaded'
+                transform_records_status.append(transform.status)
+            elif status == 'Success':
+                transform.status = 'Loaded'
+                transform_records_status.append(transform.status)
+        if "Error" in transform_records_status:
+            self.change_status('File upload',file['name'], 'Error')
+        elif "Partially Loaded":
             self.change_status('File upload', file['name'], 'Partially Loaded')
         else:
             self.change_status('File upload', file['name'], 'Loaded')
@@ -193,7 +203,7 @@ class Transformer():
                 self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
                 loader = Loader(self.document_type)
                 loader.process()
-                status = self.change_status_using_child_table(file)
+                self.change_status_using_child_table(file)
 
 
 class BillTransformer(Transformer):
