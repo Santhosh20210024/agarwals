@@ -150,7 +150,8 @@ class Transformer():
     def change_status_using_child_table(self,file):
         file_upload = frappe.get_doc('File upload',file['name'])
         transform_file_status = []
-        for transform_record in file_upload.transform:
+        transform_files = file_upload.transform
+        for transform_record in transform_files:
             transform_file_status.append(transform_record['status'])
         if "Error" in transform_file_status:
             self.change_status('File upload', file['name'], 'Error')

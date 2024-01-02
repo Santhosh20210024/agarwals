@@ -34,16 +34,20 @@ class Loader():
                 return 'Update Existing Records'
 
     def load_data(self,import_type,file):
-        data_import_mapping_doc = frappe.get_doc("Data Import Mapping", self.document_type)
-        template = data_import_mapping_doc.template
-        data_import_doc = frappe.new_doc("Data Import")
-        data_import_doc.set('reference_doctype', self.document_type)
-        data_import_doc.set('import_type', import_type)
-        data_import_doc.set('import_file', file['file_url'])
-        data_import_doc.save()
-        frappe.db.set_value("Data Import", data_import_doc.name, 'template_options', template)
-        data_import_doc.start_import()
-        return data_import_doc.status
+        data_import_mapping = frappe.get_doc("Data Import Mapping", self.document_type)
+        template = data_import_mapping.template
+        data_import = frappe.new_doc("Data Import")
+        data_import.set('reference_doctype', self.document_type)
+        data_import.set('import_type', import_type)
+        data_import.set('import_file', file['file_url'])
+        data_import.save()
+        frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
+        data_import.start_import()
+        return data_import.name
+
+    def get_data_import_status(self,name):
+        data_import = frappe.get_doc('Data Import', name)
+        return data_import.status
 
     def process(self):
         files = self.get_files_to_load()
@@ -52,7 +56,8 @@ class Loader():
         for file in files:
             self.change_status('Transform', file['name'], 'In Process')
             import_type = self.get_type_of_import(file)
-            status = self.load_data(import_type,file)
+            data_import = self.load_data(import_type,file)
+            status = self.get_data_import_status(data_import)
             if status == "Success":
                 self.change_status('Transform', file['name'], 'Loaded')
             elif status == "Not Started" and status == "Error":
