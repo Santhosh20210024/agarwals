@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:unique_id",
+ "autoname": "field : unique_id",
  "creation": "2023-11-30 15:08:14.268098",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -152,9 +152,8 @@
   },
   {
    "fieldname": "final_bill_number",
-   "fieldtype": "Link",
-   "label": "Final Bill Number",
-   "options": "Sales Invoice"
+   "fieldtype": "Data",
+   "label": "Final Bill Number"
   },
   {
    "fieldname": "final_bill_date",
@@ -294,8 +293,7 @@
   {
    "fieldname": "unique_id",
    "fieldtype": "Data",
-   "label": "Unique ID",
-   "unique": 1
+   "label": "Unique ID"
   },
   {
    "fieldname": "sub_date",
@@ -348,12 +346,12 @@
   {
    "fieldname": "hash",
    "fieldtype": "Data",
-   "label": "Hash"
+   "label": "hash "
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-02 11:32:49.469811",
+ "modified": "2024-01-02 11:37:42.419681",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
