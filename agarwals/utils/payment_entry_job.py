@@ -1,7 +1,6 @@
 import frappe
 from datetime import datetime
 import traceback
-
 class BankTransactionWrapper():
     
     def __init__(self, bank_transaction):
@@ -16,6 +15,8 @@ class BankTransactionWrapper():
                 SELECT * FROM `tabSettlement Advice` WHERE utr_number = %(utr_number)s
                 """, values = { 'utr_number' : str(self.bank_transaction.reference_number).strip().lstrip('0') }, as_dict = 1 )
             
+            advices = [item for item in advices if (item.status == None) or (item.status == 'Error' and item.retry == 1) ]
+            
             if len(advices) < 1:
                 return
             
@@ -24,7 +25,6 @@ class BankTransactionWrapper():
             bank_je.accounts = []
             bank_je_advices = []
             tds_je_advices = []
-
             for advice in advices:
                 if not (advice.claim_id or advice.bill_no):
                     continue
@@ -32,7 +32,6 @@ class BankTransactionWrapper():
                     break
                 
                 entry, tds_entry = self.create_payment_entry_item(advice)
-
                 if entry:
                     bank_je.append('accounts', entry)
                     bank_je_advices.append(advice.name)
@@ -42,7 +41,6 @@ class BankTransactionWrapper():
                         tds_je_advices.append(advice.name)
                 else:
                     continue
-
             if  bank_je.accounts != None and len(bank_je.accounts) > 0:
                 allocated_amount = self.bank_transaction.deposit - self.available_amount
                 asset_entry = {'account': self.bank_account, 'debit_in_account_currency': allocated_amount }
@@ -59,11 +57,9 @@ class BankTransactionWrapper():
                 self.set_transaction_reference(bank_je.name, allocated_amount)
             
             if tds_je.accounts != None and len(tds_je.accounts) > 0:
-                self.create_tds_entry(tds_je,tds_je_advices)
-
+                self.create_tds_entries(tds_je,tds_je_advices)
             if len(tds_je.accounts) > 0 or len(bank_je.accounts) > 0:
                 frappe.db.commit()
-
         except Exception as error:
             self.error_log(system_error_msg = error)
             
@@ -74,9 +70,9 @@ class BankTransactionWrapper():
                 "parenttype": 'Journal Entry',
                 "parent": je_doc.name
             })
-            return je_doc
-
-    def create_tds_entry(self, tds_je, tds_je_advices):
+        return je_doc
+    
+    def create_tds_entries(self, tds_je, tds_je_advices):
         try:
             name_ref = self.bank_transaction.reference_number or self.bank_transaction.name
             tds_je.name = str(name_ref) + "-" + "TDS"
@@ -84,7 +80,6 @@ class BankTransactionWrapper():
             tds_je.company = frappe.get_value("Global Defaults", None, "default_company")
             tds_je.posting_date = self.bank_transaction.date
             tds_je.cheque_date = self.bank_transaction.date
-            tds_je.bank_reference = self.bank_transaction.name
             tds_je = self.get_advice_obj_list(tds_je_advices, tds_je)
             tds_je.cheque_no = str(name_ref)
             tds_je.submit()
@@ -120,7 +115,7 @@ class BankTransactionWrapper():
     def get_sales_invoice(self, advice, bill_number):
         sales_invoices = frappe.db.sql("""
         SELECT * FROM `tabSales Invoice` WHERE name = %(name)s  
-        """,values = { 'name' : bill_number}, as_dict=1)
+        and status != 'Paid'""",values = { 'name' : bill_number}, as_dict=1)
         if len(sales_invoices) == 1:
             return sales_invoices[0]
         else:
@@ -153,7 +148,6 @@ class BankTransactionWrapper():
                 return None,None
         else:
             allocated_amount = self.available_amount
-
         self.available_amount = self.available_amount - allocated_amount
         
         entry = {
@@ -212,11 +206,9 @@ class BankTransactionWrapper():
             trace_info = traceback.format_exc()
             error_record_doc.error_message = f"Error: {str(system_error_msg)}\n\nTraceback:\n{trace_info}"
             error_record_doc.save()
-
         else:
             error_record_doc.error_message = user_error_msg
             error_record_doc.save()
-
 def batch_operation(chunk):
     for record in chunk:
         transaction_doc = frappe.get_doc("Bank Transaction", record)
@@ -225,8 +217,7 @@ def batch_operation(chunk):
         
 def get_unreconciled_bank_transactions():
     return frappe.db.sql("""
-    SELECT * FROM `tabBank Transaction` WHERE status in ('unreconciled', 'pending') AND deposit > 0 AND deposit is NOT NULL AND LENGTH(reference_number) > 1""", as_dict=1)
-
+    SELECT name FROM `tabBank Transaction` WHERE status in ('unreconciled', 'pending') AND deposit > 0 AND deposit is NOT NULL AND LENGTH(reference_number) > 1;""", as_dict=1)
 
 @frappe.whitelist()
 def create_payment_entries():
@@ -234,8 +225,6 @@ def create_payment_entries():
     bank_transactions = []
     for bank_transaction in unreconciled_bank_transactions:
             bank_transactions.append(bank_transaction.name)
-
     chunk_size = 1000
-    
     for i in range(0, len(bank_transactions), chunk_size):
         frappe.enqueue(batch_operation, queue='long', is_async=True, timeout=18000, chunk = bank_transactions[i:i + chunk_size])
