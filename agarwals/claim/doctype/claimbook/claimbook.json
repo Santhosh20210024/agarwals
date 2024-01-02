@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:unique_id",
  "creation": "2023-11-30 15:08:14.268098",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -293,7 +294,8 @@
   {
    "fieldname": "unique_id",
    "fieldtype": "Data",
-   "label": "Unique ID"
+   "label": "Unique ID",
+   "unique": 1
   },
   {
    "fieldname": "sub_date",
@@ -351,10 +353,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-02 11:16:27.657174",
+ "modified": "2024-01-02 11:32:49.469811",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
