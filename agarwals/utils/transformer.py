@@ -152,7 +152,7 @@ class Transformer():
         transform_file_status = []
         transform_files = file_upload.transform
         for transform_record in transform_files:
-            transform_file_status.append(transform_record['status'])
+            transform_file_status.append(transform_record.status)
         if "Error" in transform_file_status:
             self.change_status('File upload', file['name'], 'Error')
         elif "Partially Loaded" in transform_file_status:
