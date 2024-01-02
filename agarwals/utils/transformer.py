@@ -203,7 +203,7 @@ class Transformer():
                 self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
                 loader = Loader(self.document_type)
                 loader.process()
-                self.change_status_using_child_table(file)
+                self.change_whole_status(file)
 
 
 class BillTransformer(Transformer):
