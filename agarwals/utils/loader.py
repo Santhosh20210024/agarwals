@@ -1,4 +1,5 @@
 import frappe
+from frappe.core.doctype.data_import.data_import import start_import
 class Loader():
     def __init__(self,document_type):
         self.document_type = document_type
@@ -43,7 +44,7 @@ class Loader():
         data_import.set('import_file', file['file_url'])
         data_import.save()
         frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
-        data_import.start_import()
+        start_import(data_import.name)
         return data_import.status
 
     def process(self):

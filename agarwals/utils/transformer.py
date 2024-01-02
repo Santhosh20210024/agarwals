@@ -1,9 +1,6 @@
 import pandas as pd
-import os
-import shutil
 from agarwals.utils.path_data import SITE_PATH
 import frappe
-import openpyxl
 from datetime import date
 import hashlib
 from agarwals.utils.loader import Loader
@@ -23,6 +20,7 @@ class Transformer():
         self.unmodified_records = pd.DataFrame()
         self.file = ''
         self.hashing = 0
+        self.clean_utr = 0
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -160,6 +158,9 @@ class Transformer():
         else:
             self.update_status('File upload', file['name'], 'Loaded')
 
+    def format_utr(self):
+        utr_list = self.source_df.fillutr_number
+
 
     def process(self):
         files = self.get_files_to_transform()
@@ -168,6 +169,7 @@ class Transformer():
         for file in files:
             self.update_status('File upload', file['name'], 'In Process')
             self.load_source_df(file)
+
             if self.source_df.empty:
                 self.log_error(self.document_type, file['name'], 'The File is Empty')
                 self.update_status('File upload', file['name'], 'Error')
@@ -175,15 +177,20 @@ class Transformer():
 
             if self.hashing == 1:
                 self.hashing_job()
+
+            if self.clean_utr == 1:
+                self.format_utr()
+
             self.load_target_df()
+
             if self.target_df.empty:
                 self.new_records = self.source_df
                 self.move_to_transform(file, self.new_records, 'Insert','Transform',False)
-
             else:
                 merged_df = self.left_join(file)
                 if merged_df.empty:
                     continue
+
                 self.new_records = merged_df[merged_df['_merge'] == 'left_only']
                 existing_df = merged_df[merged_df['_merge'] == 'both']
                 self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
@@ -191,9 +198,9 @@ class Transformer():
                 self.move_to_transform(file, self.modified_records, 'Update','Transform',True)
                 self.move_to_transform(file, self.unmodified_records, 'Skip','Bin',True, 'Skipped')
                 self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
-                loader = Loader(self.document_type)
-                loader.process()
-                self.update_parent_status(file)
+            loader = Loader(self.document_type)
+            loader.process()
+            self.update_parent_status(file)
 
 
 class BillTransformer(Transformer):
@@ -230,6 +237,7 @@ class ClaimbookTransformer(Transformer):
         self.file_type = 'Claim Book'
         self.document_type = 'ClaimBook'
         self.hashing = 1
+        self.clean_utr = 1
 
     def get_columns_to_hash(self):
         return ['unique_id','settled_amount']
