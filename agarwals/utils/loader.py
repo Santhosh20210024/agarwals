@@ -22,7 +22,7 @@ class Loader():
         files = frappe.db.sql(file_query, as_dict=True)
         return files
 
-    def change_status(self, doctype, name, status):
+    def update_status(self, doctype, name, status):
         frappe.db.set_value(doctype, name, 'status', status)
 
     def get_type_of_import(self,file):
@@ -44,14 +44,21 @@ class Loader():
         data_import.save()
         frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
         data_import.start_import()
+        return data_import.status
 
     def process(self):
         files = self.get_files_to_load()
         if files == []:
             return None
         for file in files:
-            self.change_status('Transform', file['name'], 'In Process')
+            self.update_status('Transform', file['name'], 'In Process')
             import_type = self.get_type_of_import(file)
-            self.load_data(import_type,file)
+            import_status = self.load_data(import_type,file)
+            if import_status == 'Pending' or import_status == 'Error':
+                self.update_status('Transform', file['name'], 'Error')
+            elif import_status == 'Partial Success':
+                self.update_status('Transform', file['name'], 'Partially Loaded')
+            else:
+                self.update_status('Transform', file['name'], 'Loaded')
 
 

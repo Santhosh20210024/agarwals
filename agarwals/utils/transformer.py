@@ -55,7 +55,7 @@ class Transformer():
             return merged_df
 
         except Exception as e:
-            self.change_status('File upload', file['name'], 'Error')
+            self.update_status('File upload', file['name'], 'Error')
             self.log_error('File upload',file['name'],e)
             return pd.DataFrame()
 
@@ -131,7 +131,7 @@ class Transformer():
             self.source_df = pd.read_csv(SITE_PATH + file['upload'])
         else:
             self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
-            self.change_status('File upload', file['name'], 'Error')
+            self.update_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
         return []
@@ -143,32 +143,22 @@ class Transformer():
             self.source_df['hash_column'] = self.source_df['hash_column'].astype(str) + self.source_df[column].astype(str)
         self.source_df['hash'] = self.source_df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
 
-    def change_status(self, doctype, name, status):
+    def update_status(self, doctype, name, status):
         frappe.db.set_value(doctype,name,'status',status)
         frappe.db.commit()
 
-    def change_whole_status(self,file):
-        file_upload = frappe.get_doc('File upload',file['name'])
-        transform_records_status = []
-        transform_records = file_upload.transform
-        for transform in transform_records:
-            transform_record = frappe.get_doc('Data Import',transform.name)
-            status = transform_record.status
-            if status == 'Not Started' and status == 'Error':
-                transform.status = 'Error'
-                transform_records_status.append(transform.status)
-            elif status == 'Partial Success':
-                transform.status = 'Partially Loaded'
-                transform_records_status.append(transform.status)
-            elif status == 'Success':
-                transform.status = 'Loaded'
-                transform_records_status.append(transform.status)
-        if "Error" in transform_records_status:
-            self.change_status('File upload',file['name'], 'Error')
-        elif "Partially Loaded":
-            self.change_status('File upload', file['name'], 'Partially Loaded')
+    def update_parent_status(self,file):
+        file_record = frappe.get_doc('File upload',file['name'])
+        transform_records = file_record.transform
+        transform_record_status = []
+        for transform_record in transform_records:
+            transform_record_status.append(transform_record.status)
+        if "Error" in transform_record_status:
+            self.update_status('File upload',file['name'],'Error')
+        elif "Partially Loaded" in transform_record_status:
+            self.update_status('File upload', file['name'], 'Partially Loaded')
         else:
-            self.change_status('File upload', file['name'], 'Loaded')
+            self.update_status('File upload', file['name'], 'Loaded')
 
 
     def process(self):
@@ -176,11 +166,11 @@ class Transformer():
         if files == []:
             return None
         for file in files:
-            self.change_status('File upload',file['name'],'In Process')
+            self.update_status('File upload', file['name'], 'In Process')
             self.load_source_df(file)
             if self.source_df.empty:
                 self.log_error(self.document_type, file['name'], 'The File is Empty')
-                self.change_status('File upload', file['name'], 'Error')
+                self.update_status('File upload', file['name'], 'Error')
                 continue
 
             if self.hashing == 1:
@@ -203,7 +193,7 @@ class Transformer():
                 self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
                 loader = Loader(self.document_type)
                 loader.process()
-                self.change_whole_status(file)
+                self.update_parent_status(file)
 
 
 class BillTransformer(Transformer):
