@@ -1,5 +1,7 @@
+import shutil
 import frappe
 from frappe.core.doctype.data_import.data_import import start_import
+from agarwals.utils.path_data import SITE_PATH
 class Loader():
     def __init__(self,document_type):
         self.document_type = document_type
@@ -51,6 +53,14 @@ class Loader():
         import_doc = frappe.get_doc('Data Import',import_name)
         return import_doc.status
 
+    def move_file(self,source_file,target_file):
+        shutil.copy(source_file,target_file)
+
+    def update_file_url(self,file,target_file):
+        transform_record = frappe.get_doc('Transform',file['name'])
+        transform_record.file_url = target_file
+        transform_record.save()
+
     def process(self):
         files = self.get_files_to_load()
         if files == []:
@@ -66,5 +76,10 @@ class Loader():
                 self.update_status('Transform', file['name'], 'Partially Loaded')
             else:
                 self.update_status('Transform', file['name'], 'Loaded')
+            source_file = file['file_url']
+            target_file = file['file_url'].replace('Transform','Load')
+            self.move_file(SITE_PATH + source_file,SITE_PATH + target_file)
+            self.update_file_url(file,target_file)
+
 
 

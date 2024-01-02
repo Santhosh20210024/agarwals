@@ -62,7 +62,8 @@
   "sub_date",
   "remarks",
   "file_size",
-  "hash"
+  "hash",
+  "final_utr_number"
  ],
  "fields": [
   {
@@ -348,12 +349,17 @@
   {
    "fieldname": "hash",
    "fieldtype": "Data",
-   "label": "hash "
+   "label": "Hash"
+  },
+  {
+   "fieldname": "final_utr_number",
+   "fieldtype": "Data",
+   "label": "Final UTR Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-02 12:11:47.567560",
+ "modified": "2024-01-02 20:41:28.034684",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

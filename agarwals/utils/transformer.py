@@ -8,8 +8,7 @@ from agarwals.utils.loader import Loader
 FOLDER = "Home/DrAgarwals/"
 IS_PRIVATE = 1
 
-
-class Transformer():
+class Transformer:
     def __init__(self):
         self.file_type = ''
         self.document_type = ''
@@ -158,8 +157,42 @@ class Transformer():
         else:
             self.update_status('File upload', file['name'], 'Loaded')
 
+    def remove_x(self,item):
+        if "XXXXXXX" in str(item):
+            return item.replace("XXXXXXX", '')
+        elif "XX" in str(item) and len(item) > 16:
+            return item.replace("XX", '')
+        return item
+
     def format_utr(self):
-        utr_list = self.source_df.fillutr_number
+        utr_list = self.source_df.fillna(0).utr_number.to_list()
+        new_utr_list = []
+
+        for item in utr_list:
+            item = str(item).replace('UIIC_', 'CITIN')
+            item = str(item).replace('UIC_', 'CITIN')
+
+            if str(item).startswith('23') and len(str(item)) == 11:
+                item = "CITIN" + str(item)
+                new_utr_list.append(item)
+            elif len(str(item)) == 9:
+                item = 'AXISCN0' + str(item)
+                new_utr_list.append(item)
+            elif '/' in str(item) and len(item.split('/')) == 2:
+                item = item.split('/')[1]
+                if '-' in str(item):
+                    item = item.split('-')
+                    new_utr_list.append(item[-1])
+                else:
+                    new_utr_list.append(self.remove_x(item))
+            elif '-' in str(item):
+                item = item.split('-')
+                new_utr_list.append(self.remove_x(item[-1]))
+            else:
+                new_utr_list.append(self.remove_x(item))
+
+        self.source_df['final_utr_number'] = new_utr_list
+
 
 
     def process(self):
