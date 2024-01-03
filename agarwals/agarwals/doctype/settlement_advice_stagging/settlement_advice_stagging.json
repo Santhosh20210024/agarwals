@@ -76,7 +76,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Open\nError\nProcessed"
+   "options": "Open\nError\nProcessed\nWarning"
   },
   {
    "fieldname": "remarks",
@@ -92,7 +92,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-03 11:42:33.396732",
+ "modified": "2024-01-03 18:32:47.734621",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Settlement Advice Stagging",
