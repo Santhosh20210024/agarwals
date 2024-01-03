@@ -57,7 +57,7 @@ class Loader():
         shutil.copy(source_file,target_file)
 
     def update_file_url(self,file,target_file):
-        file_list_name = frappe.get_list('File', filters = {'file_url':file['file_url'],'attached_to_doctype':'Transform'},pluck = 'name')[0]
+        file_list_name = frappe.get_list('File', filters = {'file_url':file['file_url'],'attached_to_doctype':'Data Import'},pluck = 'name')[0]
         frappe.db.set_value("File", file_list_name, 'file_url',target_file)
         frappe.db.set_value("Transform",file['name'],'file_url',target_file)
         frappe.db.commit()
