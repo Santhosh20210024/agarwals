@@ -152,10 +152,10 @@ class Transformer:
             transform_record_status.append(transform_record.status)
         if "Error" in transform_record_status:
             self.update_status('File upload',file['name'],'Error')
-        elif "Partially Loaded" in transform_record_status:
-            self.update_status('File upload', file['name'], 'Partially Loaded')
+        elif "Partial Success" in transform_record_status:
+            self.update_status('File upload', file['name'], 'Partial Success')
         else:
-            self.update_status('File upload', file['name'], 'Loaded')
+            self.update_status('File upload', file['name'], 'Success')
 
     def remove_x(self,item):
         if "XXXXXXX" in str(item):

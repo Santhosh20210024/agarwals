@@ -73,10 +73,8 @@ class Loader():
             import_status = self.get_import_status(import_name)
             if import_status == 'Pending' or import_status == 'Error':
                 self.update_status('Transform', file['name'], 'Error')
-            elif import_status == 'Partial Success':
-                self.update_status('Transform', file['name'], 'Partially Loaded')
             else:
-                self.update_status('Transform', file['name'], 'Loaded')
+                self.update_status('Transform', file['name'], import_status)
             source_file = file['file_url']
             target_file = file['file_url'].replace('Transform','Load')
             self.move_file(SITE_PATH + source_file,SITE_PATH + target_file)
