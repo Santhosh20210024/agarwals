@@ -3,7 +3,7 @@
  "allow_auto_repeat": 1,
  "allow_events_in_timeline": 1,
  "allow_import": 1,
- "autoname": "autoincrement",
+ "autoname": "hash",
  "creation": "2024-01-02 13:53:59.980854",
  "default_view": "List",
  "doctype": "DocType",
@@ -19,7 +19,7 @@
   "currency",
   "description",
   "reference_number",
-  "modifications_section",
+  "column_break_5xa6d",
   "status",
   "remarks",
   "retry"
@@ -28,17 +28,21 @@
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Date "
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date"
   },
   {
+   "default": "Pending",
    "fieldname": "transaction_status",
-   "fieldtype": "Select",
-   "label": "Transaction Status",
-   "options": "\nPending\nSettled\nUnreconciled\nReconciled\nCancelled"
+   "fieldtype": "Data",
+   "label": "Transaction Status"
   },
   {
    "fieldname": "bank_account",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Bank Account",
    "options": "Bank Account"
   },
@@ -72,18 +76,18 @@
   {
    "fieldname": "reference_number",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Reference Number"
   },
   {
-   "fieldname": "modifications_section",
-   "fieldtype": "Section Break",
-   "label": "Modifications"
-  },
-  {
+   "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Status",
-   "options": "\nError\nProcessed"
+   "options": "Open\nError\nProcessed"
   },
   {
    "fieldname": "remarks",
@@ -94,16 +98,23 @@
    "default": "0",
    "fieldname": "retry",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Retry"
+  },
+  {
+   "fieldname": "column_break_5xa6d",
+   "fieldtype": "Column Break",
+   "label": "Modifications"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-02 15:53:57.599562",
+ "modified": "2024-01-02 19:36:22.902555",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Transaction Stagging",
- "naming_rule": "Autoincrement",
+ "name_case": "Title Case",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
