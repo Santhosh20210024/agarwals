@@ -21,16 +21,18 @@ def compile_patterns(patterns):
     return '(?:%s)' % '|'.join(compress_text(pattern) for pattern in patterns)
 
 def advice_utr_process(_doctype=None):
-    _doc_list = get_doc_list(_doctype, _filters = {'_user_tags': ['=', None]} ,fields = ['name', '_user_tags', 'reference_number'])
+    _doc_list = frappe.get_list(_doctype, filters = {'_user_tags': ['=', None]} ,fields = ['name', '_user_tags', 'reference_number'])
+    print(_doc_list)
     advice_utr_list = frappe.get_list('Settlement Advice', filters = {'utr_number' : ['!=', None]}, pluck = 'utr_number')
 
     for doc_item in _doc_list:
         if doc_item._user_tags != None:
             if INSURANCE_TAG in doc_item._user_tags:
+                print(doc_item)
                 continue
 
         if doc_item.reference_number in advice_utr_list:
-            frappe.db.sql("""UPDATE `tabTransaction Stagging`
+            frappe.db.sql("""UPDATE `tabBank Transaction Stagging`
                 SET _user_tags = CONCAT(',',%(tag)s)
                 WHERE name = %(name)s;
                 """, values = { 'name': doc_item.name, 'tag': INSURANCE_TAG }, as_dict=1)
@@ -60,17 +62,19 @@ def tag_insurance_pattern(doctype=None):
         compressed_description = compress_text(doc_item.description)
         if re.search(compressed_inclusion_patterns, compressed_description):
             try:
-                frappe.db.sql("""UPDATE `tabTransaction Stagging`
+                frappe.db.sql("""UPDATE `tabBank Transaction Stagging`
                 SET _user_tags = CONCAT(',',%(tag)s)
                 WHERE name = %(name)s;
                 """, values = { 'name': doc_item.name, 'tag': INSURANCE_TAG }, as_dict=1)
                 frappe.db.commit()
 
             except Exception as e:
-                error_record_doc = frappe.new_doc('Error Record Log')
-                error_record_doc.doctype = doctype
-                error_record_doc.error_message = "Inclusion: "+ str(e)
-                error_record_doc.save()
+                error_log = frappe.new_doc('Error Record Log')
+                error_log.set('doctype_name', 'Bank Transaction Stagging')
+                error_log.set('error_message', str(e))
+                error_log.save()
+
+    # frappe.show_progress('Loading ...', 0, len(_doc_list) + len(inclusion_doc_list), 'Please Wait')
 
     # exclusion pattern applying
     for doc_item in inclusion_doc_list:
@@ -78,15 +82,15 @@ def tag_insurance_pattern(doctype=None):
         if re.search(compressed_exclusion_patterns, compressed_description):
             try:
                 frappe.db.sql("""
-                UPDATE `tabTransaction Stagging` SET _user_tags = ',' where name = %(name)s
+                UPDATE `tabBank Transaction Stagging` SET _user_tags = ',' where name = %(name)s
                 """,values = { 'name' : doc_item.name }, as_dict = 1)
                 frappe.db.commit()
 
             except Exception as e:
-                error_record_doc = frappe.new_doc('Error Record Log')
-                error_record_doc.doctype = doctype
-                error_record_doc.error_message = "Exclusion: " + str(e)
-                error_record_doc.save()
+                error_log = frappe.new_doc('Error Record Log')
+                error_log.set('doctype_name', 'Bank Transaction Stagging')
+                error_log.set('error_message', str(e))
+                error_log.save()
 
     advice_utr_process(_doctype=doctype)
     return "Success"
