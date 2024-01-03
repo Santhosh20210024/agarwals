@@ -89,3 +89,4 @@ def tag_insurance_pattern(doctype=None):
                 error_record_doc.save()
 
     advice_utr_process(_doctype=doctype)
+    return "Success"
