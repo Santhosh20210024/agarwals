@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-01-03 14:07:20.481220",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "bank_and_source_columns",
+  "bank_and_target_columns",
+  "banks_having_crdr_column",
+  "types_of_narration_column",
+  "skip_row_1"
+ ],
+ "fields": [
+  {
+   "fieldname": "bank_and_source_columns",
+   "fieldtype": "JSON",
+   "label": "Bank and Source Columns"
+  },
+  {
+   "fieldname": "bank_and_target_columns",
+   "fieldtype": "JSON",
+   "label": "Bank and Target Columns"
+  },
+  {
+   "fieldname": "banks_having_crdr_column",
+   "fieldtype": "Code",
+   "label": "Banks Having CR/DR Column"
+  },
+  {
+   "fieldname": "types_of_narration_column",
+   "fieldtype": "Code",
+   "label": "Types Of Narration Column"
+  },
+  {
+   "fieldname": "skip_row_1",
+   "fieldtype": "Code",
+   "label": "Skip Row 1"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-01-03 14:07:20.481220",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Bank Configuration",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

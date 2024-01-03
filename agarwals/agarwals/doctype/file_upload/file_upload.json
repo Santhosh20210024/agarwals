@@ -14,7 +14,7 @@
   "bank_account",
   "upload",
   "status",
-  "document_reference"
+  "transform"
  ],
  "fields": [
   {
@@ -50,14 +50,7 @@
    "fieldtype": "Select",
    "hidden": 1,
    "label": "Status",
-   "options": "Open\nIn Process\nProcessed\nError"
-  },
-  {
-   "depends_on": "eval:doc.upload !=null ",
-   "fieldname": "document_reference",
-   "fieldtype": "Table",
-   "label": "Document Reference",
-   "options": "Reference Table"
+   "options": "Open\nIn Process\nPartial Success\nSuccess\nError"
   },
   {
    "bold": 1,
@@ -66,12 +59,19 @@
    "in_standard_filter": 1,
    "label": "File Type",
    "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement"
+  },
+  {
+   "depends_on": "eval:doc.upload !=null ",
+   "fieldname": "transform",
+   "fieldtype": "Table",
+   "label": "Transform",
+   "options": "Transform"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-23 13:03:21.277245",
+ "modified": "2024-01-03 13:13:44.438521",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
