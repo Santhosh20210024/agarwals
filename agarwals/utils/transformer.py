@@ -295,3 +295,11 @@ class ClaimbookTransformer(Transformer):
 
     def get_columns_to_check(self):
         return {'hash': 'hash_x'}
+
+    class BankTransformer(Transformer):
+        def __init__(self):
+            super().__init__()
+            self.file_type = 'Bank Statement'
+            self.document_type = 'Bank Transaction Staging'
+
+
