@@ -22,13 +22,11 @@ def compile_patterns(patterns):
 
 def advice_utr_process(_doctype=None):
     _doc_list = frappe.get_list(_doctype, filters = {'_user_tags': ['=', None]} ,fields = ['name', '_user_tags', 'reference_number'])
-    print(_doc_list)
     advice_utr_list = frappe.get_list('Settlement Advice', filters = {'utr_number' : ['!=', None]}, pluck = 'utr_number')
 
     for doc_item in _doc_list:
         if doc_item._user_tags != None:
             if INSURANCE_TAG in doc_item._user_tags:
-                print(doc_item)
                 continue
 
         if doc_item.reference_number in advice_utr_list:
@@ -73,9 +71,7 @@ def tag_insurance_pattern(doctype=None):
                 error_log.set('doctype_name', 'Bank Transaction Stagging')
                 error_log.set('error_message', str(e))
                 error_log.save()
-
-    # frappe.show_progress('Loading ...', 0, len(_doc_list) + len(inclusion_doc_list), 'Please Wait')
-
+                
     # exclusion pattern applying
     for doc_item in inclusion_doc_list:
         compressed_description = compress_text(doc_item.description)
