@@ -47,16 +47,16 @@ def advice_transform():
         print(columns)
         df = df.rename(columns = new_mapper)
         print(df.columns)
-        if "claim_id" in df.columns and "utr_number" in df.columns:
-            df = df[['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount"]]
-            new_file_name = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/{file.name}'
-            df.dropna()
-            new_df = format_utr(df)
-            write_file_insert_record(new_df, folder,file_details,"None", new_file_name)
-        else:
-            folder = None
-            new_file_name = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/Error/{file.name}'
-            write_file_insert_record(df,folder, file_details, "None", new_file_name )
+        all_columns = ['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount", "paid_date", "bill_no", "claim_amount"]
+        for every_column in all_columns:
+            if every_column not in df.columns:
+                df[every_column] = []
+                
+        df = df[['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount", "paid_date", "bill_no", "claim_amount"]]
+        new_file_name = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/{file.name}'
+        df.dropna()
+        new_df = format_utr(df)
+        write_file_insert_record(new_df, folder,file_details,"None", new_file_name)
 
 def write_file_insert_record(df,filename, parent_list,upload_type, new_file_name):
     is_private = 1
