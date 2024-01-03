@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "allow_auto_repeat": 1,
+ "allow_events_in_timeline": 1,
+ "allow_import": 1,
+ "autoname": "hash",
+ "creation": "2024-01-02 13:53:59.980854",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "transaction_status",
+  "bank_account",
+  "company",
+  "deposit",
+  "withdrawal",
+  "currency",
+  "description",
+  "reference_number",
+  "column_break_5xa6d",
+  "status",
+  "remarks",
+  "retry"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "transaction_status",
+   "fieldtype": "Data",
+   "label": "Transaction Status"
+  },
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Bank Account",
+   "options": "Bank Account"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "deposit",
+   "fieldtype": "Currency",
+   "label": "Deposit"
+  },
+  {
+   "fieldname": "withdrawal",
+   "fieldtype": "Currency",
+   "label": "Withdrawal"
+  },
+  {
+   "default": "INR",
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "label": "Currency"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "Description"
+  },
+  {
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Reference Number"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nError\nProcessed"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
+  },
+  {
+   "default": "0",
+   "fieldname": "retry",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Retry"
+  },
+  {
+   "fieldname": "column_break_5xa6d",
+   "fieldtype": "Column Break",
+   "label": "Modifications"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-01-02 19:36:22.902555",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Transaction Stagging",
+ "name_case": "Title Case",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
