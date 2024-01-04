@@ -4,6 +4,7 @@ import frappe
 from datetime import date
 import hashlib
 from agarwals.utils.loader import Loader
+import re
 
 FOLDER = "Home/DrAgarwals/"
 IS_PRIVATE = 1
@@ -212,8 +213,107 @@ class Transformer:
                 for bank,columns in bank_configuration.bank_and_source_columns:
                     columns = [self.trim_and_lower(column) for column in columns]
                     if set(identified_header_row) == set(columns):
-                        return bank,header_row_index
-        return 'Not Identified',0
+                        return bank,header_row_index,identified_header_row,narration
+        return 'Not Identified',0,[],''
+
+    def extract_transactions(self,bank,narration,bank_configuration):
+        null_index = self.source_df.index[self.source_df[narration].isnull()].min
+        if bank in bank_configuration.skip_row_1:
+            self.source_df = self.source_df[1:null_index - 1]
+        else:
+            self.source_df = self.source_df[:null_index - 1]
+
+    def rename_columns(self,columns):
+        self.source_df = self.source_df.rename(columns=columns)
+        self.source_df = self.source_df.loc[:, ~self.source_df.columns.duplicated()]
+
+    def get_column_name_to_convert_to_numeric(self):
+        return []
+
+    def convert_to_common_format_and_add_search_column(self):
+        columns_to_select = ['date', 'narration', 'credit']
+        if 'utr_number' in self.source_df.columns:
+            columns_to_select.append('utr_number')
+
+        if 'debit' in self.source_df.columns:
+            columns_to_select.append('debit')
+
+        self.source_df = self.source_df[columns_to_select]
+        self.source_df['search'] = self.source_df['narration'].str.replace(r'[\'"\s]', '', regex=True).str.lower()
+
+    def convert_column_to_numeric(self):
+        columns = self.get_column_name_to_convert_to_numeric()
+        for column in columns:
+            self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
+
+    def utr_validation(self, pattern, token):
+        return bool(re.match(pattern, token))
+
+    def extract_utr(self,narration, reference, delimiters):
+        numeric = '^[0-9]+$'
+        alphanumeric_pattern = '^[a-zA-Z]*[0-9]+[a-zA-Z0-9]*$'
+        if "IMPS" in narration:
+            length = 12
+            pattern = numeric
+        elif "NEFT" in narration:
+            pattern = alphanumeric_pattern
+            utr_13 = None
+            utr_16 = None
+            if "CMS" in narration:
+                utr_13 = self.extract_utr_by_length(narration, 13, delimiters, pattern)
+            utr_16 = self.extract_utr_by_length(narration, 16, delimiters, pattern)
+            return utr_13 or utr_16 or reference
+        elif "RTGS" in narration:
+            length = 22
+            pattern = alphanumeric_pattern
+        elif "IFT" in narration:
+            length = 12
+            pattern = alphanumeric_pattern
+        elif "UPI" in narration:
+            length = 12
+            pattern = numeric
+        else:
+            return reference  # Return the original UTR if none of the patterns match
+
+        return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
+
+    def extract_utr_by_length(self,narration, length, delimiters, pattern):
+        if len(narration) < length:
+            return None
+
+        for delimiter in delimiters:
+            for token in map(str.strip, narration.split(delimiter)):
+                if len(token) == length and len(token.strip()) == length:
+                    if self.utr_validation(pattern, token):
+                        return token
+
+        return None
+
+    def get_columns_to_fill_na_as_0(self):
+        return []
+
+    def fill_na_as_0(self):
+        columns = self.get_columns_to_fill_na_as_0()
+        for column in columns:
+            self.source_df[column] = self.source_df[column].fillna(0)
+            self.source_df[column] = self.source_df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
+
+    def add_source_and_bank_account_column(self,source,bank_account):
+        self.source_df['source'] = source
+        self.source_df['bank_account'] = bank_account
+
+    def format_date(self,bank_configuration):
+        self.source_df['original_date'] = self.source_df['date'].astype(str).apply(lambda x: x.strip() if isinstance(x, str) else x)
+        self.source_df['formatted_date'] = pd.NaT
+        formats = bank_configuration.date_formates
+        for fmt in formats:
+            new_column = 'date_' + fmt.replace('%', '').replace('/', '_').replace(':', '').replace(' ', '_')
+            self.source_df[new_column] = pd.to_datetime(self.source_df['original_date'], format=fmt, errors='coerce')
+            self.source_df['formatted_date'] = self.source_df['formatted_date'].combine_first(self.source_df[new_column])
+
+        self.source_df['date'] = self.source_df['formatted_date']
+        self.source_df.drop(columns=[col for col in self.source_df.columns if 'date_' in col or col == 'formatted_date' or col == 'original_date'], inplace=True)
+
 
     def process(self):
         files = self.get_files_to_transform()
@@ -230,7 +330,7 @@ class Transformer:
 
             if self.bank_transform == 1:
                 bank_configuration = self.get_bank_configuration()
-                bank,header_index = self.find_and_validate_header(bank_configuration)
+                bank,header_index,cleaned_columns,narration = self.find_and_validate_header(bank_configuration)
 
                 if bank == 'Not Identified':
                     self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
@@ -238,6 +338,30 @@ class Transformer:
                     continue
 
                 self.load_source_df(file,header_index)
+                self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
+                columns_to_drop = ['*', '.', 'nan']
+                self.source_df = self.source_df.drop(columns=columns_to_drop, errors='ignore')
+                self.source_df.columns = cleaned_columns
+
+                if bank in bank_configuration.first_line_empty:
+                    self.source_df = self.source_df[1:]
+
+                self.extract_transactions(bank,narration,bank_configuration)
+                self.rename_columns(bank_configuration.bank_and_target_columns[bank])
+
+                if bank in bank_configuration.banks_having_crdr_column:
+                    self.source_df = self.source_df[self.source_df['cr/dr'].str.lower() == 'cr']
+
+                self.convert_to_common_format_and_add_search_column()
+                self.convert_column_to_numeric()
+
+                self.source_df['reference_number'] = self.source_df.apply(
+                    lambda row: self.extract_utr(row['narration'], row['utr_number'], bank_configuration.delimiters), axis=1)
+
+                self.fill_na_as_0()
+                self.add_source_and_bank_account_column(file['upload'].split('/')[-1] + "-" + file['date'],file['bank_account'])
+                self.format_date(bank_configuration)
+                self.new_records = self.source_df
 
             else:
                 if self.hashing == 1:
@@ -335,4 +459,20 @@ class BankTransformer(Transformer):
         self.document_type = 'Bank Transaction Staging'
         self.bank_transformer = 1
 
+    def get_column_name_to_convert_to_numeric(self):
+        return ['credit','debit']
+
+    def get_columns_to_fill_na_as_0(self):
+        return ['reference_number']
+
+    def get_files_to_transform(self):
+        file_query = f"""SELECT 
+                            upload,name,date,bank_account 
+                        FROM 
+                            `tabFile upload` 
+                        WHERE 
+                            status = 'Open' AND document_type = '{self.file_type}'
+                            ORDER BY creation"""
+        files = frappe.db.sql(file_query, as_dict=True)
+        return files
 
