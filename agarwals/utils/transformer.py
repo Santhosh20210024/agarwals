@@ -20,6 +20,7 @@ class Transformer:
         self.file = ''
         self.hashing = 0
         self.clean_utr = 0
+        self.bank_transform = 0
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -121,11 +122,11 @@ class Transformer:
         self.create_file_record(file_path,folder)
         self.insert_in_file_upload(file_path, file['name'], type, status)
 
-    def load_source_df(self, file):
+    def load_source_df(self, file, header):
         if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
-            self.source_df = pd.read_excel(SITE_PATH + file['upload'], engine='openpyxl')
+            self.source_df = pd.read_excel(SITE_PATH + file['upload'], engine='openpyxl', header=header )
         elif file['upload'].endswith('.csv'):
-            self.source_df = pd.read_csv(SITE_PATH + file['upload'])
+            self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
         else:
             self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
             self.update_status('File upload', file['name'], 'Error')
@@ -193,7 +194,26 @@ class Transformer:
 
         self.source_df['final_utr_number'] = new_utr_list
 
+    def get_bank_configuration(self):
+        return frappe.get_single('Bank Configuration')
 
+    def trim_and_lower(self,word):
+        return str(word).strip().lower().replace(' ','')
+
+    def find_and_validate_header(self,bank_configuration):
+        for narration in bank_configuration.types_of_narration_column:
+            header_row_index = None
+            for index,row in self.source_df.iterrows():
+                if narration in row.values:
+                    header_row_index = index
+                    break
+            if header_row_index is not None:
+                identified_header_row = [self.trim_and_lower(column) for column in self.source_df[header_row_index].to_list() if 'nan' not in str(column) and str(column) != '*' and str(column) != '.']
+                for bank,columns in bank_configuration.bank_and_source_columns:
+                    columns = [self.trim_and_lower(column) for column in columns]
+                    if set(identified_header_row) == set(columns):
+                        return bank,header_row_index
+        return 'Not Identified',0
 
     def process(self):
         files = self.get_files_to_transform()
@@ -201,35 +221,47 @@ class Transformer:
             return None
         for file in files:
             self.update_status('File upload', file['name'], 'In Process')
-            self.load_source_df(file)
+            self.load_source_df(file,0)
 
             if self.source_df.empty:
                 self.log_error(self.document_type, file['name'], 'The File is Empty')
                 self.update_status('File upload', file['name'], 'Error')
                 continue
 
-            if self.hashing == 1:
-                self.hashing_job()
+            if self.bank_transform == 1:
+                bank_configuration = self.get_bank_configuration()
+                bank,header_index = self.find_and_validate_header(bank_configuration)
 
-            if self.clean_utr == 1:
-                self.format_utr()
-
-            self.load_target_df()
-
-            if self.target_df.empty:
-                self.new_records = self.source_df
-                self.move_to_transform(file, self.new_records, 'Insert','Transform',False)
-            else:
-                merged_df = self.left_join(file)
-                if merged_df.empty:
+                if bank == 'Not Identified':
+                    self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
+                    self.update_status('File upload', file['name'], 'Error')
                     continue
 
-                self.new_records = merged_df[merged_df['_merge'] == 'left_only']
-                existing_df = merged_df[merged_df['_merge'] == 'both']
-                self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
-                    existing_df)
-                self.move_to_transform(file, self.modified_records, 'Update','Transform',True)
-                self.move_to_transform(file, self.unmodified_records, 'Skip','Bin',True, 'Skipped')
+                self.load_source_df(file,header_index)
+
+            else:
+                if self.hashing == 1:
+                    self.hashing_job()
+
+                if self.clean_utr == 1:
+                    self.format_utr()
+
+                self.load_target_df()
+
+                if self.target_df.empty:
+                    self.new_records = self.source_df
+                    self.move_to_transform(file, self.new_records, 'Insert','Transform',False)
+                else:
+                    merged_df = self.left_join(file)
+                    if merged_df.empty:
+                        continue
+
+                    self.new_records = merged_df[merged_df['_merge'] == 'left_only']
+                    existing_df = merged_df[merged_df['_merge'] == 'both']
+                    self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
+                        existing_df)
+                    self.move_to_transform(file, self.modified_records, 'Update','Transform',True)
+                    self.move_to_transform(file, self.unmodified_records, 'Skip','Bin',True, 'Skipped')
                 self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
             loader = Loader(self.document_type)
             loader.process()
@@ -295,5 +327,12 @@ class ClaimbookTransformer(Transformer):
 
     def get_columns_to_check(self):
         return {'hash': 'hash_x'}
+
+class BankTransformer(Transformer):
+    def __init__(self):
+        super().__init__()
+        self.file_type = 'Bank Statement'
+        self.document_type = 'Bank Transaction Staging'
+        self.bank_transformer = 1
 
 
