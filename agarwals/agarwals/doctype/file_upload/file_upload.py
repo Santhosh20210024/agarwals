@@ -52,21 +52,13 @@ class Fileupload(Document):
 				frappe.publish_realtime(event="Errorbox", message="no error")
 				return
 		
-		# Verify the same file with different hash content
-		file_name_list = frappe.get_list("File", filters = {'file_name': doc_file_name}, pluck = 'name', order_by = 'creation ASC')
-		if len(file_name_list) > 1:
-			frappe.delete_doc("File", file_name_list[0])
-			frappe.db.commit()
-
-			# Delete the shell files
-			self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 
 	def validate_file(self):
 		file_name, file_doc_id = self.get_file_doc_data()
 		# file_type = frappe.get_value('File',file_doc_id,'file_type')
 		# get_file_name = frappe.get_doc('File', )
 		if file_doc_id:
-			if file_name.split('.')[-1].upper() != 'XLSX' and file_name.split('.')[-1].upper() != 'PDF':
+			if file_name.split('.')[-1].upper() != 'XLSX' and file_name.split('.')[-1].upper() != 'PDF' and file_name.split('.')[-1].upper() != 'CSV':
 				frappe.delete_doc("File", file_doc_id)
 				frappe.db.commit()
 				# Delete the shell files
