@@ -5,6 +5,7 @@ from datetime import date
 import hashlib
 from agarwals.utils.loader import Loader
 import re
+import json
 
 FOLDER = "Home/DrAgarwals/"
 IS_PRIVATE = 1
@@ -85,7 +86,16 @@ class Transformer:
         error_log.set('error_message', error_message)
         error_log.save()
 
+    def get_column_orders(self):
+        return []
+
+    def reorder_columns(self,column_orders,df):
+        return df[column_orders]
+
     def write_excel(self, df, file_path, type, target_folder):
+        column_orders = self.get_column_orders()
+        if column_orders:
+            df = self.reorder_columns(column_orders,df)
         file_path = file_path.replace('Extract', target_folder).replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
         file_path_to_write = SITE_PATH + file_path
         df.to_excel(file_path_to_write, index=False)
@@ -209,19 +219,19 @@ class Transformer:
                     header_row_index = index
                     break
             if header_row_index is not None:
-                identified_header_row = [self.trim_and_lower(column) for column in self.source_df[header_row_index].to_list() if 'nan' not in str(column) and str(column) != '*' and str(column) != '.']
-                for bank,columns in bank_configuration.bank_and_source_columns:
+                identified_header_row = [self.trim_and_lower(column) for column in self.source_df.loc[header_row_index].to_list() if 'nan' not in str(column) and str(column) != '*' and str(column) != '.']
+                for bank,columns in json.loads(bank_configuration.bank_and_source_columns.replace("'",'"')).items():
                     columns = [self.trim_and_lower(column) for column in columns]
                     if set(identified_header_row) == set(columns):
                         return bank,header_row_index,identified_header_row,narration
         return 'Not Identified',0,[],''
 
     def extract_transactions(self,bank,narration,bank_configuration):
-        null_index = self.source_df.index[self.source_df[narration].isnull()].min
+        null_index = self.source_df.index[self.source_df[self.trim_and_lower(narration)].isnull()].min()
         if bank in eval(bank_configuration.skip_row_1):
-            self.source_df = self.source_df[1:null_index - 1]
+            self.source_df = self.source_df.loc[1:null_index - 1]
         else:
-            self.source_df = self.source_df[:null_index - 1]
+            self.source_df = self.source_df.loc[:null_index - 1]
 
     def rename_columns(self,columns):
         self.source_df = self.source_df.rename(columns=columns)
@@ -337,17 +347,17 @@ class Transformer:
                     self.update_status('File upload', file['name'], 'Error')
                     continue
 
-                self.load_source_df(file,header_index)
+                self.load_source_df(file,header_index+1)
                 self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
                 columns_to_drop = ['*', '.', 'nan']
                 self.source_df = self.source_df.drop(columns=columns_to_drop, errors='ignore')
                 self.source_df.columns = cleaned_columns
 
-                if bank in eval(bank_configuration.first_line_empty):
+                if bank in eval(bank_configuration.first_row_empty):
                     self.source_df = self.source_df[1:]
 
                 self.extract_transactions(bank,narration,bank_configuration)
-                self.rename_columns(bank_configuration.bank_and_target_columns[bank])
+                self.rename_columns(json.loads(bank_configuration.bank_and_target_columns.replace("'",'"'))[bank])
 
                 if bank in eval(bank_configuration.banks_having_crdr_column):
                     self.source_df = self.source_df[self.source_df['cr/dr'].str.lower() == 'cr']
@@ -359,7 +369,7 @@ class Transformer:
                     lambda row: self.extract_utr(row['narration'], row['utr_number'], eval(bank_configuration.delimiters)), axis=1)
 
                 self.fill_na_as_0()
-                self.add_source_and_bank_account_column(file['upload'].split('/')[-1] + "-" + file['date'],file['bank_account'])
+                self.add_source_and_bank_account_column(file['upload'].split('/')[-1] + "-" + file['date'].strftime("%d-%m-%Y"),file['bank_account'])
                 self.format_date(bank_configuration)
                 self.new_records = self.source_df
 
@@ -386,7 +396,7 @@ class Transformer:
                         existing_df)
                     self.move_to_transform(file, self.modified_records, 'Update','Transform',True)
                     self.move_to_transform(file, self.unmodified_records, 'Skip','Bin',True, 'Skipped')
-                self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
+            self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
             loader = Loader(self.document_type)
             loader.process()
             self.update_parent_status(file)
@@ -418,6 +428,9 @@ class BillTransformer(Transformer):
 
     def get_columns_to_check(self):
         return {'Status': 'status'}
+
+    def get_column_orders(self):
+        return []
 
 
 class ClaimbookTransformer(Transformer):
@@ -452,6 +465,9 @@ class ClaimbookTransformer(Transformer):
     def get_columns_to_check(self):
         return {'hash': 'hash_x'}
 
+    def get_column_orders(self):
+        return []
+
 class BankTransformer(Transformer):
     def __init__(self):
         super().__init__()
@@ -476,3 +492,5 @@ class BankTransformer(Transformer):
         files = frappe.db.sql(file_query, as_dict=True)
         return files
 
+    def get_column_orders(self):
+        return []
