@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 import frappe
-import dask.dataframe as dd
 import tempfile
 import shutil
 from agarwals.utils.path_data import SITE_PATH
