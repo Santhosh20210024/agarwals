@@ -333,70 +333,78 @@ class Transformer:
             self.update_status('File upload', file['name'], 'In Process')
             self.load_source_df(file,0)
 
-            if self.source_df.empty:
-                self.log_error(self.document_type, file['name'], 'The File is Empty')
-                self.update_status('File upload', file['name'], 'Error')
-                continue
-
-            if self.bank_transform == 1:
-                bank_configuration = self.get_bank_configuration()
-                bank,header_index,cleaned_columns,narration = self.find_and_validate_header(bank_configuration)
-
-                if bank == 'Not Identified':
-                    self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
+            try:
+                if self.source_df.empty:
+                    self.log_error(self.document_type, file['name'], 'The File is Empty')
                     self.update_status('File upload', file['name'], 'Error')
                     continue
 
-                self.load_source_df(file,header_index+1)
-                self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
-                columns_to_drop = ['*', '.', 'nan']
-                self.source_df = self.source_df.drop(columns=columns_to_drop, errors='ignore')
-                self.source_df.columns = cleaned_columns
+                if self.bank_transform == 1:
+                    bank_configuration = self.get_bank_configuration()
+                    bank, header_index, cleaned_columns, narration = self.find_and_validate_header(bank_configuration)
 
-                if bank in eval(bank_configuration.first_row_empty):
-                    self.source_df = self.source_df[1:]
-
-                self.extract_transactions(bank,narration,bank_configuration)
-                self.rename_columns(json.loads(bank_configuration.bank_and_target_columns.replace("'",'"'))[bank])
-
-                if bank in eval(bank_configuration.banks_having_crdr_column):
-                    self.source_df = self.source_df[self.source_df['cr/dr'].str.lower() == 'cr']
-
-                self.convert_to_common_format_and_add_search_column()
-                self.convert_column_to_numeric()
-
-                self.source_df['reference_number'] = self.source_df.apply(
-                    lambda row: self.extract_utr(row['narration'], row['utr_number'], eval(bank_configuration.delimiters)), axis=1)
-
-                self.fill_na_as_0()
-                self.add_source_and_bank_account_column(file['upload'].split('/')[-1] + "-" + file['date'].strftime("%d-%m-%Y"),file['bank_account'])
-                self.format_date(bank_configuration)
-                self.new_records = self.source_df
-
-            else:
-                if self.hashing == 1:
-                    self.hashing_job()
-
-                if self.clean_utr == 1:
-                    self.format_utr()
-
-                self.load_target_df()
-
-                if self.target_df.empty:
-                    self.new_records = self.source_df
-                    self.move_to_transform(file, self.new_records, 'Insert','Transform',False)
-                else:
-                    merged_df = self.left_join(file)
-                    if merged_df.empty:
+                    if bank == 'Not Identified':
+                        self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
+                        self.update_status('File upload', file['name'], 'Error')
                         continue
 
-                    self.new_records = merged_df[merged_df['_merge'] == 'left_only']
-                    existing_df = merged_df[merged_df['_merge'] == 'both']
-                    self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
-                        existing_df)
-                    self.move_to_transform(file, self.modified_records, 'Update','Transform',True)
-                    self.move_to_transform(file, self.unmodified_records, 'Skip','Bin',True, 'Skipped')
-            self.move_to_transform(file, self.new_records, 'Insert','Transform',True)
+                    self.load_source_df(file, header_index + 1)
+                    self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
+                    columns_to_drop = ['*', '.', 'nan']
+                    self.source_df = self.source_df.drop(columns=columns_to_drop, errors='ignore')
+                    self.source_df.columns = cleaned_columns
+
+                    if bank in eval(bank_configuration.first_row_empty):
+                        self.source_df = self.source_df[1:]
+
+                    self.extract_transactions(bank, narration, bank_configuration)
+                    self.rename_columns(json.loads(bank_configuration.bank_and_target_columns.replace("'", '"'))[bank])
+
+                    if bank in eval(bank_configuration.banks_having_crdr_column):
+                        self.source_df = self.source_df[self.source_df['cr/dr'].str.lower() == 'cr']
+
+                    self.convert_to_common_format_and_add_search_column()
+                    self.convert_column_to_numeric()
+
+                    self.source_df['reference_number'] = self.source_df.apply(
+                        lambda row: self.extract_utr(row['narration'], row['utr_number'],
+                                                     eval(bank_configuration.delimiters)), axis=1)
+
+                    self.fill_na_as_0()
+                    self.add_source_and_bank_account_column(
+                        file['upload'].split('/')[-1] + "-" + file['date'].strftime("%d-%m-%Y"), file['bank_account'])
+                    self.format_date(bank_configuration)
+                    self.new_records = self.source_df
+
+                else:
+                    if self.hashing == 1:
+                        self.hashing_job()
+
+                    if self.clean_utr == 1:
+                        self.format_utr()
+
+                    self.load_target_df()
+
+                    if self.target_df.empty:
+                        self.new_records = self.source_df
+                        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
+                    else:
+                        merged_df = self.left_join(file)
+                        if merged_df.empty:
+                            continue
+
+                        self.new_records = merged_df[merged_df['_merge'] == 'left_only']
+                        existing_df = merged_df[merged_df['_merge'] == 'both']
+                        self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
+                            existing_df)
+                        self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
+                        self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
+                self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
+
+            except Exception as e:
+                self.log_error(self.document_type, file['name'], e)
+                self.update_status('File upload', file['name'], 'Error')
+                continue
             loader = Loader(self.document_type)
             loader.process()
             self.update_parent_status(file)
