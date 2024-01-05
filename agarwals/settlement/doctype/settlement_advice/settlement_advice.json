@@ -1,65 +1,114 @@
 {
  "actions": [],
- "allow_rename": 1,
- "creation": "2023-12-05 18:11:50.036137",
+ "allow_import": 1,
+ "autoname": "format:{utr_number}-{claim_id}",
+ "creation": "2023-12-23 12:12:27.383921",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "date",
-  "claim_no",
+  "paid_date",
   "utr_number",
-  "payer",
+  "bill_no",
+  "claim_id",
   "claim_amount",
+  "settled_amount",
   "tds_amount",
-  "source"
+  "column_break_ne4ar",
+  "source",
+  "status",
+  "remark",
+  "retry"
  ],
  "fields": [
   {
-   "fieldname": "date",
-   "fieldtype": "Date",
-   "label": "Date"
-  },
-  {
-   "fieldname": "claim_no",
-   "fieldtype": "Data",
-   "label": "Claim No"
-  },
-  {
-   "fieldname": "payer",
-   "fieldtype": "Link",
-   "label": "Payer",
-   "options": "Customer"
-  },
-  {
    "fieldname": "claim_amount",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "in_preview": 1,
    "label": "Claim Amount"
   },
   {
    "fieldname": "tds_amount",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "in_preview": 1,
    "label": "TDS Amount"
   },
   {
    "fieldname": "source",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
    "label": "Source",
    "options": "\nTPA\nSystem"
   },
   {
    "fieldname": "utr_number",
    "fieldtype": "Data",
-   "label": "UTR No"
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "UTR Number"
+  },
+  {
+   "fieldname": "paid_date",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Paid Date"
+  },
+  {
+   "fieldname": "bill_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Bill No"
+  },
+  {
+   "fieldname": "claim_id",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Claim ID"
+  },
+  {
+   "fieldname": "settled_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "label": "Settled Amount"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Data",
+   "label": "Remark"
+  },
+  {
+   "default": "0",
+   "fieldname": "retry",
+   "fieldtype": "Check",
+   "label": "Retry"
+  },
+  {
+   "fieldname": "column_break_ne4ar",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nError\nOpen"
   }
  ],
- "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-06 00:26:49.740652",
+ "modified": "2023-12-30 02:00:18.004393",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -75,6 +124,7 @@
    "write": 1
   }
  ],
+ "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
