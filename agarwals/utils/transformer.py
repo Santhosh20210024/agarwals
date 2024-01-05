@@ -202,7 +202,7 @@ class Transformer:
         return str(word).strip().lower().replace(' ','')
 
     def find_and_validate_header(self,bank_configuration):
-        for narration in bank_configuration.types_of_narration_column:
+        for narration in eval(bank_configuration.types_of_narration_column):
             header_row_index = None
             for index,row in self.source_df.iterrows():
                 if narration in row.values:
@@ -218,7 +218,7 @@ class Transformer:
 
     def extract_transactions(self,bank,narration,bank_configuration):
         null_index = self.source_df.index[self.source_df[narration].isnull()].min
-        if bank in bank_configuration.skip_row_1:
+        if bank in eval(bank_configuration.skip_row_1):
             self.source_df = self.source_df[1:null_index - 1]
         else:
             self.source_df = self.source_df[:null_index - 1]
@@ -273,7 +273,7 @@ class Transformer:
             length = 12
             pattern = numeric
         else:
-            return reference  # Return the original UTR if none of the patterns match
+            return reference
 
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
@@ -305,7 +305,7 @@ class Transformer:
     def format_date(self,bank_configuration):
         self.source_df['original_date'] = self.source_df['date'].astype(str).apply(lambda x: x.strip() if isinstance(x, str) else x)
         self.source_df['formatted_date'] = pd.NaT
-        formats = bank_configuration.date_formates
+        formats = eval(bank_configuration.date_formats)
         for fmt in formats:
             new_column = 'date_' + fmt.replace('%', '').replace('/', '_').replace(':', '').replace(' ', '_')
             self.source_df[new_column] = pd.to_datetime(self.source_df['original_date'], format=fmt, errors='coerce')
@@ -343,20 +343,20 @@ class Transformer:
                 self.source_df = self.source_df.drop(columns=columns_to_drop, errors='ignore')
                 self.source_df.columns = cleaned_columns
 
-                if bank in bank_configuration.first_line_empty:
+                if bank in eval(bank_configuration.first_line_empty):
                     self.source_df = self.source_df[1:]
 
                 self.extract_transactions(bank,narration,bank_configuration)
                 self.rename_columns(bank_configuration.bank_and_target_columns[bank])
 
-                if bank in bank_configuration.banks_having_crdr_column:
+                if bank in eval(bank_configuration.banks_having_crdr_column):
                     self.source_df = self.source_df[self.source_df['cr/dr'].str.lower() == 'cr']
 
                 self.convert_to_common_format_and_add_search_column()
                 self.convert_column_to_numeric()
 
                 self.source_df['reference_number'] = self.source_df.apply(
-                    lambda row: self.extract_utr(row['narration'], row['utr_number'], bank_configuration.delimiters), axis=1)
+                    lambda row: self.extract_utr(row['narration'], row['utr_number'], eval(bank_configuration.delimiters)), axis=1)
 
                 self.fill_na_as_0()
                 self.add_source_and_bank_account_column(file['upload'].split('/')[-1] + "-" + file['date'],file['bank_account'])
@@ -456,8 +456,8 @@ class BankTransformer(Transformer):
     def __init__(self):
         super().__init__()
         self.file_type = 'Bank Statement'
-        self.document_type = 'Bank Transaction Staging'
-        self.bank_transformer = 1
+        self.document_type = 'Bank Transaction Stagging'
+        self.bank_transform = 1
 
     def get_column_name_to_convert_to_numeric(self):
         return ['credit','debit']
