@@ -38,8 +38,12 @@ class Loader():
                 return 'Update Existing Records'
 
     def load_data(self,import_type,file):
-        data_import_mapping = frappe.get_doc("Data Import Mapping", self.document_type)
-        template = data_import_mapping.template
+        try:
+            data_import_mapping = frappe.get_doc("Data Import Mapping", self.document_type)
+            template = data_import_mapping.template
+        except Exception as e:
+            template = 0
+            self.log_error(self.document_type,file['name'],e)
         data_import = frappe.new_doc("Data Import")
         data_import.set('reference_doctype', self.document_type)
         data_import.set('import_type', import_type)
@@ -47,6 +51,7 @@ class Loader():
         data_import.save()
         frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
         start_import(data_import.name)
+        frappe.db.commit()
         return data_import.name
 
     def get_import_status(self, import_name):
