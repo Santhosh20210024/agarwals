@@ -45,6 +45,7 @@ class Loader():
         data_import.set('import_file', file['file_url'])
         data_import.save()
         frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
+        frappe.db.commit()
         start_import(data_import.name)
         return data_import.name
 
