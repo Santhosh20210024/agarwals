@@ -244,12 +244,15 @@ class Transformer:
         columns_to_select = ['date', 'narration', 'credit']
         if 'utr_number' in self.source_df.columns:
             columns_to_select.append('utr_number')
+        else:
+            self.source_df['utr_number'] = ''
 
         if 'debit' in self.source_df.columns:
             columns_to_select.append('debit')
+        else:
+            self.source_df['debit'] = ''
 
         self.source_df = self.source_df[columns_to_select]
-        self.source_df['search'] = self.source_df['narration'].str.replace(r'[\'"\s]', '', regex=True).str.lower()
 
     def convert_column_to_numeric(self):
         columns = self.get_column_name_to_convert_to_numeric()
@@ -372,7 +375,7 @@ class Transformer:
 
                     self.fill_na_as_0()
                     self.add_source_and_bank_account_column(
-                        file['upload'].split('/')[-1] + "-" + file['date'].strftime("%d-%m-%Y"), file['bank_account'])
+                        file['name'], file['bank_account'])
                     self.format_date(bank_configuration)
                     self.new_records = self.source_df
 
@@ -501,4 +504,4 @@ class BankTransformer(Transformer):
         return files
 
     def get_column_orders(self):
-        return []
+        return ["date","narration","credit","utr_number","debit","search","reference_number","bank_account"]
