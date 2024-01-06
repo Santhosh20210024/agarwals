@@ -27,6 +27,7 @@ class Loader():
 
     def update_status(self, doctype, name, status):
         frappe.db.set_value(doctype, name, 'status', status)
+        frappe.db.commit()
 
     def get_type_of_import(self,file):
         match file['type']:
@@ -45,7 +46,6 @@ class Loader():
         data_import.set('import_file', file['file_url'])
         data_import.save()
         frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
-        frappe.db.commit()
         start_import(data_import.name)
         return data_import.name
 
