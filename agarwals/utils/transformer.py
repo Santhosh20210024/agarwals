@@ -504,4 +504,4 @@ class BankTransformer(Transformer):
         return files
 
     def get_column_orders(self):
-        return ["date","narration","credit","utr_number","debit","reference_number","bank_account"]
+        return ["date","narration","credit","utr_number","debit","reference_number","bank_account","source"]
