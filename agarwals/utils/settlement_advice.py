@@ -35,9 +35,6 @@ def advice_transform():
         config = frappe.get_doc("Settlement Advice Configuration")
         header_row_patterns = eval(config.header_row_patterns)
         target_columns = eval(config.target_columns)
-        target_columns["claim_amount"]=clean_header(target_columns["claim_amount"])
-        # print(target_columns["claim_amount"])
-        # print("target_columns:", target_columns,"header_row_patterns",header_row_patterns)
         if ".csv" in file_link.lower():
             df = pd.read_csv(folder)
         else:
@@ -52,19 +49,36 @@ def advice_transform():
                         header_row_index-=1
         
         df = pd.read_excel(folder , header = int(header_row_index)+1)
-        columns = clean_header(df.columns.values)
-
-        
-        
-        
-        df = df.rename(columns = new_mapper)
-        print(df.columns)
-        all_columns = ['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount", "paid_date", "bill_no", "claim_amount"]
+        df.columns = clean_header(df.columns.values)
+        column_list = df.columns.values
+        print(column_list)
+        rename_value={}
+        for key,value in target_columns.items():
+            # print(key,":",value)
+            if isinstance(value[0],list):
+                p1_list=clean_header(value[0])
+                p2_list=clean_header(value[1])
+                # print(p1_list,p2_list)
+            else:
+                p1_list=clean_header(value)
+                p2_list=[]
+            i=0
+            for columns in p1_list:
+                if columns in column_list:
+                    rename_value[columns]=key
+                    i+=1
+                    break
+            if i==0 and p2_list is not None:
+                for columns in p2_list:
+                    if columns in column_list:
+                        rename_value[columns]=key
+                        break
+        df = df.rename(columns = rename_value)
+        all_columns = target_columns.keys()
         for every_column in all_columns:
             if every_column not in df.columns:
-                df[every_column] = []
-                
-        df = df[['claim_id','utr_number', 'settled_amount', "claim_status", "tds_amount", "paid_date", "bill_no", "claim_amount"]]
+                df[every_column] = ""         
+        df = df[all_columns]
         new_file_name = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/{file.name}'
         df.dropna()
         new_df = format_utr(df)
