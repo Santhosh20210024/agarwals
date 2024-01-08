@@ -1,0 +1,117 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-01-03 11:39:31.152789",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "claim_id",
+  "utr_number",
+  "settled_amount",
+  "claim_status",
+  "tds_amount",
+  "paid_date",
+  "bill_number",
+  "claim_amount",
+  "modifications_column",
+  "status",
+  "remarks",
+  "retry"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "claim_id",
+   "fieldtype": "Data",
+   "label": "Claim Id"
+  },
+  {
+   "fieldname": "utr_number",
+   "fieldtype": "Data",
+   "label": "Utr Number"
+  },
+  {
+   "fieldname": "settled_amount",
+   "fieldtype": "Data",
+   "label": "Settled Amount"
+  },
+  {
+   "fieldname": "claim_status",
+   "fieldtype": "Data",
+   "label": "Claim Status"
+  },
+  {
+   "fieldname": "tds_amount",
+   "fieldtype": "Data",
+   "label": "Tds Amount"
+  },
+  {
+   "fieldname": "paid_date",
+   "fieldtype": "Data",
+   "label": "Paid Date"
+  },
+  {
+   "fieldname": "bill_number",
+   "fieldtype": "Data",
+   "label": "Bill Number"
+  },
+  {
+   "fieldname": "claim_amount",
+   "fieldtype": "Data",
+   "label": "Claim Amount"
+  },
+  {
+   "fieldname": "modifications_column",
+   "fieldtype": "Column Break",
+   "label": "Modifications"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nError\nProcessed"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
+  },
+  {
+   "default": "0",
+   "fieldname": "retry",
+   "fieldtype": "Check",
+   "label": "Retry"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-01-03 19:36:49.192119",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Settlement Advice Staging",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

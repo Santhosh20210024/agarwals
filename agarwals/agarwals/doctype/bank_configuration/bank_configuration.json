@@ -11,7 +11,10 @@
   "bank_and_target_columns",
   "banks_having_crdr_column",
   "types_of_narration_column",
-  "skip_row_1"
+  "skip_row_1",
+  "first_row_empty",
+  "delimiters",
+  "date_formats"
  ],
  "fields": [
   {
@@ -38,12 +41,27 @@
    "fieldname": "skip_row_1",
    "fieldtype": "Code",
    "label": "Skip Row 1"
+  },
+  {
+   "fieldname": "first_row_empty",
+   "fieldtype": "Code",
+   "label": "First Row Empty"
+  },
+  {
+   "fieldname": "delimiters",
+   "fieldtype": "Code",
+   "label": "Delimiters"
+  },
+  {
+   "fieldname": "date_formats",
+   "fieldtype": "Code",
+   "label": "Date Formats"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-01-03 14:07:20.481220",
+ "modified": "2024-01-05 21:05:31.254996",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Configuration",

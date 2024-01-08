@@ -45,7 +45,8 @@
   "submission_date",
   "column_break_ahot",
   "final_submission_date",
-  "invoice"
+  "invoice",
+  "invoice_status"
  ],
  "fields": [
   {
@@ -249,6 +250,12 @@
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center"
+  },
+  {
+   "fieldname": "invoice_status",
+   "fieldtype": "Select",
+   "label": "Invoice Status",
+   "options": "\nRAISED\nCANCELLED"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -259,7 +266,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2023-12-20 19:57:27.755237",
+ "modified": "2024-01-08 16:29:32.160450",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
