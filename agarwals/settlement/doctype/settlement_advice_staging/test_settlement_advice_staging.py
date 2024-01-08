@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestSettlementAdviceStagging(FrappeTestCase):
+class TestSettlementAdviceStaging(FrappeTestCase):
 	pass
