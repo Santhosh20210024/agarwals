@@ -3,9 +3,9 @@ from agarwals.utils.path_data import SITE_PATH
 import frappe
 from datetime import date
 import hashlib
-from agarwals.utils.loader import Loader
 import re
 import json
+from agarwals.utils.loader import Loader
 
 FOLDER = "Home/DrAgarwals/"
 IS_PRIVATE = 1
@@ -22,7 +22,7 @@ class Transformer:
         self.file = ''
         self.hashing = 0
         self.clean_utr = 0
-        self.bank_transform = 0
+        self.utr_column_name = ''
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -61,8 +61,7 @@ class Transformer:
 
     def prune_columns(self, df):
         columns_to_prune = self.get_columns_to_prune()
-        for column in columns_to_prune:
-            df = df.loc[:,df.columns != column]
+        df = df.drop(columns=columns_to_prune, errors='ignore')
         return df
 
     def get_columns_to_prune(self):
@@ -86,14 +85,14 @@ class Transformer:
         error_log.set('error_message', error_message)
         error_log.save()
 
-    def get_column_orders(self):
+    def get_column_needed(self):
         return []
 
     def reorder_columns(self,column_orders,df):
         return df[column_orders]
 
     def write_excel(self, df, file_path, type, target_folder):
-        column_orders = self.get_column_orders()
+        column_orders = self.get_column_needed()
         if column_orders:
             df = self.reorder_columns(column_orders,df)
         file_path = file_path.replace('Extract', target_folder).replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
@@ -126,9 +125,10 @@ class Transformer:
     def move_to_transform(self, file, df, type, folder, prune = True, status = 'Open'):
         if df.empty:
             return None
-
         if prune:
             df = self.prune_columns(df)
+        if self.clean_utr == 1:
+            self.format_utr(self.utr_column_name)
         file_path = self.write_excel(df, file['upload'], type,folder)
         self.create_file_record(file_path,folder)
         self.insert_in_file_upload(file_path, file['name'], type, status)
@@ -169,15 +169,15 @@ class Transformer:
         else:
             self.update_status('File upload', file['name'], 'Success')
 
-    def remove_x(self,item):
+    def remove_x_in_UTR(self, item):
         if "XXXXXXX" in str(item):
             return item.replace("XXXXXXX", '')
         elif "XX" in str(item) and len(item) > 16:
             return item.replace("XX", '')
         return item
 
-    def format_utr(self):
-        utr_list = self.source_df.fillna(0).utr_number.to_list()
+    def format_utr(self,utr_column):
+        utr_list = self.source_df[utr_column].fillna(0).to_list()
         new_utr_list = []
 
         for item in utr_list:
@@ -196,73 +196,274 @@ class Transformer:
                     item = item.split('-')
                     new_utr_list.append(item[-1])
                 else:
-                    new_utr_list.append(self.remove_x(item))
+                    new_utr_list.append(self.remove_x_in_UTR(item))
             elif '-' in str(item):
                 item = item.split('-')
-                new_utr_list.append(self.remove_x(item[-1]))
+                new_utr_list.append(self.remove_x_in_UTR(item[-1]))
             else:
-                new_utr_list.append(self.remove_x(item))
+                new_utr_list.append(self.remove_x_in_UTR(item))
 
         self.source_df['final_utr_number'] = new_utr_list
 
-    def get_bank_configuration(self):
-        return frappe.get_single('Bank Configuration')
+    def transform(self, file):
+        return None
 
-    def trim_and_lower(self,word):
-        return str(word).strip().lower().replace(' ','')
+    def trim_and_lower(self, word):
+        return str(word).strip().lower().replace(' ', '')
 
-    def find_and_validate_header(self,bank_configuration):
-        for narration in eval(bank_configuration.types_of_narration_column):
+    def validate_header(self, header_row, source_column_list):
+        return 'Not Identified', 0, []
+
+    def find_and_validate_header(self, header_list, source_column_list):
+        for header in header_list:
             header_row_index = None
-            for index,row in self.source_df.iterrows():
-                if narration in row.values:
+            for index, row in self.source_df.iterrows():
+                if header in row.values:
                     header_row_index = index
                     break
             if header_row_index is not None:
-                identified_header_row = [self.trim_and_lower(column) for column in self.source_df.loc[header_row_index].to_list() if 'nan' not in str(column) and str(column) != '*' and str(column) != '.']
-                for bank,columns in json.loads(bank_configuration.bank_and_source_columns.replace("'",'"')).items():
-                    columns = [self.trim_and_lower(column) for column in columns]
-                    if set(identified_header_row) == set(columns):
-                        return bank,header_row_index,identified_header_row,narration
-        return 'Not Identified',0,[],''
+                key, header_row_index, identified_header_row = self.validate_header(header_row_index,source_column_list)
+        return 'Not Identified', 0, []
 
-    def extract_transactions(self,bank,narration,bank_configuration):
-        null_index = self.source_df.index[self.source_df[self.trim_and_lower(narration)].isnull()].min()
-        if bank in eval(bank_configuration.skip_row_1):
-            self.source_df = self.source_df.loc[1:null_index - 1]
-        else:
-            self.source_df = self.source_df.loc[:null_index - 1]
+    def rename_columns(self,df,columns):
+        df = df.rename(columns=columns)
+        df = df.loc[:, ~self.source_df.columns.duplicated()]
+        return df
 
-    def rename_columns(self,columns):
-        self.source_df = self.source_df.rename(columns=columns)
-        self.source_df = self.source_df.loc[:, ~self.source_df.columns.duplicated()]
+    def convert_into_common_format(self,df,columns_to_select):
+        columns = []
+        for column in columns_to_select:
+            if column in df.columns:
+                columns.append(column)
+            else:
+                df[column] = ''
+        return df
 
     def get_column_name_to_convert_to_numeric(self):
         return []
-
-    def convert_to_common_format_and_add_search_column(self):
-        columns_to_select = ['date', 'narration', 'credit']
-        if 'utr_number' in self.source_df.columns:
-            columns_to_select.append('utr_number')
-        else:
-            self.source_df['utr_number'] = ''
-
-        if 'debit' in self.source_df.columns:
-            columns_to_select.append('debit')
-        else:
-            self.source_df['debit'] = ''
-
-        self.source_df = self.source_df[columns_to_select]
 
     def convert_column_to_numeric(self):
         columns = self.get_column_name_to_convert_to_numeric()
         for column in columns:
             self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
 
+    def process(self):
+        files = self.get_files_to_transform()
+        if files == []:
+            return None
+        for file in files:
+            self.update_status('File upload', file['name'], 'In Process')
+            self.load_source_df(file,0)
+
+            try:
+                if self.source_df.empty:
+                    self.log_error(self.document_type, file['name'], 'The File is Empty')
+                    self.update_status('File upload', file['name'], 'Error')
+                    continue
+                self.transform(file)
+
+                self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
+
+            except Exception as e:
+                self.log_error(self.document_type, file['name'], e)
+                self.update_status('File upload', file['name'], 'Error')
+                continue
+            loader = Loader(self.document_type)
+            loader.process()
+            self.update_parent_status(file)
+
+class DirectTransformer(Transformer):
+    def __init__(self):
+        super().__init__()
+
+    def transform(self, file):
+        if self.hashing == 1:
+            self.hashing_job()
+
+        self.load_target_df()
+
+        if self.target_df.empty:
+            self.new_records = self.source_df
+            self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
+        else:
+            merged_df = self.left_join(file)
+            if merged_df.empty:
+                pass
+            self.new_records = merged_df[merged_df['_merge'] == 'left_only']
+            existing_df = merged_df[merged_df['_merge'] == 'both']
+            self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
+                existing_df)
+            self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
+            self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
+
+class Billtransformer(DirectTransformer):
+    def __init__(self):
+        super().__init__()
+        self.file_type = 'Debtors Report'
+        self.document_type = 'Bill'
+
+    def load_target_df(self):
+        query = f"""
+                     SELECT 
+                         name, status
+                     FROM 
+                         `tab{self.document_type}`
+                     """
+        records = frappe.db.sql(query, as_list=True)
+        self.target_df = pd.DataFrame(records,columns = ['name','status'])
+
+    def get_join_columns(self):
+        left_df_column = 'Bill No'
+        right_df_column = 'name'
+        return left_df_column, right_df_column
+
+    def get_columns_to_prune(self):
+        return ['name', '_merge', 'status']
+
+    def get_columns_to_check(self):
+        return {'Status': 'status'}
+
+    def get_column_needed(self):
+        return []
+
+class ClaimbookTransformer(DirectTransformer):
+    class ClaimbookTransformer(DirectTransformer):
+        def __init__(self):
+            super().__init__()
+            self.file_type = 'Claim Book'
+            self.document_type = 'ClaimBook'
+            self.hashing = 1
+            self.clean_utr = 1
+
+        def get_columns_to_hash(self):
+            return ['unique_id', 'settled_amount']
+
+        def load_target_df(self):
+            query = f"""
+                          SELECT 
+                              name, hash
+                          FROM 
+                              `tab{self.document_type}`
+                          """
+            records = frappe.db.sql(query, as_list=True)
+            self.target_df = pd.DataFrame(records, columns=['name', 'hash'])
+
+        def get_join_columns(self):
+            left_df_column = 'unique_id'
+            right_df_column = 'name'
+            return left_df_column, right_df_column
+
+        def get_columns_to_prune(self):
+            return ['name', '_merge', 'hash_x', 'hash_column']
+
+        def get_columns_to_check(self):
+            return {'hash': 'hash_x'}
+
+        def get_column_needed(self):
+            return []
+
+class StagingTransformer(Transformer):
+    def __init__(self):
+        super().__init__()
+
+    def get_configuration(self):
+        return []
+
+    def get_header_identification_keys(self, configuration):
+        return []
+
+    def get_source_column_dict(self, configuration):
+        return {}
+
+    def verify_file(self,file,header_index):
+        return
+
+    def extract(self,configuration,key):
+        return
+
+    def extract_transactions(self, key, configuration, column):
+        null_index = self.source_df.index[self.source_df[column].isnull()].min()
+        self.source_df = self.source_df.loc[:null_index - 1]
+
+
+    def transform(self,file):
+        configuration = self.get_configuration()
+        header_identification_keys = self.get_header_identification_keys(configuration)
+        source_column_dict = self.get_source_column_dict(configuration)
+        key, header_index, cleaned_header_row = self.find_and_validate_header(header_identification_keys,source_column_dict)
+
+        if key == 'Not Identified':
+            self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
+            self.update_status('File upload', file['name'], 'Error')
+            return
+
+        valid = self.verify_file(file,header_index)
+        if not valid:
+            return
+
+        self.load_source_df(file, header_index + 1)
+        self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
+        self.prune_columns(self.source_df)
+        self.source_df.columns = cleaned_header_row
+        self.extract(configuration,key)
+
+
+class BankTransformer(StagingTransformer):
+    def __init__(self):
+        super().__init__()
+        self.file_type = 'Bank Statement'
+        self.document_type = 'Bank Transaction Stagging'
+
+    def validate_header(self, header_row_index, source_column_list):
+        identified_header_row = [self.trim_and_lower(column) for column in
+                                 self.source_df.loc[header_row_index].to_list() if
+                                 'nan' not in str(column) and str(column) != '*' and str(column) != '.']
+        for key, columns in source_column_list.items():
+            columns = [self.trim_and_lower(column) for column in columns]
+            if set(identified_header_row) == set(columns):
+                return key, header_row_index, identified_header_row
+        return 'Not Identified', 0, []
+
+    def verify_file(self,file,header_index):
+        valid = False
+        bank_account = file['bank_account']
+        df = self.source_df.loc[:header_index]
+        for index, row in df.iterrows():
+            row_values = row.values
+            for values in row_values:
+                if bank_account in values:
+                    valid = True
+        if not valid:
+            self.log_error(self.document_type, file['name'], 'Wrong Bank Account Statement Uploaded')
+            self.update_status('File upload', file['name'], 'Error')
+        return valid
+
+    def get_column_needed(self):
+        return ['date','narration','utr_number','credit','debit']
+
+    def add_search_column(self):
+        self.source_df['search'] = self.source_df['narration'].str.replace(r'[\'"\s]', '', regex=True).str.lower()
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ['credit','debit']
+
+
     def utr_validation(self, pattern, token):
         return bool(re.match(pattern, token))
 
-    def extract_utr(self,narration, reference, delimiters):
+    def extract_utr_by_length(self,narration, length, delimiters, pattern):
+        if len(narration) < length:
+            return None
+
+        for delimiter in delimiters:
+            for token in map(str.strip, narration.split(delimiter)):
+                if len(token) == length and len(token.strip()) == length:
+                    if self.utr_validation(pattern, token):
+                        return token
+
+        return None
+
+    def extract_utr(self, narration, reference, delimiters):
         numeric = '^[0-9]+$'
         alphanumeric_pattern = '^[a-zA-Z]*[0-9]+[a-zA-Z0-9]*$'
         if "IMPS" in narration:
@@ -290,218 +491,21 @@ class Transformer:
 
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
-    def extract_utr_by_length(self,narration, length, delimiters, pattern):
-        if len(narration) < length:
-            return None
+    def extract_utr_from_narration(self, configuration):
+        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(row['narration'], row['utr_number'],eval(configuration.delimiters)), axis = 1)
 
-        for delimiter in delimiters:
-            for token in map(str.strip, narration.split(delimiter)):
-                if len(token) == length and len(token.strip()) == length:
-                    if self.utr_validation(pattern, token):
-                        return token
-
-        return None
-
-    def get_columns_to_fill_na_as_0(self):
-        return []
-
-    def fill_na_as_0(self):
-        columns = self.get_columns_to_fill_na_as_0()
-        for column in columns:
-            self.source_df[column] = self.source_df[column].fillna(0)
-            self.source_df[column] = self.source_df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
-
-    def add_source_and_bank_account_column(self,source,bank_account):
-        self.source_df['source'] = source
-        self.source_df['bank_account'] = bank_account
-
-    def format_date(self,bank_configuration):
-        self.source_df['original_date'] = self.source_df['date'].astype(str).apply(lambda x: x.strip() if isinstance(x, str) else x)
-        self.source_df['formatted_date'] = pd.NaT
-        formats = eval(bank_configuration.date_formats)
-        for fmt in formats:
-            new_column = 'date_' + fmt.replace('%', '').replace('/', '_').replace(':', '').replace(' ', '_')
-            self.source_df[new_column] = pd.to_datetime(self.source_df['original_date'], format=fmt, errors='coerce')
-            self.source_df['formatted_date'] = self.source_df['formatted_date'].combine_first(self.source_df[new_column])
-
-        self.source_df['date'] = self.source_df['formatted_date']
-        self.source_df.drop(columns=[col for col in self.source_df.columns if 'date_' in col or col == 'formatted_date' or col == 'original_date'], inplace=True)
-
-
-    def process(self):
-        files = self.get_files_to_transform()
-        if files == []:
-            return None
-        for file in files:
-            self.update_status('File upload', file['name'], 'In Process')
-            self.load_source_df(file,0)
-
-            try:
-                if self.source_df.empty:
-                    self.log_error(self.document_type, file['name'], 'The File is Empty')
-                    self.update_status('File upload', file['name'], 'Error')
-                    continue
-
-                if self.bank_transform == 1:
-                    bank_configuration = self.get_bank_configuration()
-                    bank, header_index, cleaned_columns, narration = self.find_and_validate_header(bank_configuration)
-
-                    if bank == 'Not Identified':
-                        self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
-                        self.update_status('File upload', file['name'], 'Error')
-                        continue
-
-                    self.load_source_df(file, header_index + 1)
-                    self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
-                    columns_to_drop = ['*', '.', 'nan']
-                    self.source_df = self.source_df.drop(columns=columns_to_drop, errors='ignore')
-                    self.source_df.columns = cleaned_columns
-
-                    if bank in eval(bank_configuration.first_row_empty):
-                        self.source_df = self.source_df[1:]
-
-                    self.extract_transactions(bank, narration, bank_configuration)
-                    self.rename_columns(json.loads(bank_configuration.bank_and_target_columns.replace("'", '"'))[bank])
-
-                    if bank in eval(bank_configuration.banks_having_crdr_column):
-                        self.source_df = self.source_df[self.source_df['cr/dr'].str.lower() == 'cr']
-
-                    self.convert_to_common_format_and_add_search_column()
-                    self.convert_column_to_numeric()
-
-                    self.source_df['reference_number'] = self.source_df.apply(
-                        lambda row: self.extract_utr(row['narration'], row['utr_number'],
-                                                     eval(bank_configuration.delimiters)), axis=1)
-
-                    self.fill_na_as_0()
-                    self.add_source_and_bank_account_column(
-                        file['name'], file['bank_account'])
-                    self.format_date(bank_configuration)
-                    self.new_records = self.source_df
-
-                else:
-                    if self.hashing == 1:
-                        self.hashing_job()
-
-                    if self.clean_utr == 1:
-                        self.format_utr()
-
-                    self.load_target_df()
-
-                    if self.target_df.empty:
-                        self.new_records = self.source_df
-                        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
-                    else:
-                        merged_df = self.left_join(file)
-                        if merged_df.empty:
-                            continue
-
-                        self.new_records = merged_df[merged_df['_merge'] == 'left_only']
-                        existing_df = merged_df[merged_df['_merge'] == 'both']
-                        self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
-                            existing_df)
-                        self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
-                        self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
-                self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
-
-            except Exception as e:
-                self.log_error(self.document_type, file['name'], e)
-                self.update_status('File upload', file['name'], 'Error')
-                continue
-            loader = Loader(self.document_type)
-            loader.process()
-            self.update_parent_status(file)
-
-
-class BillTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Debtors Report'
-        self.document_type = 'Bill'
-
-    def load_target_df(self):
-        query = f"""
-                     SELECT 
-                         name, status
-                     FROM 
-                         `tab{self.document_type}`
-                     """
-        records = frappe.db.sql(query, as_list=True)
-        self.target_df = pd.DataFrame(records,columns = ['name','status'])
-
-    def get_join_columns(self):
-        left_df_column = 'Bill No'
-        right_df_column = 'name'
-        return left_df_column, right_df_column
-
-    def get_columns_to_prune(self):
-        return ['name', '_merge', 'status']
-
-    def get_columns_to_check(self):
-        return {'Status': 'status'}
-
-    def get_column_orders(self):
-        return []
-
-
-class ClaimbookTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Claim Book'
-        self.document_type = 'ClaimBook'
-        self.hashing = 1
-        self.clean_utr = 1
-
-    def get_columns_to_hash(self):
-        return ['unique_id','settled_amount']
-
-    def load_target_df(self):
-        query = f"""
-                      SELECT 
-                          name, hash
-                      FROM 
-                          `tab{self.document_type}`
-                      """
-        records = frappe.db.sql(query, as_list=True)
-        self.target_df = pd.DataFrame(records,columns=['name','hash'])
-
-    def get_join_columns(self):
-        left_df_column = 'unique_id'
-        right_df_column = 'name'
-        return left_df_column, right_df_column
-
-    def get_columns_to_prune(self):
-        return ['name', '_merge','hash_x','hash_column']
-
-    def get_columns_to_check(self):
-        return {'hash': 'hash_x'}
-
-    def get_column_orders(self):
-        return []
-
-class BankTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Bank Statement'
-        self.document_type = 'Bank Transaction Stagging'
-        self.bank_transform = 1
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ['credit','debit']
-
-    def get_columns_to_fill_na_as_0(self):
-        return ['reference_number']
-
-    def get_files_to_transform(self):
-        file_query = f"""SELECT 
-                            upload,name,date,bank_account 
-                        FROM 
-                            `tabFile upload` 
-                        WHERE 
-                            status = 'Open' AND document_type = '{self.file_type}'
-                            ORDER BY creation"""
-        files = frappe.db.sql(file_query, as_dict=True)
-        return files
-
-    def get_column_orders(self):
-        return ["date","narration","credit","utr_number","debit","reference_number","bank_account","source"]
+    def extract(self,configuration,key):
+        self.source_df = self.rename_columns(self.source_df,json.loads(configuration.bank_and_target_columns.replace("'", '"'))[key])
+        if key in eval(configuration.first_row_empty):
+            self.source_df = self.source_df[1:]
+        self.extract_transactions(key, configuration, "narration")
+        if key in eval(configuration.skip_row_1):
+            self.source_df = self.source_df.loc[1:]
+        if key in eval(configuration.banks_having_crdr_column):
+            self.source_df['credit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower() == 'cr')
+            self.source_df['debit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower() == 'dr')
+        columns_to_select = self.get_column_needed()
+        self.source_df = self.convert_into_common_format(self.source_df,columns_to_select)
+        self.add_search_column()
+        self.convert_column_to_numeric()
+        self.extract_utr_from_narration(configuration)
