@@ -59,8 +59,9 @@ class Transformer:
             self.log_error('File upload',file['name'],e)
             return pd.DataFrame()
 
-    def prune_columns(self, df):
-        columns_to_prune = self.get_columns_to_prune()
+    def prune_columns(self, df, columns_to_prune = None):
+        if columns_to_prune is None:
+            columns_to_prune = self.get_columns_to_prune()
         df = df.drop(columns=columns_to_prune, errors='ignore')
         return df
 
@@ -247,9 +248,30 @@ class Transformer:
         for column in columns:
             self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
 
+    def format_date(self,df,date_formats,date_column):
+        df['original_date'] = df[date_column].astype(str).apply(lambda x: x.strip() if isinstance(x,str) else x)
+        df['formatted_date'] = pd.NaT
+        for fmt in date_formats:
+            new_column = 'date_' + fmt.replace('%','').replace('/','_').replace(':','').replace(' ','_')
+            df[new_column] = pd.to_datetime(df['original_date'],format = fmt, errors='coerce')
+            df['formatted_date'] = df['formatted_date'].combine_first(df[new_column])
+        df[date_column] = df['formatted_date']
+        df = self.prune_columns(df,[col for col in df.columns if 'date_' in col or col == 'formatted_date' or col == 'original_date'])
+        return df
+
+    def get_columns_to_fill_na_as_0(self):
+        return []
+
+    def fill_na_as_0(self,df):
+        columns = self.get_columns_to_fill_na_as_0()
+        for column in columns:
+            df[column] = df[column].fillna(0)
+            df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
+        return df
+
     def process(self):
         files = self.get_files_to_transform()
-        if files == []:
+        if not files:
             return None
         for file in files:
             self.update_status('File upload', file['name'], 'In Process')
@@ -261,7 +283,6 @@ class Transformer:
                     self.update_status('File upload', file['name'], 'Error')
                     continue
                 self.transform(file)
-
                 self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
 
             except Exception as e:
@@ -378,10 +399,10 @@ class StagingTransformer(Transformer):
     def verify_file(self,file,header_index):
         return
 
-    def extract(self,configuration,key):
+    def extract(self,configuration,key,bank):
         return
 
-    def extract_transactions(self, key, configuration, column):
+    def extract_transactions(self, column):
         null_index = self.source_df.index[self.source_df[column].isnull()].min()
         self.source_df = self.source_df.loc[:null_index - 1]
 
@@ -405,7 +426,9 @@ class StagingTransformer(Transformer):
         self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
         self.prune_columns(self.source_df)
         self.source_df.columns = cleaned_header_row
-        self.extract(configuration,key)
+        self.extract(configuration,key,file)
+        self.source_df = self.fill_na_as_0(self.source_df)
+        self.new_records = self.source_df
 
 
 class BankTransformer(StagingTransformer):
@@ -494,11 +517,18 @@ class BankTransformer(StagingTransformer):
     def extract_utr_from_narration(self, configuration):
         self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(row['narration'], row['utr_number'],eval(configuration.delimiters)), axis = 1)
 
-    def extract(self,configuration,key):
+    def add_source_and_bank_account_column(self, source, bank_account):
+        self.source_df['source'] = source
+        self.source_df['bank_account'] = bank_account
+
+    def get_columns_to_fill_na_as_0(self):
+        return ['reference_number']
+
+    def extract(self,configuration,key,file):
         self.source_df = self.rename_columns(self.source_df,json.loads(configuration.bank_and_target_columns.replace("'", '"'))[key])
         if key in eval(configuration.first_row_empty):
             self.source_df = self.source_df[1:]
-        self.extract_transactions(key, configuration, "narration")
+        self.extract_transactions("narration")
         if key in eval(configuration.skip_row_1):
             self.source_df = self.source_df.loc[1:]
         if key in eval(configuration.banks_having_crdr_column):
@@ -509,3 +539,5 @@ class BankTransformer(StagingTransformer):
         self.add_search_column()
         self.convert_column_to_numeric()
         self.extract_utr_from_narration(configuration)
+        self.add_source_and_bank_account_column(file['name'], file['bank_account'])
+        self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
