@@ -23,6 +23,7 @@ class Transformer:
         self.hashing = 0
         self.clean_utr = 0
         self.utr_column_name = ''
+        self.header = 0
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -276,7 +277,7 @@ class Transformer:
             return None
         for file in files:
             self.update_status('File upload', file['name'], 'In Process')
-            self.load_source_df(file,0)
+            self.load_source_df(file,self.header)
 
             try:
                 if self.source_df.empty:
@@ -349,46 +350,45 @@ class BillTransformer(DirectTransformer):
 
     def get_column_needed(self):
         return []
-
 class ClaimbookTransformer(DirectTransformer):
-    class ClaimbookTransformer(DirectTransformer):
-        def __init__(self):
-            super().__init__()
-            self.file_type = 'Claim Book'
-            self.document_type = 'ClaimBook'
-            self.hashing = 1
-            self.clean_utr = 1
+    def __init__(self):
+        super().__init__()
+        self.file_type = 'Claim Book'
+        self.document_type = 'ClaimBook'
+        self.hashing = 1
+        self.clean_utr = 1
 
-        def get_columns_to_hash(self):
-            return ['unique_id', 'settled_amount']
+    def get_columns_to_hash(self):
+        return ['unique_id', 'settled_amount']
 
-        def load_target_df(self):
-            query = f"""
-                          SELECT 
-                              name, hash
-                          FROM 
-                              `tab{self.document_type}`
-                          """
-            records = frappe.db.sql(query, as_list=True)
-            self.target_df = pd.DataFrame(records, columns=['name', 'hash'])
+    def load_target_df(self):
+        query = f"""
+                      SELECT 
+                          name, hash
+                      FROM 
+                          `tab{self.document_type}`
+                      """
+        records = frappe.db.sql(query, as_list=True)
+        self.target_df = pd.DataFrame(records, columns=['name', 'hash'])
 
-        def get_join_columns(self):
-            left_df_column = 'unique_id'
-            right_df_column = 'name'
-            return left_df_column, right_df_column
+    def get_join_columns(self):
+        left_df_column = 'unique_id'
+        right_df_column = 'name'
+        return left_df_column, right_df_column
 
-        def get_columns_to_prune(self):
-            return ['name', '_merge', 'hash_x', 'hash_column']
+    def get_columns_to_prune(self):
+        return ['name', '_merge', 'hash_x', 'hash_column']
 
-        def get_columns_to_check(self):
-            return {'hash': 'hash_x'}
+    def get_columns_to_check(self):
+        return {'hash': 'hash_x'}
 
-        def get_column_needed(self):
-            return []
+    def get_column_needed(self):
+        return []
 
 class StagingTransformer(Transformer):
     def __init__(self):
         super().__init__()
+
 
     def get_configuration(self):
         return []
@@ -425,7 +425,7 @@ class StagingTransformer(Transformer):
         if not valid:
             return False
 
-        self.load_source_df(file, header_index + 1)
+        self.load_source_df(file, header_index)
         self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
         self.prune_columns(self.source_df)
         self.source_df.columns = cleaned_header_row
@@ -440,6 +440,7 @@ class BankTransformer(StagingTransformer):
         super().__init__()
         self.file_type = 'Bank Statement'
         self.document_type = 'Bank Transaction Stagging'
+        self.header = None
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
