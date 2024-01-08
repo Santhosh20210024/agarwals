@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import frappe
 from frappe.utils import now
+from agarwals.utils.loader import Loader
 
 # defining the path of the input and output
 base_path = os.getcwd()
@@ -87,17 +88,19 @@ def advice_transform():
         if ".csv" in file_link.lower():
             df = pd.read_csv(folder)
         else:
-            df = pd.read_excel(folder)
-            for keys in header_row_patterns:
-                header_row_index = 0
+            df = pd.read_excel(folder,header=None)
+            break_loop=False
+            for keys in header_row_patterns: 
+                if break_loop:
+                    break
+                header_row_index = None
                 for index,row in df.iterrows():
                     if keys in row.values:
                         header_row_index = index
-                        break
-                    if header_row_index==0:
-                        header_row_index-=1
+                        break_loop=True
+                        break 
         
-        df = pd.read_excel(folder , header = int(header_row_index)+1)
+        df = pd.read_excel(folder , header = header_row_index)
         df.columns = clean_header(df.columns.values)
         column_list = df.columns.values
         rename_value={}
@@ -128,3 +131,5 @@ def advice_transform():
         clean_data(df)
         new_file_name = f'{base_path}{site_path}/private/files/DrAgarwals/Transform/{file.name}'
         write_file_insert_record(df, folder,file_list_details,"None", new_file_name)
+        loader = Loader("sE")
+        loader.process()
