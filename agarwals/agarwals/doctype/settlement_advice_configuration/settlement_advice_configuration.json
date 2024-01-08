@@ -18,14 +18,14 @@
   },
   {
    "fieldname": "target_columns",
-   "fieldtype": "JSON",
+   "fieldtype": "Code",
    "label": "Target Columns"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-01-08 12:52:57.324041",
+ "modified": "2024-01-08 15:14:12.797285",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Settlement Advice Configuration",
