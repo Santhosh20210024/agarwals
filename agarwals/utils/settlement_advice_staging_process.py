@@ -26,17 +26,17 @@ def insert_record_in_settlement_advice(doc_to_insert):
 
 @frappe.whitelist()
 def process():
-    for advice in frappe.get_all('Settlement Advice Stagging',filters = {'status' : ['!=', 'Processed']}, fields = "*" ):
-        advice_stagging_doc=frappe.get_doc('Settlement Advice Stagging',advice.name)
-        if advice_stagging_doc.status == "Error" and advice_stagging_doc.retry==0:
+    for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed']}, fields = "*" ):
+        advice_staging_doc=frappe.get_doc('Settlement Advice Staging',advice.name)
+        if advice_staging_doc.status == "Error" and advice_staging_doc.retry==0:
             continue
-        if advice_stagging_doc.status == "Open" and (advice_stagging_doc.utr_number == None or advice_stagging_doc.claim_id == None):
-            advice_stagging_doc.status = "Error"
-            advice_stagging_doc.remarks = "UTR and claim id should not be null"
-            advice_stagging_doc.save(ignore_permissions=True)
+        if advice_staging_doc.status == "Open" and (advice_staging_doc.utr_number == None or advice_staging_doc.claim_id == None):
+            advice_staging_doc.status = "Error"
+            advice_staging_doc.remarks = "UTR and claim id should not be null"
+            advice_staging_doc.save(ignore_permissions=True)
             frappe.db.commit()
             continue
         
-        insert_record_in_settlement_advice(advice_stagging_doc)
+        insert_record_in_settlement_advice(advice_staging_doc)
         
         
