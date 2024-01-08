@@ -17,8 +17,13 @@ base_path = os.getcwd()
 site_path = frappe.get_site_path()[1:]
 
 def clean_header(list_to_clean):
+    cleaned_list=[]
+    list_of_char_to_repalce=[" ","-","/","_"]
     for header in list_to_clean:
-        header 
+        for char_to_replace in list_of_char_to_repalce:
+            header=header.replace(char_to_replace,"").lower()
+        cleaned_list.append(header)
+    return cleaned_list
     
 
 @frappe.whitelist()
@@ -30,6 +35,8 @@ def advice_transform():
         config = frappe.get_doc("Settlement Advice Configuration")
         header_row_patterns = eval(config.header_row_patterns)
         target_columns = eval(config.target_columns)
+        target_columns["claim_amount"]=clean_header(target_columns["claim_amount"])
+        # print(target_columns["claim_amount"])
         # print("target_columns:", target_columns,"header_row_patterns",header_row_patterns)
         if ".csv" in file_link.lower():
             df = pd.read_csv(folder)
@@ -45,9 +52,8 @@ def advice_transform():
                         header_row_index-=1
         
         df = pd.read_excel(folder , header = int(header_row_index)+1)
-        columns = df.columns.values
-        # print("\n",columns)
-        
+        columns = clean_header(df.columns.values)
+
         
         
         
