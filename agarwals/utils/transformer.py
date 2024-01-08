@@ -224,6 +224,7 @@ class Transformer:
                     break
             if header_row_index is not None:
                 key, header_row_index, identified_header_row = self.validate_header(header_row_index,source_column_list)
+                return key, header_row_index, identified_header_row
         return 'Not Identified', 0, []
 
     def rename_columns(self,df,columns):
@@ -282,7 +283,9 @@ class Transformer:
                     self.log_error(self.document_type, file['name'], 'The File is Empty')
                     self.update_status('File upload', file['name'], 'Error')
                     continue
-                self.transform(file)
+                transformed =self.transform(file)
+                if not transformed:
+                    continue
                 self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
 
             except Exception as e:
@@ -309,7 +312,7 @@ class DirectTransformer(Transformer):
         else:
             merged_df = self.left_join(file)
             if merged_df.empty:
-                pass
+                return False
             self.new_records = merged_df[merged_df['_merge'] == 'left_only']
             existing_df = merged_df[merged_df['_merge'] == 'both']
             self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
@@ -317,7 +320,7 @@ class DirectTransformer(Transformer):
             self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
             self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
 
-class Billtransformer(DirectTransformer):
+class BillTransformer(DirectTransformer):
     def __init__(self):
         super().__init__()
         self.file_type = 'Debtors Report'
@@ -416,11 +419,11 @@ class StagingTransformer(Transformer):
         if key == 'Not Identified':
             self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
             self.update_status('File upload', file['name'], 'Error')
-            return
+            return False
 
         valid = self.verify_file(file,header_index)
         if not valid:
-            return
+            return False
 
         self.load_source_df(file, header_index + 1)
         self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
@@ -429,6 +432,7 @@ class StagingTransformer(Transformer):
         self.extract(configuration,key,file)
         self.source_df = self.fill_na_as_0(self.source_df)
         self.new_records = self.source_df
+        return True
 
 
 class BankTransformer(StagingTransformer):
@@ -436,6 +440,17 @@ class BankTransformer(StagingTransformer):
         super().__init__()
         self.file_type = 'Bank Statement'
         self.document_type = 'Bank Transaction Stagging'
+
+    def get_files_to_transform(self):
+        file_query = f"""SELECT 
+                            upload,name,date,bank_account 
+                        FROM 
+                            `tabFile upload` 
+                        WHERE 
+                            status = 'Open' AND document_type = '{self.file_type}'
+                            ORDER BY creation"""
+        files = frappe.db.sql(file_query, as_dict=True)
+        return files
 
     def validate_header(self, header_row_index, source_column_list):
         identified_header_row = [self.trim_and_lower(column) for column in
@@ -449,20 +464,21 @@ class BankTransformer(StagingTransformer):
 
     def verify_file(self,file,header_index):
         valid = False
-        bank_account = file['bank_account']
+        bank_account = file['bank_account'].split('-')[-2].strip()
         df = self.source_df.loc[:header_index]
         for index, row in df.iterrows():
-            row_values = row.values
-            for values in row_values:
-                if bank_account in values:
-                    valid = True
+            if any(bank_account in str(value) for value in row.values):
+                valid = True
         if not valid:
             self.log_error(self.document_type, file['name'], 'Wrong Bank Account Statement Uploaded')
             self.update_status('File upload', file['name'], 'Error')
         return valid
 
     def get_column_needed(self):
-        return ['date','narration','utr_number','credit','debit']
+        return ['date','narration','utr_number','credit','debit','search','source','bank_account']
+
+    def get_configuration(self):
+        return frappe.get_single('Bank Configuration')
 
     def add_search_column(self):
         self.source_df['search'] = self.source_df['narration'].str.replace(r'[\'"\s]', '', regex=True).str.lower()
@@ -523,6 +539,12 @@ class BankTransformer(StagingTransformer):
 
     def get_columns_to_fill_na_as_0(self):
         return ['reference_number']
+
+    def get_header_identification_keys(self,configuration):
+        return eval(configuration.types_of_narration_column)
+
+    def get_source_column_dict(self,configuration):
+        return json.loads(configuration.bank_and_source_columns.replace("'", '"'))
 
     def extract(self,configuration,key,file):
         self.source_df = self.rename_columns(self.source_df,json.loads(configuration.bank_and_target_columns.replace("'", '"'))[key])
