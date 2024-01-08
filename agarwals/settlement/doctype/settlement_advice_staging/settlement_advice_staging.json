@@ -7,6 +7,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "source",
   "date",
   "claim_id",
   "utr_number",
@@ -19,7 +20,9 @@
   "modifications_column",
   "status",
   "remarks",
-  "retry"
+  "retry",
+  "disallowed_amount",
+  "payers_remark"
  ],
  "fields": [
   {
@@ -88,13 +91,28 @@
    "fieldname": "retry",
    "fieldtype": "Check",
    "label": "Retry"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Data",
+   "label": "Source"
+  },
+  {
+   "fieldname": "disallowed_amount",
+   "fieldtype": "Data",
+   "label": "Disallowed Amount"
+  },
+  {
+   "fieldname": "payers_remark",
+   "fieldtype": "Data",
+   "label": "Payers Remark"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-03 19:36:49.192119",
+ "modified": "2024-01-08 21:02:41.319614",
  "modified_by": "Administrator",
- "module": "Agarwals",
+ "module": "Settlement",
  "name": "Settlement Advice Staging",
  "owner": "Administrator",
  "permissions": [
