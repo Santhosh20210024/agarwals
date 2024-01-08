@@ -49,7 +49,8 @@ class Loader():
         data_import.set('import_type', import_type)
         data_import.set('import_file', file['file_url'])
         data_import.save()
-        frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
+        if template != 0:
+            frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
         start_import(data_import.name)
         frappe.db.commit()
         return data_import.name
@@ -72,18 +73,23 @@ class Loader():
         if files == []:
             return None
         for file in files:
-            self.update_status('Transform', file['name'], 'In Process')
-            import_type = self.get_type_of_import(file)
-            import_name = self.load_data(import_type,file)
-            import_status = self.get_import_status(import_name)
-            if import_status == 'Pending' or import_status == 'Error':
+            try:
+                self.update_status('Transform', file['name'], 'In Process')
+                import_type = self.get_type_of_import(file)
+                import_name = self.load_data(import_type, file)
+                import_status = self.get_import_status(import_name)
+                if import_status == 'Pending' or import_status == 'Error':
+                    self.update_status('Transform', file['name'], 'Error')
+                else:
+                    self.update_status('Transform', file['name'], import_status)
+                source_file = file['file_url']
+                target_file = file['file_url'].replace('Transform', 'Load')
+                self.move_file(SITE_PATH + source_file, SITE_PATH + target_file)
+                self.update_file_url(file, target_file)
+            except Exception as e:
                 self.update_status('Transform', file['name'], 'Error')
-            else:
-                self.update_status('Transform', file['name'], import_status)
-            source_file = file['file_url']
-            target_file = file['file_url'].replace('Transform','Load')
-            self.move_file(SITE_PATH + source_file,SITE_PATH + target_file)
-            self.update_file_url(file,target_file)
+                self.log_error('Transform', file['name'], e)
+
 
 
 

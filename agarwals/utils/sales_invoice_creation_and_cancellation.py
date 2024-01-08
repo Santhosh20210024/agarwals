@@ -3,15 +3,20 @@ import frappe
 
 @frappe.whitelist()
 def create_sales_background_job(n):
-    bills = frappe.db.get_list('Bill',filters = {'status':'RAISED','invoice':''},fields='*')
+    bills = frappe.db.get_list('Bill',filters = {'invoice':''},fields='*')
     n = int(n)
     
     for i in range(0, len(bills), n):
         frappe.enqueue(create_sales_invoice, queue='long', is_async=True, timeout=18000, bills=bills[i:i + n])
 
+    cancelled_bills = frappe.db.get_list('Bill', filters={'status': 'CANCELLED','invoice_status':'RAISED'}, pluck = 'name')
+    n = int(n)
+
+    for i in range(0, len(cancelled_bills), n):
+        frappe.enqueue(cancel_sales_invoice, queue='long', is_async=True, timeout=18000, bills=cancelled_bills[i:i + n])
+
 
 def create_sales_invoice(bills):
-    print('Job Started')
     try:
         for bill in bills:
             try:
@@ -32,7 +37,7 @@ def create_sales_invoice(bills):
                     sales_invoice.set('due_date', bill.bill_date)
                     sales_invoice.save()
                     sales_invoice.submit()
-                    frappe.db.set_value('Bill', bill.bill_no, 'invoice', sales_invoice.name)
+                    frappe.db.set_value('Bill',bill.bill_no,{'invoice':sales_invoice.name, 'invoice_status':'RAISED'})
                     frappe.db.commit()
                     print('Sales Invoice Created')
             except Exception as e:
@@ -46,3 +51,26 @@ def create_sales_invoice(bills):
 
     except Exception as e:
         return e
+
+def cancel_sales_invoice(bills):
+    if bills:
+        for bill in bills:
+            try:
+                sales_invoice = frappe.get_doc('Sales Invoice', bill)
+                if sales_invoice.docstatus == 1:
+                    try:
+                        sales_invoice.cancel()
+                    except Exception as e:
+                        error_log = frappe.new_doc('Error Record Log')
+                        error_log.set('doctype_name', 'Sales Invoice')
+                        error_log.set('reference_name', bill.bill_no)
+                        error_log.set('error_message', e)
+                        error_log.save()
+            except Exception as e:
+                error_log = frappe.new_doc('Error Record Log')
+                error_log.set('doctype_name', 'Sales Invoice')
+                error_log.set('reference_name', bill.bill_no)
+                error_log.set('error_message', e)
+                error_log.save()
+
+
