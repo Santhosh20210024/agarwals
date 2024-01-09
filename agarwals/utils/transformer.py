@@ -443,7 +443,7 @@ class BankTransformer(StagingTransformer):
     def __init__(self):
         super().__init__()
         self.file_type = 'Bank Statement'
-        self.document_type = 'Bank Transaction Stagging'
+        self.document_type = 'Bank Transaction Staging'
         self.header = None
 
     def get_files_to_transform(self):
