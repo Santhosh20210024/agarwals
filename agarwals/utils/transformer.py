@@ -136,12 +136,16 @@ class Transformer:
         self.insert_in_file_upload(file_path, file['name'], type, status)
 
     def load_source_df(self, file, header):
-        if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
-            self.source_df = pd.read_excel(SITE_PATH + file['upload'], engine='openpyxl', header=header )
-        elif file['upload'].endswith('.csv'):
-            self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
-        else:
-            self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
+        try:
+            if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
+                self.source_df = pd.read_excel(SITE_PATH + file['upload'], engine='openpyxl', header=header)
+            elif file['upload'].endswith('.csv'):
+                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
+            else:
+                self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
+                self.update_status('File upload', file['name'], 'Error')
+        except Exception as e:
+            self.log_error(self.document_type, file['name'], e)
             self.update_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
@@ -476,7 +480,7 @@ class BankTransformer(StagingTransformer):
         return valid
 
     def get_column_needed(self):
-        return ['date','narration','utr_number','credit','debit','search','source','bank_account']
+        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number']
 
     def get_configuration(self):
         return frappe.get_single('Bank Configuration')
