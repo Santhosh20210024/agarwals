@@ -83,7 +83,7 @@
   },
   {
    "fieldname": "remarks",
-   "fieldtype": "Data",
+   "fieldtype": "Text",
    "label": "Remarks"
   },
   {
@@ -111,7 +111,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-09 12:11:19.131141",
+ "modified": "2024-01-09 21:43:31.947570",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
