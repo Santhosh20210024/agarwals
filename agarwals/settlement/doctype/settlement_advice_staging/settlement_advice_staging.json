@@ -7,11 +7,14 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "source",
   "date",
   "claim_id",
   "utr_number",
-  "settled_amount",
   "claim_status",
+  "settled_amount",
+  "disallowed_amount",
+  "payers_remark",
   "tds_amount",
   "paid_date",
   "bill_number",
@@ -88,13 +91,29 @@
    "fieldname": "retry",
    "fieldtype": "Check",
    "label": "Retry"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Link",
+   "label": "Source",
+   "options": "File upload"
+  },
+  {
+   "fieldname": "disallowed_amount",
+   "fieldtype": "Data",
+   "label": "Disallowed Amount"
+  },
+  {
+   "fieldname": "payers_remark",
+   "fieldtype": "Data",
+   "label": "Payers Remark"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-03 19:36:49.192119",
+ "modified": "2024-01-09 12:11:19.131141",
  "modified_by": "Administrator",
- "module": "Agarwals",
+ "module": "Settlement",
  "name": "Settlement Advice Staging",
  "owner": "Administrator",
  "permissions": [

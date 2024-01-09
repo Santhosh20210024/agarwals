@@ -1,4 +1,5 @@
 import frappe
+from datetime import date
 
 def insert_record_in_settlement_advice(doc_to_insert):
     try:
@@ -26,17 +27,22 @@ def insert_record_in_settlement_advice(doc_to_insert):
 
 @frappe.whitelist()
 def process():
-    for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed']}, fields = "*" ):
-        advice_staging_doc=frappe.get_doc('Settlement Advice Staging',advice.name)
-        if advice_staging_doc.status == "Error" and advice_staging_doc.retry==0:
-            continue
-        if advice_staging_doc.status == "Open" and (advice_staging_doc.utr_number == None or advice_staging_doc.claim_id == None):
-            advice_staging_doc.status = "Error"
-            advice_staging_doc.remarks = "UTR and claim id should not be null"
-            advice_staging_doc.save(ignore_permissions=True)
-            frappe.db.commit()
-            continue
-        
-        insert_record_in_settlement_advice(advice_staging_doc)
+    try:
+        for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed']}, fields = "*" ):
+            advice_staging_doc=frappe.get_doc('Settlement Advice Staging',advice.name)
+            advice_staging_doc.date = date.today(),
+            if advice_staging_doc.status == "Error" and advice_staging_doc.retry==0:
+                continue
+            if advice_staging_doc.status == "Open" and (advice_staging_doc.utr_number == "0" or advice_staging_doc.claim_id =="0"):
+                advice_staging_doc.status = "Error"
+                advice_staging_doc.remarks = "UTR and claim id should not be null"
+                advice_staging_doc.save(ignore_permissions=True)
+                frappe.db.commit()
+                continue
+            
+            insert_record_in_settlement_advice(advice_staging_doc)
+        return "Success"
+    except Exception as e:
+        return e
         
         
