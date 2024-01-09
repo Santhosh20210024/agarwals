@@ -3,7 +3,6 @@
  "allow_auto_repeat": 1,
  "allow_events_in_timeline": 1,
  "allow_import": 1,
- "autoname": "hash",
  "creation": "2024-01-02 13:53:59.980854",
  "default_view": "List",
  "doctype": "DocType",
@@ -20,8 +19,11 @@
   "currency",
   "description",
   "reference_number",
+  "source_reference_number",
   "column_break_5xa6d",
-  "status",
+  "tag",
+  "search",
+  "staging_status",
   "remarks",
   "update_reference_number",
   "retry"
@@ -84,15 +86,6 @@
    "label": "Reference Number"
   },
   {
-   "default": "Open",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "Open\nError\nProcessed\nWarning"
-  },
-  {
    "fieldname": "remarks",
    "fieldtype": "Data",
    "label": "Remarks"
@@ -112,23 +105,48 @@
   {
    "fieldname": "source",
    "fieldtype": "Data",
-   "label": "Source"
+   "label": "Source File"
   },
   {
    "depends_on": "eval:doc.status == 'Warning'",
    "fieldname": "update_reference_number",
    "fieldtype": "Data",
    "label": "Update Reference Number"
+  },
+  {
+   "fieldname": "tag",
+   "fieldtype": "Link",
+   "label": "Tag",
+   "options": "Tag"
+  },
+  {
+   "fieldname": "source_reference_number",
+   "fieldtype": "Data",
+   "label": "Source Reference Number"
+  },
+  {
+   "fieldname": "search",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Search"
+  },
+  {
+   "default": "Open",
+   "fieldname": "staging_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nError\nProcessed\nWarning"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-03 18:20:34.260141",
+ "modified": "2024-01-09 10:17:36.374864",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "Bank Transaction Stagging",
+ "name": "Bank Transaction Staging",
  "name_case": "Title Case",
- "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
