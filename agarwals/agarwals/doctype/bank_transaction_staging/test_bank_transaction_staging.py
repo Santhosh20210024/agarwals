@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestBankTransactionStagging(FrappeTestCase):
+class TestBankTransactionStaging(FrappeTestCase):
 	pass
