@@ -11,8 +11,10 @@
   "date",
   "claim_id",
   "utr_number",
-  "settled_amount",
   "claim_status",
+  "settled_amount",
+  "disallowed_amount",
+  "payers_remark",
   "tds_amount",
   "paid_date",
   "bill_number",
@@ -20,9 +22,7 @@
   "modifications_column",
   "status",
   "remarks",
-  "retry",
-  "disallowed_amount",
-  "payers_remark"
+  "retry"
  ],
  "fields": [
   {
@@ -94,8 +94,9 @@
   },
   {
    "fieldname": "source",
-   "fieldtype": "Data",
-   "label": "Source"
+   "fieldtype": "Link",
+   "label": "Source",
+   "options": "File upload"
   },
   {
    "fieldname": "disallowed_amount",
@@ -110,7 +111,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-08 21:02:41.319614",
+ "modified": "2024-01-09 12:11:19.131141",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",

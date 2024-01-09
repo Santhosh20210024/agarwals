@@ -18,9 +18,15 @@ def clean_header(list_to_clean):
     return cleaned_list
     
 def clean_data(df):
+        print(df.head())
+        df["utr_number"]=df["utr_number"].astype(str).str.replace(r"[\"\'^(0+)]", '',regex=True)
+        df["claim_id"]=df["claim_id"].astype(str).str.replace(r"[\"\']", '',regex=True)
+        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0").fillna("0")
+        df["claim_id"]=df["claim_id"].astype(str).str.strip().fillna("0")
+        print(df.head())
         format_utr(df)
-        df["utr_number"].str.strip()
-        df["claim_id"].str.strip()
+        
+        
         
 def update_status(doctype, name, status):
     frappe.db.set_value(doctype,name,'status',status)
@@ -174,7 +180,9 @@ def advice_transform():
                     if every_column not in df.columns:
                         df[every_column] = ""         
                 df = df[all_columns]
+                df["source"]=file.name
                 clean_data(df)
+                print(df.head())
                 move_to_transform(file, df, 'Insert', 'Transform')
                 loader = Loader("Settlement Advice Staging")
                 loader.process()

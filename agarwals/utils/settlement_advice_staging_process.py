@@ -1,4 +1,5 @@
 import frappe
+from datetime import date
 
 def insert_record_in_settlement_advice(doc_to_insert):
     try:
@@ -29,9 +30,10 @@ def process():
     try:
         for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed']}, fields = "*" ):
             advice_staging_doc=frappe.get_doc('Settlement Advice Staging',advice.name)
+            advice_staging_doc.date = date.today(),
             if advice_staging_doc.status == "Error" and advice_staging_doc.retry==0:
                 continue
-            if advice_staging_doc.status == "Open" and (advice_staging_doc.utr_number == None or float(advice_staging_doc.utr_number) == 0 or advice_staging_doc.claim_id == None or float(advice_staging_doc.claim_id) == 0):
+            if advice_staging_doc.status == "Open" and (advice_staging_doc.utr_number == "0" or advice_staging_doc.claim_id =="0"):
                 advice_staging_doc.status = "Error"
                 advice_staging_doc.remarks = "UTR and claim id should not be null"
                 advice_staging_doc.save(ignore_permissions=True)
