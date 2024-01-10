@@ -19,10 +19,12 @@ def clean_header(list_to_clean):
     
 def clean_data(df):
         print(df.head())
+        df["utr_number"]=df["utr_number"].fillna("0")
+        df["claim_id"]=df["claim_id"].fillna("0")
         df["utr_number"]=df["utr_number"].astype(str).str.replace(r"[\"\'^(0+)]", '',regex=True)
         df["claim_id"]=df["claim_id"].astype(str).str.replace(r"[\"\']", '',regex=True)
-        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0").fillna("0")
-        df["claim_id"]=df["claim_id"].astype(str).str.strip().fillna("0")
+        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0")
+        df["claim_id"]=df["claim_id"].astype(str).str.strip()
         print(df.head())
         format_utr(df)
         
@@ -139,7 +141,7 @@ def advice_transform():
                     df = pd.read_csv(file_url_to_read)
                     file_link=file_link.lower().replace(".csv",".xlsx")
                 else:
-                    df = pd.read_excel(file_url_to_read,header=None)
+                    df = pd.read_excel(file_url_to_read,header=None, engine='openpyxl')
                     
                     break_loop=False
                     for keys in header_row_patterns: 
@@ -187,7 +189,9 @@ def advice_transform():
                 loader = Loader("Settlement Advice Staging")
                 loader.process()
                 update_parent_status(file)
-                return "Success"
             except Exception as e:
                 log_error('Settlement Advice Staging',file.name,e)
-                return e
+                update_status('File upload', file.name, 'Error')
+                frappe.db.commit()
+                continue
+        return "Success"

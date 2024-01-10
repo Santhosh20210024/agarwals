@@ -28,37 +28,48 @@
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Date"
+   "hidden": 1,
+   "label": "Date",
+   "read_only": 1
   },
   {
    "fieldname": "claim_id",
    "fieldtype": "Data",
-   "label": "Claim Id"
+   "label": "Claim Id",
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.claim_id != null"
   },
   {
    "fieldname": "utr_number",
    "fieldtype": "Data",
-   "label": "Utr Number"
+   "label": "Utr Number",
+   "mandatory_depends_on": "eval:doc.utr_number != null",
+   "read_only": 1
   },
   {
    "fieldname": "settled_amount",
    "fieldtype": "Data",
-   "label": "Settled Amount"
+   "label": "Settled Amount",
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.settled_amount != null"
   },
   {
    "fieldname": "claim_status",
    "fieldtype": "Data",
-   "label": "Claim Status"
+   "label": "Claim Status",
+   "read_only": 1
   },
   {
    "fieldname": "tds_amount",
    "fieldtype": "Data",
-   "label": "Tds Amount"
+   "label": "Tds Amount",
+   "read_only": 1
   },
   {
    "fieldname": "paid_date",
    "fieldtype": "Data",
-   "label": "Paid Date"
+   "label": "Paid Date",
+   "read_only": 1
   },
   {
    "fieldname": "bill_number",
@@ -68,7 +79,8 @@
   {
    "fieldname": "claim_amount",
    "fieldtype": "Data",
-   "label": "Claim Amount"
+   "label": "Claim Amount",
+   "read_only": 1
   },
   {
    "fieldname": "modifications_column",
@@ -78,13 +90,16 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Status",
-   "options": "Open\nError\nProcessed"
+   "options": "Open\nError\nProcessed",
+   "read_only": 1
   },
   {
    "fieldname": "remarks",
    "fieldtype": "Text",
-   "label": "Remarks"
+   "label": "Remarks",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -96,22 +111,25 @@
    "fieldname": "source",
    "fieldtype": "Link",
    "label": "Source",
-   "options": "File upload"
+   "options": "File upload",
+   "read_only": 1
   },
   {
    "fieldname": "disallowed_amount",
    "fieldtype": "Data",
-   "label": "Disallowed Amount"
+   "label": "Disallowed Amount",
+   "read_only": 1
   },
   {
    "fieldname": "payers_remark",
-   "fieldtype": "Data",
-   "label": "Payers Remark"
+   "fieldtype": "Text",
+   "label": "Payers Remark",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-09 21:43:31.947570",
+ "modified": "2024-01-10 12:43:40.775751",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
