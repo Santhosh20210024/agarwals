@@ -3,12 +3,20 @@ import frappe
 
 @frappe.whitelist()
 def create_sales_background_job(n):
+    cancelled_bills = frappe.get_list('Bill',filters={'status':'CANCELLED','invoice_status':'RAISED'},pluck = 'name')
+    for bill in cancelled_bills:
+        cancel_sales_invoice(bill)
     bills = frappe.db.get_list('Bill',filters = {'invoice':''},fields='*')
     n = int(n)
     
     for i in range(0, len(bills), n):
         frappe.enqueue(create_sales_invoice, queue='long', is_async=True, timeout=18000, bills=bills[i:i + n])
 
+def cancel_sales_invoice(bill_no):
+    sales_invoice = frappe.get_doc('Sales Invoice', bill_no)
+    sales_invoice.cancel()
+    frappe.db.set_value('Bill', bill_no, 'invoice_status', "CANCELLED")
+    frappe.db.commit()
 
 def create_sales_invoice(bills):
     try:
