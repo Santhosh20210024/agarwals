@@ -179,6 +179,12 @@ def advice_transform():
                                 rename_value[columns]=key
                                 break
                 df = df.rename(columns = rename_value)
+                print(df.head())
+                if "claim_id" not in df.columns:
+                    log_error('Settlement Advice Staging',file.name,"No Valid data or file is empty")
+                    update_status('File upload', file.name, 'Error')
+                    frappe.db.commit()
+                    continue
                 all_columns = target_columns.keys()
                 for every_column in all_columns:
                     if every_column not in df.columns:
