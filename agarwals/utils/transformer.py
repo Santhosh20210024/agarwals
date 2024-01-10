@@ -326,6 +326,7 @@ class DirectTransformer(Transformer):
                 existing_df)
             self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
             self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
+        return True
 
 class BillTransformer(DirectTransformer):
     def __init__(self):
