@@ -293,8 +293,6 @@ class Transformer:
                 transformed =self.transform(file)
                 if not transformed:
                     continue
-                self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
-
             except Exception as e:
                 self.log_error(self.document_type, file['name'], e)
                 self.update_status('File upload', file['name'], 'Error')
@@ -316,7 +314,7 @@ class DirectTransformer(Transformer):
         if self.target_df.empty:
             self.new_records = self.source_df
             self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
-            return False
+            return True
         else:
             merged_df = self.left_join(file)
             if merged_df.empty:
@@ -325,6 +323,7 @@ class DirectTransformer(Transformer):
             existing_df = merged_df[merged_df['_merge'] == 'both']
             self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
                 existing_df)
+            self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
             self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
             self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
         return True
@@ -441,6 +440,7 @@ class StagingTransformer(Transformer):
         self.extract(configuration,key,file)
         self.source_df = self.fill_na_as_0(self.source_df)
         self.new_records = self.source_df
+        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
 
 

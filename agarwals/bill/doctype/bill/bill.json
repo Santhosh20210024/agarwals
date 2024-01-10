@@ -258,7 +258,11 @@
    "label": "Invoice Status",
    "options": "\nRAISED\nCANCELLED"
   },
+<<<<<<< HEAD
+  {
+=======
    {
+>>>>>>> f03b818a5fbe22417fda8438554903c1af45a0c0
    "fieldname": "branch_type",
    "fieldtype": "Data",
    "label": "Branch Type"
@@ -272,7 +276,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-01-08 16:29:32.160450",
+ "modified": "2024-01-10 19:45:32.652369",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
