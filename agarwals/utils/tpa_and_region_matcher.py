@@ -46,3 +46,26 @@ def map_region():
 
     except Exception as e:
         return e
+
+@frappe.whitelist()
+def map_branch_type():
+    bills = frappe.get_list('Bill',filters = {'branch_type':''},fields = '*')
+    branch_master = frappe.get_list('Branch Region List', fields = ['branch','region','branch_type'])
+
+    try:
+        for bill in bills:
+            try:
+                for region in branch_master:
+                    if bill.branch == region['branch']:
+                        frappe.db.set_value('Bill',bill.bill_no,'branch_type',region['branch_type'])
+                        break
+            except Exception as e:
+                error_log = frappe.new_doc('Error Record Log')
+                error_log.set('doctype_name', 'Bill')
+                error_log.set('error_message', e)
+                error_log.save()
+
+        return "success"
+
+    except Exception as e:
+        return e
