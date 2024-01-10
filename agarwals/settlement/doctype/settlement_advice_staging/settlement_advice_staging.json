@@ -43,15 +43,15 @@
    "fieldname": "utr_number",
    "fieldtype": "Data",
    "label": "Utr Number",
-   "mandatory_depends_on": "eval:doc.utr_number != null",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:(doc.utr_number != null || doc.utr_number == '0')"
   },
   {
    "fieldname": "settled_amount",
    "fieldtype": "Data",
    "label": "Settled Amount",
    "read_only": 1,
-   "read_only_depends_on": "eval:doc.settled_amount != null"
+   "read_only_depends_on": "eval:(doc.settled_amount != 0 || doc.settled_amount != null)"
   },
   {
    "fieldname": "claim_status",
@@ -74,7 +74,8 @@
   {
    "fieldname": "bill_number",
    "fieldtype": "Data",
-   "label": "Bill Number"
+   "label": "Bill Number",
+   "read_only": 1
   },
   {
    "fieldname": "claim_amount",
@@ -129,7 +130,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-10 12:43:40.775751",
+ "modified": "2024-01-10 15:27:25.420443",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",

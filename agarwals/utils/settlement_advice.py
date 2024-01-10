@@ -9,11 +9,12 @@ base_path = os.getcwd()
 site_path = frappe.get_site_path()[1:]
 
 def clean_header(list_to_clean):
+    
     cleaned_list=[]
-    list_of_char_to_repalce=[" ","-","/","_"]
+    list_of_char_to_repalce=[" ","-","/","_","\'","\""]
     for header in list_to_clean:
         for char_to_replace in list_of_char_to_repalce:
-            header=header.replace(char_to_replace,"").lower()
+            header=str(header).replace(char_to_replace,"").lower()
         cleaned_list.append(header)
     return cleaned_list
     
@@ -48,7 +49,8 @@ def update_parent_status(file):
         update_status('File upload', file.name, 'Success')
         
 def write_excel(df, file_path, type, target_folder):
-    file_path = file_path.replace('Extract', target_folder).replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx').replace('.CSV','.xlsx')
+    excel_file_path = file_path.replace(file_path.split('.')[-1],'xlsx')
+    file_path = excel_file_path.replace('Extract', target_folder).replace('.xlsx','_' + type + '.xlsx')
     file_path_to_write = SITE_PATH + file_path
     df.to_excel(file_path_to_write, index=False)
     return file_path
@@ -136,20 +138,20 @@ def advice_transform():
                 file_url_to_read =  f"{base_path}{site_path}{file_link}"
                 config = frappe.get_doc("Settlement Advice Configuration")
                 header_row_patterns = eval(config.header_row_patterns)
+                header_row_patterns = clean_header(header_row_patterns)
                 target_columns = eval(config.target_columns)
                 if ".csv" in file_link.lower():
                     df = pd.read_csv(file_url_to_read)
                     file_link=file_link.lower().replace(".csv",".xlsx")
                 else:
-                    df = pd.read_excel(file_url_to_read,header=None, engine='openpyxl')
-                    
+                    df = pd.read_excel(file_url_to_read,header=None,)
                     break_loop=False
                     for keys in header_row_patterns: 
                         if break_loop:
                             break
                         header_row_index = None
                         for index,row in df.iterrows():
-                            if keys in row.values:
+                            if keys in clean_header(row.values):
                                 header_row_index = index
                                 break_loop=True
                                 break 

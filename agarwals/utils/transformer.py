@@ -97,7 +97,8 @@ class Transformer:
         column_orders = self.get_column_needed()
         if column_orders:
             df = self.reorder_columns(column_orders,df)
-        file_path = file_path.replace('Extract', target_folder).replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
+        excel_file_path = file_path.replace(file_path.split('.')[-1],'xlsx')
+        file_path = excel_file_path.replace('Extract', target_folder).replace('.xlsx','_' + type + '.xlsx')
         file_path_to_write = SITE_PATH + file_path
         df.to_excel(file_path_to_write, index=False)
         return file_path
