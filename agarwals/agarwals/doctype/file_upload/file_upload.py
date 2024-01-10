@@ -9,8 +9,6 @@ from agarwals.utils.path_data import HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, 
 import re
 
 class Fileupload(Document):
-	# def __init__(self):
-	# 	self.fil
 	def get_file_doc_data(self):
 		file_name = self.upload.split("/")[-1]
 		file_doc_id = frappe.get_list("File", filters={'file_url':self.upload}, pluck='name')[0]
@@ -30,17 +28,23 @@ class Fileupload(Document):
 		if os.path.exists(file_path):
 			os.remove(file_path)
 
-	def validate_hash_content(self, file_name, file_doc_id):
-		file_doc = frappe.get_doc('File', file_doc_id)
-		doc_file_name = file_doc.file_name
-		file_content_hash = file_doc.content_hash
+	def validate_hash_content(self, file_name, file_id):
+		file_doc = frappe.get_doc('File', file_id)
+		file_ch = file_doc.content_hash
 		
 		# Verify the same hash content 
-		if file_content_hash:
-			file_hash_doc = frappe.get_list("File", filters = {'content_hash':file_content_hash}, pluck = 'name', order_by = 'creation DESC')
-			if len(file_hash_doc) > 1:
-				frappe.delete_doc("File", file_hash_doc[0])
+		if file_ch:
+			file_doc_hash = frappe.get_list("File", filters = { 'content_hash':file_ch, 'attached_to_doctype': 'File upload' }, fields = [ 'name', 'attached_to_name' ], order_by = 'creation DESC')
+			file_doc_hash_filtered = []
+
+			for file in file_doc_hash:
+				if frappe.get_value('File upload', file.attached_to_name, 'status') != 'Error':
+					file_doc_hash_filtered.append(file) 
+			
+			if len(file_doc_hash_filtered) > 1:
+				frappe.delete_doc("File", file_doc_hash[0])
 				frappe.db.commit()
+
 				# Delete the files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				self.set(str(self.upload), '')
@@ -54,22 +58,23 @@ class Fileupload(Document):
 		
 
 	def validate_file(self):
-		file_name, file_doc_id = self.get_file_doc_data()
-		# file_type = frappe.get_value('File',file_doc_id,'file_type')
-		# get_file_name = frappe.get_doc('File', )
-		if file_doc_id:
-			if file_name.split('.')[-1].upper() != 'XLSX' and file_name.split('.')[-1].upper() != 'PDF' and file_name.split('.')[-1].upper() != 'CSV':
-				frappe.delete_doc("File", file_doc_id)
+		file_name, file_id = self.get_file_doc_data()
+		if file_id:
+			file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
+			if file_name.split('.')[-1].upper() not in file_extensions:
+				frappe.delete_doc("File", file_id)
 				frappe.db.commit()
+
 				# Delete the shell files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				frappe.publish_realtime(event="Errorbox", message="error")
-				frappe.throw("Please upload files in Excel format only (XLSX).")
+				frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
 				self.set(str(self.upload), '')
 				return
+			
 			else:
 				frappe.publish_realtime(event="Errorbox", message="no error")									
-			self.validate_hash_content(file_name, file_doc_id)
+			self.validate_hash_content(file_name, file_id)
 				
 	def move_shell_file(self, source, destination):
 		try:
@@ -92,9 +97,12 @@ class Fileupload(Document):
 		self.set("upload_url",_file_url)
 		
 	def validate(self):
-		
+
+		# To avoid other valid entries
 		if self.status != 'Open':
 			return
+		
+		# To check whether the file uploaded
 		if self.upload == None or self.upload == '':
 			frappe.throw('Please upload file')
 
