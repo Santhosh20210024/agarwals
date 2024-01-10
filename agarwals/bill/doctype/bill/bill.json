@@ -258,11 +258,7 @@
    "label": "Invoice Status",
    "options": "\nRAISED\nCANCELLED"
   },
-<<<<<<< HEAD
-  {
-=======
    {
->>>>>>> f03b818a5fbe22417fda8438554903c1af45a0c0
    "fieldname": "branch_type",
    "fieldtype": "Data",
    "label": "Branch Type"
