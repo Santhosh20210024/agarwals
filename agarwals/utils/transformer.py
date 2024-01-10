@@ -316,6 +316,7 @@ class DirectTransformer(Transformer):
         if self.target_df.empty:
             self.new_records = self.source_df
             self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
+            return False
         else:
             merged_df = self.left_join(file)
             if merged_df.empty:
