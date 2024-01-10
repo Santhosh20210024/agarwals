@@ -162,6 +162,7 @@ class Transformer:
 
     def update_status(self, doctype, name, status):
         frappe.db.set_value(doctype,name,'status',status)
+        frappe.db.commit()
 
     def update_parent_status(self,file):
         file_record = frappe.get_doc('File upload',file['name'])
