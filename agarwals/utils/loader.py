@@ -27,7 +27,6 @@ class Loader():
 
     def update_status(self, doctype, name, status):
         frappe.db.set_value(doctype, name, 'status', status)
-        frappe.db.commit()
 
     def get_type_of_import(self,file):
         match file['type']:
