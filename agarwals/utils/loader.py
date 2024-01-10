@@ -52,7 +52,6 @@ class Loader():
         if template != 0:
             frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
         start_import(data_import.name)
-        frappe.db.commit()
         return data_import.name
 
     def get_import_status(self, import_name):

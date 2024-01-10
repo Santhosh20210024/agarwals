@@ -91,6 +91,7 @@ class Transformer:
         return []
 
     def reorder_columns(self,column_orders,df):
+        df = self.convert_into_common_format(df,column_orders)
         return df[column_orders]
 
     def write_excel(self, df, file_path, type, target_folder):
@@ -325,6 +326,7 @@ class DirectTransformer(Transformer):
                 existing_df)
             self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
             self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
+        return True
 
 class BillTransformer(DirectTransformer):
     def __init__(self):
@@ -354,7 +356,8 @@ class BillTransformer(DirectTransformer):
         return {'Status': 'status'}
 
     def get_column_needed(self):
-        return []
+        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN','Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID']
+
 class ClaimbookTransformer(DirectTransformer):
     def __init__(self):
         super().__init__()
@@ -388,7 +391,7 @@ class ClaimbookTransformer(DirectTransformer):
         return {'hash': 'hash_x'}
 
     def get_column_needed(self):
-        return []
+        return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size']
 
 class StagingTransformer(Transformer):
     def __init__(self):
