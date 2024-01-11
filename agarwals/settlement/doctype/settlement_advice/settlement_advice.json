@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "format:{utr_number}-{claim_id}",
+ "autoname": "format:{final_utr_number}-{claim_id}",
  "creation": "2023-12-23 12:12:27.383921",
  "default_view": "List",
  "doctype": "DocType",
@@ -129,7 +129,7 @@
   }
  ],
  "links": [],
- "modified": "2024-01-11 18:25:45.374539",
+ "modified": "2024-01-11 22:05:41.842548",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

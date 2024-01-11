@@ -45,7 +45,7 @@ def process():
                 advice_staging_doc.date = date.today(),
                 if advice_staging_doc.status == "Error" and advice_staging_doc.retry==0:
                     continue
-                if advice_staging_doc.status == "Open" and (advice_staging_doc.utr_number == "0" or advice_staging_doc.utr_number is None  or advice_staging_doc.claim_id =="0" or advice_staging_doc.utr_number is None):
+                if advice_staging_doc.status == "Open" and (advice_staging_doc.final_utr_number == "0" or advice_staging_doc.final_utr_number is None  or advice_staging_doc.claim_id =="0" or advice_staging_doc.utr_number is None):
                     advice_staging_doc.status = "Error"
                     advice_staging_doc.remarks = "UTR and claim id should not be null"
                     advice_staging_doc.save(ignore_permissions=True)
