@@ -13,6 +13,8 @@
   "bill_no",
   "claim_id",
   "claim_amount",
+  "disallowed_amount",
+  "payers_remark",
   "settled_amount",
   "tds_amount",
   "column_break_ne4ar",
@@ -101,10 +103,20 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "\nError\nOpen"
+  },
+  {
+   "fieldname": "disallowed_amount",
+   "fieldtype": "Data",
+   "label": "Disallowed Amount"
+  },
+  {
+   "fieldname": "payers_remark",
+   "fieldtype": "Text",
+   "label": "Payers Remark"
   }
  ],
  "links": [],
- "modified": "2023-12-30 02:00:18.004393",
+ "modified": "2024-01-10 12:44:01.179789",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

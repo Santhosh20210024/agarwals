@@ -9,20 +9,23 @@ base_path = os.getcwd()
 site_path = frappe.get_site_path()[1:]
 
 def clean_header(list_to_clean):
+    
     cleaned_list=[]
-    list_of_char_to_repalce=[" ","-","/","_"]
+    list_of_char_to_repalce=[" ","-","/","_","\'","\""]
     for header in list_to_clean:
         for char_to_replace in list_of_char_to_repalce:
-            header=header.replace(char_to_replace,"").lower()
+            header=str(header).replace(char_to_replace,"").lower()
         cleaned_list.append(header)
     return cleaned_list
     
 def clean_data(df):
         print(df.head())
+        df["utr_number"]=df["utr_number"].fillna("0")
+        df["claim_id"]=df["claim_id"].fillna("0")
         df["utr_number"]=df["utr_number"].astype(str).str.replace(r"[\"\'^(0+)]", '',regex=True)
         df["claim_id"]=df["claim_id"].astype(str).str.replace(r"[\"\']", '',regex=True)
-        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0").fillna("0")
-        df["claim_id"]=df["claim_id"].astype(str).str.strip().fillna("0")
+        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0")
+        df["claim_id"]=df["claim_id"].astype(str).str.strip()
         print(df.head())
         format_utr(df)
         
@@ -46,7 +49,8 @@ def update_parent_status(file):
         update_status('File upload', file.name, 'Success')
         
 def write_excel(df, file_path, type, target_folder):
-    file_path = file_path.replace('Extract', target_folder).replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx').replace('.CSV','.xlsx')
+    excel_file_path = file_path.replace(file_path.split('.')[-1],'xlsx')
+    file_path = excel_file_path.replace('Extract', target_folder).replace('.xlsx','_' + type + '.xlsx')
     file_path_to_write = SITE_PATH + file_path
     df.to_excel(file_path_to_write, index=False)
     return file_path
@@ -134,20 +138,20 @@ def advice_transform():
                 file_url_to_read =  f"{base_path}{site_path}{file_link}"
                 config = frappe.get_doc("Settlement Advice Configuration")
                 header_row_patterns = eval(config.header_row_patterns)
+                header_row_patterns = clean_header(header_row_patterns)
                 target_columns = eval(config.target_columns)
                 if ".csv" in file_link.lower():
                     df = pd.read_csv(file_url_to_read)
                     file_link=file_link.lower().replace(".csv",".xlsx")
                 else:
-                    df = pd.read_excel(file_url_to_read,header=None)
-                    
+                    df = pd.read_excel(file_url_to_read,header=None,)
                     break_loop=False
                     for keys in header_row_patterns: 
                         if break_loop:
                             break
                         header_row_index = None
                         for index,row in df.iterrows():
-                            if keys in row.values:
+                            if keys in clean_header(row.values):
                                 header_row_index = index
                                 break_loop=True
                                 break 
@@ -175,6 +179,12 @@ def advice_transform():
                                 rename_value[columns]=key
                                 break
                 df = df.rename(columns = rename_value)
+                print(df.head())
+                if "claim_id" not in df.columns:
+                    log_error('Settlement Advice Staging',file.name,"No Valid data or file is empty")
+                    update_status('File upload', file.name, 'Error')
+                    frappe.db.commit()
+                    continue
                 all_columns = target_columns.keys()
                 for every_column in all_columns:
                     if every_column not in df.columns:
@@ -187,7 +197,9 @@ def advice_transform():
                 loader = Loader("Settlement Advice Staging")
                 loader.process()
                 update_parent_status(file)
-                return "Success"
             except Exception as e:
                 log_error('Settlement Advice Staging',file.name,e)
-                return e
+                update_status('File upload', file.name, 'Error')
+                frappe.db.commit()
+                continue
+        return "Success"
