@@ -16,35 +16,40 @@
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Date"
+   "label": "Date",
+   "read_only": 1
   },
   {
    "fieldname": "document_type",
    "fieldtype": "Data",
-   "label": "Document Type"
+   "label": "Document Type",
+   "read_only": 1
   },
   {
    "fieldname": "type",
    "fieldtype": "Select",
    "label": "Type",
-   "options": "\nInsert\nUpdate\nSkip"
+   "options": "\nInsert\nUpdate\nSkip",
+   "read_only": 1
   },
   {
    "fieldname": "file_url",
    "fieldtype": "Attach",
-   "label": "File URL"
+   "label": "File URL",
+   "read_only": 1
   },
   {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nOpen\nIn Process\nSuccess\nPartial Success\nSkipped\nError"
+   "options": "\nOpen\nIn Process\nSuccess\nPartial Success\nSkipped\nError",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-01-03 13:13:18.835799",
+ "modified": "2024-01-11 12:48:14.050503",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Transform",
