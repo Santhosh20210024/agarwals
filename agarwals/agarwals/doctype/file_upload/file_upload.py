@@ -42,7 +42,7 @@ class Fileupload(Document):
 					file_doc_hash_filtered.append(file) 
 			
 			if len(file_doc_hash_filtered) > 1:
-				frappe.delete_doc("File", file_doc_hash[0])
+				frappe.delete_doc("File", file_doc_hash[0]['name'])
 				frappe.db.commit()
 
 				# Delete the files
