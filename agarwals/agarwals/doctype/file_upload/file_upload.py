@@ -42,7 +42,7 @@ class Fileupload(Document):
 					file_doc_hash_filtered.append(file) 
 			
 			if len(file_doc_hash_filtered) > 1:
-				frappe.delete_doc("File", file_doc_hash[0]['name'])
+				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name': file_doc_hash[0]['name']})
 				frappe.db.commit()
 
 				# Delete the files
@@ -64,6 +64,7 @@ class Fileupload(Document):
 				file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
 				if file_name.split('.')[-1].upper() not in file_extensions:
 					frappe.delete_doc("File", file_id)
+					frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
 					frappe.db.commit()
 
 					# Delete the shell files
@@ -76,7 +77,7 @@ class Fileupload(Document):
 					frappe.publish_realtime(event="Errorbox", message="no error")
 
 			except Exception as e:
-				frappe.delete_doc("File", file_id)
+				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
 				frappe.db.commit()
 
 				# Delete the shell files
@@ -107,7 +108,6 @@ class Fileupload(Document):
 	def process_file_attachment(self):
      
 		file_name,file_doc_id = self.get_file_doc_data()
-		# _file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
 		hashed_file_name = self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),
