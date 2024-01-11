@@ -19,14 +19,12 @@ def clean_header(list_to_clean):
     return cleaned_list
     
 def clean_data(df):
-        print(df.head())
         df["utr_number"]=df["utr_number"].fillna("0")
         df["claim_id"]=df["claim_id"].fillna("0")
         df["utr_number"]=df["utr_number"].astype(str).str.replace(r"[\"\'^(0+)]", '',regex=True)
         df["claim_id"]=df["claim_id"].astype(str).str.replace(r"[\"\']", '',regex=True)
         df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0")
         df["claim_id"]=df["claim_id"].astype(str).str.strip()
-        print(df.head())
         format_utr(df)
         
         
@@ -179,7 +177,6 @@ def advice_transform():
                                 rename_value[columns]=key
                                 break
                 df = df.rename(columns = rename_value)
-                print(df.head())
                 if "claim_id" not in df.columns:
                     log_error('Settlement Advice Staging',file.name,"No Valid data or file is empty")
                     update_status('File upload', file.name, 'Error')
@@ -192,7 +189,6 @@ def advice_transform():
                 df = df[all_columns]
                 df["source"]=file.name
                 clean_data(df)
-                print(df.head())
                 move_to_transform(file, df, 'Insert', 'Transform')
                 loader = Loader("Settlement Advice Staging")
                 loader.process()
