@@ -89,23 +89,16 @@ class Fileupload(Document):
 				
 	def move_shell_file(self, source, destination, file_name, file_content_hash, file_doc_id):
 		try:
-			if os.path.exists(source):
-				if os.path.exists(destination + '/' + file_name):
-					hash = str(file_content_hash)[:5]
-					hashed_file_name = hash + '_' + file_name
-					changed_source_file_name = source.replace( file_name, hashed_file_name )
+			hash = str(file_content_hash)[:5]
+			hashed_file_name = hash + '_' + file_name
+			changed_source_file_name = source.replace( file_name, hashed_file_name )
 
-					# source name changed
-					os.rename(source, changed_source_file_name)
-					shutil.move(changed_source_file_name, destination)
+			# source name changed
+			os.rename(source, changed_source_file_name)
+			shutil.move(changed_source_file_name, destination)
 
-					# change file name
-					# frappe.db.set_value('File', file_doc_id, 'file_name', hashed_file_name)
-					# frappe.db.commit()
-					return hashed_file_name
-				else:
-					shutil.move(source, destination)
-					return None
+			return hashed_file_name
+
 
 		except Exception as e:
 			frappe.throw('Error:', str(e))
@@ -114,17 +107,14 @@ class Fileupload(Document):
 	def process_file_attachment(self):
      
 		file_name,file_doc_id = self.get_file_doc_data()
-		_file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
+		# _file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
 		hashed_file_name = self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),
 										  construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]),
 										  file_name, file_doc.content_hash, file_doc_id)
-		
-		if hashed_file_name != None: # need to refactor the replace
-			file_doc.file_url = _file_url.replace(file_name, hashed_file_name)
-		else:
-			file_doc.file_url = _file_url
+
+		file_doc.file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], hashed_file_name)
 
 		file_doc.save()
 		self.set("upload",file_doc.file_url)
