@@ -140,7 +140,7 @@ class Transformer:
     def load_source_df(self, file, header):
         try:
             if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
-                self.source_df = pd.read_excel(SITE_PATH + file['upload'], engine='openpyxl', header=header)
+                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             elif file['upload'].endswith('.csv'):
                 self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
             else:
@@ -356,7 +356,7 @@ class BillTransformer(DirectTransformer):
         return {'Status': 'status'}
 
     def get_column_needed(self):
-        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN','Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID']
+        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID']
 
 class ClaimbookTransformer(DirectTransformer):
     def __init__(self):
