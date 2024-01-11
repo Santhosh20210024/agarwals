@@ -1,5 +1,4 @@
 import pandas as pd
-from agarwals.utils.path_data import SITE_PATH
 import frappe
 from datetime import date
 import hashlib
@@ -9,6 +8,7 @@ from agarwals.utils.loader import Loader
 
 FOLDER = "Home/DrAgarwals/"
 IS_PRIVATE = 1
+SITE_PATH = frappe.get_single('Control Panel').site_path
 
 class Transformer:
     def __init__(self):
