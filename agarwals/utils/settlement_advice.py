@@ -23,7 +23,7 @@ def clean_data(df):
         df["claim_id"]=df["claim_id"].fillna("0")
         df["utr_number"]=df["utr_number"].astype(str).str.replace(r"[\"\'^(0+)]", '',regex=True)
         df["claim_id"]=df["claim_id"].astype(str).str.replace(r"[\"\']", '',regex=True)
-        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0")
+        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0").replace("-","")
         df["claim_id"]=df["claim_id"].astype(str).str.strip()
         format_utr(df)
         
@@ -178,7 +178,7 @@ def advice_transform():
                                 break
                 df = df.rename(columns = rename_value)
                 if "claim_id" not in df.columns:
-                    log_error('Settlement Advice Staging',file.name,"No Valid data or file is empty")
+                    log_error('Settlement Advice Staging',file.name,"No Valid data header or file is empty")
                     update_status('File upload', file.name, 'Error')
                     frappe.db.commit()
                     continue
