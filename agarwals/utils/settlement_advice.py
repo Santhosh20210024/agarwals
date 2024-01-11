@@ -8,10 +8,9 @@ from agarwals.utils.path_data import SITE_PATH
 base_path = os.getcwd()
 site_path = frappe.get_site_path()[1:]
 
-def clean_header(list_to_clean):
+def clean_header(list_to_clean,list_of_char_to_repalce):
     
     cleaned_list=[]
-    list_of_char_to_repalce=[" ","-","/","_","\'","\""]
     for header in list_to_clean:
         for char_to_replace in list_of_char_to_repalce:
             header=str(header).replace(char_to_replace,"").lower()
@@ -19,12 +18,8 @@ def clean_header(list_to_clean):
     return cleaned_list
     
 def clean_data(df):
-        df["utr_number"]=df["utr_number"].fillna("0")
-        df["claim_id"]=df["claim_id"].fillna("0")
-        df["utr_number"]=df["utr_number"].astype(str).str.replace(r"[\"\'^(0+)]", '',regex=True)
-        df["claim_id"]=df["claim_id"].astype(str).str.replace(r"[\"\']", '',regex=True)
-        df["utr_number"]=df["utr_number"].astype(str).str.strip().replace("NOT AVAILABLE","0").replace("-","")
-        df["claim_id"]=df["claim_id"].astype(str).str.strip()
+        df["utr_number"]=df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(r"[\"\'?-]", '',regex=True).replace("NOT AVAILABLE","0").replace("","0")
+        df["claim_id"]=df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?-]", '',regex=True).replace("","0")
         format_utr(df)
         
         
@@ -117,7 +112,7 @@ def format_utr(source_df):
             else:
                 new_utr_list.append(remove_x(item))
 
-        source_df['utr_number'] = new_utr_list
+        source_df['final_utr_number'] = new_utr_list
 
 def log_error(doctype_name, reference_name, error_message):
     error_log = frappe.new_doc('Error Record Log')
@@ -136,7 +131,8 @@ def advice_transform():
                 file_url_to_read =  f"{base_path}{site_path}{file_link}"
                 config = frappe.get_doc("Settlement Advice Configuration")
                 header_row_patterns = eval(config.header_row_patterns)
-                header_row_patterns = clean_header(header_row_patterns)
+                list_of_char_to_repalce = eval(config.char_to_replace_in_header)
+                header_row_patterns = clean_header(header_row_patterns,list_of_char_to_repalce)
                 target_columns = eval(config.target_columns)
                 if ".csv" in file_link.lower():
                     df = pd.read_csv(file_url_to_read)
@@ -149,21 +145,21 @@ def advice_transform():
                             break
                         header_row_index = None
                         for index,row in df.iterrows():
-                            if keys in clean_header(row.values):
+                            if keys in clean_header(row.values,list_of_char_to_repalce):
                                 header_row_index = index
                                 break_loop=True
                                 break 
                     
                     df = pd.read_excel(file_url_to_read , header = header_row_index)
-                df.columns = clean_header(df.columns.values)
+                df.columns = clean_header(df.columns.values,list_of_char_to_repalce)
                 column_list = df.columns.values
                 rename_value={}
                 for key,value in target_columns.items():
                     if isinstance(value[0],list):
-                        p1_list=clean_header(value[0])
-                        p2_list=clean_header(value[1])
+                        p1_list=clean_header(value[0],list_of_char_to_repalce)
+                        p2_list=clean_header(value[1],list_of_char_to_repalce)
                     else:
-                        p1_list=clean_header(value)
+                        p1_list=clean_header(value,list_of_char_to_repalce)
                         p2_list=[]
                     i=0
                     for columns in p1_list:
@@ -182,7 +178,8 @@ def advice_transform():
                     update_status('File upload', file.name, 'Error')
                     frappe.db.commit()
                     continue
-                all_columns = target_columns.keys()
+                all_columns = list(target_columns.keys())
+                all_columns.append("final_utr_number")
                 for every_column in all_columns:
                     if every_column not in df.columns:
                         df[every_column] = ""         

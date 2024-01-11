@@ -8,19 +8,20 @@
  "engine": "InnoDB",
  "field_order": [
   "source",
-  "date",
   "claim_id",
+  "bill_number",
   "utr_number",
+  "final_utr_number",
   "claim_status",
-  "settled_amount",
+  "claim_amount",
   "disallowed_amount",
   "payers_remark",
+  "settled_amount",
   "tds_amount",
   "paid_date",
-  "bill_number",
-  "claim_amount",
   "modifications_column",
   "status",
+  "date",
   "remarks",
   "retry"
  ],
@@ -29,7 +30,7 @@
    "fieldname": "date",
    "fieldtype": "Date",
    "hidden": 1,
-   "label": "Date",
+   "label": "Date of processed",
    "read_only": 1
   },
   {
@@ -37,51 +38,57 @@
    "fieldtype": "Data",
    "label": "Claim Id",
    "read_only": 1,
-   "read_only_depends_on": "eval:doc.claim_id != null"
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "utr_number",
    "fieldtype": "Data",
    "label": "Utr Number",
    "read_only": 1,
-   "read_only_depends_on": "eval:(doc.utr_number != null || doc.utr_number == '0')"
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "settled_amount",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Settled Amount",
    "read_only": 1,
-   "read_only_depends_on": "eval:(doc.settled_amount != 0 || doc.settled_amount != null)"
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "claim_status",
    "fieldtype": "Data",
    "label": "Claim Status",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "tds_amount",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Tds Amount",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "paid_date",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Paid Date",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "bill_number",
    "fieldtype": "Data",
    "label": "Bill Number",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
+   "depends_on": "eval:doc.status == \"Processed\"",
    "fieldname": "claim_amount",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Claim Amount",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "modifications_column",
@@ -106,7 +113,8 @@
    "default": "0",
    "fieldname": "retry",
    "fieldtype": "Check",
-   "label": "Retry"
+   "label": "Retry",
+   "read_only_depends_on": "eval:doc.status != \"Processed\""
   },
   {
    "fieldname": "source",
@@ -117,20 +125,28 @@
   },
   {
    "fieldname": "disallowed_amount",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "label": "Disallowed Amount",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "payers_remark",
    "fieldtype": "Text",
    "label": "Payers Remark",
+   "read_only": 1,
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
+  },
+  {
+   "fieldname": "final_utr_number",
+   "fieldtype": "Data",
+   "label": "Final UTR Number",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-10 15:27:25.420443",
+ "modified": "2024-01-11 19:01:17.568886",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",

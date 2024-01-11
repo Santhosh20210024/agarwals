@@ -13,15 +13,19 @@ def insert_record_in_settlement_advice(doc_to_insert):
     try:
         frappe.get_doc({
             "doctype": "Settlement Advice",
-            "paid_date": doc_to_insert.paid_date,
-            "utr_number": doc_to_insert.utr_number,
-            "bill_no": doc_to_insert.bill_number,
             "claim_id": doc_to_insert.claim_id,
+            "bill_no":doc_to_insert.bill_number,
+            "utr_number": doc_to_insert.utr_number,
+            "final_utr_number":doc_to_insert.final_utr_number,
             "claim_amount": doc_to_insert.claim_amount,
-            "settled_amount": doc_to_insert.settled_amount,
+            "disallowed_amount":doc_to_insert.disallowed_amount,
+            "payers_remark":doc_to_insert.payers_remark,
             "tds_amount": doc_to_insert.tds_amount,
+            "settled_amount": doc_to_insert.settled_amount,
+            "paid_date": doc_to_insert.paid_date,
+            "source_file":doc_to_insert.source,
             "source": "TPA",
-            "status": "Open",
+            "status": "Open",   
         }).insert(ignore_permissions=True)
         doc_to_insert.status = "Processed"
         doc_to_insert.save(ignore_permissions=True)
