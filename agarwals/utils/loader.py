@@ -52,6 +52,7 @@ class Loader():
         if template != 0:
             frappe.db.set_value("Data Import", data_import.name, 'template_options', template)
         start_import(data_import.name)
+        frappe.db.commit()
         return data_import.name
 
     def get_import_status(self, import_name):
@@ -65,7 +66,6 @@ class Loader():
         file_list_name = frappe.get_list('File', filters = {'file_url':file['file_url'],'attached_to_doctype':'Data Import'},pluck = 'name')[0]
         frappe.db.set_value("File", file_list_name, {'file_url':target_file,'folder':'Home/DrAgarwals/Load'})
         frappe.db.set_value("Transform",file['name'],'file_url',target_file)
-        frappe.db.commit()
 
     def process(self):
         files = self.get_files_to_load()
