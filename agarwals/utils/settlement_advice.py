@@ -18,8 +18,8 @@ def clean_header(list_to_clean,list_of_char_to_repalce):
     return cleaned_list
     
 def clean_data(df):
-        df["utr_number"]=df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(r"[\"\'?-]", '',regex=True).replace("NOT AVAILABLE","0").replace("","0")
-        df["claim_id"]=df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?-]", '',regex=True).replace("","0")
+        df["final_utr_number"]=df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(r"[\"\'?]", '',regex=True).replace("NOT AVAILABLE","0").replace("","0")
+        df["claim_id"]=df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '',regex=True).replace("","0")
         format_utr(df)
         
         
@@ -87,7 +87,7 @@ def remove_x(item):
 
 
 def format_utr(source_df):
-        utr_list = source_df.fillna(0).utr_number.to_list()
+        utr_list = source_df.fillna(0).final_utr_number.to_list()
         new_utr_list = []
         for item in utr_list:
             item = str(item).replace('UIIC_', 'CITIN')
