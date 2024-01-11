@@ -55,13 +55,27 @@ class Fileupload(Document):
 			else:
 				frappe.publish_realtime(event="Errorbox", message="no error")
 				return
-		
 
 	def validate_file(self):
 		file_name, file_id = self.get_file_doc_data()
+		
 		if file_id:
-			file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
-			if file_name.split('.')[-1].upper() not in file_extensions:
+			try:
+				file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
+				if file_name.split('.')[-1].upper() not in file_extensions:
+					frappe.delete_doc("File", file_id)
+					frappe.db.commit()
+
+					# Delete the shell files
+					self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
+					frappe.publish_realtime(event="Errorbox", message="error")
+					frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
+					self.set(str(self.upload), '')
+				
+				else:
+					frappe.publish_realtime(event="Errorbox", message="no error")
+
+			except Exception as e:
 				frappe.delete_doc("File", file_id)
 				frappe.db.commit()
 
@@ -70,16 +84,29 @@ class Fileupload(Document):
 				frappe.publish_realtime(event="Errorbox", message="error")
 				frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
 				self.set(str(self.upload), '')
-				return
-			
-			else:
-				frappe.publish_realtime(event="Errorbox", message="no error")									
+												
 			self.validate_hash_content(file_name, file_id)
 				
-	def move_shell_file(self, source, destination):
+	def move_shell_file(self, source, destination, file_name, file_content_hash, file_doc_id):
 		try:
 			if os.path.exists(source):
-				os.rename(source, destination)
+				if os.path.exists(destination + '/' + file_name):
+					hash = str(file_content_hash)[:5]
+					hashed_file_name = hash + '_' + file_name
+					changed_source_file_name = source.replace( file_name, hashed_file_name )
+
+					# source name changed
+					os.rename(source, changed_source_file_name)
+					shutil.move(changed_source_file_name, destination)
+
+					# change file name
+					# frappe.db.set_value('File', file_doc_id, 'file_name', hashed_file_name)
+					# frappe.db.commit()
+					return hashed_file_name
+				else:
+					shutil.move(source, destination)
+					return None
+
 		except Exception as e:
 			frappe.throw('Error:', str(e))
 			return
@@ -90,11 +117,23 @@ class Fileupload(Document):
 		_file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
-		file_doc.file_url = _file_url
-		self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),construct_file_url(SITE_PATH, _file_url.lstrip('/') ))
+		hashed_file_name = self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),
+										  construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]),
+										  file_name, file_doc.content_hash, file_doc_id)
+		
+		if hashed_file_name != None: # need to refactor the replace
+			file_doc.file_url = _file_url.replace(file_name, hashed_file_name)
+		else:
+			file_doc.file_url = _file_url
+
 		file_doc.save()
-		self.set("upload",_file_url)
-		self.set("upload_url",_file_url)
+		self.set("upload",file_doc.file_url)
+		self.set("upload_url",file_doc.file_url)
+
+		if hashed_file_name != None:
+			frappe.db.set_value('File', file_doc_id, 'file_name', hashed_file_name)
+			frappe.db.commit()
+		
 		
 	def validate(self):
 
