@@ -62,7 +62,14 @@ class Transformer:
 
     def prune_columns(self, df, columns_to_prune = None):
         if columns_to_prune is None:
-            columns_to_prune = self.get_columns_to_prune()
+            columns_to_prune = []
+            columns = self.get_columns_to_prune()
+            for column in columns:
+                if column in df.columns:
+                    columns_to_prune.append(column)
+        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column]
+        if unnamed_columns:
+            columns_to_prune.extend(unnamed_columns)
         df = df.drop(columns=columns_to_prune, errors='ignore')
         return df
 
@@ -414,8 +421,14 @@ class StagingTransformer(Transformer):
         return
 
     def extract_transactions(self, column):
+        if pd.isna(self.source_df.at[0, column]):
+            if len(self.source_df) > 1:
+                self.source_df = self.source_df.loc[1:]
+            else:
+                return False
         null_index = self.source_df.index[self.source_df[column].isnull()].min()
         self.source_df = self.source_df.loc[:null_index - 1]
+        return True
 
 
     def transform(self,file):
@@ -435,9 +448,11 @@ class StagingTransformer(Transformer):
 
         self.load_source_df(file, header_index)
         self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
-        self.prune_columns(self.source_df)
+        self.source_df = self.prune_columns(self.source_df)
         self.source_df.columns = cleaned_header_row
-        self.extract(configuration,key,file)
+        is_extracted = self.extract(configuration,key,file)
+        if not is_extracted:
+            return False
         self.source_df = self.fill_na_as_0(self.source_df)
         self.new_records = self.source_df
         self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
@@ -556,16 +571,21 @@ class BankTransformer(StagingTransformer):
     def get_source_column_dict(self,configuration):
         return json.loads(configuration.bank_and_source_columns.replace("'", '"'))
 
+    def get_columns_to_prune(self):
+        return ['nan','*','.']
+
     def extract(self,configuration,key,file):
         self.source_df = self.rename_columns(self.source_df,json.loads(configuration.bank_and_target_columns.replace("'", '"'))[key])
         if key in eval(configuration.first_row_empty):
             self.source_df = self.source_df[1:]
-        self.extract_transactions("narration")
-        if key in eval(configuration.skip_row_1):
-            self.source_df = self.source_df.loc[1:]
+        is_extracted = self.extract_transactions("narration")
+        if not is_extracted:
+            self.log_error(self.document_type, file['name'], 'Transaction is Empty')
+            self.update_status('File upload', file['name'], 'Error')
+            return False
         if key in eval(configuration.banks_having_crdr_column):
-            self.source_df['credit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower() == 'cr')
-            self.source_df['debit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower() == 'dr')
+            self.source_df['credit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower().str.contains('cr'))
+            self.source_df['debit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower().str.contains('dr'))
         columns_to_select = self.get_column_needed()
         self.source_df = self.convert_into_common_format(self.source_df,columns_to_select)
         self.add_search_column()
@@ -573,3 +593,4 @@ class BankTransformer(StagingTransformer):
         self.extract_utr_from_narration(configuration)
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
+        return True
