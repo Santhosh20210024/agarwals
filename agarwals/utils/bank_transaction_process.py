@@ -8,7 +8,7 @@ def create_bank_transaction(transaction_list):
     for transaction in transaction_list:
         try:
             # Update record
-            if transaction.get('update_reference_number') != None: # tested # done
+            if transaction.get('update_reference_number') != None and transaction.get('retry') == 1: # tested # done
                 bank_transaction_doc = frappe.get_doc('Bank Transaction', transaction.reference_number) 
                 frappe.db.sql("""
                              update `tabBank Transaction` set name = %(name)s, reference_number = %(name)s where name = %(reference_number)s   
