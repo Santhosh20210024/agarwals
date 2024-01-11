@@ -26,6 +26,7 @@
   "staging_status",
   "remarks",
   "update_reference_number",
+  "previous_utr",
   "retry"
  ],
  "fields": [
@@ -87,7 +88,7 @@
   },
   {
    "fieldname": "remarks",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Remarks"
   },
   {
@@ -108,7 +109,7 @@
    "label": "Source File"
   },
   {
-   "depends_on": "eval:doc.status == 'Warning'",
+   "depends_on": "eval:doc.staging_status == 'Warning'",
    "fieldname": "update_reference_number",
    "fieldtype": "Data",
    "label": "Update Reference Number"
@@ -138,11 +139,18 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Open\nError\nProcessed\nWarning"
+  },
+  {
+   "depends_on": "eval:doc.staging_status == 'Warning'",
+   "fieldname": "previous_utr",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Previous utr"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-09 10:17:36.374864",
+ "modified": "2024-01-12 02:04:42.685867",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",
