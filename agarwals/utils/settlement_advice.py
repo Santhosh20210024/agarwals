@@ -16,12 +16,28 @@ def clean_header(list_to_clean,list_of_char_to_repalce):
             header=str(header).replace(char_to_replace,"").lower()
         cleaned_list.append(header)
     return cleaned_list
-    
+
+def format_date(df,date_formats,date_column):
+    df['original_date'] = df[date_column].astype(str).apply(lambda x: x.strip() if isinstance(x,str) else x)
+    df['formatted_date'] = pd.NaT
+    for fmt in date_formats:
+        new_column = 'date_' + fmt.replace('%','').replace('/','_').replace(':','').replace(' ','_')
+        df[new_column] = pd.to_datetime(df['original_date'],format = fmt, errors='coerce')
+        df['formatted_date'] = df['formatted_date'].combine_first(df[new_column])
+    df[date_column] = df['formatted_date']
+    df = prune_columns(df,[col for col in df.columns if 'date_' in col or col == 'formatted_date' or col == 'original_date'])
+    return df
+
+def prune_columns(df, columns_to_prune):
+    df = df.drop(columns=columns_to_prune, errors='ignore')
+    return df
+
 def clean_data(df):
         df["final_utr_number"]=df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(r"[\"\'?]", '',regex=True).replace("NOT AVAILABLE","0").replace("","0")
         df["claim_id"]=df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '',regex=True).replace("","0")
+        df = format_date(df,eval(frappe.get_single('Bank Configuration').date_formats),'paid_date')
         format_utr(df)
-        
+        return df
         
         
 def update_status(doctype, name, status):
@@ -185,7 +201,7 @@ def advice_transform():
                         df[every_column] = ""         
                 df = df[all_columns]
                 df["source"]=file.name
-                clean_data(df)
+                df = clean_data(df)
                 move_to_transform(file, df, 'Insert', 'Transform')
                 loader = Loader("Settlement Advice Staging")
                 loader.process()
