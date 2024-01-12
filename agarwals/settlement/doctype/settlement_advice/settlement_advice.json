@@ -23,6 +23,8 @@
   "status",
   "remark",
   "retry",
+  "reference_section",
+  "match_log"
   "source_file"
  ],
  "fields": [
@@ -106,7 +108,7 @@
    "label": "Status",
    "options": "\nError\nOpen"
   },
-  {
+   {
    "fieldname": "disallowed_amount",
    "fieldtype": "Currency",
    "label": "Disallowed Amount"
@@ -126,6 +128,17 @@
    "fieldtype": "Link",
    "label": "Source File",
    "options": "File upload"
+  },
+  {
+   "fieldname": "reference_section",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "match_log",
+   "fieldtype": "Table",
+   "label": "Match Log",
+   "options": "Match Log"
   }
  ],
  "links": [],
