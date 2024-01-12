@@ -19,7 +19,9 @@
   "source",
   "status",
   "remark",
-  "retry"
+  "retry",
+  "reference_section",
+  "match_log"
  ],
  "fields": [
   {
@@ -101,10 +103,21 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "\nError\nOpen"
+  },
+  {
+   "fieldname": "reference_section",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "match_log",
+   "fieldtype": "Table",
+   "label": "Match Log",
+   "options": "Match Log"
   }
  ],
  "links": [],
- "modified": "2023-12-30 02:00:18.004393",
+ "modified": "2024-01-10 23:38:18.683053",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
