@@ -4,37 +4,7 @@ frappe.listview_settings['Bill'] = {
         listview.page.add_inner_button('View Unverified Bills', () => {
             window.location.href = '/app/bill?verified=0';
         });
-		listview.page.add_inner_button('Match TPA', () => {
-            frappe.call({
-					method: "agarwals.utils.tpa_matcher.match_tpa",
-					callback: function(r){
-						var return_msg = r.message
-						console.log(return_msg)
-					}
-			})
-        });
-		listview.page.add_inner_button('Map Region', () => {
-            frappe.call({
-					method: "agarwals.utils.tpa_matcher.map_region",
-					callback: function(r){
-						var return_msg = r.message
-						console.log(return_msg)
-					}
-			})
-        });
 
-		listview.page.add_inner_button('Create Sales Invoice', () => {
-            frappe.call({
-					method: "agarwals.utils.sales_invoice_creation.create_sales_background_job",
-					args: { 
-						n:1000 
-					},
-					callback: function(r){
-						var return_msg = r.message
-						console.log(return_msg)
-					}
-			});
-        });
     //For Creating the Physical Claim Submission using Bulk select and Create
         listview.page.add_action_item(__("Physical Claim Submission"), ()=>{
 			let check_items = listview.get_checked_items();

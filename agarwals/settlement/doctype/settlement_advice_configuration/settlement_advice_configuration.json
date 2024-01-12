@@ -8,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "header_row_patterns",
-  "target_columns"
+  "target_columns",
+  "char_to_replace_in_header"
  ],
  "fields": [
   {
@@ -20,12 +21,17 @@
    "fieldname": "target_columns",
    "fieldtype": "Code",
    "label": "Target Columns"
+  },
+  {
+   "fieldname": "char_to_replace_in_header",
+   "fieldtype": "Code",
+   "label": "Char to replace in header"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-01-08 19:01:37.638640",
+ "modified": "2024-01-11 17:06:54.412133",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Configuration",

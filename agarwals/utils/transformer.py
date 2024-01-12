@@ -1,5 +1,4 @@
 import pandas as pd
-from agarwals.utils.path_data import SITE_PATH
 import frappe
 from datetime import date
 import hashlib
@@ -9,6 +8,7 @@ from agarwals.utils.loader import Loader
 
 FOLDER = "Home/DrAgarwals/"
 IS_PRIVATE = 1
+SITE_PATH = frappe.get_single('Control Panel').site_path
 
 class Transformer:
     def __init__(self):
@@ -23,6 +23,7 @@ class Transformer:
         self.hashing = 0
         self.clean_utr = 0
         self.utr_column_name = ''
+        self.header = 0
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -61,7 +62,14 @@ class Transformer:
 
     def prune_columns(self, df, columns_to_prune = None):
         if columns_to_prune is None:
-            columns_to_prune = self.get_columns_to_prune()
+            columns_to_prune = []
+            columns = self.get_columns_to_prune()
+            for column in columns:
+                if column in df.columns:
+                    columns_to_prune.append(column)
+        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column]
+        if unnamed_columns:
+            columns_to_prune.extend(unnamed_columns)
         df = df.drop(columns=columns_to_prune, errors='ignore')
         return df
 
@@ -90,13 +98,15 @@ class Transformer:
         return []
 
     def reorder_columns(self,column_orders,df):
+        df = self.convert_into_common_format(df,column_orders)
         return df[column_orders]
 
     def write_excel(self, df, file_path, type, target_folder):
         column_orders = self.get_column_needed()
         if column_orders:
             df = self.reorder_columns(column_orders,df)
-        file_path = file_path.replace('Extract', target_folder).replace('.csv', '.xlsx').replace('.xlsx','_' + type + '.xlsx')
+        excel_file_path = file_path.replace(file_path.split('.')[-1],'xlsx')
+        file_path = excel_file_path.replace('Extract', target_folder).replace('.xlsx','_' + type + '.xlsx')
         file_path_to_write = SITE_PATH + file_path
         df.to_excel(file_path_to_write, index=False)
         return file_path
@@ -135,12 +145,16 @@ class Transformer:
         self.insert_in_file_upload(file_path, file['name'], type, status)
 
     def load_source_df(self, file, header):
-        if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
-            self.source_df = pd.read_excel(SITE_PATH + file['upload'], engine='openpyxl', header=header )
-        elif file['upload'].endswith('.csv'):
-            self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
-        else:
-            self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
+        try:
+            if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
+                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
+            elif file['upload'].endswith('.csv'):
+                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
+            else:
+                self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
+                self.update_status('File upload', file['name'], 'Error')
+        except Exception as e:
+            self.log_error(self.document_type, file['name'], e)
             self.update_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
@@ -276,7 +290,7 @@ class Transformer:
             return None
         for file in files:
             self.update_status('File upload', file['name'], 'In Process')
-            self.load_source_df(file,0)
+            self.load_source_df(file,self.header)
 
             try:
                 if self.source_df.empty:
@@ -286,8 +300,6 @@ class Transformer:
                 transformed =self.transform(file)
                 if not transformed:
                     continue
-                self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
-
             except Exception as e:
                 self.log_error(self.document_type, file['name'], e)
                 self.update_status('File upload', file['name'], 'Error')
@@ -309,6 +321,7 @@ class DirectTransformer(Transformer):
         if self.target_df.empty:
             self.new_records = self.source_df
             self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
+            return True
         else:
             merged_df = self.left_join(file)
             if merged_df.empty:
@@ -317,8 +330,10 @@ class DirectTransformer(Transformer):
             existing_df = merged_df[merged_df['_merge'] == 'both']
             self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
                 existing_df)
+            self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
             self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
             self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
+        return True
 
 class BillTransformer(DirectTransformer):
     def __init__(self):
@@ -348,47 +363,47 @@ class BillTransformer(DirectTransformer):
         return {'Status': 'status'}
 
     def get_column_needed(self):
-        return []
+        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID']
 
 class ClaimbookTransformer(DirectTransformer):
-    class ClaimbookTransformer(DirectTransformer):
-        def __init__(self):
-            super().__init__()
-            self.file_type = 'Claim Book'
-            self.document_type = 'ClaimBook'
-            self.hashing = 1
-            self.clean_utr = 1
+    def __init__(self):
+        super().__init__()
+        self.file_type = 'Claim Book'
+        self.document_type = 'ClaimBook'
+        self.hashing = 1
+        self.clean_utr = 1
 
-        def get_columns_to_hash(self):
-            return ['unique_id', 'settled_amount']
+    def get_columns_to_hash(self):
+        return ['unique_id', 'settled_amount']
 
-        def load_target_df(self):
-            query = f"""
-                          SELECT 
-                              name, hash
-                          FROM 
-                              `tab{self.document_type}`
-                          """
-            records = frappe.db.sql(query, as_list=True)
-            self.target_df = pd.DataFrame(records, columns=['name', 'hash'])
+    def load_target_df(self):
+        query = f"""
+                      SELECT 
+                          name, hash
+                      FROM 
+                          `tab{self.document_type}`
+                      """
+        records = frappe.db.sql(query, as_list=True)
+        self.target_df = pd.DataFrame(records, columns=['name', 'hash'])
 
-        def get_join_columns(self):
-            left_df_column = 'unique_id'
-            right_df_column = 'name'
-            return left_df_column, right_df_column
+    def get_join_columns(self):
+        left_df_column = 'unique_id'
+        right_df_column = 'name'
+        return left_df_column, right_df_column
 
-        def get_columns_to_prune(self):
-            return ['name', '_merge', 'hash_x', 'hash_column']
+    def get_columns_to_prune(self):
+        return ['name', '_merge', 'hash_x', 'hash_column']
 
-        def get_columns_to_check(self):
-            return {'hash': 'hash_x'}
+    def get_columns_to_check(self):
+        return {'hash': 'hash_x'}
 
-        def get_column_needed(self):
-            return []
+    def get_column_needed(self):
+        return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size']
 
 class StagingTransformer(Transformer):
     def __init__(self):
         super().__init__()
+
 
     def get_configuration(self):
         return []
@@ -406,8 +421,14 @@ class StagingTransformer(Transformer):
         return
 
     def extract_transactions(self, column):
+        if pd.isna(self.source_df.at[0, column]):
+            if len(self.source_df) > 1:
+                self.source_df = self.source_df.loc[1:]
+            else:
+                return False
         null_index = self.source_df.index[self.source_df[column].isnull()].min()
         self.source_df = self.source_df.loc[:null_index - 1]
+        return True
 
 
     def transform(self,file):
@@ -425,13 +446,16 @@ class StagingTransformer(Transformer):
         if not valid:
             return False
 
-        self.load_source_df(file, header_index + 1)
+        self.load_source_df(file, header_index)
         self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
-        self.prune_columns(self.source_df)
+        self.source_df = self.prune_columns(self.source_df)
         self.source_df.columns = cleaned_header_row
-        self.extract(configuration,key,file)
+        is_extracted = self.extract(configuration,key,file)
+        if not is_extracted:
+            return False
         self.source_df = self.fill_na_as_0(self.source_df)
         self.new_records = self.source_df
+        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
 
 
@@ -439,7 +463,8 @@ class BankTransformer(StagingTransformer):
     def __init__(self):
         super().__init__()
         self.file_type = 'Bank Statement'
-        self.document_type = 'Bank Transaction Stagging'
+        self.document_type = 'Bank Transaction Staging'
+        self.header = None
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -475,7 +500,7 @@ class BankTransformer(StagingTransformer):
         return valid
 
     def get_column_needed(self):
-        return ['date','narration','utr_number','credit','debit','search','source','bank_account']
+        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number']
 
     def get_configuration(self):
         return frappe.get_single('Bank Configuration')
@@ -546,16 +571,21 @@ class BankTransformer(StagingTransformer):
     def get_source_column_dict(self,configuration):
         return json.loads(configuration.bank_and_source_columns.replace("'", '"'))
 
+    def get_columns_to_prune(self):
+        return ['nan','*','.']
+
     def extract(self,configuration,key,file):
         self.source_df = self.rename_columns(self.source_df,json.loads(configuration.bank_and_target_columns.replace("'", '"'))[key])
         if key in eval(configuration.first_row_empty):
             self.source_df = self.source_df[1:]
-        self.extract_transactions("narration")
-        if key in eval(configuration.skip_row_1):
-            self.source_df = self.source_df.loc[1:]
+        is_extracted = self.extract_transactions("narration")
+        if not is_extracted:
+            self.log_error(self.document_type, file['name'], 'Transaction is Empty')
+            self.update_status('File upload', file['name'], 'Error')
+            return False
         if key in eval(configuration.banks_having_crdr_column):
-            self.source_df['credit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower() == 'cr')
-            self.source_df['debit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower() == 'dr')
+            self.source_df['credit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower().str.contains('cr'))
+            self.source_df['debit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower().str.contains('dr'))
         columns_to_select = self.get_column_needed()
         self.source_df = self.convert_into_common_format(self.source_df,columns_to_select)
         self.add_search_column()
@@ -563,3 +593,4 @@ class BankTransformer(StagingTransformer):
         self.extract_utr_from_narration(configuration)
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
+        return True

@@ -2,6 +2,8 @@ import shutil
 import frappe
 from frappe.core.doctype.data_import.data_import import start_import
 from agarwals.utils.path_data import SITE_PATH
+import os
+
 class Loader():
     def __init__(self,document_type):
         self.document_type = document_type
@@ -60,19 +62,29 @@ class Loader():
         return import_doc.status
 
     def move_file(self,source_file,target_file):
-        shutil.copy(source_file,target_file)
+        shutil.move(source_file,target_file)
 
-    def update_file_url(self,file,target_file):
-        file_list_name = frappe.get_list('File', filters = {'file_url':file['file_url'],'attached_to_doctype':'Data Import'},pluck = 'name')[0]
+    def update_file_url(self,file,target_file,import_name):
+        file_list_name = frappe.get_list('File', filters = {'file_url':file['file_url'],'attached_to_doctype':'Data Import','attached_to_name':import_name},pluck = 'name')[0]
         frappe.db.set_value("File", file_list_name, {'file_url':target_file,'folder':'Home/DrAgarwals/Load'})
         frappe.db.set_value("Transform",file['name'],'file_url',target_file)
-        frappe.db.commit()
+        frappe.db.set_value("Data Import",import_name, 'import_file', target_file)
+
+    def delete_file_in_outside_folder(self, file_name,file):
+        if file_name in os.listdir(SITE_PATH + '/private/files/'):
+            try:
+                os.remove(SITE_PATH + '/private/files/'+ file_name)
+            except Exception as e:
+                self.log_error('Transform', file['name'], e)
 
     def process(self):
         files = self.get_files_to_load()
         if files == []:
             return None
         for file in files:
+            file_name = file['file_url'].split("/")[-1]
+            source_file = file['file_url']
+            target_file = file['file_url'].replace('Transform', 'Load')
             try:
                 self.update_status('Transform', file['name'], 'In Process')
                 import_type = self.get_type_of_import(file)
@@ -82,13 +94,13 @@ class Loader():
                     self.update_status('Transform', file['name'], 'Error')
                 else:
                     self.update_status('Transform', file['name'], import_status)
-                source_file = file['file_url']
-                target_file = file['file_url'].replace('Transform', 'Load')
-                self.move_file(SITE_PATH + source_file, SITE_PATH + target_file)
-                self.update_file_url(file, target_file)
+                self.update_file_url(file, target_file, import_name)
+                self.delete_file_in_outside_folder(file_name,file)
             except Exception as e:
                 self.update_status('Transform', file['name'], 'Error')
                 self.log_error('Transform', file['name'], e)
+            self.move_file(SITE_PATH + source_file, SITE_PATH + target_file)
+
 
 
 

@@ -1,20 +1,23 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "format:{utr_number}-{claim_id}",
+ "autoname": "format:{final_utr_number}-{claim_id}",
  "creation": "2023-12-23 12:12:27.383921",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "paid_date",
-  "utr_number",
-  "bill_no",
   "claim_id",
+  "bill_no",
+  "utr_number",
+  "final_utr_number",
   "claim_amount",
-  "settled_amount",
+  "disallowed_amount",
+  "payers_remark",
   "tds_amount",
+  "settled_amount",
+  "paid_date",
   "column_break_ne4ar",
   "source",
   "status",
@@ -22,6 +25,7 @@
   "retry",
   "reference_section",
   "match_log"
+  "source_file"
  ],
  "fields": [
   {
@@ -56,7 +60,7 @@
   },
   {
    "fieldname": "paid_date",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Paid Date"
@@ -85,7 +89,7 @@
   },
   {
    "fieldname": "remark",
-   "fieldtype": "Data",
+   "fieldtype": "Text",
    "label": "Remark"
   },
   {
@@ -104,6 +108,27 @@
    "label": "Status",
    "options": "\nError\nOpen"
   },
+   {
+   "fieldname": "disallowed_amount",
+   "fieldtype": "Currency",
+   "label": "Disallowed Amount"
+  },
+  {
+   "fieldname": "payers_remark",
+   "fieldtype": "Text",
+   "label": "Payers Remark"
+  },
+  {
+   "fieldname": "final_utr_number",
+   "fieldtype": "Data",
+   "label": "Final UTR Number"
+  },
+  {
+   "fieldname": "source_file",
+   "fieldtype": "Link",
+   "label": "Source File",
+   "options": "File upload"
+  },
   {
    "fieldname": "reference_section",
    "fieldtype": "Section Break",
@@ -117,7 +142,7 @@
   }
  ],
  "links": [],
- "modified": "2024-01-10 23:38:18.683053",
+ "modified": "2024-01-11 22:05:41.842548",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
