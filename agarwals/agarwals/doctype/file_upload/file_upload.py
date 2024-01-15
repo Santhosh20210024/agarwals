@@ -9,8 +9,6 @@ from agarwals.utils.path_data import HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, 
 import re
 
 class Fileupload(Document):
-	# def __init__(self):
-	# 	self.fil
 	def get_file_doc_data(self):
 		file_name = self.upload.split("/")[-1]
 		file_doc_id = frappe.get_list("File", filters={'file_url':self.upload}, pluck='name')[0]
@@ -30,17 +28,23 @@ class Fileupload(Document):
 		if os.path.exists(file_path):
 			os.remove(file_path)
 
-	def validate_hash_content(self, file_name, file_doc_id):
-		file_doc = frappe.get_doc('File', file_doc_id)
-		doc_file_name = file_doc.file_name
-		file_content_hash = file_doc.content_hash
+	def validate_hash_content(self, file_name, file_id):
+		file_doc = frappe.get_doc('File', file_id)
+		file_ch = file_doc.content_hash
 		
 		# Verify the same hash content 
-		if file_content_hash:
-			file_hash_doc = frappe.get_list("File", filters = {'content_hash':file_content_hash}, pluck = 'name', order_by = 'creation DESC')
-			if len(file_hash_doc) > 1:
-				frappe.delete_doc("File", file_hash_doc[0])
+		if file_ch:
+			file_doc_hash = frappe.get_list("File", filters = { 'content_hash':file_ch, 'attached_to_doctype': 'File upload' }, fields = [ 'name', 'attached_to_name' ], order_by = 'creation DESC')
+			file_doc_hash_filtered = []
+
+			for file in file_doc_hash:
+				if frappe.get_value('File upload', file.attached_to_name, 'status') != 'Error':
+					file_doc_hash_filtered.append(file) 
+			
+			if len(file_doc_hash_filtered) > 1:
+				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name': file_doc_hash[0]['name']})
 				frappe.db.commit()
+
 				# Delete the files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				self.set(str(self.upload), '')
@@ -51,38 +55,52 @@ class Fileupload(Document):
 			else:
 				frappe.publish_realtime(event="Errorbox", message="no error")
 				return
-		
-		# Verify the same file with different hash content
-		file_name_list = frappe.get_list("File", filters = {'file_name': doc_file_name}, pluck = 'name', order_by = 'creation ASC')
-		if len(file_name_list) > 1:
-			frappe.delete_doc("File", file_name_list[0])
-			frappe.db.commit()
-
-			# Delete the shell files
-			self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 
 	def validate_file(self):
-		file_name, file_doc_id = self.get_file_doc_data()
-		# file_type = frappe.get_value('File',file_doc_id,'file_type')
-		# get_file_name = frappe.get_doc('File', )
-		if file_doc_id:
-			if file_name.split('.')[-1].upper() != 'XLSX' and file_name.split('.')[-1].upper() != 'PDF':
-				frappe.delete_doc("File", file_doc_id)
+		file_name, file_id = self.get_file_doc_data()
+		
+		if file_id:
+			try:
+				file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
+				if file_name.split('.')[-1].upper() not in file_extensions:
+					frappe.delete_doc("File", file_id)
+					frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
+					frappe.db.commit()
+
+					# Delete the shell files
+					self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
+					frappe.publish_realtime(event="Errorbox", message="error")
+					frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
+					self.set(str(self.upload), '')
+				
+				else:
+					frappe.publish_realtime(event="Errorbox", message="no error")
+
+			except Exception as e:
+				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
 				frappe.db.commit()
+
 				# Delete the shell files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				frappe.publish_realtime(event="Errorbox", message="error")
-				frappe.throw("Please upload files in Excel format only (XLSX).")
+				frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
 				self.set(str(self.upload), '')
-				return
-			else:
-				frappe.publish_realtime(event="Errorbox", message="no error")									
-			self.validate_hash_content(file_name, file_doc_id)
+												
+			self.validate_hash_content(file_name, file_id)
 				
-	def move_shell_file(self, source, destination):
+	def move_shell_file(self, source, destination, file_name, file_content_hash, file_doc_id):
 		try:
-			if os.path.exists(source):
-				os.rename(source, destination)
+			hash = str(file_content_hash)[:5]
+			hashed_file_name = hash + '_' + file_name
+			changed_source_file_name = source.replace( file_name, hashed_file_name )
+
+			# source name changed
+			os.rename(source, changed_source_file_name)
+			shutil.move(changed_source_file_name, destination)
+
+			return hashed_file_name
+
+
 		except Exception as e:
 			frappe.throw('Error:', str(e))
 			return
@@ -90,19 +108,30 @@ class Fileupload(Document):
 	def process_file_attachment(self):
      
 		file_name,file_doc_id = self.get_file_doc_data()
-		_file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
 		file_doc = frappe.get_doc("File", file_doc_id)
 		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
-		file_doc.file_url = _file_url
-		self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),construct_file_url(SITE_PATH, _file_url.lstrip('/') ))
+		hashed_file_name = self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),
+										  construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]),
+										  file_name, file_doc.content_hash, file_doc_id)
+
+		file_doc.file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], hashed_file_name)
+
 		file_doc.save()
-		self.set("upload",_file_url)
-		self.set("upload_url",_file_url)
+		self.set("upload",file_doc.file_url)
+		self.set("upload_url",file_doc.file_url)
+
+		if hashed_file_name != None:
+			frappe.db.set_value('File', file_doc_id, 'file_name', hashed_file_name)
+			frappe.db.commit()
+		
 		
 	def validate(self):
-		
+
+		# To avoid other valid entries
 		if self.status != 'Open':
 			return
+		
+		# To check whether the file uploaded
 		if self.upload == None or self.upload == '':
 			frappe.throw('Please upload file')
 

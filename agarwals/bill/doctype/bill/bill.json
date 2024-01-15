@@ -11,6 +11,7 @@
   "region",
   "cost_center",
   "branch",
+  "branch_type",
   "bill_no",
   "bill_date",
   "column_break_kire",
@@ -45,7 +46,8 @@
   "submission_date",
   "column_break_ahot",
   "final_submission_date",
-  "invoice"
+  "invoice",
+  "invoice_status"
  ],
  "fields": [
   {
@@ -249,6 +251,17 @@
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center"
+  },
+  {
+   "fieldname": "invoice_status",
+   "fieldtype": "Select",
+   "label": "Invoice Status",
+   "options": "\nRAISED\nCANCELLED"
+  },
+   {
+   "fieldname": "branch_type",
+   "fieldtype": "Data",
+   "label": "Branch Type"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -259,7 +272,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2023-12-20 19:57:27.755237",
+ "modified": "2024-01-10 19:45:32.652369",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
