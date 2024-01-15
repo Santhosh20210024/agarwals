@@ -191,7 +191,7 @@ class Transformer:
             return item.replace("XX", '')
         return item
 
-    def format_utr(self,utr_column):
+    def format_utr(self, utr_column):
         utr_list = self.source_df[utr_column].fillna(0).to_list()
         new_utr_list = []
 
@@ -287,7 +287,7 @@ class Transformer:
     def process(self):
         files = self.get_files_to_transform()
         if not files:
-            return None
+            return None 
         for file in files:
             self.update_status('File upload', file['name'], 'In Process')
             self.load_source_df(file,self.header)
@@ -318,8 +318,8 @@ class DirectTransformer(Transformer):
 
         self.load_target_df()
 
-        if self.target_df.empty:
-            self.new_records = self.source_df
+        if self.target_df.empty: 
+            self.new_records = self.source_df 
             self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
             return True
         else:
@@ -372,6 +372,7 @@ class ClaimbookTransformer(DirectTransformer):
         self.document_type = 'ClaimBook'
         self.hashing = 1
         self.clean_utr = 1
+        self.utr_column_name = 'utr_number'
 
     def get_columns_to_hash(self):
         return ['unique_id', 'settled_amount']
@@ -398,7 +399,7 @@ class ClaimbookTransformer(DirectTransformer):
         return {'hash': 'hash_x'}
 
     def get_column_needed(self):
-        return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size']
+        return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size','final_utr_number']
 
 class StagingTransformer(Transformer):
     def __init__(self):
