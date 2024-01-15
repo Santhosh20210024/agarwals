@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:unique_id",
  "creation": "2023-11-30 15:08:14.268098",
@@ -153,9 +154,8 @@
   },
   {
    "fieldname": "final_bill_number",
-   "fieldtype": "Link",
-   "label": "Final Bill Number",
-   "options": "Sales Invoice"
+   "fieldtype": "Data",
+   "label": "Final Bill Number"
   },
   {
    "fieldname": "final_bill_date",
@@ -359,7 +359,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-02 20:41:28.034684",
+ "modified": "2024-01-13 20:38:43.912786",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
