@@ -3,10 +3,7 @@ import os
 import frappe
 from datetime import date
 from agarwals.utils.loader import Loader
-from agarwals.utils.path_data import SITE_PATH
-# defining the path of the input and output
-base_path = os.getcwd()
-site_path = frappe.get_site_path()[1:]
+SITE_PATH = frappe.get_single('Control Panel').site_path
 
 def clean_header(list_to_clean,list_of_char_to_repalce):
     
@@ -144,7 +141,7 @@ def advice_transform():
             try:
                 update_status('File upload', file.name, 'In Process')
                 file_link = file.upload
-                file_url_to_read =  f"{base_path}{site_path}{file_link}"
+                file_url_to_read =  SITE_PATH+file_link
                 config = frappe.get_doc("Settlement Advice Configuration")
                 header_row_patterns = eval(config.header_row_patterns)
                 list_of_char_to_repalce = eval(config.char_to_replace_in_header)

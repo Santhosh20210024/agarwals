@@ -458,18 +458,14 @@ def payment_batch_operation(chunk):
         
 def get_unreconciled_bank_transactions(): # tested
     return frappe.db.sql("""
-    SELECT * FROM `tabBank Transaction` WHERE status in ('unreconciled', 'pending') AND deposit > 0 AND deposit is NOT NULL AND LENGTH(reference_number) > 1 AND reference_number != '0' AND unallocated_amount > 10""", as_dict=1)
+    SELECT name FROM `tabBank Transaction` WHERE status in ('unreconciled', 'pending') AND deposit > 0 AND deposit is NOT NULL AND LENGTH(reference_number) > 1 AND reference_number != '0' AND unallocated_amount > 10""", as_dict=1)
 
 @frappe.whitelist()
 def create_payment_entries():
     unreconciled_bank_transactions = get_unreconciled_bank_transactions()
     pending_transactions = []
-
-    for bank_transaction in unreconciled_bank_transactions: # tested
-            transaction_doc = frappe.get_doc("Bank Transaction", bank_transaction.name)
-            transaction = BankTransactionWrapper(transaction_doc)
-            transaction.process()
-            # pending_transactions.append(bank_transaction.name)
+    for bank_transaction in unreconciled_bank_transactions:
+            pending_transactions.append(bank_transaction.name)
 
     chunk_size = 1000
     for i in range(0, len(pending_transactions), chunk_size):
