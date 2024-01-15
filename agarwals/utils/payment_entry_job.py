@@ -171,12 +171,12 @@ class BankTransactionWrapper():
                 bank_je.cheque_no = self.bank_transaction.name
                 bank_je.custom_bank_reference = self.bank_transaction.reference_number
                 bank_je.name = self.bank_transaction.reference_number
-                bank_je = self.get_advice_obj_list(bank_je_advices, bank_je) # need to test
+                bank_je = self.get_advice_obj_list(bank_je_advices, bank_je)
                 bank_je.submit()
                 self.set_transaction_reference(bank_je.name, allocated_amount)
             
             if tds_je.accounts != None and len(tds_je.accounts) > 0:
-                self.create_tds_entries(tds_je,tds_je_advices) #need to test
+                self.create_tds_entries(tds_je,tds_je_advices)
             if len(tds_je.accounts) > 0 or len(bank_je.accounts) > 0:
                 # need to change the status
                 self.sales_utr_entry(tds_je.accounts, bank_je.accounts)
@@ -323,7 +323,6 @@ class BankTransactionWrapper():
         
         invoice_number = 0
 
-
         if advice.bill_no:
             invoice_number = advice.bill_no
             self.advice_log['sa.bill'] = advice.bill_no
@@ -337,7 +336,6 @@ class BankTransactionWrapper():
                 else:
                     self.advice_log_value['sa.claim'] = advice.claim_id
         else:
-            self.advice_log['sa.claim'] = advice.claim_id
             claim = self.get_claim(advice, advice.claim_id)
 
             if claim != None:
@@ -347,7 +345,7 @@ class BankTransactionWrapper():
             else:
                 self.advice_log_value['sa.claim'] = advice.claim_id
         
-        if invoice_number: # tested
+        if invoice_number:
             sales_invoice = self.get_sales_invoice(advice, invoice_number)
             if sales_invoice  != None:
                 self.advice_log['dbr.bill'] = sales_invoice.name
@@ -359,7 +357,7 @@ class BankTransactionWrapper():
         if self.available_amount >= advice.settled_amount:
             if advice.settled_amount <= sales_invoice.outstanding_amount:
                 allocated_amount = advice.settled_amount
-            else: # TESTED
+            else:
                 self.error_log(advice, user_error_msg = "Settlement Amount is greater than the Outstanding Amount for " + str(invoice_number))
                 return None,None
         else:
@@ -466,7 +464,6 @@ def get_unreconciled_bank_transactions(): # tested
 def create_payment_entries():
     unreconciled_bank_transactions = get_unreconciled_bank_transactions()
     pending_transactions = []
-
     for bank_transaction in unreconciled_bank_transactions:
             pending_transactions.append(bank_transaction.name)
 
