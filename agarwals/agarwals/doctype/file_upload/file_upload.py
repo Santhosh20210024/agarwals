@@ -48,12 +48,10 @@ class Fileupload(Document):
 				# Delete the files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				self.set(str(self.upload), '')
-				frappe.publish_realtime(event="Errorbox", message="error")
 				self.set("upload",'')
 				frappe.throw('Duplicate File Error: The file being uploaded already exists. Please check.')
 				return 
 			else:
-				frappe.publish_realtime(event="Errorbox", message="no error")
 				return
 
 	def validate_file(self):
@@ -69,12 +67,8 @@ class Fileupload(Document):
 
 					# Delete the shell files
 					self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-					frappe.publish_realtime(event="Errorbox", message="error")
 					frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
 					self.set(str(self.upload), '')
-				
-				else:
-					frappe.publish_realtime(event="Errorbox", message="no error")
 
 			except Exception as e:
 				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
@@ -82,7 +76,6 @@ class Fileupload(Document):
 
 				# Delete the shell files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-				frappe.publish_realtime(event="Errorbox", message="error")
 				frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
 				self.set(str(self.upload), '')
 												
