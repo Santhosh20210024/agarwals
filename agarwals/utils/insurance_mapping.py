@@ -44,7 +44,7 @@ def advice_rfn_match(_doctype=None):
 
         for doc_name in matched_name:
                 frappe.db.sql("""
-                            UPDATE `tabBank Transaction Staging` SET tag = %(tag)s where name = %(name)s
+                            UPDATE `tabBank Transaction Staging` SET tag = %(tag)s, based_on = 'Settlement Advice' where name = %(name)s
                             """, values = { 'tag' : INSURANCE_TAG, 'name' : doc_name})
                 frappe.db.commit()
     except Exception as e:
@@ -87,7 +87,7 @@ def tag_insurance_pattern(doctype=None):
         if compressed_inclusion_patterns:   
 
             # Truncate the 'TAG' column intially 
-            frappe.db.sql("""UPDATE `tabBank Transaction Staging` SET tag = NULL where tag = %(tag)s""", values = { 'tag' : INSURANCE_TAG})
+            frappe.db.sql("""UPDATE `tabBank Transaction Staging` SET tag = NULL, based_on = NULL where tag = %(tag)s""", values = { 'tag' : INSURANCE_TAG})
             frappe.db.commit()
 
             frappe.db.sql("""
@@ -114,8 +114,17 @@ def tag_insurance_pattern(doctype=None):
         else:
             frappe.throw('Exclusion Patterns is not found')
 
+        frappe.db.sql("""
+                      UPDATE `tabBank Transaction Staging` SET based_on = 'Insurance Pattern' where tag = %(_tag)s
+                      """, values = {'_tag' : INSURANCE_TAG})
+        frappe.db.commit()
+        
         rm_transactions()
         advice_rfn_match(_doctype=doctype)
+        # frappe.db.sql("""
+        #               UPDATE `tabBank Transaction Stagging` SET based_on = `Insurance Pattern` where tag = %(_tag)s
+        #               """, values = {'_tag' : INSURANCE_TAG})
+        # frappe.db.commit()
 
     except Exception as e:
         error_log = frappe.new_doc('Error Record Log')
