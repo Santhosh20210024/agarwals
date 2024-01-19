@@ -3,7 +3,7 @@ import frappe
 @frappe.whitelist()
 def get_outstanding_amount():
     outstanding_amount = frappe.db.sql("""
-                                    SELECT ABS( t1.collection - t2.revenue ) AS `Revenue`
+                                    SELECT ABS( t1.collection - t2.revenue ) AS `Amount`
                                     FROM (
                                     select sum(deposit) as collection from `tabBank Transaction` tbt ) AS t1,
                                     (
