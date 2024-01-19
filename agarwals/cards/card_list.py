@@ -13,5 +13,18 @@ def get_outstanding_amount():
 
     return {
         "value" : outstanding_amount[0]['Amount'],
-        "fieldtype" : "Currency",
+        "fieldtype" : "Currency"
     }
+
+# @frappe.whitelist()
+# def get_revenue():
+#     revenue_amount = frappe.db.sql("""
+#                                       SELECT SUM(t1.total) as `Revenue` 
+#                                       FROM `tabSales Invoice` t1 where t1.status != 'Cancelled';
+#                                       """, as_dict = True)
+#     return {
+#         "value" : revenue_amount[0]['Revenue'],
+#         "fieldtype" : "Currency"
+#     }
+
+# # @frappe.
