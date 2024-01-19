@@ -13,8 +13,7 @@ def get_outstanding_amount():
 
     return {
         "value" : outstanding_amount[0]['Amount'],
-        "fieldtype" : "Currency",
-        "ignore_user_permissions" : 1
+        "fieldtype" : "Currency"
     }
 
 # @frappe.whitelist()
