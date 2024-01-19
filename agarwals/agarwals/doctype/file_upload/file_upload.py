@@ -10,9 +10,13 @@ import re
 
 class Fileupload(Document):
 	def get_file_doc_data(self):
-		file_name = self.upload.split("/")[-1]
-		file_doc_id = frappe.get_list("File", filters={'file_url':self.upload}, pluck='name')[0]
-		return file_name, file_doc_id
+		file_name = self.upload.split("/")[-1] # Need to the
+		file_doc_id = frappe.get_list("File", filters={'file_url':self.upload}, pluck='name')
+		if len(file_doc_id) < 1:
+			frappe.throw("Again upload the file.")
+			return None, None
+		else:
+			return file_name, file_doc_id
 	
 	def get_uploaded_field(self):
 		list_upload_fields = get_doc_fields("upload")
@@ -47,13 +51,10 @@ class Fileupload(Document):
 
 				# Delete the files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-				self.set(str(self.upload), '')
-				frappe.publish_realtime(event="Errorbox", message="error")
-				self.set("upload",'')
+				self.set(str(self.upload), None)
 				frappe.throw('Duplicate File Error: The file being uploaded already exists. Please check.')
-				return 
+				return
 			else:
-				frappe.publish_realtime(event="Errorbox", message="no error")
 				return
 
 	def validate_file(self):
@@ -69,12 +70,9 @@ class Fileupload(Document):
 
 					# Delete the shell files
 					self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-					frappe.publish_realtime(event="Errorbox", message="error")
+					self.set(str(self.upload), None)
 					frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
-					self.set(str(self.upload), '')
-				
-				else:
-					frappe.publish_realtime(event="Errorbox", message="no error")
+					
 
 			except Exception as e:
 				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
@@ -82,46 +80,46 @@ class Fileupload(Document):
 
 				# Delete the shell files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-				frappe.publish_realtime(event="Errorbox", message="error")
-				frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
-				self.set(str(self.upload), '')
+				self.set(str(self.upload), None)
 												
 			self.validate_hash_content(file_name, file_id)
 				
-	def move_shell_file(self, source, destination, file_name, file_content_hash, file_doc_id):
+	def move_shell_file(self, source, destination, file_name, file_id):
 		try:
-			hash = str(file_content_hash)[:5]
-			hashed_file_name = hash + '_' + file_name
-			changed_source_file_name = source.replace( file_name, hashed_file_name )
+			current_timestamp = str(frappe.utils.now()).split('.')[0]
+			timestamped_file_name = current_timestamp.replace(' ', '-') + '_' + file_name
+			changed_source_file_name = source.replace( file_name, timestamped_file_name )
 
 			# source name changed
 			os.rename(source, changed_source_file_name)
 			shutil.move(changed_source_file_name, destination)
 
-			return hashed_file_name
-
+			return timestamped_file_name
 
 		except Exception as e:
+			frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
+			frappe.db.commit()
+			self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 			frappe.throw('Error:', str(e))
 			return
 
 	def process_file_attachment(self):
      
-		file_name,file_doc_id = self.get_file_doc_data()
+		file_name, file_doc_id = self.get_file_doc_data()
 		file_doc = frappe.get_doc("File", file_doc_id)
-		file_doc.folder =   construct_file_url(HOME_PATH, SUB_DIR[0])
-		hashed_file_name = self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),
+		file_doc.folder = construct_file_url(HOME_PATH, SUB_DIR[0])
+		timestamped_file_name = self.move_shell_file(construct_file_url(SITE_PATH, SHELL_PATH, file_name),
 										  construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]),
-										  file_name, file_doc.content_hash, file_doc_id)
+										  file_name, file_doc_id)
 
-		file_doc.file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], hashed_file_name)
-
+		file_doc.file_url = "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], timestamped_file_name)
 		file_doc.save()
-		self.set("upload",file_doc.file_url)
-		self.set("upload_url",file_doc.file_url)
 
-		if hashed_file_name != None:
-			frappe.db.set_value('File', file_doc_id, 'file_name', hashed_file_name)
+		self.set("upload", file_doc.file_url)
+		self.set("upload_url", file_doc.file_url)
+
+		if timestamped_file_name != None:
+			frappe.db.set_value('File', file_doc_id, 'file_name', timestamped_file_name)
 			frappe.db.commit()
 		
 		

@@ -5,46 +5,25 @@
 // Read only
 frappe.ui.form.on('File upload', {
 	onload: function(frm) {
-    frappe.realtime.on("Errorbox", function(response) {
-      if (response === "error") {
-        frm.set_df_property("upload", "read_only",0);
-        frm.set_df_property("payer_type", "read_only",0);
-        frm.set_df_property("bank_account", "read_only",0);
-        frm.set_df_property("document_type", "read_only",0);
+          // Check if the document is old
+          var isOldDocument = frm.doc.__islocal ? 0 : 1;
+          // Set the read-only property of the field based on the condition
+          frm.set_df_property("upload", "read_only", isOldDocument);
+          frm.set_df_property("payer_type", "read_only", isOldDocument);
+          frm.set_df_property("bank_account", "read_only", isOldDocument);
+          frm.set_df_property("document_type", "read_only", isOldDocument);
       }
-      else{
-        frm.set_df_property("upload", "read_only",1);
-        frm.set_df_property("payer_type", "read_only",1);
-        frm.set_df_property("bank_account", "read_only",1);
-        frm.set_df_property("document_type", "read_only",1);
-      }
-    });    
-
-	 }
-});
+  });
+  
 frappe.ui.form.on('File upload', {
 	refresh: function(frm) {
-    if (frm.doc.upload != null){
-      frm.set_df_property("upload", "read_only",1);
-      frm.set_df_property("payer_type", "read_only",1);
-      frm.set_df_property("bank_account", "read_only",1);
-      frm.set_df_property("document_type", "read_only",1);
-    }
-    frappe.realtime.on("Errorbox", function(response) {
-      if (response === "error") {
-        frm.set_df_property("upload", "read_only",0);
-        frm.set_df_property("payer_type", "read_only",0);
-        frm.set_df_property("bank_account", "read_only",0);
-        frm.set_df_property("document_type", "read_only",0);
-      }
-      else{
-        frm.set_df_property("upload", "read_only",1);
-        frm.set_df_property("payer_type", "read_only",1);
-        frm.set_df_property("bank_account", "read_only",1);
-        frm.set_df_property("document_type", "read_only",1);
-      }
-    });    
-
+           // Check if the document is old
+           var isOldDocument = frm.doc.__islocal ? 0 : 1;
+           // Set the read-only property of the field based on the condition
+           frm.set_df_property("upload", "read_only", isOldDocument);
+           frm.set_df_property("payer_type", "read_only", isOldDocument);
+           frm.set_df_property("bank_account", "read_only", isOldDocument);
+           frm.set_df_property("document_type", "read_only", isOldDocument);
 	 }
 });
 
