@@ -13,5 +13,5 @@ def get_outstanding_amount():
 
     return {
         "value" : outstanding_amount[0]['Amount'],
-        "fieldtype" : "Data",
+        "fieldtype" : "Currency",
     }
