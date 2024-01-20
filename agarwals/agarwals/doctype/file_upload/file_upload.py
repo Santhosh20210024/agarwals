@@ -62,7 +62,7 @@ class Fileupload(Document):
 		
 		if file_id:
 			try:
-				file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
+				file_extensions = 'XLSX,XLS,CSV,PDF,XLSB'.split(',')
 				if file_name.split('.')[-1].upper() not in file_extensions:
 					frappe.delete_doc("File", file_id)
 					frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
