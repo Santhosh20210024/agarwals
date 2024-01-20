@@ -67,15 +67,20 @@ class Fileupload(Document):
 					frappe.delete_doc("File", file_id)
 					frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
 					frappe.db.commit()
-			
+
+					# Delete the shell files
+					self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
+					self.set(str(self.upload), None)
+					frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
+					
+
 			except Exception as e:
+				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
+				frappe.db.commit()
+
 				# Delete the shell files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				self.set(str(self.upload), None)
-
-					# Delete the shell files
-			self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-			frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
 												
 			self.validate_hash_content(file_name, file_id)
 				
@@ -111,7 +116,7 @@ class Fileupload(Document):
 		file_doc.save()
 
 		self.set("upload", file_doc.file_url)
-		self.set("file", file_name)
+		self.set("upload_url", file_doc.file_url)
 
 		if timestamped_file_name != None:
 			frappe.db.set_value('File', file_doc_id, 'file_name', timestamped_file_name)
@@ -130,7 +135,6 @@ class Fileupload(Document):
 
 		self.validate_file()
 		self.process_file_attachment()
-		
 
 	def on_trash(self):
 		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0] , self.upload.split("/")[-1]))
