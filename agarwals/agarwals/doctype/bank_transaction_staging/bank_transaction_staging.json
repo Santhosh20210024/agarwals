@@ -22,6 +22,7 @@
   "source_reference_number",
   "column_break_5xa6d",
   "tag",
+  "based_on",
   "search",
   "staging_status",
   "remarks",
@@ -146,11 +147,16 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Previous utr"
+  },
+  {
+   "fieldname": "based_on",
+   "fieldtype": "Data",
+   "label": "Based On"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-12 02:04:42.685867",
+ "modified": "2024-01-20 02:18:34.631646",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",

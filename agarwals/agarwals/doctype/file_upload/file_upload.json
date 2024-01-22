@@ -12,6 +12,7 @@
   "payer_type",
   "bank_account",
   "upload",
+  "file",
   "status",
   "transform"
  ],
@@ -71,12 +72,19 @@
    "fieldtype": "Table",
    "label": "Transform",
    "options": "Transform"
+  },
+  {
+   "fieldname": "file",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "File"
   }
  ],
- "hide_toolbar": 0,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-09 19:43:25.341094",
+ "modified": "2024-01-20 04:02:33.223974",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
