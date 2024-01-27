@@ -114,7 +114,7 @@
    "fieldname": "retry",
    "fieldtype": "Check",
    "label": "Retry",
-   "read_only_depends_on": "eval:doc.status != \"Processed\""
+   "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
    "fieldname": "source",
@@ -146,7 +146,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-11 19:01:17.568886",
+ "modified": "2024-01-27 15:39:02.756907",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
