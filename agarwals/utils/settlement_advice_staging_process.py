@@ -51,6 +51,12 @@ def process():
                     advice_staging_doc.save(ignore_permissions=True)
                     frappe.db.commit()
                     continue
+                if advice_staging_doc.settled_amount is None or advice_staging_doc.settled_amount == 0:
+                    advice_staging_doc.status = "Error"
+                    advice_staging_doc.remarks = "No Settled amount"
+                    advice_staging_doc.save(ignore_permissions=True)
+                    frappe.db.commit()
+                    continue
                 
                 insert_record_in_settlement_advice(advice_staging_doc)
             except Exception as e:
