@@ -10,6 +10,7 @@ def log_error(doctype_name, reference_name, error_message):
     error_log.save()
 
 def insert_record_in_settlement_advice(doc_to_insert):
+    doc_to_insert.retry = 0
     try:
         frappe.get_doc({
             "doctype": "Settlement Advice",
@@ -39,7 +40,7 @@ def insert_record_in_settlement_advice(doc_to_insert):
 
 @frappe.whitelist()
 def process():
-        for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed']}, fields = "*" ):
+        for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed'],'retry':['!=', 0]}, fields = "*" ):
             try:
                 advice_staging_doc=frappe.get_doc('Settlement Advice Staging',advice.name)
                 advice_staging_doc.date = date.today(),
@@ -57,7 +58,7 @@ def process():
                     advice_staging_doc.save(ignore_permissions=True)
                     frappe.db.commit()
                     continue
-                
+                advice_staging_doc.claim_id=advice_staging_doc.claim_id.replace(".0","")
                 insert_record_in_settlement_advice(advice_staging_doc)
             except Exception as e:
                 log_error('Settlement Advice Staging',advice.name,e)
