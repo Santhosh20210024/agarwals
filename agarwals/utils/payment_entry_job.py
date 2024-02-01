@@ -6,13 +6,13 @@ import unicodedata
 
 class BankTransactionWrapper():
 
-    def __init__(self, bank_transaction):
+    def __init__(self, bank_transaction, total_claim_records, total_debtors_records):
         self.bank_transaction = bank_transaction
         self.available_amount = bank_transaction.deposit
         self.advice_log = {"bnk.utr": '', "sa.utr": '', "sa.bill": '', "sa.claim": '', "cb.al": '', "cb.cl": '',
                            "dbr.claim": '', "dbr.bill": ''}
-        self.claim_records = frappe.db.sql('SELECT name, al_number, cl_number, custom_raw_bill_number, insurance_name FROM `tabClaimBook`', as_dict = True)
-        self.debtors_records = frappe.db.sql('SELECT name, claim_id FROM `tabBill` WHERE status != "CANCELLED"' ,as_dict = True)
+        self.claim_records = total_claim_records
+        self.debtors_records = total_debtors_records
 
     def clear_advice_log(self):
         for log in self.advice_log:
@@ -21,7 +21,7 @@ class BankTransactionWrapper():
     def add_log_entries(self, advice_name):
         advice_doc = frappe.get_doc("Settlement Advice", advice_name)
         advice_doc.match_log = []
-        # Verify whether the advice is already passed
+        # Verify whether the advice is already passed  # doubts
         frappe.db.sql('DELETE FROM `tabMatch Log` WHERE parent = %(parent)s', values={'parent': advice_name})
         frappe.db.commit()
 
@@ -83,15 +83,16 @@ class BankTransactionWrapper():
                                and status != 'Processed' and claim_id != 0""", values={'utr_number': bnk_ref_num},
                                             as_dict=1)
 
-            _flag = False
+            check_flag = False
             if not advices:
                 if len(advices_org_utr) > 0:
                     advices = advices_org_utr
-                    _flag = True
+                    check_flag = True
 
             # Advice Intial Validation,
             # Status in bank transaction
             if len(advices) < 1:
+                self.error_log(user_error_msg= 'No Advices Found for the ' + str(self.bank_transaction.name))
                 self.bank_transaction.custom_advice_status = 'Not Found'
                 self.bank_transaction.save()
                 frappe.db.commit()
@@ -135,7 +136,7 @@ class BankTransactionWrapper():
                 self.advice_log['sa.bill'] = advice.bill_no
                 self.advice_log['sa.claim'] = advice.claim_id
 
-                if _flag == True:  # only for log value
+                if check_flag == True:  # only for log value
                     self.advice_log["sa.utr"] = advice['utr_number']
                 else:
                     self.advice_log["sa.utr"] = advice['final_utr_number']
@@ -195,15 +196,6 @@ class BankTransactionWrapper():
                 self.sales_utr_entry(bank_je.accounts)
 
             for advice in bank_je_advices:
-                # if len(tds_je_advices) > 0:
-                #     if advice in tds_je_advices:
-                #         if len(dis_je_advices) > 0:
-
-                # #     e
-                # for i
-                #     if advice in tds_je_advices and advice in dis_je_advices:
-                #         frappe.set_value('Settlement Advice', advice, 'status', 'Fully Processed')
-                #     else:
                 frappe.set_value('Settlement Advice', advice, 'status', 'Processed')
                 frappe.db.commit()
 
@@ -296,7 +288,9 @@ class BankTransactionWrapper():
                         self.advice_log[log_key] = str(claim_record[claim_key])
                         frappe.set_value('ClaimBook', claim_record['name'], 'status', 'Matched')
                         frappe.set_value('ClaimBook', claim_record['name'], 'cgclaim_id', debtor_record['claim_id'])
-                        return debtor_record['name'],debtor_record['claim_id'],claim_record['insurance_name']
+                        frappe.set_value('bill', debtor_record['name'], 'cgclaim_id', claim_record['claim_id'])
+                        frappe.db.commit()
+                        return debtor_record['name'],debtor_record['claim_id'],claim_record['insurance_company_name']
         return None,None,None
 
     def get_possible_claim_ids(self, claim_id):
@@ -345,6 +339,8 @@ class BankTransactionWrapper():
         # Final Validation
         if matched_bill_number:
             self.advice_log['dbr.claim'] = matched_debtor_claim_number
+            frappe.set_value('Settlement Advice', advice.name, 'cgbill_claim_id', frappe.get_value('Bill', matched_bill_number, 'name'))
+            frappe.set_value('Settlement Advice', advice.name, 'cgclaim_claim_id', frappe.get_value('Bill', matched_bill_number, 'cgclaim_id'))
             return matched_bill_number, insurance_name
 
         else:
@@ -435,10 +431,10 @@ class BankTransactionWrapper():
                              tpa = %(customer)s, 
                              insurance_company_name = %(insurance)s
                              where name = %(name)s """,
-                          values={'region': sales_invoice['region'],
-                                  'entity': sales_invoice['entity'],
-                                  'branch_type': sales_invoice['branch_type'],
-                                  'customer': sales_invoice['customer'],
+                          values={'region': sales_invoice.region,
+                                  'entity': sales_invoice.entity,
+                                  'branch_type': sales_invoice.branch_type,
+                                  'customer': sales_invoice.customer,
                                   'insurance': insurance_name,
                                   'name': advice.name},
                           as_dict=True)
@@ -574,9 +570,11 @@ class BankTransactionWrapper():
         frappe.db.commit()
 
 def payment_batch_operation(chunk):
+    total_claim_records = frappe.db.sql('SELECT name, al_number, cl_number, custom_raw_bill_number, insurance_company_name FROM `tabClaimBook`', as_dict = True)
+    total_debtors_records = frappe.db.sql('SELECT name, claim_id FROM `tabBill` WHERE status != "CANCELLED"' ,as_dict = True)
     for record in chunk:
         transaction_doc = frappe.get_doc("Bank Transaction", record)
-        transaction = BankTransactionWrapper(transaction_doc)
+        transaction = BankTransactionWrapper(transaction_doc, total_claim_records, total_debtors_records)
         transaction.process()
 
 
@@ -586,16 +584,13 @@ def get_unreconciled_bank_transactions():
     SELECT name FROM `tabBank Transaction` WHERE status in ('unreconciled', 'pending') AND deposit > 0 AND deposit is NOT NULL AND LENGTH(reference_number) > 1 AND reference_number != '0' AND unallocated_amount > 10""",
                          as_dict=1)
 
-
 @frappe.whitelist()
 def create_payment_entries():
     unreconciled_bank_transactions = get_unreconciled_bank_transactions()
     pending_transactions = []
     for bank_transaction in unreconciled_bank_transactions:
         pending_transactions.append(bank_transaction.name)
-        # transaction_doc = frappe.get_doc("Bank Transaction", bank_transaction.name)
-        # transaction = BankTransactionWrapper(transaction_doc)
-        # transaction.process()
+
 
     chunk_size = 1000
     for i in range(0, len(pending_transactions), chunk_size):
