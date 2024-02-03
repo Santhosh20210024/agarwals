@@ -1,6 +1,5 @@
 from agarwals.utils.transformer import BillTransformer,ClaimbookTransformer,BankTransformer
 import frappe
-from agarwals.utils.record_mapper import ClaimBookMapper, FinalDetailsMapper
 
 @frappe.whitelist()
 def run_transform_process(type):
@@ -28,16 +27,16 @@ def run_transform_process(type):
             return "Success"
         except Exception as e:
             return e
-@frappe.whitelist()
-def map_claim_book_records():
-    try:
-        ClaimBookMapper().enqeue_job()
-    except Exception as e:
-        frappe.throw(e)
 
 @frappe.whitelist()
-def map_final_details():
+def create_sales_invoice():
     try:
-        FinalDetailsMapper().enqeue_job()
+        cancelled_bills = frappe.get_list('Bill', filters={'status': 'CANCELLED', 'invoice_status': 'RAISED'},
+                                          pluck='name')
+        SalesInvoiceCreator().cancel_sales_invoice(cancelled_bills)
+        new_bills = frappe.get_list('Bill', filters= {'invoice':''})
+        SalesInvoiceCreator().enqueue_job(new_bills)
     except Exception as e:
-        frappe.throw(e)
+        error_log = frappe.new_doc('Error Record Log')
+        error_log.set('error_message', e)
+        error_log.save()

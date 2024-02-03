@@ -2,6 +2,7 @@ import frappe
 import traceback
 import re
 import unicodedata
+from fuzzywuzzy import fuzz
 
 
 class BankTransactionWrapper():
@@ -13,6 +14,7 @@ class BankTransactionWrapper():
                            "dbr.claim": '', "dbr.bill": ''}
         self.claim_records = frappe.db.sql('SELECT name, al_number, cl_number, custom_raw_bill_number, insurance_name FROM `tabClaimBook`', as_dict = True)
         self.debtors_records = frappe.db.sql('SELECT name, claim_id FROM `tabBill` WHERE status != "CANCELLED"' ,as_dict = True)
+        self.minimum_matching_percentage = int(frappe.get_single('Control Panel').minimum_matching_percentage)
 
     def clear_advice_log(self):
         for log in self.advice_log:
@@ -279,9 +281,8 @@ class BankTransactionWrapper():
         matched_records = []
         for record in search_records:
             if record[key]:
-                formatted_claim_id = self.get_possible_claim_ids(record[key])
-                matched_claim_id = value.intersection(formatted_claim_id)
-                if len(matched_claim_id) > 0:
+                matching_percentage = int(fuzz.ratio(value, record[key]))
+                if matching_percentage > self.minimum_matching_percentage:
                     matched_records.append(claim_record)
         return matched_records
 
@@ -295,37 +296,14 @@ class BankTransactionWrapper():
                         return debtor_record['name'],debtor_record['claim_id'],claim_record['insurance_name']
         return None, None,None
 
-    def get_possible_claim_ids(self, claim_id):
-        claim_id = unicodedata.normalize("NFKD", claim_id)
-        possible_claim_numbers = []
-        possible_claim_numbers.append(claim_id)
-        possible_claim_id = re.sub(r'-?\((\d)\)$', '', claim_id)
-        possible_claim_numbers.append(possible_claim_id)
-        formatted_claim_id = claim_id.lower().replace(' ', '').replace('.', '').replace('alnumber', '').replace(
-            'number', '').replace(
-            'alno', '').replace('al-', '').replace('ccn', '').replace('id:', '').replace('orderid:', '').replace(':',
-                                                                                                                 '').replace(
-            '(', '').replace(')', '')
-        possible_claim_numbers.append(formatted_claim_id)
-        possible_claim_id = re.sub(r'-(\d)(\d)?$', '', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
-        possible_claim_id = re.sub(r'-(\d)(\d)?$', r'\1\2', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
-        possible_claim_id = re.sub(r'_(\d)(\d)?$', '', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
-        possible_claim_id = re.sub(r'_(\d)(\d)?$', r'\1\2', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
-        return set(possible_claim_numbers)
-
     def check_claim(self, advice, claim_id):  # only based on claim id
         matched_bill_number = None
         insurance_name = None
         matched_debtor_claim_number = None
-        possible_claim_id = self.get_possible_claim_ids(claim_id)
 
-        debtors = self.get_matched_records('claim_id',possible_claim_id, self.debtors_records)
-        claims_al = self.get_matched_records('al_number', possible_claim_id, self.claim_records)
-        claims_cl = self.get_matched_record('cl_number',possible_claim_id,self.claim_records)
+        debtors = self.get_matched_records('claim_id',claim_id, self.debtors_records)
+        claims_al = self.get_matched_records('al_number', claim_id, self.claim_records)
+        claims_cl = self.get_matched_record('cl_number', claim_id,self.claim_records)
 
         if debtors:
             if claims_al:
@@ -348,6 +326,7 @@ class BankTransactionWrapper():
             return matched_bill_number, insurance_name
 
     # Done
+
     def get_sales_invoice(self, advice, bill_number):
         try:
             return frappe.get_doc('Sales Invoice', bill_number)

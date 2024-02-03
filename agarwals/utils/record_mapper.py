@@ -1,6 +1,7 @@
 import frappe
 import re
 import unicodedata
+from fuzzywuzzy import fuzz
 
 
 class ClaimBookMapper:
@@ -46,13 +47,13 @@ class ClaimBookMapper:
                                                                                                                  '').replace(
             '(', '').replace(')', '')
         possible_claim_numbers.append(formatted_claim_id)
-        possible_claim_id = re.sub(r'-(\d)?$', '', formatted_claim_id)
+        possible_claim_id = re.sub(r'-(\d)(\d)?$', '', formatted_claim_id)
         possible_claim_numbers.append(possible_claim_id)
-        possible_claim_id = re.sub(r'-(\d)?$', r'\1', formatted_claim_id)
+        possible_claim_id = re.sub(r'-(\d)(\d)?$', r'\1\2', formatted_claim_id)
         possible_claim_numbers.append(possible_claim_id)
-        possible_claim_id = re.sub(r'_(\d)?$', '', formatted_claim_id)
+        possible_claim_id = re.sub(r'_(\d)(\d)?$', '', formatted_claim_id)
         possible_claim_numbers.append(possible_claim_id)
-        possible_claim_id = re.sub(r'_(\d)?$', r'\1', formatted_claim_id)
+        possible_claim_id = re.sub(r'_(\d)(\d)?$', r'\1\2', formatted_claim_id)
         possible_claim_numbers.append(possible_claim_id)
         return set(possible_claim_numbers)
 
@@ -192,6 +193,16 @@ class FinalDetailsMapper(ClaimBookMapper):
             if payer_remarks:
                 bill_record.payer_remark = ','.join(payer_remarks)
             bill_record.save()
+
+    def verify_payer(self, bill_record):
+        if not bill_record.final_payer_name:
+            return
+        matching_percentage = fuzz.WRatio(bill_record.final_payer_name,bill_record.payer)
+        if matching_percentage < self.minimum_matching_percentage:
+            return
+        bill_record.payer_matched = 1
+        bill_record.save()
+
     def process(self,bill_numbers):
         all_settlement_advice_records = self.get_all_settlement_advice_records()
         for bill_number in bill_numbers:
@@ -200,4 +211,7 @@ class FinalDetailsMapper(ClaimBookMapper):
             if bill_record.final_claim_number == 'Unable to Identify Claim ID':
                 continue
             self.map_settlement_details(bill_record,all_settlement_advice_records)
+            self.verify_payer(bill_record)
             frappe.db.commit()
+
+
