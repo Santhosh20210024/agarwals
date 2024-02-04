@@ -24,18 +24,19 @@ class PaymentEntryCreator:
         error_log_record.save()
         frappe.db.commit()
 
-    def strip_and_remove_leading_zeros(self, text):
+    def strip_leading_zeros(self, text):
         return str(text).strip().lstrip('0')
 
-    def get_matched_settlement_advice_records(self, reference_number):
+    def get_matched_advice_records(self, reference_number):
         matched_records = []
         for settlement_advice_record in self.settlement_advice_records:
-            utr_number = self.strip_and_remove_leading_zeros(settlement_advice_record['utr_number'])
-            final_utr_number = self.strip_and_remove_leading_zeros(settlement_advice_record['final_utr_number'])
+            utr_number = self.strip_leading_zeros(settlement_advice_record['utr_number'])
+            final_utr_number = self.strip_leading_zeros(settlement_advice_record['final_utr_number'])
             if reference_number != utr_number or reference_number != final_utr_number:
                 continue
             elif reference_number == utr_number:
                 matched_records.append(settlement_advice_record)
+                continue
             elif reference_number == final_utr_number:
                 matched_records.append(settlement_advice_record)
         return matched_records
@@ -101,7 +102,7 @@ class PaymentEntryCreator:
         matched_bill_record = []
         matched_claim_record = []
         if settlement_advice_record.bill_no:
-            formatted_bill_no = self.strip_and_remove_leading_zeros(settlement_advice_record.bill_no)
+            formatted_bill_no = self.strip_leading_zeros(settlement_advice_record.bill_no)
             formatted_bill_no = formatted_bill_no.replace(':','')
             bill_record = self.get_bill_record(formatted_bill_no)
             if bill_record:
@@ -138,7 +139,7 @@ class PaymentEntryCreator:
                     'status': 'Success', 'order': 4})
                 return debtors_records_with_claim_id[0] ,None, match_log
             for claim_book_record in claim_book_records_matched_with_cl:
-                formatted_bill_no = self.strip_and_remove_leading_zeros(claim_book_record['custom_raw_bill_number'])
+                formatted_bill_no = self.strip_leading_zeros(claim_book_record['custom_raw_bill_number'])
                 formatted_bill_no = formatted_bill_no.replace(':', '').lower()
                 for debtor_record in self.debtors_records:
                     if formatted_bill_no == debtor_record['name'].strip().lower():
@@ -155,7 +156,7 @@ class PaymentEntryCreator:
                     'status': 'Success', 'order': 3})
                 return matched_bill_record[0], matched_claim_record[0], match_log
         for claim_book_record in claim_book_records_matched_with_al:
-            formatted_bill_no = self.strip_and_remove_leading_zeros(claim_book_record['custom_raw_bill_number'])
+            formatted_bill_no = self.strip_leading_zeros(claim_book_record['custom_raw_bill_number'])
             formatted_bill_no = formatted_bill_no.replace(':', '').lower()
             for debtor_record in self.debtors_records:
                 if formatted_bill_no == debtor_record['name'].strip().lower():
@@ -199,13 +200,13 @@ class PaymentEntryCreator:
         settlement_advice_record.save()
         frappe.db.commit()
 
-    def create_payment_entry_record_and_update_bank_transaction(self, bank_transaction, sales_invoice, bank_account, settled_amount, tds_amount = 0, disallowed_amount = 0):
+    def strip_leading_zeros(self, bank_transaction, sales_invoice, bank_account, settled_amount, tds_amount = 0, disallowed_amount = 0):
         deductions = []
         payment_entry_record = frappe.new_doc('Payment Entry')
         payment_entry_record.set('custom_sales_invoice',sales_invoice.name)
         payment_entry_record.set('payment_type', 'Receive')
         payment_entry_record.set('posting_date', bank_transaction.date)
-        payment_entry_record.set('mode_of_payment','Bank Draft')
+        payment_entry_record.set('mode_of_payment','Bank Draft') #Need to verify
         payment_entry_record.set('party_type', 'Customer')
         payment_entry_record.set('party',sales_invoice.customer)
         payment_entry_record.set('bank_account', bank_transaction.bank_account)
@@ -226,7 +227,7 @@ class PaymentEntryCreator:
         reference_item = [{
             'reference_doctype': 'Sales Invoice',
             'reference_name': sales_invoice.name,
-            'allocated_amount': settled_amount+tds_amount+disallowed_amount
+            'allocated_amount': settled_amount + tds_amount + disallowed_amount
         }]
         payment_entry_record.set('references',reference_item)
         payment_entry_record.save()
@@ -279,12 +280,12 @@ class PaymentEntryCreator:
                 settlement_advice_record.set('remark','Settled amount is greater than Outstanding Amount')
                 settlement_advice_record.save()
                 frappe.db.commit()
-            elif matched_sales_invoice_record.outstanding_amount < settled_amount+tds_amount+disallowed_amount:
+            elif matched_sales_invoice_record.outstanding_amount < settled_amount + tds_amount + disallowed_amount:
                 if matched_sales_invoice_record.outstanding_amount >= settled_amount + tds_amount:
-                    self.create_payment_entry_record_and_update_bank_transaction(bank_transaction_record, matched_sales_invoice_record, bank_account, settled_amount, tds_amount)
+                    self.strip_leading_zeros(bank_transaction_record, matched_sales_invoice_record, bank_account, settled_amount, tds_amount)
                     settlement_advice_record.set('remark', 'Disallowance amount is greater than Outstanding Amount')
                 else:
-                    self.create_payment_entry_record_and_update_bank_transaction(bank_transaction_record,
+                    self.strip_leading_zeros(bank_transaction_record,
                                                      matched_sales_invoice_record, bank_account,
                                                      settled_amount, disallowed_amount)
                     settlement_advice_record.set('remark', 'TDS amount is greater than Outstanding Amount')
@@ -292,14 +293,12 @@ class PaymentEntryCreator:
                 settlement_advice_record.save()
                 frappe.db.commit()
             else:
-                self.create_payment_entry_record_and_update_bank_transaction(bank_transaction_record,
+                self.strip_leading_zeros(bank_transaction_record,
                                                  matched_sales_invoice_record, bank_account,
                                                  settled_amount, tds_amount, disallowed_amount)
                 settlement_advice_record.set('status', 'Fully Processed')
                 settlement_advice_record.save()
                 frappe.db.commit()
-
-
 
     def process(self, bank_transaction_records):
         for bank_transaction_record in bank_transaction_records:
@@ -315,6 +314,7 @@ class PaymentEntryCreator:
                 continue
             frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_matched_status',
                                 'Found')
+            frappe.db.commit()
             matched_settlement_advice_records = sorted(matched_settlement_advice_records, key=lambda x:(x['tds_amount'],x['disallowed_amount']), reverse = True)
             self.create_payment_entry(matched_settlement_advice_records, bank_transaction_record['name'], bank_account)
 
