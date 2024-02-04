@@ -1,4 +1,5 @@
 from agarwals.utils.transformer import BillTransformer,ClaimbookTransformer,BankTransformer
+from agarwals.utils.payment_entry_creator import PaymentEntryCreator
 import frappe
 
 @frappe.whitelist()
@@ -27,3 +28,7 @@ def run_transform_process(type):
             return "Success"
         except Exception as e:
             return e
+
+@frappe.whitelist()
+def run_payment_entry():
+    PaymentEntryCreator().enqueue_job()

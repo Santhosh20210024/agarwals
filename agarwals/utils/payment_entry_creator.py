@@ -2,7 +2,7 @@ import frappe
 
 class PaymentEntryCreator:
     def __init__(self):
-        self.bank_transaction_records = frappe.db.sql("SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE status IN ('Pending','Unreconciled') AND deposit != 0 ",as_dict=True)
+        self.bank_transaction_records = frappe.db.sql("SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE status IN ('Pending','Unreconciled') AND deposit != 0  AND LENGTH(reference_number) > 4 AND deposit > 10",as_dict=True)
         self.claim_records = frappe.db.sql(
             "SELECT name, al_number, cl_number, custom_raw_bill_number, insurance_company_name FROM `tabClaimBook`",
             as_dict=True)
@@ -105,36 +105,36 @@ class PaymentEntryCreator:
             formatted_bill_no = formatted_bill_no.replace(':','')
             bill_record = self.get_bill_record(formatted_bill_no)
             if bill_record:
-                match_log.append({'log' : f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[{settlement_advice_record.bill_no}] > dbr_bill[{bill_record.bill_no}]', 'status':'Success', 'order': 1})
+                match_log.append({'log' : f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[{settlement_advice_record.bill_no}] > dbr_bill[{bill_record.bill_no}]", 'status':'Success', 'order': 1})
                 return bill_record,None, match_log
-            match_log.append({'log' : f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[{settlement_advice_record.bill_no}] > dbr_bill[no bill record]', 'status':'Fail', 'order':1})
+            match_log.append({'log' : f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[{settlement_advice_record.bill_no}] > dbr_bill[no bill record]", 'status':'Fail', 'order':1})
         match_log.append({
-                             'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[no bill number]',
+                             'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[no bill number]",
                              'status': 'Fail', 'order': 1})
         settlement_advice_record_possible_claim_ids = self.get_possible_claim_ids(settlement_advice_record.claim_id)
         claim_book_records_matched_with_al = self.get_matched_claim_book_records(settlement_advice_record_possible_claim_ids,'al_number')
         if not claim_book_records_matched_with_al:
             match_log.append({
-                                 'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[no claimbook record]',
+                                 'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[no claimbook record]",
                                  'status': 'Fail', 'order': 2})
             claim_book_records_matched_with_cl = self.get_matched_claim_book_records(settlement_advice_record_possible_claim_ids,'cl_number')
             if not claim_book_records_matched_with_cl:
                 match_log.append({
-                                     'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[no claimbook record]',
+                                     'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[no claimbook record]",
                                      'status': 'Fail', 'order': 3})
                 debtors_records_with_claim_id = self.get_matched_debtor_records(settlement_advice_record_possible_claim_ids)
                 if not debtors_records_with_claim_id:
                     match_log.append({
-                        'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[no bill record]',
+                        'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[no bill record]",
                         'status': 'Fail', 'order': 4})
                     return None, None, match_log
                 if len(debtors_records_with_claim_id) > 1:
                     match_log.append({
-                        'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[more than 1 record found]',
+                        'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[more than 1 record found]",
                         'status': 'Fail', 'order': 4})
                     return None, None, match_log
                 match_log.append({
-                    'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[{debtors_records_with_claim_id[0]['claim_id']}] > dbr_bill_number[{debtors_records_with_claim_id[0]['name']}]',
+                    'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[{debtors_records_with_claim_id[0]['claim_id']}] > dbr_bill_number[{debtors_records_with_claim_id[0]['name']}]",
                     'status': 'Success', 'order': 4})
                 return debtors_records_with_claim_id[0] ,None, match_log
             for claim_book_record in claim_book_records_matched_with_cl:
@@ -146,12 +146,12 @@ class PaymentEntryCreator:
                         matched_claim_record.append(claim_book_record)
             if len(matched_bill_record) > 1:
                 match_log.append({
-                    'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[more than 1 record found]',
+                    'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[more than 1 record found]",
                     'status': 'Fail', 'order': 3})
                 return None, None, match_log
             elif len(matched_bill_record) == 1:
                 match_log.append({
-                    'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[{matched_claim_record[0]['cl_number']}] > cb_final_bill_number[{matched_claim_record[0]['custom_raw_bill_number']}] > dbr_bill_number[{matched_bill_record[0]['name']}]',
+                    'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[{matched_claim_record[0]['cl_number']}] > cb_final_bill_number[{matched_claim_record[0]['custom_raw_bill_number']}] > dbr_bill_number[{matched_bill_record[0]['name']}]",
                     'status': 'Success', 'order': 3})
                 return matched_bill_record[0], matched_claim_record[0], match_log
         for claim_book_record in claim_book_records_matched_with_al:
@@ -163,30 +163,30 @@ class PaymentEntryCreator:
                     matched_claim_record.append(claim_book_record)
         if len(matched_bill_record) > 1:
             match_log.append({
-                'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[more than 1 record found]',
+                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[more than 1 record found]",
                 'status': 'Fail', 'order': 2})
             return None, None, match_log
         elif len(matched_bill_record) == 1:
             match_log.append({
-                'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[{matched_claim_record[0]['cl_number']}] > cb_final_bill_number[{matched_claim_record[0]['custom_raw_bill_number']}] > dbr_bill_number[{matched_bill_record[0]['name']}]',
+                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[{matched_claim_record[0]['cl_number']}] > cb_final_bill_number[{matched_claim_record[0]['custom_raw_bill_number']}] > dbr_bill_number[{matched_bill_record[0]['name']}]",
                 'status': 'Success', 'order': 2})
             return matched_bill_record[0],matched_claim_record[0], match_log
         match_log.append({
-            'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > matched_with_claimbook_but_not_matched_with_debtor',
+            'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > matched_with_claimbook_but_not_matched_with_debtor",
             'status': 'Success', 'order': 2})
         debtors_records_with_claim_id = self.get_matched_debtor_records(settlement_advice_record_possible_claim_ids)
         if not debtors_records_with_claim_id:
             match_log.append({
-                'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[no bill record]',
+                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[no bill record]",
                 'status': 'Fail', 'order': 3})
             return None, None, match_log
         if len(debtors_records_with_claim_id) > 1:
             match_log.append({
-                'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[more than 1 record found]',
+                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[more than 1 record found]",
                 'status': 'Fail', 'order': 3})
             return None, None, match_log
         match_log.append({
-            'log': f'bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[{debtors_records_with_claim_id[0]['claim_id']}] > dbr_bill_number[{debtors_records_with_claim_id[0]['name']}]',
+            'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[{debtors_records_with_claim_id[0]['claim_id']}] > dbr_bill_number[{debtors_records_with_claim_id[0]['name']}]",
             'status': 'Success', 'order': 3})
         return debtors_records_with_claim_id[0],None, match_log
 
@@ -231,7 +231,7 @@ class PaymentEntryCreator:
         payment_entry_record.set('references',reference_item)
         payment_entry_record.save()
         payment_entry_record.submit()
-        bank_transaction.set('payment_entries',[{'payment_document':'Payment Entry','payment_entry':payment_entry_record.name,'allocated_amount':payment_entry_record.paid_amount}])
+        bank_transaction.append('payment_entries',{'payment_document':'Payment Entry','payment_entry':payment_entry_record.name,'allocated_amount':payment_entry_record.paid_amount})
         bank_transaction.submit()
         frappe.db.commit()
 
@@ -307,10 +307,19 @@ class PaymentEntryCreator:
             if not bank_account:
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "No Company Account Found")
                 continue
-            reference_number = self.stip_and_remove_leading_zeros(bank_transaction_record['reference_number'])
+            reference_number = self.strip_and_remove_leading_zeros(bank_transaction_record['reference_number'])
             matched_settlement_advice_records = self.get_matched_settlement_advice_records(reference_number)
             if not matched_settlement_advice_records:
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "No Settlement Advices Found")
+                frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_matched_status', 'Not Found')
                 continue
+            frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_matched_status',
+                                'Found')
             matched_settlement_advice_records = sorted(matched_settlement_advice_records, key=lambda x:(x['tds_amount'],x['disallowed_amount']), reverse = True)
             self.create_payment_entry(matched_settlement_advice_records, bank_transaction_record['name'], bank_account)
+
+    def enqueue_job(self):
+        n = 1000
+        for i in range(0, len(self.bank_transaction_records), n):
+            frappe.enqueue(self.process, queue='long', is_async=True, timeout=18000, bank_transaction_records = self.bank_transaction_records[i:i+n])
+            print('Job Enqueued')
