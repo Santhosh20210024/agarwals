@@ -139,9 +139,9 @@ class PaymentEntryCreator:
                 return debtors_records_with_claim_id[0] ,None, match_log
             for claim_book_record in claim_book_records_matched_with_cl:
                 formatted_bill_no = self.strip_and_remove_leading_zeros(claim_book_record['custom_raw_bill_number'])
-                formatted_bill_no = formatted_bill_no.replace(':', '')
+                formatted_bill_no = formatted_bill_no.replace(':', '').lower()
                 for debtor_record in self.debtors_records:
-                    if formatted_bill_no == debtor_record['name']:
+                    if formatted_bill_no == debtor_record['name'].strip().lower():
                         matched_bill_record.append(debtor_record)
                         matched_claim_record.append(claim_book_record)
             if len(matched_bill_record) > 1:
@@ -156,9 +156,9 @@ class PaymentEntryCreator:
                 return matched_bill_record[0], matched_claim_record[0], match_log
         for claim_book_record in claim_book_records_matched_with_al:
             formatted_bill_no = self.strip_and_remove_leading_zeros(claim_book_record['custom_raw_bill_number'])
-            formatted_bill_no = formatted_bill_no.replace(':', '')
+            formatted_bill_no = formatted_bill_no.replace(':', '').lower()
             for debtor_record in self.debtors_records:
-                if formatted_bill_no == debtor_record['name']:
+                if formatted_bill_no == debtor_record['name'].strip().lower():
                     matched_bill_record.append(debtor_record)
                     matched_claim_record.append(claim_book_record)
         if len(matched_bill_record) > 1:
