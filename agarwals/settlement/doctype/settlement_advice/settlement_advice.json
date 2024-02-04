@@ -8,6 +8,11 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "insurance_company_name",
+  "tpa",
+  "region",
+  "entity",
+  "branch_type",
   "claim_id",
   "bill_no",
   "utr_number",
@@ -19,13 +24,18 @@
   "settled_amount",
   "paid_date",
   "column_break_ne4ar",
+  "processed_entries",
   "source",
   "status",
   "remark",
   "retry",
   "reference_section",
   "match_log",
-  "source_file"
+  "matched_bank_transaction",
+  "matched_claimbook_record",
+  "matched_bill_record",
+  "source_file",
+  "file_name"
  ],
  "fields": [
   {
@@ -106,9 +116,9 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nError\nOpen"
+   "options": "\nError\nOpen\nNot Processed\nPartially Processed\nFully Processed"
   },
-   {
+  {
    "fieldname": "disallowed_amount",
    "fieldtype": "Currency",
    "label": "Disallowed Amount"
@@ -139,10 +149,67 @@
    "fieldtype": "Table",
    "label": "Match Log",
    "options": "Match Log"
+  },
+  {
+   "fieldname": "insurance_company_name",
+   "fieldtype": "Data",
+   "label": "Insurance Company Name"
+  },
+  {
+   "fieldname": "tpa",
+   "fieldtype": "Data",
+   "label": "TPA"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "label": "Region",
+   "options": "Region"
+  },
+  {
+   "fieldname": "entity",
+   "fieldtype": "Link",
+   "label": "Entity",
+   "options": "Entity"
+  },
+  {
+   "fieldname": "branch_type",
+   "fieldtype": "Link",
+   "label": "Branch Type",
+   "options": "Branch Type"
+  },
+  {
+   "fieldname": "processed_entries",
+   "fieldtype": "Data",
+   "label": "Processed Entries"
+  },
+  {
+   "fieldname": "matched_bank_transaction",
+   "fieldtype": "Link",
+   "label": "Matched Bank Transaction",
+   "options": "Bank Transaction"
+  },
+  {
+   "fieldname": "matched_claimbook_record",
+   "fieldtype": "Link",
+   "label": "Matched ClaimBook Record",
+   "options": "ClaimBook"
+  },
+  {
+   "fieldname": "matched_bill_record",
+   "fieldtype": "Link",
+   "label": "Matched Bill Record",
+   "options": "Bill"
+  },
+  {
+   "fetch_from": "source_file.file",
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name"
   }
  ],
  "links": [],
- "modified": "2024-01-11 22:05:41.842548",
+ "modified": "2024-02-04 17:52:38.162797",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
