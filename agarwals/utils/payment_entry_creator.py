@@ -2,35 +2,24 @@ import frappe
 import unicodedata
 import re
 
+
 class PaymentEntryCreator:
     def __init__(self):
-        self.bank_transaction_records = frappe.db.sql("SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE status IN ('Pending','Unreconciled') AND deposit != 0  AND LENGTH(reference_number) > 4 AND deposit > 10",as_dict=True)
+        self.bank_transaction_records = frappe.db.sql("SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE status IN ('Pending','Unreconciled') AND deposit != 0  AND LENGTH(reference_number) > 4 AND deposit > 10 ORDER BY unallocated_amount DESC",as_dict=True)
         self.claim_records = frappe.db.sql(
             "SELECT name, al_number, cl_number, custom_raw_bill_number, insurance_company_name FROM `tabClaimBook`",
             as_dict=True)
-        self.debtors_records = frappe.db.sql("SELECT name, claim_id FROM `tabBill` WHERE status != 'CANCELLED'",
+        self.bill_records = frappe.db.sql("SELECT name, claim_id FROM `tabBill` WHERE status != 'CANCELLED'",
                                              as_dict=True)
-        self.settlement_advice_records = frappe.db.sql("SELECT name, claim_id, utr_number, final_utr_number, settled_amount, tds_amount, disallowed_amount FROM `tabSettlement Advice` WHERE status = 'Open'", as_dict = True)
+        self.settlement_advice_records = frappe.db.sql("SELECT name, utr_number, final_utr_number, settled_amount, tds_amount, disallowed_amount FROM `tabSettlement Advice` WHERE status = 'Open'", as_dict = True)
 
-    def get_company_account(self, bank_account_name):
-        bank_account = frappe.get_doc('Bank Account', bank_account_name)
-        if not bank_account.account:
-            return None
-        return bank_account.account
-
-    def log_error(self, doctype, record_name, error_msg):
-        error_log_record = frappe.new_doc('Payment Entry Error Log')
-        error_log_record.set('reference_doctype',doctype)
-        error_log_record.set('reference_record',record_name)
-
-        error_log_record.set('error_message',error_msg)
-        error_log_record.save()
-        frappe.db.commit()
-
-    def strip_leading_zeros(self, text):
+    def trim_and_remove_leading_zeros(self, text):
         return str(text).strip().lstrip('0')
 
-    def get_matched_settlement_advice_records(self, reference_number):
+    def get_document_record(self, doctype, name):
+        return frappe.get_doc(doctype,name)
+
+    def get_matched_sa_records(self, reference_number):
         matched_records = []
         for settlement_advice_record in self.settlement_advice_records:
             utr_number = self.strip_leading_zeros(settlement_advice_record['utr_number'])
@@ -43,155 +32,183 @@ class PaymentEntryCreator:
                 matched_records.append(settlement_advice_record)
         return matched_records
 
-    def get_settlement_advice_record(self,name):
-        return frappe.get_doc('Settlement Advice', name)
+    def format_bill_no(self,bill_no):
+        return bill_no.strip().lower().replace(':','')
 
-    def get_bank_transaction_record(self, name):
-        return frappe.get_doc('Bank Transaction', name)
+    def get_bill_record_with_bill_no(self, bill_no):
+        bill_no = self.format_bill_no(bill_no)
+        for record in self.bill_records:
+            dbr_bill_no = self.format_bill_no(record['name'])
+            if bill_no == dbr_bill_no:
+                return record
+        return None
 
-    def get_bill_record(self,name):
-        try:
-            bill_record = frappe.get_doc('Bill', name)
-            return bill_record
-        except:
-            return None
-
-    def get_sales_invoice_record(self, name):
-        return frappe.get_doc('Sales Invoice', name)
-
-    def get_possible_claim_ids(self, claim_id):
+    def get_variant_claim_numbers(self,claim_id):
         claim_id = unicodedata.normalize("NFKD", claim_id)
-        possible_claim_numbers = []
-        possible_claim_numbers.append(claim_id)
+        variant_claim_number = []
+        variant_claim_number.append(claim_id)
         possible_claim_id = re.sub(r'-?\((\d)\)$', '', claim_id)
-        possible_claim_numbers.append(possible_claim_id)
+        variant_claim_number.append(possible_claim_id)
         formatted_claim_id = claim_id.lower().replace(' ', '').replace('.', '').replace('alnumber', '').replace(
             'number', '').replace(
             'alno', '').replace('al-', '').replace('ccn', '').replace('id:', '').replace('orderid:', '').replace(':',
                                                                                                                  '').replace(
             '(', '').replace(')', '')
-        possible_claim_numbers.append(formatted_claim_id)
+        variant_claim_number.append(formatted_claim_id)
         possible_claim_id = re.sub(r'-(\d)(\d)?$', '', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
+        variant_claim_number.append(possible_claim_id)
         possible_claim_id = re.sub(r'-(\d)(\d)?$', r'\1\2', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
+        variant_claim_number.append(possible_claim_id)
         possible_claim_id = re.sub(r'_(\d)(\d)?$', '', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
+        variant_claim_number.append(possible_claim_id)
         possible_claim_id = re.sub(r'_(\d)(\d)?$', r'\1\2', formatted_claim_id)
-        possible_claim_numbers.append(possible_claim_id)
-        return set(possible_claim_numbers)
+        variant_claim_number.append(possible_claim_id)
+        return set(variant_claim_number)
 
-    def get_matched_claim_book_records(self, settlement_advice_claim_ids, match_with):
-        matched_records = []
-        for claim_record in self.claim_records:
-            claim_book_claim_ids = self.get_possible_claim_ids(claim_record[match_with])
-            matched_claim_ids = settlement_advice_claim_ids.intersection(claim_book_claim_ids)
-            if len(matched_claim_ids) > 0:
-                matched_records.append(claim_record)
-        return matched_records
+    def match_with_claimbook_and_bill(self,sa_record,bank_utr,match_log, match_with,order):
+        matched_bills = []
+        matched_claims = []
+        matched_cb_records = None
+        matched_bill_records = None
+        sa_claim_numbers = self.get_variant_claim_numbers(sa_record.claim_id)
+        for record in self.claim_records:
+            if not record[match_with]:
+                continue
+            cb_claim_numbers = self.get_variant_claim_numbers(record[match_with])
+            matched_claim_numbers = sa_claim_numbers.intersection(cb_claim_numbers)
+            if not matched_claim_numbers:
+                continue
+            if not record['custom_raw_bill_number']:
+                match_log.append({
+                    'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[Not found]",
+                    'status': 'Fail', 'order': order + 1})
+            cb_bill_no = self.format_bill_no(record['custom_raw_bill_number'])
+            for bill_record in self.bill_records:
+                bill_no = self.format_bill_no(bill_record['name'])
+                if bill_no == cb_bill_no:
+                    if not bill_record['claim_id']:
+                        match_log.append({
+                            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[{record['custom_raw_bill_number']}] > dbr_bill_no[{bill_record['name']}] > dbr_claim[No claim Id]",
+                            'status': 'Fail', 'order': order + 1})
+                    bill_claim_numbers = self.get_variant_claim_numbers(bill_record['claim_id'])
+                    matched_bill_records = bill_claim_numbers.intersection(cb_claim_numbers)
+                    if not matched_bill_records:
+                        match_log.append({
+                            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[{record['custom_raw_bill_number']}] > dbr_bill_no[{bill_record['name']}] > dbr_claim[{bill_record['claim_id']}] > Not matched",
+                            'status': 'Fail', 'order': order + 1})
+                    matched_bills.append(bill_record)
+                    matched_claims.append(record)
+                    match_log.append({
+                        'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[{record['custom_raw_bill_number']}] > dbr_bill_no[{bill_record['name']}] > dbr_claim[{bill_record['claim_id']}] > Matched",
+                        'status': 'Success', 'order': order + 1})
+            return matched_bills,matched_claims,match_log
 
-    def get_matched_debtor_records(self,settlement_advice_claim_ids):
-        matched_records = []
-        for debtor_record in self.debtors_records:
-            claim_ids = self.get_possible_claim_ids(debtor_record['claim_id'])
-            matched_claim_ids = settlement_advice_claim_ids.intersection(claim_ids)
-            if len(matched_claim_ids) > 0:
-                matched_records.append(debtor_record)
-        return matched_records
+    def match_with_bill(self,sa_record,bank_utr,match_log,order):
+        matched_bills = []
+        matched_bill_records = None
+        sa_claim_numbers = self.get_variant_claim_numbers(sa_record.claim_id)
+        for record in self.bill_records:
+            if not record['claim_id']:
+                continue
+            bill_claim_numbers = self.get_variant_claim_numbers(record['claim_id'])
+            matched_bill_records = sa_claim_numbers.intersection(bill_claim_numbers)
+            if matched_bill_records:
+                matched_bills.append(record)
+                match_log.append({
+                    'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > dbr_claim[{bill_record['claim_id']}]",
+                    'status': 'Success', 'order': order + 1})
+        return matched_bills, match_log
 
-    def get_matched_bill_and_logs(self, settlement_advice_record, bank_transaction_utr_number):
+    def get_matched_bill_and_claim(self,sa_record,bank_utr):
         match_log = []
-        matched_bill_record = []
-        matched_claim_record = []
-        if settlement_advice_record.bill_no:
-            formatted_bill_no = self.strip_leading_zeros(settlement_advice_record.bill_no)
-            formatted_bill_no = formatted_bill_no.replace(':','')
-            bill_record = self.get_bill_record(formatted_bill_no)
-            if bill_record:
-                match_log.append({'log' : f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[{settlement_advice_record.bill_no}] > dbr_bill[{bill_record.bill_no}]", 'status':'Success', 'order': 1})
-                return bill_record,None, match_log
-            match_log.append({'log' : f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[{settlement_advice_record.bill_no}] > dbr_bill[no bill record]", 'status':'Fail', 'order':1})
+        # If Bill No in Settlement Advice trying to match with Debtors Bill No
+        if sa_record.bill_no:
+            bill_record = self.get_bill_record_with_bill_no(sa_record.bill_no)
+            if not bill_record:
+                match_log.append({
+                                     'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[{sa_record.bill_no}] > dbr_bill[no bill record]",
+                                     'status': 'Fail', 'order': 1})
+            match_log.append({
+                                 'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[{sa_record.bill_no}] > dbr_bill[{bill_record['name']}]",
+                                 'status': 'Success', 'order': 1})
+            return bill_record, None, match_log
         match_log.append({
-                             'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_bill[no bill number]",
-                             'status': 'Fail', 'order': 1})
-        settlement_advice_record_possible_claim_ids = self.get_possible_claim_ids(settlement_advice_record.claim_id)
-        claim_book_records_matched_with_al = self.get_matched_claim_book_records(settlement_advice_record_possible_claim_ids,'al_number')
-        if not claim_book_records_matched_with_al:
-            match_log.append({
-                                 'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[no claimbook record]",
-                                 'status': 'Fail', 'order': 2})
-            claim_book_records_matched_with_cl = self.get_matched_claim_book_records(settlement_advice_record_possible_claim_ids,'cl_number')
-            if not claim_book_records_matched_with_cl:
-                match_log.append({
-                                     'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[no claimbook record]",
-                                     'status': 'Fail', 'order': 3})
-                debtors_records_with_claim_id = self.get_matched_debtor_records(settlement_advice_record_possible_claim_ids)
-                if not debtors_records_with_claim_id:
-                    match_log.append({
-                        'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[no bill record]",
-                        'status': 'Fail', 'order': 4})
-                    return None, None, match_log
-                if len(debtors_records_with_claim_id) > 1:
-                    match_log.append({
-                        'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[more than 1 record found]",
-                        'status': 'Fail', 'order': 4})
-                    return None, None, match_log
-                match_log.append({
-                    'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[{debtors_records_with_claim_id[0]['claim_id']}] > dbr_bill_number[{debtors_records_with_claim_id[0]['name']}]",
-                    'status': 'Success', 'order': 4})
-                return debtors_records_with_claim_id[0] ,None, match_log
-            for claim_book_record in claim_book_records_matched_with_cl:
-                formatted_bill_no = self.strip_leading_zeros(claim_book_record['custom_raw_bill_number'])
-                formatted_bill_no = formatted_bill_no.replace(':', '').lower()
-                for debtor_record in self.debtors_records:
-                    if formatted_bill_no == debtor_record['name'].strip().lower():
-                        matched_bill_record.append(debtor_record)
-                        matched_claim_record.append(claim_book_record)
-            if len(matched_bill_record) > 1:
-                match_log.append({
-                    'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[more than 1 record found]",
-                    'status': 'Fail', 'order': 3})
-                return None, None, match_log
-            elif len(matched_bill_record) == 1:
-                match_log.append({
-                    'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_cl_number[{matched_claim_record[0]['cl_number']}] > cb_final_bill_number[{matched_claim_record[0]['custom_raw_bill_number']}] > dbr_bill_number[{matched_bill_record[0]['name']}]",
-                    'status': 'Success', 'order': 3})
-                return matched_bill_record[0], matched_claim_record[0], match_log
-        for claim_book_record in claim_book_records_matched_with_al:
-            formatted_bill_no = self.strip_leading_zeros(claim_book_record['custom_raw_bill_number'])
-            formatted_bill_no = formatted_bill_no.replace(':', '').lower()
-            for debtor_record in self.debtors_records:
-                if formatted_bill_no == debtor_record['name'].strip().lower():
-                    matched_bill_record.append(debtor_record)
-                    matched_claim_record.append(claim_book_record)
-        if len(matched_bill_record) > 1:
-            match_log.append({
-                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[more than 1 record found]",
-                'status': 'Fail', 'order': 2})
-            return None, None, match_log
-        elif len(matched_bill_record) == 1:
-            match_log.append({
-                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > cb_al_number[{matched_claim_record[0]['cl_number']}] > cb_final_bill_number[{matched_claim_record[0]['custom_raw_bill_number']}] > dbr_bill_number[{matched_bill_record[0]['name']}]",
-                'status': 'Success', 'order': 2})
-            return matched_bill_record[0],matched_claim_record[0], match_log
-        match_log.append({
-            'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > matched_with_claimbook_but_not_matched_with_debtor",
-            'status': 'Success', 'order': 2})
-        debtors_records_with_claim_id = self.get_matched_debtor_records(settlement_advice_record_possible_claim_ids)
-        if not debtors_records_with_claim_id:
-            match_log.append({
-                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[no bill record]",
-                'status': 'Fail', 'order': 3})
-            return None, None, match_log
-        if len(debtors_records_with_claim_id) > 1:
-            match_log.append({
-                'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[more than 1 record found]",
-                'status': 'Fail', 'order': 3})
-            return None, None, match_log
-        match_log.append({
-            'log': f"bank_utr[{bank_transaction_utr_number}] > sa_utr[{settlement_advice_record.utr_number}] > sa_claim_id[{settlement_advice_record.claim_id}] > dbr_claim_id[{debtors_records_with_claim_id[0]['claim_id']}] > dbr_bill_number[{debtors_records_with_claim_id[0]['name']}]",
-            'status': 'Success', 'order': 3})
-        return debtors_records_with_claim_id[0],None, match_log
+            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[no bill number]",
+            'status': 'Fail', 'order': 1})
+        matched_bill, matched_claim, match_log = self.match_with_claimbook_and_bill(sa_record,bank_utr,match_log,'al_number',1)
+        if matched_bill:
+            if len(matched_bill) == 1:
+                return matched_bill[0], matched_claim[0], match_log
+            sa_record.set('remark',str(sa_record.remark) + '\nMore than 1 bill Matched')
+            sa_record.save()
+        matched_bill, matched_claim, match_log = self.match_with_claimbook_and_bill(sa_record, bank_utr, match_log,
+                                                                                    'cl_number', 2)
+        if matched_bill:
+            if len(matched_bill) == 1:
+                return matched_bill[0], matched_claim[0], match_log
+            sa_record.set('remark', str(sa_record.remark) + '\nMore than 1 bill Matched')
+            sa_record.save()
+        matched_bill, match_log = self.match_with_bill(sa_record, bank_utr, match_log, 3)
+        if matched_bill:
+            if len(matched_bill) == 1:
+                return matched_bill[0], None, match_log
+            sa_record.set('remark', str(sa_record.remark) + '\nMore than 1 bill Matched')
+            sa_record.save()
+        return None
+
+    def create_payment_entry_record_and_update_bank_transaction(self, bank_transaction, sales_invoice, bank_account, settled_amount, tds_amount = 0, disallowed_amount = 0):
+        try:
+            deductions = []
+            payment_entry_record = frappe.new_doc('Payment Entry')
+            payment_entry_record.set('custom_sales_invoice', sales_invoice.name)
+            payment_entry_record.set('payment_type', 'Receive')
+            payment_entry_record.set('posting_date', bank_transaction.date)
+            payment_entry_record.set('mode_of_payment', 'Bank Draft')  # Need to verify
+            payment_entry_record.set('party_type', 'Customer')
+            payment_entry_record.set('party', sales_invoice.customer)
+            payment_entry_record.set('bank_account', bank_transaction.bank_account)
+            payment_entry_record.set('paid_to', bank_account)
+            payment_entry_record.set('paid_from', 'Debtors - A')
+            payment_entry_record.set('paid_amount', settled_amount)
+            payment_entry_record.set('received_amount', settled_amount)
+            payment_entry_record.set('reference_no', bank_transaction.reference_number)
+            payment_entry_record.set('reference_date', bank_transaction.date)
+            payment_entry_record.set('cost_center', sales_invoice.cost_center)
+            payment_entry_record.set('branch', sales_invoice.branch)
+            payment_entry_record.set('entity', sales_invoice.entity)
+            payment_entry_record.set('region', sales_invoice.region)
+            payment_entry_record.set('branch_type', sales_invoice.branch_type)
+            if tds_amount > 0:
+                deductions.append({'account': 'TDS - A', 'cost_center': sales_invoice.cost_center, 'description': 'TDS',
+                                   'branch': sales_invoice.branch, 'entity': sales_invoice.entity,
+                                   'region': sales_invoice.region, 'branch_type': sales_invoice.branch_type,
+                                   'amount': tds_amount})
+            if disallowed_amount > 0:
+                deductions.append({'account': 'Disallowance - A', 'cost_center': sales_invoice.cost_center,
+                                   'description': 'Disallowance',
+                                   'branch': sales_invoice.branch, 'entity': sales_invoice.entity,
+                                   'region': sales_invoice.region, 'branch_type': sales_invoice.branch_type,
+                                   'amount': disallowed_amount})
+            if deductions:
+                payment_entry_record.set('deductions', deductions)
+            reference_item = [{
+                'reference_doctype': 'Sales Invoice',
+                'reference_name': sales_invoice.name,
+                'allocated_amount': settled_amount + tds_amount + disallowed_amount
+            }]
+            payment_entry_record.set('references', reference_item)
+            payment_entry_record.save()
+            payment_entry_record.submit()
+            bank_transaction.append('payment_entries',
+                                    {'payment_document': 'Payment Entry', 'payment_entry': payment_entry_record.name,
+                                     'allocated_amount': payment_entry_record.paid_amount})
+            bank_transaction.submit()
+            frappe.db.commit()
+            return True
+        except Exception as e:
+            self.log_error('Payment Entry',error_msg=e)
+            return False
+
 
     def add_match_log(self,match_logs,settlement_advice_record):
         match_logs = sorted(match_logs, key=lambda x:x['order'])
@@ -202,127 +219,100 @@ class PaymentEntryCreator:
         settlement_advice_record.save()
         frappe.db.commit()
 
-    def create_payment_entry_record_and_update_bank_transaction(self, bank_transaction, sales_invoice, bank_account, settled_amount, tds_amount = 0, disallowed_amount = 0):
-        deductions = []
-        payment_entry_record = frappe.new_doc('Payment Entry')
-        payment_entry_record.set('custom_sales_invoice',sales_invoice.name)
-        payment_entry_record.set('payment_type', 'Receive')
-        payment_entry_record.set('posting_date', bank_transaction.date)
-        payment_entry_record.set('mode_of_payment','Bank Draft') #Need to verify
-        payment_entry_record.set('party_type', 'Customer')
-        payment_entry_record.set('party',sales_invoice.customer)
-        payment_entry_record.set('bank_account', bank_transaction.bank_account)
-        payment_entry_record.set('paid_to',bank_account)
-        payment_entry_record.set('paid_from', 'Debtors - A')
-        payment_entry_record.set('paid_amount',settled_amount)
-        payment_entry_record.set('received_amount',settled_amount)
-        payment_entry_record.set('reference_no',bank_transaction.reference_number)
-        payment_entry_record.set('reference_date',bank_transaction.date)
-        if tds_amount > 0:
-            deductions.append({'account': 'TDS - A','cost_center':sales_invoice.cost_center,'description':'TDS','branch':sales_invoice.branch,'entity':sales_invoice.entity,'region':sales_invoice.region,'branch_type':sales_invoice.branch_type})
-        if disallowed_amount > 0:
-            deductions.append({'account': 'Disallowance - A', 'cost_center': sales_invoice.cost_center, 'description': 'Disallowance',
-                               'branch': sales_invoice.branch, 'entity': sales_invoice.entity,
-                               'region': sales_invoice.region, 'branch_type': sales_invoice.branch_type})
-        if deductions:
-            payment_entry_record.set('deductions',deductions)
-        reference_item = [{
-            'reference_doctype': 'Sales Invoice',
-            'reference_name': sales_invoice.name,
-            'allocated_amount': settled_amount + tds_amount + disallowed_amount
-        }]
-        payment_entry_record.set('references',reference_item)
-        payment_entry_record.save()
-        payment_entry_record.submit()
-        bank_transaction.append('payment_entries',{'payment_document':'Payment Entry','payment_entry':payment_entry_record.name,'allocated_amount':payment_entry_record.paid_amount})
-        bank_transaction.submit()
-        frappe.db.commit()
-
-
-    def create_payment_entry(self, matched_settlement_advice_records, bank_transaction_record_name, bank_account):
-        for matched_settlement_advice_record in matched_settlement_advice_records:
-            settlement_advice_record = self.get_settlement_advice_record(matched_settlement_advice_record['name'])
-            if settlement_advice_record.settled_amount == settlement_advice_record.claim_amount:
-                settled_amount = settlement_advice_record.settled_amount - settlement_advice_record.tds_amount - settlement_advice_record.disallowed_amount
-                tds_amount = settlement_advice_record.tds_amount
-                disallowed_amount = abs(settlement_advice_record.disallowed_amount)
-            else:
-                settled_amount = settlement_advice_record.settled_amount
-                tds_amount = settlement_advice_record.tds_amount
-                disallowed_amount = abs(settlement_advice_record.disallowed_amount)
-            bank_transaction_record = self.get_bank_transaction_record(bank_transaction_record_name)
-            if settled_amount > bank_transaction_record.unallocated_amount:
-                return
-            matched_bill, matched_claim, match_logs = self.get_matched_bill_and_logs(settlement_advice_record, bank_transaction_record.reference_number)
-            if not matched_bill:
-                self.add_match_log(match_logs,settlement_advice_record)
-                settlement_advice_record.set('status','Error')
-                settlement_advice_record.set('matched_bank_transaction',bank_transaction_record.name)
-                settlement_advice_record.save()
-                frappe.db.commit()
+    def process(self):
+        for bank_transaction_record in self.bank_transaction_records:
+            if not bank_transaction_record['date']:  #If Date is null skip to next record
+                self.log_error('Bank Transaction', bank_transaction_record['name'], "Date is Null")
                 continue
-            matched_sales_invoice_record = self.get_sales_invoice_record(matched_bill['name'])
-            if matched_claim:
-                self.add_match_log(match_logs, settlement_advice_record)
-                settlement_advice_record.set('matched_bank_transaction', bank_transaction_record.name)
-                settlement_advice_record.set('matched_claimbook_record', matched_claim['name'])
-                settlement_advice_record.set('matched_bill_record', matched_bill['name'])
-                settlement_advice_record.save()
-                frappe.db.set_value('Sales Invoice', matched_sales_invoice_record.name, 'custom_insurance_name',
-                                    matched_claim['insurance_company_name'])
-                frappe.db.commit()
-            else:
-                self.add_match_log(match_logs, settlement_advice_record)
-                settlement_advice_record.set('matched_bank_transaction', bank_transaction_record.name)
-                settlement_advice_record.set('matched_bill_record', matched_bill['name'])
-                settlement_advice_record.save()
-                frappe.db.commit()
-            if matched_sales_invoice_record.outstanding_amount < settled_amount:
-                self.log_error('Settlement Advice', settlement_advice_record['name'], "Settled amount is greater than Outstanding Amount")
-                settlement_advice_record.set('status', 'Not Processed')
-                settlement_advice_record.set('remark','Settled amount is greater than Outstanding Amount')
-                settlement_advice_record.save()
-                frappe.db.commit()
-            elif matched_sales_invoice_record.outstanding_amount < settled_amount + tds_amount + disallowed_amount:
-                if matched_sales_invoice_record.outstanding_amount >= settled_amount + tds_amount:
-                    self.create_payment_entry_record_and_update_bank_transaction(bank_transaction_record, matched_sales_invoice_record, bank_account, settled_amount, tds_amount)
-                    settlement_advice_record.set('remark', 'Disallowance amount is greater than Outstanding Amount')
-                else:
-                    self.create_payment_entry_record_and_update_bank_transaction(bank_transaction_record,
-                                                     matched_sales_invoice_record, bank_account,
-                                                     settled_amount, disallowed_amount)
-                    settlement_advice_record.set('remark', 'TDS amount is greater than Outstanding Amount')
-                settlement_advice_record.set('status','Partially Processed')
-                settlement_advice_record.save()
-                frappe.db.commit()
-            else:
-                self.create_payment_entry_record_and_update_bank_transaction(bank_transaction_record,
-                                                 matched_sales_invoice_record, bank_account,
-                                                 settled_amount, tds_amount, disallowed_amount)
-                settlement_advice_record.set('status', 'Fully Processed')
-                settlement_advice_record.save()
-                frappe.db.commit()
-
-    def process(self, bank_transaction_records):
-        for bank_transaction_record in bank_transaction_records:
             bank_account = self.get_company_account(bank_transaction_record['bank_account'])
-            if not bank_account:
+            if not bank_account:  #If Company Bank Account is not found skip to next record
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "No Company Account Found")
                 continue
-            reference_number = self.strip_leading_zeros(bank_transaction_record['reference_number'])
-            matched_settlement_advice_records = self.get_matched_settlement_advice_records(reference_number)
-            if not matched_settlement_advice_records:
+            utr_number = self.trim_and_remove_leading_zeros(bank_transaction_record['reference_number']) #trim and removing leading zeros in utr number
+            matched_sa_records = self.get_matched_sa_records(utr_number) #Getting matched settlement advice records using utr number
+            if not matched_sa_records: #If no settlement advice records matched with utr number skip to next record
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "No Settlement Advices Found")
-                frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_matched_status', 'Not Found')
+                frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_advice_status',
+                                    'Not Found')
+                frappe.db.commit()
                 continue
-            frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_matched_status',
+            frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_advice_status',
                                 'Found')
             frappe.db.commit()
-            matched_settlement_advice_records = sorted(matched_settlement_advice_records, key=lambda x:(x['tds_amount'],x['disallowed_amount']), reverse = True)
-            self.create_payment_entry(matched_settlement_advice_records, bank_transaction_record['name'], bank_account)
-
-    def enqueue_job(self):
-        n = 1000
-        for i in range(0, len(self.bank_transaction_records), n):
-            frappe.enqueue(self.process, queue='long', is_async=True, timeout=18000, bank_transaction_records = self.bank_transaction_records[i:i+n])
-            print('Job Enqueued')
+            matched_sa_records = sorted(matched_sa_records,
+                                                       key=lambda x: (x['tds_amount'], x['disallowed_amount']),
+                                                       reverse=True) #Sort the Settlement Advice with TDS Amount and then Disallowed Amount
+            for record in matched_sa_records:
+                settlement_advice = self.get_document_record('Settlement Advice',record['name'])
+                if settlement_advice.settled_amount == settlement_advice_record.claim_amount:
+                    settled_amount = settlement_advice.settled_amount - settlement_advice.tds_amount - settlement_advice.disallowed_amount
+                    tds_amount = settlement_advice.tds_amount
+                    disallowed_amount = abs(settlement_advice.disallowed_amount)
+                else:
+                    settled_amount = settlement_advice.settled_amount
+                    tds_amount = settlement_advice.tds_amount
+                    disallowed_amount = abs(settlement_advice.disallowed_amount)
+                bank_transaction = self.get_document_record('Bank Transaction',bank_transaction_record['name'])
+                if settled_amount > bank_transaction.unallocated_amount:
+                    continue
+                matched_bill,matched_claim,match_log = self.get_matched_bill_and_claim(settlement_advice,bank_account.reference_number)
+                if not matched_bill:
+                    self.add_match_log(match_logs, settlement_advice)
+                    settlement_advice.set('status', 'Error')
+                    settlement_advice.set('matched_bank_transaction', bank_transaction_record.name)
+                    settlement_advice.save()
+                    frappe.db.commit()
+                    continue
+                if not matched_claim:
+                    self.add_match_log(match_logs, settlement_advice)
+                    settlement_advice.set('matched_bank_transaction', bank_transaction.name)
+                    settlement_advice.set('matched_bill_record', matched_bill['name'])
+                    settlement_advice.save()
+                    frappe.db.commit()
+                self.add_match_log(match_logs, settlement_advice_record)
+                settlement_advice.set('matched_bank_transaction', bank_transaction.name)
+                settlement_advice.set('matched_claimbook_record', matched_claim['name'])
+                settlement_advice.set('matched_bill_record', matched_bill['name'])
+                settlement_advice.save()
+                sales_invoice = self.get_document_record('Sales Invoice',matched_bill['name'])
+                frappe.db.set_value('Sales Invoice', sales_invoice.name, 'custom_insurance_name',
+                                    matched_claim['insurance_company_name'])
+                frappe.db.commit()
+                if sales_invoice.outstanding_amount < settled_amount:
+                    self.log_error('Settlement Advice', settlement_advice.name,
+                                   "Settled amount is greater than Outstanding Amount")
+                    settlement_advice.set('status', 'Not Processed')
+                    settlement_advice.set('remark', 'Settled amount is greater than Outstanding Amount')
+                    settlement_advice.save()
+                    frappe.db.commit()
+                elif sales_invoice.outstanding_amount < settled_amount + tds_amount + disallowed_amount:
+                    if sales_invoice.outstanding_amount >= settled_amount + tds_amount:
+                        payment_entry_created = self.create_payment_entry_and_update_bank_transaction(
+                            bank_transaction, sales_invoice, bank_account, settled_amount,
+                            tds_amount)
+                        settlement_advice_record.set('remark', 'Disallowance amount is greater than Outstanding Amount')
+                    else:
+                        payment_entry_created = self.create_payment_entry_and_update_bank_transaction(
+                            bank_transaction,
+                            sales_invoice, bank_account,
+                            settled_amount, disallowed_amount)
+                        settlement_advice.set('remark', 'TDS amount is greater than Outstanding Amount')
+                    if payment_entry_created:
+                        settlement_advice.set('status', 'Partially Processed')
+                    else:
+                        settlement_advice.set('remark', 'Unable to Create Payment Entry')
+                        settlement_advice_record.set('status', 'Warning')
+                    settlement_advice_record.save()
+                    frappe.db.commit()
+                else:
+                    payment_entry_created = self.create_payment_entry_and_update_bank_transaction(
+                        bank_transaction,
+                        sales_invoice, bank_account,
+                        settled_amount, tds_amount, disallowed_amount)
+                    if payment_entry_created:
+                        settlement_advice.set('status', 'Fully Processed')
+                    else:
+                        settlement_advice.set('remark','Unable to Create Payment Entry')
+                        settlement_advice.set('status', 'Warning')
+                    settlement_advice_record.save()
+                    frappe.db.commit()

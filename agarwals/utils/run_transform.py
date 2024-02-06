@@ -31,4 +31,4 @@ def run_transform_process(type):
 
 @frappe.whitelist()
 def run_payment_entry():
-    PaymentEntryCreator().enqueue_job()
+    PaymentEntryCreator().process()
