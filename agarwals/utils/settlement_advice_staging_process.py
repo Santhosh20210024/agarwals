@@ -11,8 +11,16 @@ def log_error(doctype_name, reference_name, error_message):
 
 def insert_record_in_settlement_advice(doc_to_insert):
     try:
+        settlement_advices = frappe.get_list("Settlement Advice", filters={
+            'utr_number': doc_to_insert.utr_number, 'claim_id':doc_to_insert.claim_id, 'status': "Error"})
+        print(settlement_advices)
+        if len(settlement_advices) > 0:
+            name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id + "-" + str(len(settlement_advices))
+        else:
+            name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id
         frappe.get_doc({
             "doctype": "Settlement Advice",
+            "name": name,
             "claim_id": doc_to_insert.claim_id,
             "bill_no":doc_to_insert.bill_number,
             "utr_number": doc_to_insert.utr_number,
@@ -29,6 +37,7 @@ def insert_record_in_settlement_advice(doc_to_insert):
         }).insert(ignore_permissions=True)
         doc_to_insert.status = "Processed"
         doc_to_insert.save(ignore_permissions=True)
+        frappe.db.commit()
     except Exception as e:
         log_error('Settlement Advice Staging',doc_to_insert.name,e)
         doc_to_insert.status = "Error"

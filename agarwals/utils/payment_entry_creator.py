@@ -4,14 +4,10 @@ import re
 
 
 class PaymentEntryCreator:
-    def __init__(self):
-        self.bank_transaction_records = frappe.db.sql("SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE status IN ('Pending','Unreconciled') AND deposit != 0  AND LENGTH(reference_number) > 4 AND deposit > 10 ORDER BY unallocated_amount DESC",as_dict=True)
-        self.claim_records = frappe.db.sql(
-            "SELECT name, al_number, cl_number, custom_raw_bill_number, insurance_company_name FROM `tabClaimBook`",
-            as_dict=True)
-        self.bill_records = frappe.db.sql("SELECT name, claim_id FROM `tabBill` WHERE status != 'CANCELLED'",
-                                             as_dict=True)
-        self.settlement_advice_records = frappe.db.sql("SELECT name, utr_number, final_utr_number, settled_amount, tds_amount, disallowed_amount FROM `tabSettlement Advice` WHERE status = 'Open'", as_dict = True)
+    def __init__(self,claim_records,bill_records,settlement_advice_records):
+        self.claim_records = claim_records
+        self.bill_records = bill_records
+        self.settlement_advice_records = settlement_advice_records
 
     def trim_and_remove_leading_zeros(self, text):
         return str(text).strip().lstrip('0')
@@ -35,7 +31,7 @@ class PaymentEntryCreator:
         for settlement_advice_record in self.settlement_advice_records:
             utr_number = self.trim_and_remove_leading_zeros(settlement_advice_record['utr_number'])
             final_utr_number = self.trim_and_remove_leading_zeros(settlement_advice_record['final_utr_number'])
-            if reference_number != utr_number or reference_number != final_utr_number:
+            if utr_number != reference_number and final_utr_number != reference_number:
                 continue
             elif reference_number == utr_number:
                 matched_records.append(settlement_advice_record)
@@ -57,6 +53,7 @@ class PaymentEntryCreator:
     def get_variant_claim_numbers(self,claim_id):
         claim_id = unicodedata.normalize("NFKD", claim_id)
         variant_claim_number = []
+        claim_id = claim_id.strip()
         variant_claim_number.append(claim_id)
         possible_claim_id = re.sub(r'-?\((\d)\)$', '', claim_id)
         variant_claim_number.append(possible_claim_id)
@@ -81,6 +78,7 @@ class PaymentEntryCreator:
         matched_claims = []
         matched_cb_records = None
         matched_bill_records = None
+        claim_records_matched = False
         sa_claim_numbers = self.get_variant_claim_numbers(sa_record.claim_id)
         for record in self.claim_records:
             if not record[match_with]:
@@ -89,10 +87,12 @@ class PaymentEntryCreator:
             matched_claim_numbers = sa_claim_numbers.intersection(cb_claim_numbers)
             if not matched_claim_numbers:
                 continue
+            claim_records_matched = True
             if not record['custom_raw_bill_number']:
                 match_log.append({
                     'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[Not found]",
                     'status': 'Fail', 'order': order + 1})
+                continue
             cb_bill_no = self.format_bill_no(record['custom_raw_bill_number'])
             for bill_record in self.bill_records:
                 bill_no = self.format_bill_no(bill_record['name'])
@@ -101,18 +101,20 @@ class PaymentEntryCreator:
                         match_log.append({
                             'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[{record['custom_raw_bill_number']}] > dbr_bill_no[{bill_record['name']}] > dbr_claim[No claim Id]",
                             'status': 'Fail', 'order': order + 1})
+                        continue
                     bill_claim_numbers = self.get_variant_claim_numbers(bill_record['claim_id'])
                     matched_bill_records = bill_claim_numbers.intersection(cb_claim_numbers)
                     if not matched_bill_records:
                         match_log.append({
                             'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[{record['custom_raw_bill_number']}] > dbr_bill_no[{bill_record['name']}] > dbr_claim[{bill_record['claim_id']}] > Not matched",
                             'status': 'Fail', 'order': order + 1})
+                        continue
                     matched_bills.append(bill_record)
                     matched_claims.append(record)
                     match_log.append({
                         'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_{match_with}[{record[match_with]}] > cb_bill_no[{record['custom_raw_bill_number']}] > dbr_bill_no[{bill_record['name']}] > dbr_claim[{bill_record['claim_id']}] > Matched",
                         'status': 'Success', 'order': order + 1})
-        return matched_bills,matched_claims,match_log
+        return matched_bills,matched_claims,claim_records_matched,match_log
 
     def match_with_bill(self,sa_record,bank_utr,match_log,order):
         matched_bills = []
@@ -146,42 +148,51 @@ class PaymentEntryCreator:
                                  'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[{sa_record.bill_no}] > dbr_bill[no bill record]",
                                  'status': 'Fail', 'order': 1})
         match_log.append({
-            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[no bill number]",
+            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[No bill number]",
             'status': 'Fail', 'order': 1})
-        matched_bill, matched_claim, match_log = self.match_with_claimbook_and_bill(sa_record,bank_utr,match_log,'al_number',1)
+        matched_bill, matched_claim,claim_records_matched, match_log = self.match_with_claimbook_and_bill(sa_record,bank_utr,match_log,'al_number',1)
         if matched_bill:
             if len(matched_bill) == 1:
                 return matched_bill[0], matched_claim[0], match_log
             sa_record.set('remark',str(sa_record.remark) + '\nMore than 1 bill Matched')
             sa_record.save()
-        match_log.append({
-            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_al[No claim Record Found]",
-            'status': 'Fail', 'order': 2})
-        matched_bill, matched_claim, match_log = self.match_with_claimbook_and_bill(sa_record, bank_utr, match_log,
+        if not claim_records_matched:
+            match_log.append({
+                'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_al[No claim Record Found]",
+                'status': 'Fail', 'order': 2})
+        matched_bill, matched_claim,claim_records_matched, match_log = self.match_with_claimbook_and_bill(sa_record, bank_utr, match_log,
                                                                                     'cl_number', 2)
         if matched_bill:
             if len(matched_bill) == 1:
                 return matched_bill[0], matched_claim[0], match_log
             sa_record.set('remark', str(sa_record.remark) + '\nMore than 1 bill Matched')
             sa_record.save()
-        match_log.append({
-            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_cl[No claim Record Found]",
-            'status': 'Fail', 'order': 3})
+        if not claim_records_matched:
+            match_log.append({
+                'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > cb_cl[No claim Record Found]",
+                'status': 'Fail', 'order': 3})
         matched_bill, match_log = self.match_with_bill(sa_record, bank_utr, match_log, 3)
-        if matched_bill:
-            if len(matched_bill) == 1:
-                return matched_bill[0], None, match_log
+        if not matched_bill:
+            match_log.append({
+                'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > dbr_claim[No Bill Record Found]",
+                'status': 'Fail', 'order': 4})
+            return None, None, match_log
+        if len(matched_bill) > 1:
             sa_record.set('remark', str(sa_record.remark) + '\nMore than 1 bill Matched')
             sa_record.save()
-        match_log.append({
-            'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > dbr_claim[No Bill Record Found]",
-            'status': 'Fail', 'order': 4})
-        return None, None, match_log
+            return None, None, match_log
+        return matched_bill[0], None, match_log
 
     def create_payment_entry_and_update_bank_transaction(self, bank_transaction, sales_invoice, bank_account, settled_amount, tds_amount = 0, disallowed_amount = 0):
+        payment_entries_for_same_bill = frappe.get_list('Payment Entry', filters={'custom_sales_invoice':sales_invoice.name})
+        if payment_entries_for_same_bill:
+            name = sales_invoice.name + "-" +str(len(payment_entries_for_same_bill))
+        else:
+            name = sales_invoice.name
         try:
             deductions = []
             payment_entry_record = frappe.new_doc('Payment Entry')
+            payment_entry_record.set('name',name)
             payment_entry_record.set('custom_sales_invoice', sales_invoice.name)
             payment_entry_record.set('payment_type', 'Receive')
             payment_entry_record.set('posting_date', bank_transaction.date)
@@ -228,7 +239,7 @@ class PaymentEntryCreator:
             frappe.db.commit()
             return True
         except Exception as e:
-            self.log_error('Payment Entry',error_msg=e)
+            self.log_error('Sales Invoice',sales_invoice.name,error_msg=e)
             return False
 
 
@@ -247,10 +258,10 @@ class PaymentEntryCreator:
             return None
         return bank_account.account
 
-    def process(self):
-        count = 1
-        print("___________________________________________",count)
-        for bank_transaction_record in self.bank_transaction_records:
+    def process(self, bank_transaction_records):
+        count = 0
+        for bank_transaction_record in bank_transaction_records:
+            print('++++++++++++++++++',count)
             count = count + 1
             if not bank_transaction_record['date']:  #If Date is null skip to next record
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "Date is Null")
@@ -327,12 +338,18 @@ class PaymentEntryCreator:
                             bank_transaction, sales_invoice, bank_account, settled_amount,
                             tds_amount)
                         settlement_advice.set('remark', 'Disallowance amount is greater than Outstanding Amount')
-                    else:
+                    elif sales_invoice.outstanding_amount >= settled_amount + disallowed_amount:
                         payment_entry_created = self.create_payment_entry_and_update_bank_transaction(
                             bank_transaction,
                             sales_invoice, bank_account,
                             settled_amount, disallowed_amount)
                         settlement_advice.set('remark', 'TDS amount is greater than Outstanding Amount')
+                    else:
+                        payment_entry_created = self.create_payment_entry_and_update_bank_transaction(
+                            bank_transaction,
+                            sales_invoice, bank_account,
+                            settled_amount)
+                        settlement_advice.set('remark', 'Both Disallowed and TDS amount is greater than Outstanding Amount')
                     if payment_entry_created:
                         settlement_advice.set('status', 'Partially Processed')
                     else:
