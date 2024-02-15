@@ -16,12 +16,12 @@ def run_transform_process(type):
             return "Success"
         except Exception as e:
             return e
-    # elif type =="Settlement":
-    #     try:
-    #         SettlementTransformer().process()
-    #         return "Success"
-    #     except Exception as e:
-    #         return e
+    elif type =="Settlement":
+        try:
+            SettlementTransformer().process()
+            return "Success"
+        except Exception as e:
+            return e
     elif type =="transaction":
         try:
             BankTransformer().process()

@@ -1,7 +1,6 @@
 import frappe
 import os
 from frappe.model.document import Document
-from agarwals.utils.importation_and_doc_creation import import_bank_statement
 import shutil
 from agarwals.utils.doc_meta_util import get_doc_fields
 from agarwals.utils.file_util import construct_file_url
