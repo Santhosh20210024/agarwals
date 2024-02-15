@@ -49,3 +49,14 @@ def run_payment_entry():
         frappe.enqueue(PaymentEntryCreator(claim_records,bill_records,settlement_advice_records).process, queue='myqueue', is_async=True, job_name="Batch" + str(batch_number), timeout=25000,
                        bank_transaction_records=bank_transaction_records[i:i + n])
         print('Job Enqueued ', batch_number)
+def create_sales_invoice():
+    try:
+        cancelled_bills = frappe.get_list('Bill', filters={'status': 'CANCELLED', 'invoice_status': 'RAISED'},
+                                          pluck='name')
+        SalesInvoiceCreator().cancel_sales_invoice(cancelled_bills)
+        new_bills = frappe.get_list('Bill', filters= {'invoice':''})
+        SalesInvoiceCreator().enqueue_job(new_bills)
+    except Exception as e:
+        error_log = frappe.new_doc('Error Record Log')
+        error_log.set('error_message', e)
+        error_log.save()

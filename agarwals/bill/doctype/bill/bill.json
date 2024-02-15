@@ -47,7 +47,31 @@
   "column_break_ahot",
   "final_submission_date",
   "invoice",
-  "invoice_status"
+  "invoice_status",
+  "claim_book_records_section",
+  "bill_number_with_final_bill_number_section",
+  "no_of_claim_book_record_with_same_bill_number",
+  "bill_number_with_final_bill_number",
+  "claim_id_with_al_number_section",
+  "no_of_claim_book_record_with_same_al_number",
+  "claim_id_with_al_number",
+  "claim_id_with_cl_number_section",
+  "no_of_claim_book_record_with_same_cl_number",
+  "claim_id_with_cl_number",
+  "final_details_section",
+  "claim_record_id",
+  "final_claim_number",
+  "final_payer_name",
+  "final_insurance_name",
+  "final_claim_book_utr_number",
+  "payer_matched",
+  "settlement_details_column",
+  "final_original_utr_number",
+  "final_formatted_utr_number",
+  "settled_amount",
+  "tds_amount",
+  "disallowed_amount",
+  "payer_remarks"
  ],
  "fields": [
   {
@@ -258,10 +282,134 @@
    "label": "Invoice Status",
    "options": "\nRAISED\nCANCELLED"
   },
-   {
+  {
    "fieldname": "branch_type",
    "fieldtype": "Data",
    "label": "Branch Type"
+  },
+  {
+   "fieldname": "claim_book_records_section",
+   "fieldtype": "Section Break",
+   "label": "Claim Book Records"
+  },
+  {
+   "fieldname": "bill_number_with_final_bill_number_section",
+   "fieldtype": "Section Break",
+   "label": "Bill Number with Final Bill Number"
+  },
+  {
+   "fieldname": "no_of_claim_book_record_with_same_bill_number",
+   "fieldtype": "Data",
+   "label": "No of Claim Book Record with Same Bill Number"
+  },
+  {
+   "fieldname": "bill_number_with_final_bill_number",
+   "fieldtype": "Table",
+   "label": "Bill Number with Final Bill Number",
+   "options": "Bill Number with Final Bill Number"
+  },
+  {
+   "fieldname": "claim_id_with_al_number_section",
+   "fieldtype": "Section Break",
+   "label": "Claim ID with AL Number"
+  },
+  {
+   "fieldname": "no_of_claim_book_record_with_same_al_number",
+   "fieldtype": "Data",
+   "label": "No of Claim Book Record with Same AL Number"
+  },
+  {
+   "fieldname": "claim_id_with_al_number",
+   "fieldtype": "Table",
+   "label": "Claim ID with AL Number",
+   "options": "Claim ID with AL Number"
+  },
+  {
+   "fieldname": "claim_id_with_cl_number_section",
+   "fieldtype": "Section Break",
+   "label": "Claim ID with CL Number"
+  },
+  {
+   "fieldname": "no_of_claim_book_record_with_same_cl_number",
+   "fieldtype": "Data",
+   "label": "No of Claim Book Record with Same CL Number"
+  },
+  {
+   "fieldname": "claim_id_with_cl_number",
+   "fieldtype": "Table",
+   "label": "Claim ID with CL Number",
+   "options": "Claim ID with CL Number"
+  },
+  {
+   "fieldname": "final_details_section",
+   "fieldtype": "Section Break",
+   "label": "Final Details"
+  },
+  {
+   "fieldname": "final_claim_number",
+   "fieldtype": "Data",
+   "label": "Final Claim Number"
+  },
+  {
+   "fieldname": "final_payer_name",
+   "fieldtype": "Data",
+   "label": "Final Payer Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "payer_matched",
+   "fieldtype": "Check",
+   "label": "Payer Matched"
+  },
+  {
+   "fieldname": "settlement_details_column",
+   "fieldtype": "Column Break",
+   "label": "Settlement Details"
+  },
+  {
+   "fieldname": "settled_amount",
+   "fieldtype": "Data",
+   "label": "Settled Amount"
+  },
+  {
+   "fieldname": "tds_amount",
+   "fieldtype": "Data",
+   "label": "TDS Amount"
+  },
+  {
+   "fieldname": "disallowed_amount",
+   "fieldtype": "Data",
+   "label": "Disallowed Amount"
+  },
+  {
+   "fieldname": "final_original_utr_number",
+   "fieldtype": "Data",
+   "label": "Final Original UTR Number"
+  },
+  {
+   "fieldname": "final_formatted_utr_number",
+   "fieldtype": "Data",
+   "label": "Final Formatted UTR Number"
+  },
+  {
+   "fieldname": "payer_remarks",
+   "fieldtype": "Text",
+   "label": "Payer Remarks"
+  },
+  {
+   "fieldname": "final_insurance_name",
+   "fieldtype": "Data",
+   "label": "Final Insurance Name"
+  },
+  {
+   "fieldname": "final_claim_book_utr_number",
+   "fieldtype": "Data",
+   "label": "Final Claim Book UTR Number"
+  },
+  {
+   "fieldname": "claim_record_id",
+   "fieldtype": "Data",
+   "label": "Claim Record ID"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -272,7 +420,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-01-10 19:45:32.652369",
+ "modified": "2024-01-28 22:01:39.740872",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",

@@ -233,7 +233,7 @@ class Transformer:
         for header in header_list:
             header_row_index = None
             for index, row in self.source_df.iterrows():
-                if header in row.values:
+                if self.trim_and_lower(header) in [self.trim_and_lower(column) for column in row.values]:
                     header_row_index = index
                     break
             if header_row_index is not None:

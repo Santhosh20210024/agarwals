@@ -1,0 +1,54 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-01-27 12:38:15.888754",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "claim_book_record_id",
+  "bill_number",
+  "utr_number",
+  "payer",
+  "insurance"
+ ],
+ "fields": [
+  {
+   "fieldname": "bill_number",
+   "fieldtype": "Data",
+   "label": "Bill Number"
+  },
+  {
+   "fieldname": "utr_number",
+   "fieldtype": "Data",
+   "label": "UTR Number"
+  },
+  {
+   "fieldname": "payer",
+   "fieldtype": "Data",
+   "label": "Payer"
+  },
+  {
+   "fieldname": "insurance",
+   "fieldtype": "Data",
+   "label": "Insurance"
+  },
+  {
+   "fieldname": "claim_book_record_id",
+   "fieldtype": "Data",
+   "label": "Claim Book Record ID"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-01-27 14:35:42.850042",
+ "modified_by": "Administrator",
+ "module": "Bill",
+ "name": "Claim ID with CL Number",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
