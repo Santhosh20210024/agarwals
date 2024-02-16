@@ -237,10 +237,10 @@ class PaymentEntryCreator:
                                      'allocated_amount': payment_entry_record.paid_amount})
             bank_transaction.submit()
             frappe.db.commit()
-            return True
+            return payment_entry_record.name
         except Exception as e:
             self.log_error('Sales Invoice',sales_invoice.name,error_msg=e)
-            return False
+            return ''
 
 
     def add_match_log(self,match_logs,settlement_advice_record):
@@ -355,15 +355,17 @@ class PaymentEntryCreator:
                     settlement_advice.save()
                     frappe.db.commit()
                 else:
-                    payment_entry_created = self.create_payment_entry_and_update_bank_transaction(
+                    payment_entry_name = self.create_payment_entry_and_update_bank_transaction(
                         bank_transaction,
                         sales_invoice, bank_account,
                         settled_amount, tds_amount, disallowed_amount)
-                    if payment_entry_created:
+                    if payment_entry_name:
                         if bank_amount == 0:
                             settlement_advice.set('status', 'Fully Processed')
                         else:
                             settlement_advice.set('status', 'Partially Processed')
+                        sales_invoice.append('custom_reference',{'payment_entry':payment_entry_name})
+                        frappe.db.commit()
                     else:
                         settlement_advice.set('remark','Unable to Create Payment Entry')
                         settlement_advice.set('status', 'Warning')
