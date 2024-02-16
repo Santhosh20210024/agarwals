@@ -39,19 +39,36 @@ def insert_record_in_settlement_advice(doc_to_insert):
 
 @frappe.whitelist()
 def process():
-        for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed']}, fields = "*" ):
+        for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed'],'retry':['!=', 0]}, fields = "*" ):
             try:
                 advice_staging_doc=frappe.get_doc('Settlement Advice Staging',advice.name)
                 advice_staging_doc.date = date.today(),
                 if advice_staging_doc.status == "Error" and advice_staging_doc.retry==0:
                     continue
+                advice_staging_doc.retry=0
                 if advice_staging_doc.status == "Open" and (advice_staging_doc.final_utr_number == "0" or advice_staging_doc.final_utr_number is None  or advice_staging_doc.claim_id =="0" or advice_staging_doc.utr_number is None):
                     advice_staging_doc.status = "Error"
-                    advice_staging_doc.remarks = "UTR and claim id should not be null"
+                    advice_staging_doc.remarks = "UTR and claim id should not be null,"
                     advice_staging_doc.save(ignore_permissions=True)
                     frappe.db.commit()
                     continue
-                
+                if advice_staging_doc.settled_amount is None or advice_staging_doc.settled_amount == 0:
+                    advice_staging_doc.status = "Error"
+                    advice_staging_doc.remarks = "No Settled amount,"
+                    advice_staging_doc.save(ignore_permissions=True)
+                    frappe.db.commit()
+                    continue
+                if "e+" in advice_staging_doc.final_utr_number.lower() or "e+" in advice_staging_doc.utr_number.lower():
+                    advice_staging_doc.status = "Error"
+                    advice_staging_doc.remarks = "utr number should not be in exponential formate,"
+                    advice_staging_doc.save(ignore_permissions=True)
+                    frappe.db.commit()
+                    continue
+                advice_staging_doc.claim_id=advice_staging_doc.claim_id.replace(".0","")
+                advice_staging_doc.final_utr_number = advice_staging_doc.final_utr_number.replace(".0","")
+                advice_staging_doc.utr_number = advice_staging_doc.utr_number.replace(".0","")
+                advice_staging_doc.save(ignore_permissions=True)
+                frappe.db.commit()
                 insert_record_in_settlement_advice(advice_staging_doc)
             except Exception as e:
                 log_error('Settlement Advice Staging',advice.name,e)
