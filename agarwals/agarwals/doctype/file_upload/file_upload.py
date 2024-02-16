@@ -18,7 +18,9 @@ class Fileupload(Document):
 			return file_name, file_doc_id
 	
 	def delete_backend_files(self, file_path):
+		print("_________________________" +file_path)
 		if os.path.exists(file_path):
+			print("__________________________________deleted")
 			os.remove(file_path)
 
 	def validate_hash_content(self, file_name, file_id):
@@ -83,10 +85,14 @@ class Fileupload(Document):
 			return timestamped_file_name
 
 		except Exception as e:
+			err = frappe.get_doc('Error Record Log')
+			err.doctype_name = 'File Upload'
+			err.error_message = e
+			err.save()
 			frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
 			frappe.db.commit()
 			self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-			frappe.throw('Error:', str(e))
+			frappe.throw('Error:' + e)
 			return
 
 	def process_file_attachment(self):
