@@ -26,10 +26,13 @@
   "based_on",
   "search",
   "staging_status",
+  "error",
   "remarks",
   "update_reference_number",
   "previous_utr",
-  "retry"
+  "retry",
+  "or_check",
+  "is_fixed"
  ],
  "fields": [
   {
@@ -86,7 +89,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "CG_Reference Number"
+   "label": "Reference Number"
   },
   {
    "fieldname": "remarks",
@@ -108,10 +111,11 @@
   {
    "fieldname": "source",
    "fieldtype": "Link",
-   "label": "Source File ID",
+   "label": "Source File Id",
    "options": "File upload"
   },
   {
+   "depends_on": "eval:doc.staging_status == 'Warning'",
    "fieldname": "update_reference_number",
    "fieldtype": "Data",
    "label": "Update Reference Number"
@@ -125,7 +129,7 @@
   {
    "fieldname": "source_reference_number",
    "fieldtype": "Data",
-   "label": "AG_Reference Number"
+   "label": "Source Reference Number"
   },
   {
    "fieldname": "search",
@@ -140,7 +144,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Open\nError(E100)\nError(E101)\nError(E102)\nError(E103)\nError(E104)\nProcessed\nWarning"
+   "options": "Open\nProcessed\nError\nWarning\nWithdrawn\nSkipped\nCG.Error"
   },
   {
    "depends_on": "eval:doc.staging_status == 'Warning'",
@@ -150,20 +154,38 @@
    "label": "Previous utr"
   },
   {
-   "fieldname": "based_on",
-   "fieldtype": "Data",
-   "label": "Based On"
-  },
-  {
    "fetch_from": "source.file",
    "fieldname": "file",
    "fieldtype": "Data",
    "label": "File Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "or_check",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "OR Check"
+  },
+  {
+   "fieldname": "error",
+   "fieldtype": "Data",
+   "label": "Error"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_fixed",
+   "fieldtype": "Check",
+   "label": "Is Fixed"
+  },
+  {
+   "fieldname": "based_on",
+   "fieldtype": "Data",
+   "label": "Based On"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-03 17:18:22.720594",
+ "modified": "2024-02-13 11:49:04.464112",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",
@@ -185,5 +207,38 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Green",
+   "title": "Processed"
+  },
+  {
+   "color": "Yellow",
+   "title": "Warning"
+  },
+  {
+   "color": "Gray",
+   "title": "E100"
+  },
+  {
+   "color": "Gray",
+   "title": "E102"
+  },
+  {
+   "color": "Gray",
+   "title": "E103"
+  },
+  {
+   "color": "Gray",
+   "title": "E104"
+  },
+  {
+   "color": "Gray",
+   "title": "E105"
+  },
+  {
+   "color": "Red",
+   "title": "Error"
+  }
+ ]
 }

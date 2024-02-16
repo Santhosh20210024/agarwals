@@ -11,6 +11,7 @@
   "claim_id",
   "bill_no",
   "utr_number",
+  "cg_utr_number",
   "final_utr_number",
   "claim_amount",
   "disallowed_amount",
@@ -108,7 +109,7 @@
    "label": "Status",
    "options": "\nError\nOpen"
   },
-   {
+  {
    "fieldname": "disallowed_amount",
    "fieldtype": "Currency",
    "label": "Disallowed Amount"
@@ -139,10 +140,15 @@
    "fieldtype": "Table",
    "label": "Match Log",
    "options": "Match Log"
+  },
+  {
+   "fieldname": "cg_utr_number",
+   "fieldtype": "Data",
+   "label": "CG UTR Number"
   }
  ],
  "links": [],
- "modified": "2024-01-11 22:05:41.842548",
+ "modified": "2024-02-13 10:32:56.964263",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
