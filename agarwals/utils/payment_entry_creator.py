@@ -128,7 +128,7 @@ class PaymentEntryCreator:
             if matched_bill_records:
                 matched_bills.append(record)
                 match_log.append({
-                    'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > dbr_claim[{record['claim_id']}]",
+                    'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_claim[{sa_record.claim_id}] > dbr_claim[{record['claim_id']}] > Matched",
                     'status': 'Success', 'order': order + 1})
         return matched_bills, match_log
 
@@ -141,7 +141,7 @@ class PaymentEntryCreator:
             bill_record = self.get_bill_record_with_bill_no(sa_record.bill_no)
             if bill_record:
                 match_log.append({
-                    'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[{sa_record.bill_no}] > dbr_bill[{bill_record['name']}]",
+                    'log': f"bank_utr[{bank_utr}] > sa_utr[{sa_record.utr_number}] > sa_bill[{sa_record.bill_no}] > dbr_bill[{bill_record['name']}] > Matched",
                     'status': 'Success', 'order': 1})
                 return bill_record, None, match_log
             match_log.append({
@@ -259,10 +259,7 @@ class PaymentEntryCreator:
         return bank_account.account
 
     def process(self, bank_transaction_records):
-        count = 0
         for bank_transaction_record in bank_transaction_records:
-            print('++++++++++++++++++',count)
-            count = count + 1
             if not bank_transaction_record['date']:  #If Date is null skip to next record
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "Date is Null")
                 continue
@@ -273,7 +270,6 @@ class PaymentEntryCreator:
             utr_number = self.trim_and_remove_leading_zeros(bank_transaction_record['reference_number']) #trim and removing leading zeros in utr number
             matched_sa_records = self.get_matched_sa_records(utr_number) #Getting matched settlement advice records using utr number
             if not matched_sa_records: #If no settlement advice records matched with utr number skip to next record
-                self.log_error('Bank Transaction', bank_transaction_record['name'], "No Settlement Advices Found")
                 frappe.db.set_value('Bank Transaction', bank_transaction_record['name'], 'custom_advice_status',
                                     'Not Found')
                 frappe.db.commit()
@@ -316,6 +312,7 @@ class PaymentEntryCreator:
                     settlement_advice.set('matched_claimbook_record', matched_claim['name'])
                     settlement_advice.set('matched_bill_record', matched_bill['name'])
                     settlement_advice.save()
+                    frappe.db.set_value('ClaimBook',matched_claim['name'],'matched_status','Matched')
                     frappe.db.set_value('Sales Invoice', sales_invoice.name, 'custom_insurance_name',
                                         matched_claim['insurance_company_name'])
                     frappe.db.commit()

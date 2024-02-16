@@ -6,8 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "reference_doctype",
-  "name1",
+  "payment_entry",
   "paid_amount",
   "allocated_amount",
   "utr_number"
@@ -32,22 +31,16 @@
    "label": "Allocated Amount"
   },
   {
-   "fieldname": "reference_doctype",
+   "fieldname": "payment_entry",
    "fieldtype": "Link",
-   "label": "Reference Doctype",
-   "options": "DocType"
-  },
-  {
-   "fieldname": "name1",
-   "fieldtype": "Dynamic Link",
-   "label": "Name",
-   "options": "reference_doctype"
+   "label": "Payment Entry",
+   "options": "Payment Entry"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-02-10 19:12:50.712650",
+ "modified": "2024-02-15 15:00:30.721101",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Sales Invoice Reference",

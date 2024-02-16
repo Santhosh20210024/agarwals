@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_hjcmp",
+  "matched_status",
   "hospital",
   "preauth_claim_id",
   "mrn",
@@ -355,11 +356,17 @@
    "fieldname": "final_utr_number",
    "fieldtype": "Data",
    "label": "Final UTR Number"
+  },
+  {
+   "fieldname": "matched_status",
+   "fieldtype": "Select",
+   "label": "Matched Status",
+   "options": "\nMatched"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-13 20:38:43.912786",
+ "modified": "2024-02-16 16:12:32.761727",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

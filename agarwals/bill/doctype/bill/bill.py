@@ -3,23 +3,12 @@
 
 import frappe
 from frappe.model.document import Document
-from agarwals.utils.importation_and_doc_creation import create_sales_invoice
-from agarwals.utils.splitter import splitter
-import pandas as pd
+
 
 
 class Bill(Document):
 	def before_save(self):
 		self.cost_center = self.branch + " - A"
-		# # Sales Invoice creation before saving the debtors
-		# if self.region == "Dr Agarwals Eye Hospital - A":
-		# 	self.region = self.cost_center
-	
-		# self.region = self.region.replace(" - A", "")
-
-
-
-		# splitter('/home/balamurugan/agarwals-bench/sites/agarwals.com/private/files/DrAgarwals/Extract/total_debtors.xlsx','Bill')
 
 
 

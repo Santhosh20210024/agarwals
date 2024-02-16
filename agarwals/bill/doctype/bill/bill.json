@@ -7,7 +7,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "company",
+  "entity",
   "region",
   "cost_center",
   "branch",
@@ -27,7 +27,7 @@
   "column_break_notl",
   "category",
   "payer",
-  "tpa",
+  "customer",
   "amount_section",
   "bill_amount",
   "discount",
@@ -48,59 +48,36 @@
   "final_submission_date",
   "invoice",
   "invoice_status",
-  "claim_book_records_section",
-  "bill_number_with_final_bill_number_section",
-  "no_of_claim_book_record_with_same_bill_number",
-  "bill_number_with_final_bill_number",
-  "claim_id_with_al_number_section",
-  "no_of_claim_book_record_with_same_al_number",
-  "claim_id_with_al_number",
-  "claim_id_with_cl_number_section",
-  "no_of_claim_book_record_with_same_cl_number",
-  "claim_id_with_cl_number",
-  "final_details_section",
-  "claim_record_id",
-  "final_claim_number",
-  "final_payer_name",
-  "final_insurance_name",
-  "final_claim_book_utr_number",
-  "payer_matched",
-  "settlement_details_column",
-  "final_original_utr_number",
-  "final_formatted_utr_number",
-  "settled_amount",
-  "tds_amount",
-  "disallowed_amount",
-  "payer_remarks"
+  "sales_invoice_status",
+  "invoice_amount",
+  "outstanding_amount"
  ],
  "fields": [
   {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Entity",
-   "options": "Entity"
-  },
-  {
    "fieldname": "region",
    "fieldtype": "Data",
-   "label": "Region"
+   "label": "Region",
+   "read_only": 1
   },
   {
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
-   "options": "Branch"
+   "options": "Branch",
+   "read_only": 1
   },
   {
    "fieldname": "bill_no",
    "fieldtype": "Data",
    "label": "Bill Number",
+   "read_only": 1,
    "unique": 1
   },
   {
    "fieldname": "bill_date",
    "fieldtype": "Datetime",
-   "label": "Bill Date"
+   "label": "Bill Date",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_kire",
@@ -109,29 +86,34 @@
   {
    "fieldname": "mrn",
    "fieldtype": "Data",
-   "label": "MRN"
+   "label": "MRN",
+   "read_only": 1
   },
   {
    "fieldname": "patient_name",
    "fieldtype": "Data",
-   "label": "Patient Name"
+   "label": "Patient Name",
+   "read_only": 1
   },
   {
    "fieldname": "bedtype",
    "fieldtype": "Data",
-   "label": "Bed Type"
+   "label": "Bed Type",
+   "read_only": 1
   },
   {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nRAISED\nCANCELLED"
+   "options": "\nRAISED\nCANCELLED",
+   "read_only": 1
   },
   {
    "depends_on": "eval: doc.status == \"CANCELLED\"",
    "fieldname": "cancelled_date",
    "fieldtype": "Datetime",
-   "label": "Cancelled Date"
+   "label": "Cancelled Date",
+   "read_only": 1
   },
   {
    "fieldname": "claim_details_sb",
@@ -141,18 +123,21 @@
   {
    "fieldname": "claim_id",
    "fieldtype": "Data",
-   "label": "Claim ID"
+   "label": "Claim ID",
+   "read_only": 1
   },
   {
    "fieldname": "payer",
    "fieldtype": "Data",
-   "label": "Payer"
+   "label": "Payer",
+   "read_only": 1
   },
   {
    "fieldname": "claim_status",
    "fieldtype": "Select",
    "label": "Claim Status",
-   "options": "\nFull Due\nNo Due\nPartial Due\n\\N"
+   "options": "\nFull Due\nNo Due\nPartial Due\n\\N",
+   "read_only": 1
   },
   {
    "fieldname": "amount_section",
@@ -162,22 +147,26 @@
   {
    "fieldname": "bill_amount",
    "fieldtype": "Currency",
-   "label": "Bill Amount"
+   "label": "Bill Amount",
+   "read_only": 1
   },
   {
    "fieldname": "discount",
    "fieldtype": "Currency",
-   "label": "Discount"
+   "label": "Discount",
+   "read_only": 1
   },
   {
    "fieldname": "net_amount",
    "fieldtype": "Currency",
-   "label": "Net Amount"
+   "label": "Net Amount",
+   "read_only": 1
   },
   {
    "fieldname": "paid_amount",
    "fieldtype": "Currency",
-   "label": "Paid Amount"
+   "label": "Paid Amount",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_ogdr",
@@ -186,22 +175,26 @@
   {
    "fieldname": "due_amount",
    "fieldtype": "Currency",
-   "label": "Due Amount"
+   "label": "Due Amount",
+   "read_only": 1
   },
   {
    "fieldname": "refund",
    "fieldtype": "Currency",
-   "label": "Refund"
+   "label": "Refund",
+   "read_only": 1
   },
   {
    "fieldname": "claim_amount",
    "fieldtype": "Currency",
-   "label": "Claim Amount"
+   "label": "Claim Amount",
+   "read_only": 1
   },
   {
    "fieldname": "claim_amount_due",
    "fieldtype": "Currency",
-   "label": "Claim Amount Due"
+   "label": "Claim Amount Due",
+   "read_only": 1
   },
   {
    "fieldname": "hash_value",
@@ -212,7 +205,8 @@
   {
    "fieldname": "consultant",
    "fieldtype": "Data",
-   "label": "Consultant"
+   "label": "Consultant",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_notl",
@@ -221,13 +215,8 @@
   {
    "fieldname": "category",
    "fieldtype": "Data",
-   "label": "Category"
-  },
-  {
-   "fetch_from": "payer.payer_final_name",
-   "fieldname": "tpa",
-   "fieldtype": "Data",
-   "label": "TPA"
+   "label": "Category",
+   "read_only": 1
   },
   {
    "fieldname": "physical_submission_details_section",
@@ -268,13 +257,15 @@
    "fieldname": "invoice",
    "fieldtype": "Link",
    "label": "Invoice",
-   "options": "Sales Invoice"
+   "options": "Sales Invoice",
+   "read_only": 1
   },
   {
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
-   "options": "Cost Center"
+   "options": "Cost Center",
+   "read_only": 1
   },
   {
    "fieldname": "invoice_status",
@@ -285,131 +276,41 @@
   {
    "fieldname": "branch_type",
    "fieldtype": "Data",
-   "label": "Branch Type"
+   "label": "Branch Type",
+   "read_only": 1
   },
   {
-   "fieldname": "claim_book_records_section",
-   "fieldtype": "Section Break",
-   "label": "Claim Book Records"
+   "fetch_from": "payer.payer_final_name",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
   },
   {
-   "fieldname": "bill_number_with_final_bill_number_section",
-   "fieldtype": "Section Break",
-   "label": "Bill Number with Final Bill Number"
-  },
-  {
-   "fieldname": "no_of_claim_book_record_with_same_bill_number",
+   "fetch_from": "invoice.status",
+   "fieldname": "sales_invoice_status",
    "fieldtype": "Data",
-   "label": "No of Claim Book Record with Same Bill Number"
+   "label": "Sales Invoice Status"
   },
   {
-   "fieldname": "bill_number_with_final_bill_number",
-   "fieldtype": "Table",
-   "label": "Bill Number with Final Bill Number",
-   "options": "Bill Number with Final Bill Number"
+   "fetch_from": "invoice.total",
+   "fieldname": "invoice_amount",
+   "fieldtype": "Currency",
+   "label": "Invoice Amount"
   },
   {
-   "fieldname": "claim_id_with_al_number_section",
-   "fieldtype": "Section Break",
-   "label": "Claim ID with AL Number"
+   "fetch_from": "invoice.outstanding_amount",
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "label": "Outstanding Amount"
   },
   {
-   "fieldname": "no_of_claim_book_record_with_same_al_number",
-   "fieldtype": "Data",
-   "label": "No of Claim Book Record with Same AL Number"
-  },
-  {
-   "fieldname": "claim_id_with_al_number",
-   "fieldtype": "Table",
-   "label": "Claim ID with AL Number",
-   "options": "Claim ID with AL Number"
-  },
-  {
-   "fieldname": "claim_id_with_cl_number_section",
-   "fieldtype": "Section Break",
-   "label": "Claim ID with CL Number"
-  },
-  {
-   "fieldname": "no_of_claim_book_record_with_same_cl_number",
-   "fieldtype": "Data",
-   "label": "No of Claim Book Record with Same CL Number"
-  },
-  {
-   "fieldname": "claim_id_with_cl_number",
-   "fieldtype": "Table",
-   "label": "Claim ID with CL Number",
-   "options": "Claim ID with CL Number"
-  },
-  {
-   "fieldname": "final_details_section",
-   "fieldtype": "Section Break",
-   "label": "Final Details"
-  },
-  {
-   "fieldname": "final_claim_number",
-   "fieldtype": "Data",
-   "label": "Final Claim Number"
-  },
-  {
-   "fieldname": "final_payer_name",
-   "fieldtype": "Data",
-   "label": "Final Payer Name"
-  },
-  {
-   "default": "0",
-   "fieldname": "payer_matched",
-   "fieldtype": "Check",
-   "label": "Payer Matched"
-  },
-  {
-   "fieldname": "settlement_details_column",
-   "fieldtype": "Column Break",
-   "label": "Settlement Details"
-  },
-  {
-   "fieldname": "settled_amount",
-   "fieldtype": "Data",
-   "label": "Settled Amount"
-  },
-  {
-   "fieldname": "tds_amount",
-   "fieldtype": "Data",
-   "label": "TDS Amount"
-  },
-  {
-   "fieldname": "disallowed_amount",
-   "fieldtype": "Data",
-   "label": "Disallowed Amount"
-  },
-  {
-   "fieldname": "final_original_utr_number",
-   "fieldtype": "Data",
-   "label": "Final Original UTR Number"
-  },
-  {
-   "fieldname": "final_formatted_utr_number",
-   "fieldtype": "Data",
-   "label": "Final Formatted UTR Number"
-  },
-  {
-   "fieldname": "payer_remarks",
-   "fieldtype": "Text",
-   "label": "Payer Remarks"
-  },
-  {
-   "fieldname": "final_insurance_name",
-   "fieldtype": "Data",
-   "label": "Final Insurance Name"
-  },
-  {
-   "fieldname": "final_claim_book_utr_number",
-   "fieldtype": "Data",
-   "label": "Final Claim Book UTR Number"
-  },
-  {
-   "fieldname": "claim_record_id",
-   "fieldtype": "Data",
-   "label": "Claim Record ID"
+   "fieldname": "entity",
+   "fieldtype": "Link",
+   "label": "Entity",
+   "options": "Entity",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -420,7 +321,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-01-28 22:01:39.740872",
+ "modified": "2024-02-15 21:55:53.616766",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
