@@ -18,16 +18,6 @@ class Fileupload(Document):
 		else:
 			return file_name, file_doc_id
 	
-	def get_uploaded_field(self):
-		list_upload_fields = get_doc_fields("upload")
-		upload_field_name = None
-		
-		for upload_field in list_upload_fields:
-			if self.get( upload_field ) != None and self.get( upload_field ) != '':
-				upload_field_name = upload_field
-				break
-		return upload_field_name
-	
 	def delete_backend_files(self, file_path):
 		if os.path.exists(file_path):
 			os.remove(file_path)
@@ -57,31 +47,27 @@ class Fileupload(Document):
 			else:
 				return
 
+	def validate_file_check(self, file_id, file_name, file_extensions):
+		frappe.delete_doc("File", file_id)
+		frappe.db.sql('DELETE FROM tabFile WHERE name in %(name)s', values={'name':file_id})
+		frappe.db.commit()
+
+		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
+		self.set(str(self.upload), None)
+		frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
+
 	def validate_file(self):
 		file_name, file_id = self.get_file_doc_data()
 		
 		if file_id:
 			try:
-				file_extensions = 'XLSX,XLS,CSV,PDF,XLSB'.split(',')
+				file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
 				if file_name.split('.')[-1].upper() not in file_extensions:
-					frappe.delete_doc("File", file_id)
-					frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
-					frappe.db.commit()
-
-					# Delete the shell files
-					self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-
-					self.set(str(self.upload), None)
-					frappe.throw("Please upload files in the following format: " + ','.join(file_extensions))
+					self.validate_file_check(file_id, file_name, file_extensions)
+					
 
 			except Exception as e:
-				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
-				frappe.db.commit()
-
-				# Delete the shell files
-				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
-				self.set(str(self.upload), None)
-
+				self.validate_file_check(file_id, file_name, file_extensions)
 												
 			self.validate_hash_content(file_name, file_id)
 				
@@ -117,10 +103,11 @@ class Fileupload(Document):
 		file_doc.save()
 
 		self.set("upload", file_doc.file_url)
-		self.set("upload_url", file_doc.file_url)
+		self.set("file", file_name)
 
 		if timestamped_file_name != None:
-			frappe.db.set_value('File', file_doc_id, 'file_name', timestamped_file_name)
+			self.set('file_name', timestamped_file_name)
+			frappe.db.set_value('File', file_doc_id[0], 'file_name', timestamped_file_name)
 			frappe.db.commit()
 		
 		
