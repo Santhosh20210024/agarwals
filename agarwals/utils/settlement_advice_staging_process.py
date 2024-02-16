@@ -14,7 +14,7 @@ def insert_record_in_settlement_advice(doc_to_insert):
         settlement_advices = frappe.get_list("Settlement Advice", filters={
             'utr_number': doc_to_insert.utr_number, 'claim_id':doc_to_insert.claim_id, 'status': "Error"})
         print(settlement_advices)
-        if len(settlement_advices) > 0:
+        if len(settlement_advices) > 0 and doc_to_insert.retry == 1:
             name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id + "-" + str(len(settlement_advices))
         else:
             name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id
