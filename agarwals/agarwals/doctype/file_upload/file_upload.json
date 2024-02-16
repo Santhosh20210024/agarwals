@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "date",
+  "file_name",
   "document_type",
   "payer_type",
   "bank_account",
@@ -80,11 +81,17 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "File"
+  },
+  {
+   "depends_on": "eval:doc.upload != null",
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-20 04:02:33.223974",
+ "modified": "2024-02-06 16:09:38.187946",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
@@ -104,7 +111,6 @@
    "write": 1
   }
  ],
- "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
