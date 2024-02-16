@@ -16,6 +16,7 @@
   "claim_id",
   "bill_no",
   "utr_number",
+  "cg_utr_number",
   "final_utr_number",
   "claim_amount",
   "disallowed_amount",
@@ -149,6 +150,11 @@
    "fieldtype": "Table",
    "label": "Match Log",
    "options": "Match Log"
+  },
+  {
+   "fieldname": "cg_utr_number",
+   "fieldtype": "Data",
+   "label": "CG UTR Number"
   },
   {
    "fieldname": "insurance_company_name",
