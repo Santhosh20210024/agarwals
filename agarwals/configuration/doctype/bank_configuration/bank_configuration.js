@@ -1,7 +1,7 @@
-// Copyright (c) 2023, Agarwals and contributors
+// Copyright (c) 2024, Agarwals and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Branch Region List', {
+frappe.ui.form.on('Bank Configuration', {
 	// refresh: function(frm) {
 
 	// }

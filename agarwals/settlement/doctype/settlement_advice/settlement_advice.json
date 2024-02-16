@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "format:{final_utr_number}-{claim_id}",
+ "autoname": "prompt",
  "creation": "2023-12-23 12:12:27.383921",
  "default_view": "List",
  "doctype": "DocType",
@@ -117,7 +117,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nError\nOpen\nNot Processed\nPartially Processed\nFully Processed"
+   "options": "\nError\nOpen\nNot Processed\nPartially Processed\nFully Processed\nWarning"
   },
   {
    "fieldname": "disallowed_amount",
@@ -215,11 +215,11 @@
   }
  ],
  "links": [],
- "modified": "2024-02-04 17:52:38.162797",
+ "modified": "2024-02-12 14:59:22.241993",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
- "naming_rule": "Expression",
+ "naming_rule": "Set by user",
  "owner": "Administrator",
  "permissions": [
   {

@@ -2,6 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
+ "autoname": "field:payer_name",
  "creation": "2023-12-20 02:02:19.313890",
  "default_view": "List",
  "doctype": "DocType",
@@ -15,20 +16,23 @@
   {
    "fieldname": "payer_name",
    "fieldtype": "Data",
-   "label": "Payer Name"
+   "label": "Payer Name",
+   "unique": 1
   },
   {
    "fieldname": "payer_final_name",
-   "fieldtype": "Data",
-   "label": "Payer Final Name"
+   "fieldtype": "Link",
+   "label": "Payer Final Name",
+   "options": "Customer"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-20 10:03:11.293878",
+ "modified": "2024-02-15 14:27:44.313012",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Payer Alias",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

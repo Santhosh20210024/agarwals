@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestTransactionStagging(FrappeTestCase):
+class TestSchedulerJobConfiguration(FrappeTestCase):
 	pass

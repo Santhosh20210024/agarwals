@@ -7,7 +7,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "company",
+  "entity",
   "region",
   "cost_center",
   "branch",
@@ -27,7 +27,7 @@
   "column_break_notl",
   "category",
   "payer",
-  "tpa",
+  "customer",
   "amount_section",
   "bill_amount",
   "discount",
@@ -47,36 +47,37 @@
   "column_break_ahot",
   "final_submission_date",
   "invoice",
-  "invoice_status"
+  "invoice_status",
+  "sales_invoice_status",
+  "invoice_amount",
+  "outstanding_amount"
  ],
  "fields": [
   {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Entity",
-   "options": "Entity"
-  },
-  {
    "fieldname": "region",
    "fieldtype": "Data",
-   "label": "Region"
+   "label": "Region",
+   "read_only": 1
   },
   {
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
-   "options": "Branch"
+   "options": "Branch",
+   "read_only": 1
   },
   {
    "fieldname": "bill_no",
    "fieldtype": "Data",
    "label": "Bill Number",
+   "read_only": 1,
    "unique": 1
   },
   {
    "fieldname": "bill_date",
    "fieldtype": "Datetime",
-   "label": "Bill Date"
+   "label": "Bill Date",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_kire",
@@ -85,29 +86,34 @@
   {
    "fieldname": "mrn",
    "fieldtype": "Data",
-   "label": "MRN"
+   "label": "MRN",
+   "read_only": 1
   },
   {
    "fieldname": "patient_name",
    "fieldtype": "Data",
-   "label": "Patient Name"
+   "label": "Patient Name",
+   "read_only": 1
   },
   {
    "fieldname": "bedtype",
    "fieldtype": "Data",
-   "label": "Bed Type"
+   "label": "Bed Type",
+   "read_only": 1
   },
   {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nRAISED\nCANCELLED"
+   "options": "\nRAISED\nCANCELLED",
+   "read_only": 1
   },
   {
    "depends_on": "eval: doc.status == \"CANCELLED\"",
    "fieldname": "cancelled_date",
    "fieldtype": "Datetime",
-   "label": "Cancelled Date"
+   "label": "Cancelled Date",
+   "read_only": 1
   },
   {
    "fieldname": "claim_details_sb",
@@ -117,18 +123,21 @@
   {
    "fieldname": "claim_id",
    "fieldtype": "Data",
-   "label": "Claim ID"
+   "label": "Claim ID",
+   "read_only": 1
   },
   {
    "fieldname": "payer",
    "fieldtype": "Data",
-   "label": "Payer"
+   "label": "Payer",
+   "read_only": 1
   },
   {
    "fieldname": "claim_status",
    "fieldtype": "Select",
    "label": "Claim Status",
-   "options": "\nFull Due\nNo Due\nPartial Due\n\\N"
+   "options": "\nFull Due\nNo Due\nPartial Due\n\\N",
+   "read_only": 1
   },
   {
    "fieldname": "amount_section",
@@ -138,22 +147,26 @@
   {
    "fieldname": "bill_amount",
    "fieldtype": "Currency",
-   "label": "Bill Amount"
+   "label": "Bill Amount",
+   "read_only": 1
   },
   {
    "fieldname": "discount",
    "fieldtype": "Currency",
-   "label": "Discount"
+   "label": "Discount",
+   "read_only": 1
   },
   {
    "fieldname": "net_amount",
    "fieldtype": "Currency",
-   "label": "Net Amount"
+   "label": "Net Amount",
+   "read_only": 1
   },
   {
    "fieldname": "paid_amount",
    "fieldtype": "Currency",
-   "label": "Paid Amount"
+   "label": "Paid Amount",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_ogdr",
@@ -162,22 +175,26 @@
   {
    "fieldname": "due_amount",
    "fieldtype": "Currency",
-   "label": "Due Amount"
+   "label": "Due Amount",
+   "read_only": 1
   },
   {
    "fieldname": "refund",
    "fieldtype": "Currency",
-   "label": "Refund"
+   "label": "Refund",
+   "read_only": 1
   },
   {
    "fieldname": "claim_amount",
    "fieldtype": "Currency",
-   "label": "Claim Amount"
+   "label": "Claim Amount",
+   "read_only": 1
   },
   {
    "fieldname": "claim_amount_due",
    "fieldtype": "Currency",
-   "label": "Claim Amount Due"
+   "label": "Claim Amount Due",
+   "read_only": 1
   },
   {
    "fieldname": "hash_value",
@@ -188,7 +205,8 @@
   {
    "fieldname": "consultant",
    "fieldtype": "Data",
-   "label": "Consultant"
+   "label": "Consultant",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_notl",
@@ -197,13 +215,8 @@
   {
    "fieldname": "category",
    "fieldtype": "Data",
-   "label": "Category"
-  },
-  {
-   "fetch_from": "payer.payer_final_name",
-   "fieldname": "tpa",
-   "fieldtype": "Data",
-   "label": "TPA"
+   "label": "Category",
+   "read_only": 1
   },
   {
    "fieldname": "physical_submission_details_section",
@@ -244,13 +257,15 @@
    "fieldname": "invoice",
    "fieldtype": "Link",
    "label": "Invoice",
-   "options": "Sales Invoice"
+   "options": "Sales Invoice",
+   "read_only": 1
   },
   {
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
-   "options": "Cost Center"
+   "options": "Cost Center",
+   "read_only": 1
   },
   {
    "fieldname": "invoice_status",
@@ -258,10 +273,44 @@
    "label": "Invoice Status",
    "options": "\nRAISED\nCANCELLED"
   },
-   {
+  {
    "fieldname": "branch_type",
    "fieldtype": "Data",
-   "label": "Branch Type"
+   "label": "Branch Type",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "payer.payer_final_name",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "invoice.status",
+   "fieldname": "sales_invoice_status",
+   "fieldtype": "Data",
+   "label": "Sales Invoice Status"
+  },
+  {
+   "fetch_from": "invoice.total",
+   "fieldname": "invoice_amount",
+   "fieldtype": "Currency",
+   "label": "Invoice Amount"
+  },
+  {
+   "fetch_from": "invoice.outstanding_amount",
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "label": "Outstanding Amount"
+  },
+  {
+   "fieldname": "entity",
+   "fieldtype": "Link",
+   "label": "Entity",
+   "options": "Entity",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -272,7 +321,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-01-10 19:45:32.652369",
+ "modified": "2024-02-15 21:55:53.616766",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
