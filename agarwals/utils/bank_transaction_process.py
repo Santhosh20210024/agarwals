@@ -72,12 +72,12 @@ def create_bank_transaction(transaction_list):
                 save_trans_doc(trans_doc)
                 continue
                         
-            if int(transaction.get('deposit')) == 0 and int(transaction.get('withdrawal')) != 0:
-                trans_doc.staging_status = 'Withdrawn'
-                trans_doc.remark = 'Withdrawn case'
-                trans_doc.retry = 0
-                save_trans_doc(trans_doc)
-                continue
+            # if int(transaction.get('deposit')) == 0 and int(transaction.get('withdrawal')) != 0:
+            #     trans_doc.staging_status = 'Withdrawn'
+            #     trans_doc.remark = 'Withdrawn case'
+            #     trans_doc.retry = 0
+            #     save_trans_doc(trans_doc)
+            #     continue
 
             if transaction.retry != 1 and transaction.get('update_reference_number') is None:
                 if transaction.get('reference_number') != None and len(transaction.get('reference_number').strip().lstrip('0')) < 5:
@@ -142,15 +142,13 @@ def create_bank_transaction(transaction_list):
         except Exception as e:
             trans_doc = frappe.get_doc('Bank Transaction Staging', transaction['name'] )
             trace_info = str(traceback.format_exc()).split(':')[-1]
+            trans_doc.staging_status = "Error"
 
             # duplicate entry
             if 'Duplicate entry' in trace_info:
-                trans_doc.staging_status = "Error"
                 trans_doc.error = ERROR_LOG['E100']
-                trans_doc.remark = trace_info
-            else:
-                trans_doc.remark = trace_info
-
+                
+            trans_doc.remark = trace_info
             trans_doc.save()
             frappe.db.commit()
 
