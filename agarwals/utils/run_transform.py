@@ -46,7 +46,7 @@ def run_payment_entry():
     n = 2000
     for i in range(0, len(bank_transaction_records), n):
         batch_number = batch_number + 1
-        frappe.enqueue(PaymentEntryCreator(claim_records,bill_records,settlement_advice_records).process, queue='myqueue', is_async=True, job_name="Batch" + str(batch_number), timeout=25000,
+        frappe.enqueue(PaymentEntryCreator(claim_records,bill_records,settlement_advice_records).process, queue='long', is_async=True, job_name="Batch" + str(batch_number), timeout=25000,
                        bank_transaction_records=bank_transaction_records[i:i + n])
 
 
