@@ -364,8 +364,9 @@ class PaymentEntryCreator:
                             settlement_advice.set('status', 'Fully Processed')
                         else:
                             settlement_advice.set('status', 'Partially Processed')
-                        sales_invoice.append('custom_reference',{'payment_entry':payment_entry_name})
-                        sales_invoice.save()
+                        sales_doc = self.get_document_record('Sales Invoice', sales_invoice.name)
+                        sales_doc.append('custom_reference',{'payment_entry':payment_entry_name})
+                        sales_doc.save()
                         frappe.db.commit()
                     else:
                         settlement_advice.set('remark','Unable to Create Payment Entry')
