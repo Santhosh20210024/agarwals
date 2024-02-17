@@ -85,7 +85,7 @@ class Fileupload(Document):
 			return timestamped_file_name
 
 		except Exception as e:
-			err = frappe.get_doc('Error Record Log')
+			err = frappe.new_doc('Error Record Log')
 			err.doctype_name = 'File Upload'
 			err.error_message = e
 			err.save()
