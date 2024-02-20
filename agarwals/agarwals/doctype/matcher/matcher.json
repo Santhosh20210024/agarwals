@@ -1,0 +1,108 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-02-20 19:47:41.424633",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sales_invoice",
+  "claimbook",
+  "insurance_company_name",
+  "settlement_advice",
+  "bank_transaction",
+  "settled_amount",
+  "tds_amount",
+  "disallowance_amount",
+  "match_logic",
+  "status",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "claimbook",
+   "fieldtype": "Link",
+   "label": "ClaimBook",
+   "options": "ClaimBook"
+  },
+  {
+   "fieldname": "settlement_advice",
+   "fieldtype": "Link",
+   "label": "Settlement Advice",
+   "options": "Settlement Advice"
+  },
+  {
+   "fieldname": "bank_transaction",
+   "fieldtype": "Link",
+   "label": "Bank Transaction",
+   "options": "Bank Transaction"
+  },
+  {
+   "fieldname": "match_logic",
+   "fieldtype": "Select",
+   "label": "Match Logic",
+   "options": "MA1\nMA2\nMA3\nMA4\nMA5\nMA6\nMA7"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "tds_amount",
+   "fieldtype": "Data",
+   "label": "TDS Amount"
+  },
+  {
+   "fieldname": "disallowance_amount",
+   "fieldtype": "Data",
+   "label": "Disallowance Amount"
+  },
+  {
+   "fieldname": "settled_amount",
+   "fieldtype": "Data",
+   "label": "Settled Amount"
+  },
+  {
+   "fieldname": "insurance_company_name",
+   "fieldtype": "Data",
+   "label": "Insurance Company Name"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-02-20 23:20:27.079031",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Matcher",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
