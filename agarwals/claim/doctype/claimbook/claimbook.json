@@ -65,7 +65,9 @@
   "remarks",
   "file_size",
   "hash",
-  "final_utr_number"
+  "final_utr_number",
+  "al_key",
+  "cl_key"
  ],
  "fields": [
   {
@@ -362,11 +364,21 @@
    "fieldtype": "Select",
    "label": "Matched Status",
    "options": "\nMatched"
+  },
+  {
+   "fieldname": "al_key",
+   "fieldtype": "Data",
+   "label": "AL Key"
+  },
+  {
+   "fieldname": "cl_key",
+   "fieldtype": "Data",
+   "label": "CL Key"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-16 16:12:32.761727",
+ "modified": "2024-02-20 16:06:55.226954",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

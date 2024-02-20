@@ -36,7 +36,8 @@
   "matched_claimbook_record",
   "matched_bill_record",
   "source_file",
-  "file_name"
+  "file_name",
+  "claim_key"
  ],
  "fields": [
   {
@@ -212,10 +213,15 @@
    "fieldname": "file_name",
    "fieldtype": "Data",
    "label": "File Name"
+  },
+  {
+   "fieldname": "claim_key",
+   "fieldtype": "Data",
+   "label": "Claim Key"
   }
  ],
  "links": [],
- "modified": "2024-02-12 14:59:22.241993",
+ "modified": "2024-02-20 16:07:24.337888",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

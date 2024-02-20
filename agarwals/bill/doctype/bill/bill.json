@@ -39,6 +39,7 @@
   "claim_amount",
   "claim_amount_due",
   "hash_value",
+  "claim_key",
   "physical_submission_details_section",
   "column_break_fvwc",
   "verified",
@@ -311,6 +312,11 @@
    "label": "Entity",
    "options": "Entity",
    "read_only": 1
+  },
+  {
+   "fieldname": "claim_key",
+   "fieldtype": "Data",
+   "label": "Claim Key"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -321,7 +327,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-02-15 21:55:53.616766",
+ "modified": "2024-02-20 16:47:16.811056",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
