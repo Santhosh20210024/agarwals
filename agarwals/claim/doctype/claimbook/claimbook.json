@@ -67,7 +67,9 @@
   "hash",
   "final_utr_number",
   "al_key",
-  "cl_key"
+  "cl_key",
+  "cg_utr_number",
+  "cg_formatted_utr_number"
  ],
  "fields": [
   {
@@ -374,11 +376,21 @@
    "fieldname": "cl_key",
    "fieldtype": "Data",
    "label": "CL Key"
+  },
+  {
+   "fieldname": "cg_utr_number",
+   "fieldtype": "Data",
+   "label": "CG UTR Number"
+  },
+  {
+   "fieldname": "cg_formatted_utr_number",
+   "fieldtype": "Data",
+   "label": "CG Formatted UTR Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-20 16:06:55.226954",
+ "modified": "2024-02-20 20:00:40.344604",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

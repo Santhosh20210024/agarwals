@@ -221,3 +221,7 @@ before_install = "agarwals.utils.create_folders.folder_structure_creation"
 # auth_hooks = [
 #	"agarwals.auth.validate"
 # ]
+
+fixtures = [
+    "Custom Field"
+]

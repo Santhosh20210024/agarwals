@@ -1,0 +1,11 @@
+[
+{
+    "doctype": "Custom Field",
+    "dt": "Bank Transaction",
+    "name": "Bank Transaction-cg_utr_number",
+    "fieldname": "custom_cg_utr_number",
+    "fieldtype": "Data",
+    "label": "CG UTR Number",
+    "insert_after": "reference_number"
+    }
+  ]

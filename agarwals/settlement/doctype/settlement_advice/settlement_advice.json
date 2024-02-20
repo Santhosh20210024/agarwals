@@ -18,6 +18,7 @@
   "utr_number",
   "cg_utr_number",
   "final_utr_number",
+  "cg_formatted_utr_number",
   "claim_amount",
   "disallowed_amount",
   "payers_remark",
@@ -218,10 +219,15 @@
    "fieldname": "claim_key",
    "fieldtype": "Data",
    "label": "Claim Key"
+  },
+  {
+   "fieldname": "cg_formatted_utr_number",
+   "fieldtype": "Data",
+   "label": "CG Formatted UTR Number"
   }
  ],
  "links": [],
- "modified": "2024-02-20 16:07:24.337888",
+ "modified": "2024-02-20 20:01:40.086316",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
