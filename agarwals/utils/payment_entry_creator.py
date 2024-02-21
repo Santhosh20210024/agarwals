@@ -88,7 +88,7 @@ class PaymentEntryCreator:
     def update_payment_reference(self, sales_invoice, payment_entry):
         sales_doc = self.get_document_record('Sales Invoice', sales_invoice)
         sales_doc.append('custom_reference',{'payment_entry':payment_entry.name,'settled_amount':payment_entry.paid_amount, 
-                                                             'tds_amount':payment_entry.tds_amount, 'disallowance_amount':payment_entry.disallowance_amount, 
+                                                             'tds_amount':payment_entry.custom_tds_amount, 'disallowance_amount':payment_entry.custom_disallowed_amount,
                                                              'allocated_amount':payment_entry.total_allocated_amount, 'utr_number':payment_entry.reference_no })
         sales_doc.save()
 
