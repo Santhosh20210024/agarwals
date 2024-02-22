@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "prompt",
  "creation": "2024-02-20 19:47:41.424633",
  "default_view": "List",
  "doctype": "DocType",
@@ -42,7 +43,8 @@
    "fieldname": "match_logic",
    "fieldtype": "Select",
    "label": "Match Logic",
-   "options": "MA1\nMA2\nMA3\nMA4\nMA5\nMA6\nMA7"
+   "options": "MA1-1\nMA1-2\nMA2-1\nMA2-2\nMA3-1\nMA3-2\nMA4-1\nMA4-2\nMA5-1\nMA5-2\nMA6-1\nMA6-2\nMA7-1\nMA7-2",
+   "search_index": 1
   },
   {
    "fieldname": "status",
@@ -58,7 +60,8 @@
    "fieldname": "sales_invoice",
    "fieldtype": "Link",
    "label": "Sales Invoice",
-   "options": "Sales Invoice"
+   "options": "Sales Invoice",
+   "search_index": 1
   },
   {
    "fieldname": "tds_amount",
@@ -83,10 +86,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-20 23:20:27.079031",
+ "modified": "2024-02-21 19:24:09.406441",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",
+ "naming_rule": "Set by user",
  "owner": "Administrator",
  "permissions": [
   {

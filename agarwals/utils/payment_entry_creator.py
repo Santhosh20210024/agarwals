@@ -47,12 +47,14 @@ class PaymentEntryCreator:
                                    'branch': sales_invoice.branch, 'entity': sales_invoice.entity,
                                    'region': sales_invoice.region, 'branch_type': sales_invoice.branch_type,
                                    'amount': tds_amount})
+                payment_entry_record.set('custom_tds_amount', tds_amount)
             if disallowed_amount > 0:
                 deductions.append({'account': 'Disallowance - A', 'cost_center': sales_invoice.cost_center,
                                    'description': 'Disallowance',
                                    'branch': sales_invoice.branch, 'entity': sales_invoice.entity,
                                    'region': sales_invoice.region, 'branch_type': sales_invoice.branch_type,
                                    'amount': disallowed_amount})
+                payment_entry_record.set('custom_disallowed_amount', disallowed_amount)
             if deductions:
                 payment_entry_record.set('deductions', deductions)
             reference_item = [{
@@ -63,16 +65,17 @@ class PaymentEntryCreator:
             payment_entry_record.set('references', reference_item)
             payment_entry_record.save()
             payment_entry_record.submit()
+
+            bank_transaction = frappe.get_doc('Bank Transaction', bank_transaction.name)
             bank_transaction.append('payment_entries',
                                     {'payment_document': 'Payment Entry', 'payment_entry': payment_entry_record.name,
                                      'allocated_amount': payment_entry_record.paid_amount})
             bank_transaction.submit()
-            # frappe.db.commit()
+            frappe.db.commit()
             return payment_entry_record
         except Exception as e:
             self.log_error('Sales Invoice', sales_invoice.name, error_msg=e)
             return ''
-
 
     def get_document_record(self, doctype, name):
         return frappe.get_doc(doctype,name)
@@ -87,13 +90,13 @@ class PaymentEntryCreator:
     
     def update_payment_reference(self, sales_invoice, payment_entry):
         sales_doc = self.get_document_record('Sales Invoice', sales_invoice)
-        sales_doc.append('custom_reference',{'payment_entry':payment_entry.name,'settled_amount':payment_entry.paid_amount, 
+        sales_doc.append('custom_reference',{'payment_entry':payment_entry.name,'paid_amount':payment_entry.paid_amount,
                                                              'tds_amount':payment_entry.custom_tds_amount, 'disallowance_amount':payment_entry.custom_disallowed_amount,
                                                              'allocated_amount':payment_entry.total_allocated_amount, 'utr_number':payment_entry.reference_no })
         sales_doc.save()
 
     def process(self, bank_transaction_records):
-        match_logic = frappe.get_single('Control Panel').match_logic # neeed to replace
+        match_logic = frappe.get_single('Control Panel').match_logic.split(',') # neeed to replace
 
         for bank_transaction_record in bank_transaction_records:
             if not bank_transaction_record['date']:  #If Date is null skip to next record
@@ -115,9 +118,9 @@ class PaymentEntryCreator:
 
             for record in matcher_records:
                 bank_amount = 0
-                settled_amount = record.settled_amount
-                tds_amount = record.tds_amount
-                disallowance_amount = record.disallowance_amount
+                settled_amount = float(record.settled_amount)
+                tds_amount = float(record.tds_amount)
+                disallowance_amount = float(record.disallowance_amount)
                 unallocated_amount = frappe.get_doc('Bank Transaction', record.bank_transaction).unallocated_amount
                 settlement_advice = self.get_document_record('Settlement Advice', record.settlement_advice)
 
@@ -132,6 +135,7 @@ class PaymentEntryCreator:
                 sales_invoice = self.get_document_record('Sales Invoice', record.sales_invoice)
 
                 if record.claimbook:
+                    settlement_advice.set('insurance_company_name', record.insurance_company_name)
                     settlement_advice.set('matched_bank_transaction', bank_transaction_record['name'])
                     settlement_advice.set('matched_claimbook_record', record.claimbook)
                     settlement_advice.set('matched_bill_record', record.sales_invoice)
@@ -142,7 +146,10 @@ class PaymentEntryCreator:
                     settlement_advice.set('matched_bank_transaction', bank_transaction_record['name'])
                     settlement_advice.set('matched_bill_record',record.sales_invoice)
 
-                settlement_advice.save()
+                settlement_advice.set('tpa', sales_invoice.customer)
+                settlement_advice.set('region', sales_invoice.region)
+                settlement_advice.set('entity', sales_invoice.entity)
+                settlement_advice.set('branch_type', sales_invoice.branch_type)
 
                 if sales_invoice.outstanding_amount < settled_amount:
                     settled_amount = sales_invoice.outstanding_amount

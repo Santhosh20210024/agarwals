@@ -370,27 +370,31 @@
   {
    "fieldname": "al_key",
    "fieldtype": "Data",
-   "label": "AL Key"
+   "label": "AL Key",
+   "search_index": 1
   },
   {
    "fieldname": "cl_key",
    "fieldtype": "Data",
-   "label": "CL Key"
+   "label": "CL Key",
+   "search_index": 1
   },
   {
    "fieldname": "cg_utr_number",
    "fieldtype": "Data",
-   "label": "CG UTR Number"
+   "label": "CG UTR Number",
+   "search_index": 1
   },
   {
    "fieldname": "cg_formatted_utr_number",
    "fieldtype": "Data",
-   "label": "CG Formatted UTR Number"
+   "label": "CG Formatted UTR Number",
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-20 20:00:40.344604",
+ "modified": "2024-02-21 19:02:11.634439",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
