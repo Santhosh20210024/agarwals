@@ -51,7 +51,8 @@
   "invoice_status",
   "sales_invoice_status",
   "invoice_amount",
-  "outstanding_amount"
+  "outstanding_amount",
+  "cg_formatted_bill_number"
  ],
  "fields": [
   {
@@ -316,7 +317,14 @@
   {
    "fieldname": "claim_key",
    "fieldtype": "Data",
-   "label": "Claim Key"
+   "label": "Claim Key",
+   "search_index": 1
+  },
+  {
+   "fieldname": "cg_formatted_bill_number",
+   "fieldtype": "Data",
+   "label": "CG Formatted Bill Number",
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -327,7 +335,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-02-20 16:47:16.811056",
+ "modified": "2024-02-21 18:40:27.722622",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",

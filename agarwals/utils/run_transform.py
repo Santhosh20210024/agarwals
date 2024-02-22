@@ -39,11 +39,9 @@ def run_payment_entry():
         )
     
     batch_number = 0
-    n = frappe.get_single('Control Panel').payment_matching_chunk_size
+    n = int(frappe.get_single('Control Panel').payment_matching_chunk_size)
 
     for i in range(0, len(bank_transaction_records), n):
         batch_number = batch_number + 1
         frappe.enqueue(PaymentEntryCreator().process, queue='long', is_async=True, job_name="Batch" + str(batch_number), timeout=25000,
                        bank_transaction_records = bank_transaction_records[i:i + n])
-
-
