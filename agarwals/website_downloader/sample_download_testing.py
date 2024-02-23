@@ -488,7 +488,8 @@ download_data={
                                                         [
                                                             {
                                                                 "Literal": {
-                                                                    "Value": "514820L"
+                                                                    "Value": f"{login_response.json()["userDetail"]["properties"]["MAID"]}L"
+
                                                                 }
                                                             }
                                                         ]
