@@ -44,11 +44,10 @@ def insert_record_in_settlement_advice(doc_to_insert):
         doc_to_insert.remarks = str(e)
         doc_to_insert.save(ignore_permissions=True)
         frappe.db.commit()
-        
 
-@frappe.whitelist()
-def process():
-        for advice in frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed'],'retry':['!=', 0]}, fields = "*" ):
+
+def settlement_advice_staging(advices):
+     for advice in advices:
             try:
                 advice_staging_doc=frappe.get_doc('Settlement Advice Staging',advice.name)
                 advice_staging_doc.date = date.today(),
@@ -86,6 +85,14 @@ def process():
                 advice_staging_doc.save(ignore_permissions=True)
                 frappe.db.commit()
                 continue
-        return "Success"
+        
+
+@frappe.whitelist()
+def process():
+        advices_list = frappe.get_all('Settlement Advice Staging',filters = {'status' : ['!=', 'Processed']}, fields = "*" )
+        n = 1000
+        for i in range(0, len(advices_list), n):
+              frappe.enqueue(settlement_advice_staging, queue='long', is_async=True, job_name="settlement advice staging", timeout=25000,
+                       advices = advices_list[i:i + n])
         
         
