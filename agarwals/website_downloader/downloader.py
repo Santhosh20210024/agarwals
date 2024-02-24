@@ -5,7 +5,6 @@ import frappe
 import shutil
 import os
 from agarwals.utils.file_util import construct_file_url
-from agarwals.utils.path_data import HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER,INNER_SUB_DIR
 
 class Downloader():
     tpa=''
@@ -18,7 +17,11 @@ class Downloader():
             self.password = credential_doc[0].password
         else:
             self.log_error('TPA Login Credentials',self.user_name,"No Credenntial for the given input")
-        print("tpa",self.hospital_branch)
+        self.PROJECT_FOLDER = "DrAgarwals"
+        self.HOME_PATH = "Home/DrAgarwals"
+        self.SHELL_PATH = "private/files"
+        self.SUB_DIR = ["Extract", "Transform", "Load", "Bin"]
+        self.SITE_PATH=frappe.get_single("Control Panel").site_path
         
     def delete_backend_files(self,file_path=None):
         if os.path.exists(file_path):
@@ -28,18 +31,28 @@ class Downloader():
         if file_name and content:
             with open(file_name, "wb") as file:
                 file.write(content)
-            shutil.move(file_name,  construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]))
+            shutil.move(file_name,  construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0]))
             file=frappe.new_doc("File")
-            file.folder = construct_file_url(HOME_PATH, SUB_DIR[0])
+            file.folder = construct_file_url(self.HOME_PATH, self.SUB_DIR[0])
             file.is_private=1
-            file.file_url= "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
+            file.file_url= "/" + construct_file_url(self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name)
             file.save(ignore_permissions=True)
             frappe.db.commit()
-            self.delete_backend_files(file_path=construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0],file_name))
-            shutil.move(construct_file_url(SITE_PATH,SHELL_PATH,file_name),  construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]))
-            frappe.db.set_value('File', file.name, 'file_url', "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name))
-            
-    def log_error(doctype_name, reference_name, error_message):
+            self.delete_backend_files(file_path=construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0],file_name))
+            shutil.move(construct_file_url(self.SITE_PATH,self.SHELL_PATH,file_name),  construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0]))
+            file_url="/" + construct_file_url(self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name)
+            frappe.db.set_value('File', file.name, 'file_url', file_url)
+            self.create_fileupload(file_url)
+    
+    def create_fileupload(self,file_url):
+        file_upload_doc=frappe.new_doc("File upload")
+        file_upload_doc.document_type="Settlement Advice"
+        file_upload_doc.payer_type=self.tpa
+        file_upload_doc.upload=file_url
+        file_upload_doc.save(ignore_permissions=True)
+        frappe.db.commit()
+
+    def log_error(self,doctype_name, reference_name, error_message):
         error_log = frappe.new_doc('Error Record Log')
         error_log.set('doctype_name', doctype_name)
         error_log.set('reference_name', reference_name)
@@ -51,7 +64,6 @@ class Mediassist(Downloader):
     def __init__(self,hospital_branch):
         self.hospital_branch=hospital_branch
         Downloader.__init__(self)
-        
         
     def download(self):
         try:
