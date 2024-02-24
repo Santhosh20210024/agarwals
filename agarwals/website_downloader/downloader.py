@@ -4,17 +4,17 @@ import json
 
 class Downloader():
     def __init__(self):
-        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch":['=',self.branch],"tpa":['=',f'{self.tpa}%']})
+        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch":['=',self.hospital_branch],"tpa":['=',f'{self.tpa}%']})
         self.user_name = credential_doc.user_name
         self.password = credential_doc.password
         self.tpa=''
-        self.branch=''
+        self.hospital_branch=''
         
 class Mediassist(Downloader):
-    def __init__(self,branch):
+    def __init__(self,hospital_branch):
         super().__init__()
         self.tpa='Mediassist India Tpa P Ltd'
-        self.branch=branch
+        self.hospital_branch=hospital_branch
     
     def download(self):
         login_url="https://api-crm-inpatient-v2.ihx.in/Provider/Login"
