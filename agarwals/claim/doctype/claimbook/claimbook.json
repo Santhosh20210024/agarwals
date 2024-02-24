@@ -65,11 +65,11 @@
   "remarks",
   "file_size",
   "hash",
-  "final_utr_number",
   "al_key",
   "cl_key",
   "cg_utr_number",
-  "cg_formatted_utr_number"
+  "cg_formatted_utr_number",
+  "final_utr_number"
  ],
  "fields": [
   {
@@ -135,12 +135,19 @@
   {
    "fieldname": "al_number",
    "fieldtype": "Data",
-   "label": "AL Number"
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "AL Number",
+   "search_index": 1
   },
   {
    "fieldname": "cl_number",
    "fieldtype": "Data",
-   "label": "CL Number"
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "CL Number",
+   "search_index": 1
   },
   {
    "fieldname": "doa",
@@ -160,7 +167,11 @@
   {
    "fieldname": "final_bill_number",
    "fieldtype": "Data",
-   "label": "Final Bill Number"
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "CG Bill Number",
+   "search_index": 1
   },
   {
    "fieldname": "final_bill_date",
@@ -170,6 +181,8 @@
   {
    "fieldname": "final_bill_amount",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
    "label": "Final Bill Amount"
   },
   {
@@ -205,7 +218,9 @@
   {
    "fieldname": "utr_number",
    "fieldtype": "Data",
-   "label": "UTR Number"
+   "in_preview": 1,
+   "label": "UTR Number",
+   "search_index": 1
   },
   {
    "fieldname": "paid_on_date",
@@ -220,6 +235,7 @@
   {
    "fieldname": "approved_amount",
    "fieldtype": "Data",
+   "in_preview": 1,
    "label": "Approved Amount"
   },
   {
@@ -230,6 +246,8 @@
   {
    "fieldname": "settled_amount",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
    "label": "Settled Amount"
   },
   {
@@ -245,11 +263,15 @@
   {
    "fieldname": "tds_amount",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
    "label": "TDS Amount"
   },
   {
    "fieldname": "tpa_shortfall_amount",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
    "label": "TPA Shortfall Amount"
   },
   {
@@ -298,8 +320,11 @@
    "label": "Case Closed In Preauth"
   },
   {
+   "bold": 1,
    "fieldname": "unique_id",
    "fieldtype": "Data",
+   "in_filter": 1,
+   "in_global_search": 1,
    "label": "Unique ID",
    "unique": 1
   },
@@ -357,13 +382,12 @@
    "label": "Hash"
   },
   {
-   "fieldname": "final_utr_number",
-   "fieldtype": "Data",
-   "label": "Final UTR Number"
-  },
-  {
+   "bold": 1,
    "fieldname": "matched_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
    "label": "Matched Status",
    "options": "\nMatched"
   },
@@ -382,6 +406,9 @@
   {
    "fieldname": "cg_utr_number",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
    "label": "CG UTR Number",
    "search_index": 1
   },
@@ -390,11 +417,17 @@
    "fieldtype": "Data",
    "label": "CG Formatted UTR Number",
    "search_index": 1
+  },
+  {
+   "fieldname": "final_utr_number",
+   "fieldtype": "Data",
+   "label": "Final UTR Number",
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-21 19:02:11.634439",
+ "modified": "2024-02-23 16:11:25.429865",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
@@ -414,6 +447,8 @@
    "write": 1
   }
  ],
+ "show_name_in_global_search": 1,
+ "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
