@@ -37,11 +37,9 @@ class Downloader():
             file.is_private=1
             file.file_url= "/" + construct_file_url(self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name)
             file.save(ignore_permissions=True)
-            frappe.db.commit()
             self.delete_backend_files(file_path=construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0],file_name))
-            shutil.move(construct_file_url(self.SITE_PATH,self.SHELL_PATH,file_name),  construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0]))
-            file_url="/" + construct_file_url(self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name)
-            frappe.db.set_value('File', file.name, 'file_url', file_url)
+            file_url="/"+construct_file_url(self.SHELL_PATH, file_name)
+            frappe.db.commit()
             self.create_fileupload(file_url)
     
     def create_fileupload(self,file_url):
