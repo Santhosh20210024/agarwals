@@ -12,8 +12,8 @@ ERROR_LOG = {
     'E105': 'E105: Invalidate Update Reference Number'
 }
 
-def check_warning(trans_doc, transaction, bnk_trans_ref ): 
-    if transaction.get('reference_number') == '0' or len(transaction.get('reference_number')) < 1:
+def check_warning(trans_doc, transaction, bnk_trans_ref): 
+    if transaction.reference_number == '0':
         trans_doc.reference_number = bnk_trans_ref 
         trans_doc.staging_status = "Warning"
         trans_doc.remarks = "System Generated Reference Number"
@@ -57,7 +57,7 @@ def create_bank_transaction(transaction_list):
         trans_doc = frappe.get_doc('Bank Transaction Staging', transaction.name)
 
         try:
-            # layer level throws
+            # Layer level date (throws)
             if transaction.get('date') == None:
                 trans_doc.staging_status = 'Error'
                 trans_doc.error = ERROR_LOG['E101']
@@ -71,22 +71,6 @@ def create_bank_transaction(transaction_list):
                 trans_doc.retry = 0
                 save_trans_doc(trans_doc)
                 continue
-                        
-            # if int(transaction.get('deposit')) == 0 and int(transaction.get('withdrawal')) != 0:
-            #     trans_doc.staging_status = 'Withdrawn'
-            #     trans_doc.remark = 'Withdrawn case'
-            #     trans_doc.retry = 0
-            #     save_trans_doc(trans_doc)
-            #     continue
-
-            if transaction.retry != 1 and transaction.get('update_reference_number') is None:
-                if transaction.get('reference_number') != None and len(transaction.get('reference_number').strip().lstrip('0')) < 5:
-                    if transaction.get('reference_number') != 0:
-                        trans_doc.staging_status = 'Error'
-                        trans_doc.error = ERROR_LOG['E103']
-                        trans_doc.retry = 0
-                        save_trans_doc(trans_doc)
-                        continue
 
             if transaction.get('update_reference_number') != None and transaction.get('retry') == 1:
                 bank_trans_doc = frappe.get_doc('Bank Transaction', transaction.reference_number)
@@ -118,20 +102,17 @@ def create_bank_transaction(transaction_list):
                     frappe.db.commit()
 
             elif transaction.get('retry') == 1:
-                # paid date
                 if transaction.get('date') is not None:
-                    if transaction.reference_number is None:
+                    if transaction.reference_number is None or len(transaction.get('reference_number').strip().lstrip('0')) < 5:
                         transaction.reference_number = '0'
 
                     bnk_trans_ref = create_bank_trans_doc(transaction)
                     check_warning(trans_doc, transaction, bnk_trans_ref)
                     trans_doc.save()
                     frappe.db.commit()
-                    # if there is any update in future need to resolve those error cases
-
+            
             else: 
-                if transaction.reference_number is None:  
-                    # additional check for the blank reference_number field
+                if transaction.reference_number is None or len(transaction.get('reference_number').strip().lstrip('0')) < 5:
                     transaction.reference_number = '0'
 
                 bnk_trans_ref = create_bank_trans_doc(transaction)
@@ -143,12 +124,8 @@ def create_bank_transaction(transaction_list):
             trans_doc = frappe.get_doc('Bank Transaction Staging', transaction['name'] )
             trace_info = str(traceback.format_exc()).split(':')[-1]
             trans_doc.staging_status = "Error"
-
-            # duplicate entry
-            if 'Duplicate entry' in trace_info:
-                trans_doc.error = ERROR_LOG['E100']
-                
-            trans_doc.remark = trace_info
+            trans_doc.error = ERROR_LOG['E100']  
+            trans_doc.remarks = trace_info
             trans_doc.save()
             frappe.db.commit()
 
@@ -173,6 +150,9 @@ def bank_transaction_process(tag):
                 pending_transaction.append(transaction)
                 continue
         if transaction.staging_status == 'Open': 
+            pending_transaction.append(transaction)
+        
+        if transaction.staging_status == 'Skipped': 
             pending_transaction.append(transaction)
 
     # also Check if there is any change in the processed entrys retry
