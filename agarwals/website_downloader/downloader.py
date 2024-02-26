@@ -109,7 +109,7 @@ class Mediassist(Downloader):
                                         {"QueryName": "Hospital Claim Data.Courier Reference ID","Name": "Courier Reference ID"},{"QueryName": "Hospital Claim Data.Document Submission Date (on IHX)","Name": "Document Submission Date (on IHX)"},{"QueryName": "Hospital Claim Data.Payment Update Date","Name": "Payment Update Date"},{"QueryName": "Hospital Claim Data.InitialPayerClaimNo","Name": "Initial Claim Number"}],
                                         "Ordering": [0,1,2,3,4,5,6,7,8,10,9,11,12,35,13,14,15,16,17,18,19,20,21,22,23,24,33,34,25,26,27,28,29,30,31,32],f"FiltersDescription": f"Applied filters:\nMaMasterId is {login_response.json()['userDetail']['properties']['MAID']}"}}]}}],"cancelQueries": [],"modelId": 1263249,"userPreferredLocale": "en-US"},"artifactId": 1306251}
             download_response = requests.post(download_url,headers=download_header,json=download_data)
-            file_name=f"{self.tpa}_{self.hospital_branch}_{str(frappe.utils.now()).split('.')[0].replace(' ', '-')}.xlsx"
+            file_name=f"{self.tpa}_{self.hospital_branch}.xlsx"
             self.write_file(file_name=file_name,content=download_response.content)
             print("downloaded",file_name)
         except Exception as e:
