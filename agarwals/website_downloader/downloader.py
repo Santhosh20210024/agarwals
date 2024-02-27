@@ -8,9 +8,9 @@ from agarwals.utils.file_util import construct_file_url
 
 class Downloader():
     tpa=''
-    hospital_branch=''
+    branch_code=''
     def __init__(self):
-        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"hospital_branch":['=',self.hospital_branch],"tpa":['=',self.tpa]},fields="*")
+        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
         if credential_doc:
             self.user_name = credential_doc[0].user_name
             self.password = credential_doc[0].password
@@ -58,8 +58,8 @@ class Downloader():
         
 class Mediassist_India_Tpa_P_Ltd(Downloader):
     tpa='Mediassist India Tpa P Ltd'
-    def __init__(self,hospital_branch):
-        self.hospital_branch=hospital_branch
+    def __init__(self,branch_code):
+        self.branch_code=branch_code
         Downloader.__init__(self)
         
     def download(self):
