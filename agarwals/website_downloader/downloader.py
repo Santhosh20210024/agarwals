@@ -10,13 +10,12 @@ class Downloader():
     tpa=''
     hospital_branch=''
     def __init__(self):
-        print("tpa",self.hospital_branch)
         credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"hospital_branch":['=',self.hospital_branch],"tpa":['=',self.tpa]},fields="*")
         if credential_doc:
             self.user_name = credential_doc[0].user_name
             self.password = credential_doc[0].password
         else:
-            self.log_error('TPA Login Credentials',self.user_name,"No Credenntial for the given input")
+            self.log_error('TPA Login Credentials',error_message="No Credenntial for the given input")
         self.PROJECT_FOLDER = "DrAgarwals"
         self.HOME_PATH = "Home/DrAgarwals"
         self.SHELL_PATH = "private/files"
@@ -57,7 +56,7 @@ class Downloader():
         error_log.set('error_message', error_message)
         error_log.save()
         
-class Mediassist(Downloader):
+class Mediassist_India_Tpa_P_Ltd(Downloader):
     tpa='Mediassist India Tpa P Ltd'
     def __init__(self,hospital_branch):
         self.hospital_branch=hospital_branch
