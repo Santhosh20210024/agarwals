@@ -135,23 +135,25 @@ before_install = "agarwals.utils.create_folders.folder_structure_creation"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-#	"all": [
-#		"agarwals.tasks.all"
-#	],
-#	"daily": [
-#		"agarwals.tasks.daily"
-#	],
-#	"hourly": [
-#		"agarwals.tasks.hourly"
-#	],
-#	"weekly": [
-#		"agarwals.tasks.weekly"
-#	],
-#	"monthly": [
-#		"agarwals.tasks.monthly"
-#	],
-# }
+scheduler_events = {
+    "cron":{
+	"*/5 * * * *": [
+		"agarwals.website_downloader.downloader_job.execute_download_job"
+	],
+	# "daily": [
+	# 	"agarwals.tasks.daily"
+	# ],
+	# "hourly": [
+	# 	"agarwals.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"agarwals.tasks.weekly"
+	# ],
+	# "monthly": [
+	# 	"agarwals.tasks.monthly"
+	# ],
+    }
+}
 
 # Testing
 # -------
