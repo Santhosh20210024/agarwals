@@ -140,7 +140,7 @@ def tag_skipped():
 
 def bank_transaction_process(tag):
     pending_transaction = [] 
-    for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'tag' : tag, 'staging_status' : ['!=', 'Processed'] }, fields = "*" ):
+    for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'tag' : tag, 'staging_status' : ['!=', 'Processed'], 'withdrawal': ['=', 0] }, fields = "*" ):
         if transaction.staging_status == "Warning":
             if transaction.get('update_reference_number') != None and transaction.retry == 1:
                 pending_transaction.append(transaction)
@@ -165,38 +165,33 @@ def bank_transaction_process(tag):
 
 def change_matched_items(ref_no):
 
-    # Journal Entry # Later, it will removed.
-    for item in frappe.get_list('Journal Entry', filters={'cheque_no':ref_no, 'docstatus':['!=', '2']}):
-        je_doc = frappe.get_doc('Journal Entry', item['name'])
-        je_doc.add_comment(
-                    text= ("Journal Entry Cancelled due to Withdrawn Case")
-                )
-        je_doc.cancel()
-        frappe.db.commit()
-
     # Payment Entry # Need to check
     for item in frappe.get_list('Payment Entry', filters = {'reference_no':ref_no, 'status':['!=', 'Cancelled']}):
         pe_doc = frappe.get_doc('Payment Entry', item['name'])
+        
+        frappe.db.sql("""
+                        DELETE FROM `tabSales Invoice Reference` where payment_entry = %(name)s
+                      """, values ={'name' : pe_doc.name})
+        
+        frappe.db.commit()
+
         pe_doc.add_comment(
-                    text= ("Payment Entry Cancelled due to Withdrawn Case")
+                    text= ("Payment Entry cancelled due to withdrawal incident")
                 )
         pe_doc.cancel()
         frappe.db.commit()
     
     ref_no = str(ref_no).strip().lstrip('0')
-    advice_item_cg = frappe.get_list('Settlement Advice', filters = {'final_utr_number': ref_no, 'status': 'Processed'}, pluck = 'name')
-    advice_item_ag = [ se_item['name'] for se_item in frappe.get_list('Settlement Advice', filters = {'status': 'Processed'}, fields = ['name', 'utr_number'])
-                       if se_item['utr_number'].strip().lstrip('0') == ref_no ]
-    
-    advice = set(advice_item_cg + advice_item_ag)
-    for item in advice:
+    advices = frappe.get_list('Settlement Advice', filters = {'cg_formatted_utr_number': ref_no, 'status': 'Processed'}, pluck = 'name')
+
+    for item in advices:
         frappe.db.sql("""
                       DELETE from `tabMatch Log` where parent = %(advice)s
                       """, values = { 'advice': item})
         frappe.db.set_value('Settlement Advice', item, 'status', 'Open')
         frappe.db.set_value('Settlement Advice', item, 'remark', '')
         frappe.get_doc('Settlement Advice', item).add_comment(
-                    text= ("Advice status is changed due to the Withdrawn Case")
+                    text= ("Advice Status is changed due to withdrawal incident")
                 )
         frappe.db.commit()
 
@@ -221,7 +216,7 @@ def check_withdrawn_je():
                 bnk_doc = frappe.get_doc('Bank Transaction', doc.name)
                 bnk_doc.remove_payment_entries()
                 bnk_doc.add_comment(
-                    text= ("Bank Transaction Cancelled due to Withdraw Case")
+                    text= ("Transaction cancelled due to withdrawal incident")
                     )
                 bnk_doc.save()
                 frappe.db.commit()
