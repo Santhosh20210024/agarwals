@@ -83,7 +83,6 @@
    "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
-   "depends_on": "eval:doc.status == \"Processed\"",
    "fieldname": "claim_amount",
    "fieldtype": "Currency",
    "label": "Claim Amount",
@@ -146,7 +145,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-27 15:39:02.756907",
+ "modified": "2024-02-26 10:59:25.664684",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
