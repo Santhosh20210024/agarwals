@@ -137,7 +137,7 @@ before_install = "agarwals.utils.create_folders.folder_structure_creation"
 
 scheduler_events = {
     "cron":{
-	"*/5 * * * *": [
+	"*/1 * * * *": [
 		"agarwals.website_downloader.downloader_job.execute_download_job"
 	],
 	# "daily": [

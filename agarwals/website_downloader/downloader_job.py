@@ -12,8 +12,7 @@ def settlement_advice_job(tpa_name,branch_code):
 def execute_download_job():    
     tpa_credential_doc=frappe.get_all("TPA Login Credentials",fields='*')
     time_exc=datetime.now()
-    print((time_exc-timedelta(minutes=5)).time())
     for tpa_credential in tpa_credential_doc:
         if tpa_credential.exectution_time:
-            if (time_exc-timedelta(minutes=5)).time()<tpa_credential.exectution_time.time()<=time_exc.time():
+            if (time_exc-timedelta(minutes=1)).time()<tpa_credential.exectution_time.time()<=time_exc.time():
                 settlement_advice_job(tpa_credential.tpa,tpa_credential.branch_code)
