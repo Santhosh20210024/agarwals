@@ -118,7 +118,7 @@ class Matcher:
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
 	        "MA1-BN" as logic,
-            2 as order
+            3 as order
         from
 	        `tabBank Transaction` bt,
         	`tabSettlement Advice` sa,
@@ -151,7 +151,7 @@ class Matcher:
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
 	        "MA5-CN" as logic,
-            3 as order
+            4 as order
         from
 	        `tabBank Transaction` bt,
 	        `tabSettlement Advice` sa,
