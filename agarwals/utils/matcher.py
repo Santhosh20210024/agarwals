@@ -1,5 +1,5 @@
 import frappe
-from utr_updater import update_bill_no_separate_column, update_utr_in_separate_column
+from apps.agarwals.agarwals.utils.updater import update_bill_no_separate_column, update_utr_in_separate_column
 
 # update the order done
 # sb.status in ('Open','Error') done
