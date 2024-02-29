@@ -1,5 +1,8 @@
 import frappe
 
+# update the order done
+# sb.status in ('Open','Error') done
+
 class Matcher:
     def log_error(self,doctype, name, error):
         error_log = frappe.new_doc('Matcher Error Log')
@@ -16,6 +19,7 @@ class Matcher:
                 matcher_record.set('claimbook',record['cb'])
                 matcher_record.set('insurance_company_name',record['insurance_name'])
             if record['sa']:
+                matcher_record.set('order', record['order'])
                 matcher_record.set('settlement_advice',record['sa'])
                 matcher_record.set('settled_amount', record['settled_amount'])
                 matcher_record.set('tds_amount', record['tds_amount'])
@@ -33,11 +37,14 @@ class Matcher:
                 matcher_record.save()
             except Exception as e:
                 self.log_error('Matcher',matcher_record.name,e)
+                
         frappe.db.commit()
 
     def process(self):
         print("____________________________________________Function call")
-        ma1_1 = """select
+        
+        ma1_1 = """
+            select
 	        bi.name as bill,
 	        cb.name as cb,
 	        sa.name as sa,
@@ -46,7 +53,8 @@ class Matcher:
 	        sa.settled_amount as settled_amount,
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
-	        "MA1-1" as logic
+	        "MA1-1" as logic,
+            1 as order
         from
 	        `tabBank Transaction` bt,
 	        `tabSettlement Advice` sa,
@@ -58,7 +66,9 @@ class Matcher:
 	        and (cb.al_key = sa.claim_key
 		        or cb.cl_key = sa.claim_key)
 	        and ((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
-	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)"""
+	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
+            and sa.status in ('Open','Error')"""
+        
         ma1_1_records = frappe.db.sql(ma1_1,as_dict=True)
         print("______________________________________________________________MA1-1_________________________________________________")
         if ma1_1_records:
@@ -73,7 +83,8 @@ class Matcher:
 	        sa.settled_amount as settled_amount,
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
-	        "MA1-2" as logic
+	        "MA1-2" as logic,
+            2 as order
         from
 	        `tabBank Transaction` bt,
         	`tabSettlement Advice` sa,
@@ -86,13 +97,16 @@ class Matcher:
 		        or cb.cl_key = sa.claim_key)
 	        and bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher` WHERE match_logic = 'MA1-1') 
-	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)"""
+	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
+            and sa.status in ('Open','Error')"""
         ma1_2_records = frappe.db.sql(ma1_2, as_dict=True)
+        
         print(
             "______________________________________________________________MA1-2_________________________________________________")
         if ma1_2_records:
             self.insert_into_matcher_table(ma1_2_records)
 
+		# Skipped need to ask ?
         ma5_1 = """select
 	        bi.name as bill,
 	        '' as cb,
@@ -102,7 +116,8 @@ class Matcher:
 	        sa.settled_amount as settled_amount,
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
-	        "MA5-1" as logic
+	        "MA5-1" as logic,
+            3 as order
         from
 	        `tabBank Transaction` bt,
 	        `tabSettlement Advice` sa,
@@ -111,7 +126,8 @@ class Matcher:
 	        (sa.cg_utr_number = bt.custom_cg_utr_number
 		        or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
 	        and sa.claim_key  = bi.claim_key 
-	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)"""
+	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
+            and sa.status in ('Open','Error')"""
         ma5_1_records = frappe.db.sql(ma5_1, as_dict=True)
         print(
             "______________________________________________________________MA5-1_________________________________________________")
@@ -127,7 +143,8 @@ class Matcher:
         	sa.settled_amount as settled_amount,
         	sa.tds_amount as tds_amount,
         	sa.disallowed_amount as disallowed_amount,
-        	"MA5-1" as logic
+        	"MA5-2" as logic,
+            4 as order
         from
         	`tabBank Transaction` bt,
         	`tabSettlement Advice` sa,
@@ -136,10 +153,12 @@ class Matcher:
         	(sa.cg_utr_number = bt.custom_cg_utr_number
         		or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
         	and sa.cg_formatted_bill_number  = bi.cg_formatted_bill_number 
-        	and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)"""
+        	and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
+            and sa.status in ('Open','Error')"""
+        
         ma5_2_records = frappe.db.sql(ma5_2, as_dict=True)
-        print(
-            "______________________________________________________________MA5-2_________________________________________________")
+        
+        print("______________________________________________________________MA5-2_________________________________________________")
         if ma5_2_records:
             self.insert_into_matcher_table(ma5_2_records)
 
@@ -276,6 +295,7 @@ class Matcher:
         if ma4_2_records:
             self.insert_into_matcher_table(ma4_2_records)
 
+		# settlement advice
         ma6_1 = """select
 	        bi.name as bill,
 	        '' as cb,
@@ -292,6 +312,7 @@ class Matcher:
 	        sa.claim_key = bi.claim_key
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher`)"""
         ma6_1_records = frappe.db.sql(ma6_1, as_dict=True)
+        
         print(
             "______________________________________________________________MA6-1_________________________________________________")
         if ma6_1_records:

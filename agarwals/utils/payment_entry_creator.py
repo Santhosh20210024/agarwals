@@ -98,7 +98,7 @@ class PaymentEntryCreator:
                                                             'tds_amount':payment_entry.custom_tds_amount, 'disallowance_amount':payment_entry.custom_disallowed_amount, 
                                                             'allocated_amount':payment_entry.total_allocated_amount, 'utr_number':payment_entry.reference_no })
         
-        sales_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic})
+        sales_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'settlement_advice': record.settlement_advice})
         frappe.db.set_value('Matcher', record.name, 'status', 'Processed')
         sales_doc.save()
 
@@ -116,7 +116,7 @@ class PaymentEntryCreator:
 
             # matching table logic
             matcher_records = frappe.db.sql("""
-                          SELECT * from `tabMatcher` where match_logic in %(logic)s AND bank_transaction = %(reference_number)s AND status is NULL order by tds_amount DESC , disallowance_amount DESC
+                          SELECT * from `tabMatcher` where match_logic in %(logic)s AND bank_transaction = %(reference_number)s AND status is NULL order by order ASC, tds_amount DESC , disallowance_amount DESC
                           """, values = {'reference_number' : bank_transaction_record.name, 'logic': match_logic}, as_dict = True)
 
             if matcher_records:

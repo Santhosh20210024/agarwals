@@ -15,25 +15,47 @@ def compile_patterns(patterns):
 
 def advices_rfn_match():
     try:    # needd to chenage
+        
+        print("advice 1")
+        frappe.db.sql("""
+        update `tabBank Transaction Staging` tbts, `tabSettlement Advice` tsa set tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice'
+        where (tbts.reference_number = tsa.cg_formatted_utr_number) and tbts.tag is null and tbts.reference_number != '0';
+        """, values = {'tag' : INSURANCE_TAG})
 
-        print("advice")
-        frappe.db.sql(""" 
-            UPDATE `tabBank Transaction Staging` tbts JOIN `tabSettlement Advice` tsa ON tbts.reference_number = tsa.final_utr_number
-            SET tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice' 
-            WHERE tbts.tag IS NULL 
-            AND tbts.staging_status != 'Processed'
-            AND tsa.final_utr_number IS NOT NULL
-        """, values = {'tag': INSURANCE_TAG })
         frappe.db.commit()
 
-        frappe.db.sql(""" 
-            UPDATE `tabBank Transaction Staging` tbts JOIN `tabSettlement Advice` tsa ON TRIM(LEADING '0' FROM source_reference_number) = tsa.cg_utr_number
-            SET tag = %(tag)s, based_on = 'Settlement Advice' 
-            WHERE tbts.tag IS NULL 
-            AND tbts.staging_status != 'Processed'
-            AND tsa.cg_utr_number IS NOT NULL
-        """, values = {'tag': INSURANCE_TAG })
+        print("advice 2")
+        frappe.db.sql("""
+        update `tabBank Transaction Staging` tbts, `tabSettlement Advice` tsa set tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice'
+        where (tbts.reference_number = tsa.cg_formatted_utr_number) and tbts.tag is null and tbts.reference_number != '0';
+        """, values = {'tag' : INSURANCE_TAG})
+
         frappe.db.commit()
+    
+        print("advice 3")
+        frappe.db.sql("""
+        update `tabBank Transaction Staging` tbts, `tabSettlement Advice` tsa set tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice'
+        where (tbts.reference_number = tsa.utr_number) and tbts.tag is null and tbts.reference_number != '0';
+        """, values = {'tag' : INSURANCE_TAG})
+
+        frappe.db.commit()
+
+        # frappe.db.sql(""" 
+        #     UPDATE `tabBank Transaction Staging` tbts JOIN `tabSettlement Advice` tsa ON tbts.reference_number = tsa.final_utr_number
+        #     SET tbts.tag = %(tag)s 
+        #     WHERE tbts.tag IS NULL 
+        #     AND tbts.staging_status != 'Processed'
+        #     AND tsa.final_utr_number IS NOT NULL
+        # """, values = {'tag': INSURANCE_TAG })
+
+
+        # frappe.db.sql(""" 
+        #     UPDATE `tabBank Transaction Staging` tbts JOIN `tabSettlement Advice` tsa ON TRIM(LEADING '0' FROM source_reference_number) = tsa.cg_utr_number
+        #     SET tag = %(tag)s, based_on = 'Settlement Advice' 
+        #     WHERE tbts.tag IS NULL 
+        #     AND tbts.staging_status != 'Processed'
+        #     AND tsa.cg_utr_number IS NOT NULL
+        # """, values = {'tag': INSURANCE_TAG })
 
         print("Advice Process Completed")
 
@@ -44,20 +66,18 @@ def advices_rfn_match():
         error_log.save()
 
 def claimbook_match():
+        
+        print("claim 1")
         frappe.db.sql(""" 
-            UPDATE `tabBank Transaction Staging` tbts JOIN `tabClaimBook` cb ON tbts.reference_number = cb.final_utr_number
-            SET tbts.tag = %(tag)s, tbts.based_on = 'ClaimBook' 
-            WHERE tbts.tag IS NULL 
-            AND tbts.staging_status != 'Processed'
-            AND cb.final_utr_number != '0'
+        UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
+        where (tbts.reference_number = cb.utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
         """, values = {'tag': INSURANCE_TAG })
         frappe.db.commit()
 
+        print("claim 2")
         frappe.db.sql(""" 
-            UPDATE `tabBank Transaction Staging` tbts JOIN `tabClaimBook` cb ON TRIM(LEADING '0' FROM source_reference_number) = cb.utr_number
-            SET tbts.tag = %(tag)s, tbts.based_on = 'ClaimBook' 
-            WHERE tbts.tag IS NULL 
-            AND cb.utr_number != '0'
+           UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
+        where (tbts.reference_number = cb.final_utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
         """, values = {'tag': INSURANCE_TAG })
         frappe.db.commit()
         print("ClaimBook Process Completed")
