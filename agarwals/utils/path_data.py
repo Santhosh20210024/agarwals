@@ -5,6 +5,6 @@ HOME_PATH = "Home/DrAgarwals"
 SHELL_PATH = "private/files"
 SUB_DIR = ["Extract", "Transform", "Load", "Bin"]
 INNER_SUB_DIR = ["Error"]
-SITE_PATH = os.getcwd() + frappe.get_site_path()[1:]
+SITE_PATH = frappe.get_single('Control Panel').site_path
 
 
