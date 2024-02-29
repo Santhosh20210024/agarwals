@@ -1,4 +1,5 @@
 import frappe
+from utr_updater import update_bill_no_separate_column, update_utr_in_separate_column
 
 # update the order done
 # sb.status in ('Open','Error') done
@@ -97,7 +98,7 @@ class Matcher:
 		        or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
 	        and (cb.al_key = sa.claim_key
 		        or cb.cl_key = sa.claim_key)
-	        and ((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
+	        and (((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) or (bi.ma_claim_key = cb.al_key or bi.ma_claim_key = cb.cl_key)) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
             and sa.matcher_status is NULL
            """
@@ -126,7 +127,7 @@ class Matcher:
         where
 	        (sa.cg_utr_number = bt.custom_cg_utr_number
 		        or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
-	        and (cb.al_key = sa.claim_key
+	        and ((cb.al_key = sa.claim_key
 		        or cb.cl_key = sa.claim_key)
 	        and bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher` WHERE match_logic = 'MA1-1') 
@@ -158,10 +159,11 @@ class Matcher:
         where
 	        (sa.cg_utr_number = bt.custom_cg_utr_number
 		        or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
-	        and sa.claim_key  = bi.claim_key 
+	        and ((sa.claim_key  = bi.claim_key) or (sa.claim_key = bi.ma_claim_key) )
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
             and sa.matcher_status is NULL"""
         ma5_cn_records = frappe.db.sql(ma5_cn, as_dict=True)
+        
         print(
             "______________________________________________________________MA5-1_________________________________________________")
         if ma5_cn_records:
@@ -230,7 +232,7 @@ class Matcher:
         where
 	        (cb.cg_utr_number = bt.custom_cg_utr_number
 		        or cb.cg_formatted_utr_number = bt.custom_cg_utr_number )
-	        and ((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
+	        and (((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) or (bi.ma_claim_key = cb.al_key or bi.ma_claim_key = cb.cl_key)) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`) """
         ma3_cn_records = frappe.db.sql(ma3_cn, as_dict=True)
         print(
@@ -271,7 +273,7 @@ class Matcher:
 	        `tabClaimBook` cb,
 	        `tabBill` bi
         where
-	        ((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
+	        (((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) or (bi.ma_claim_key = cb.al_key or bi.ma_claim_key = cb.cl_key)) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher`)"""
 
         ma4_cn_records = frappe.db.sql(ma4_cn, as_dict=True)
@@ -314,7 +316,7 @@ class Matcher:
 	        `tabSettlement Advice` sa,
 	        `tabBill` bi
         where
-	        sa.claim_key = bi.claim_key
+	        (sa.claim_key = bi.claim_key or sa.claim_key = bi.ma_claim_key)
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher`)"""
         ma6_cn_records = frappe.db.sql(ma6_cn, as_dict=True)
         
@@ -347,4 +349,8 @@ class Matcher:
 
 @frappe.whitelist()
 def update_matcher():
+    update_utr_in_separate_column()
+    print('check 1')
+    update_bill_no_separate_column()
+    print('check 2')
     Matcher().process()
