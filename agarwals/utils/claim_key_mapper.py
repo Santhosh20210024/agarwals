@@ -33,16 +33,18 @@ class BillClaimKeyMapper(ClaimKeyMapper):
 
     def map_claim_keys(self, record):
         doctype = self.get_doctype()
+        
         claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.claim_id.lower().strip()}, pluck='claim_key')
         if not claim_key:
             claim_key = self.create_claim_key(record.claim_id,doctype,record.name)
         record.set('claim_key', claim_key[0])
 
-        ma_claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.ma_claim_id.lower().strip()}, pluck='claim_key')
-        if not ma_claim_key:
-            claim_key = self.create_claim_key(record.ma_claim_id, doctype,record.name)
-        record.set('ma_claim_key', claim_key[0])
+        if record.ma_claim_id:
+            ma_claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.ma_claim_id.lower().strip()}, pluck='claim_key')
 
+            if not ma_claim_key:
+                claim_key = self.create_claim_key(record.ma_claim_id, doctype,record.name)
+            record.set('ma_claim_key', claim_key[0])
 
 
 class ClaimBookClaimKeyMapper(ClaimKeyMapper):
@@ -72,14 +74,26 @@ class SAClaimKeyMapper(BillClaimKeyMapper):
 
     def get_record_obj(self, name):
         return frappe.get_doc('Settlement Advice', name)
+    
+    def map_claim_keys(self, record):
+        doctype = self.get_doctype()
+        
+        claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.claim_id.lower().strip()}, pluck='claim_key')
+        if not claim_key:
+            claim_key = self.create_claim_key(record.claim_id,doctype,record.name)
+    
+        record.set('claim_key', claim_key[0])
+
 
 @frappe.whitelist()
 def map_claim_key():
     n = 1000
     bill_records = frappe.get_list("Bill", filters={'claim_key': '', 'claim_id': ['not in', ['', '0']]},
                                        pluck='name')
+    
     for i in range(0, len(bill_records), n):
         frappe.enqueue(BillClaimKeyMapper().process,job_name= "Claim Key Mapper in Bill", queue='long', is_async=True, timeout=18000, records = bill_records[i:i + n])
+    
     claim_records = frappe.get_list("ClaimBook",
                                        filters={'al_key': '', 'cl_key': ''}, pluck='name')
     for i in range(0,len(claim_records),n):

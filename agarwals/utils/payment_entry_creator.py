@@ -116,7 +116,7 @@ class PaymentEntryCreator:
 
             # matching table logic
             matcher_records = frappe.db.sql("""
-                          SELECT * from `tabMatcher` where match_logic in %(logic)s AND bank_transaction = %(reference_number)s AND status is NULL order by order ASC, tds_amount DESC , disallowance_amount DESC
+                          SELECT * from `tabMatcher` where match_logic in %(logic)s AND bank_transaction = %(reference_number)s AND status is NULL order by payment_order ASC, tds_amount DESC , disallowance_amount DESC
                           """, values = {'reference_number' : bank_transaction_record.name, 'logic': match_logic}, as_dict = True)
 
             if matcher_records:

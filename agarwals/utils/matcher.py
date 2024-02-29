@@ -1,7 +1,7 @@
 import frappe
 from apps.agarwals.agarwals.utils.updater import update_bill_no_separate_column, update_utr_in_separate_column
 
-# update the order done
+# update the payment_order done
 # sb.status in ('Open','Error') done
 
 class Matcher:
@@ -21,7 +21,7 @@ class Matcher:
                 matcher_record.set('insurance_company_name',record['insurance_name'])
                 
             if record['sa']:
-                matcher_record.set('order', record['order'])
+                matcher_record.set('payment_order', record['payment_order'])
                 matcher_record.set('settlement_advice',record['sa'])
                 matcher_record.set('settled_amount', record['settled_amount'])
                 matcher_record.set('tds_amount', record['tds_amount'])
@@ -57,7 +57,7 @@ class Matcher:
         	sa.tds_amount as tds_amount,
         	sa.disallowed_amount as disallowed_amount,
         	"MA5-BN" as logic,
-            1 as order
+            1 as payment_order
         from
         	`tabBank Transaction` bt,
         	`tabSettlement Advice` sa,
@@ -87,7 +87,7 @@ class Matcher:
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
 	        "MA1-CN" as logic,
-            2 as order
+            2 as payment_payment_order
         from
 	        `tabBank Transaction` bt,
 	        `tabSettlement Advice` sa,
@@ -118,7 +118,7 @@ class Matcher:
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
 	        "MA1-BN" as logic,
-            3 as order
+            3 as payment_order
         from
 	        `tabBank Transaction` bt,
         	`tabSettlement Advice` sa,
@@ -151,7 +151,7 @@ class Matcher:
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
 	        "MA5-CN" as logic,
-            4 as order
+            4 as payment_order
         from
 	        `tabBank Transaction` bt,
 	        `tabSettlement Advice` sa,
