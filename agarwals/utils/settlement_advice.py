@@ -29,13 +29,23 @@ def prune_columns(df, columns_to_prune):
     df = df.drop(columns=columns_to_prune, errors='ignore')
     return df
 
+def swap_advice_amount(row):
+    if row['settled_amount'] < row['tds_amount']:
+        temp = row['settled_amount']
+        row['settled_amount'] = row['tds_amount']
+        row['tds_amount'] = temp
+    return row
+
+def check_advice_amount(df):
+    df = df.apply(swap_advice_amount, axis=1)
+    return df
+
 def clean_data(df):
         df["final_utr_number"]=df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(r"[\"\'?]", '',regex=True).replace("NOT AVAILABLE","0").replace("","0")
         df["claim_id"]=df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '',regex=True).replace("","0")
         df = format_date(df,eval(frappe.get_single('Bank Configuration').date_formats),'paid_date')
         format_utr(df)
         return df
-        
         
 def update_status(doctype, name, status):
     frappe.db.set_value(doctype,name,'status',status)
@@ -147,17 +157,19 @@ def advice_transform():
                 list_of_char_to_repalce = eval(config.char_to_replace_in_header)
                 header_row_patterns = clean_header(header_row_patterns,list_of_char_to_repalce)
                 target_columns = eval(config.target_columns)
+                
                 if ".csv" in file_link.lower():
                     df = pd.read_csv(file_url_to_read)
                     file_link=file_link.lower().replace(".csv",".xlsx")
                 else:
                     df = pd.read_excel(file_url_to_read,header=None,)
                     break_loop=False
-                    for keys in header_row_patterns: 
+                    
+                    for keys in header_row_patterns:  # header skip
                         if break_loop:
                             break
                         header_row_index = None
-                        for index,row in df.iterrows():
+                        for index, row in df.iterrows():
                             if keys in clean_header(row.values,list_of_char_to_repalce):
                                 header_row_index = index
                                 break_loop=True
@@ -185,6 +197,7 @@ def advice_transform():
                             if columns in column_list:
                                 rename_value[columns]=key
                                 break
+
                 df = df.rename(columns = rename_value)
                 if "claim_id" not in df.columns:
                     log_error('Settlement Advice Staging',file.name,"No Valid data header or file is empty")
@@ -199,6 +212,7 @@ def advice_transform():
                 df = df[all_columns]
                 df["source"]=file.name
                 df = clean_data(df)
+                df = check_advice_amount(df)
                 move_to_transform(file, df, 'Insert', 'Transform')
                 loader = Loader("Settlement Advice Staging")
                 loader.process()
