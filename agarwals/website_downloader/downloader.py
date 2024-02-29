@@ -48,7 +48,8 @@ class Downloader():
         
     def write_Json(self,file_name=None,content=None):
         if file_name and content:
-            pd.DataFrame(content).to_excel(file_name)
+            content_df=pd.DataFrame(content)
+            content_df.to_excel(file_name)
             file_url=self.move_and_create_file_record(file_name)
             self.create_fileupload(file_url)
     
@@ -170,8 +171,9 @@ class Tnnhis_Mdindia(Downloader):
 
             download_response = requests.post(download_url, headers=download_headers, data=download_payload)
             file_name=f"{self.tpa}_{self.branch_code}.xlsx"
-            if download_response.content:
-                self.write_Json(file_name=file_name,content=download_response.content)
+            content_json=json.loads(download_response.content.decode('utf-8'))
+            if content_json:
+                self.write_Json(file_name=file_name,content=content_json["data"])
             print("downloaded",file_name)
         except Exception as e:
             self.log_error('TPA Login Credentials',self.user_name,e)
