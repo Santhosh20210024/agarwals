@@ -43,7 +43,7 @@
    "fieldname": "match_logic",
    "fieldtype": "Select",
    "label": "Match Logic",
-   "options": "MA1-1\nMA1-2\nMA2-1\nMA2-2\nMA3-1\nMA3-2\nMA4-1\nMA4-2\nMA5-1\nMA5-2\nMA6-1\nMA6-2\nMA7-1\nMA7-2",
+   "options": "MA1-CN\nMA1-BN\nMA2-CN\nMA2-BN\nMA3-CN\nMA3-BN\nMA4-CN\nMA4-BN\nMA5-CN\nMA5-BN\nMA6-CN\nMA6-BN\nMA7-CN\nMA7-BN",
    "search_index": 1
   },
   {
@@ -86,7 +86,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-21 19:24:09.406441",
+ "modified": "2024-02-29 18:54:21.706657",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",

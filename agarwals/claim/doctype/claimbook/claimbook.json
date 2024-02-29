@@ -9,6 +9,7 @@
  "field_order": [
   "section_break_hjcmp",
   "matched_status",
+  "ma_bill_no",
   "hospital",
   "preauth_claim_id",
   "mrn",
@@ -423,11 +424,16 @@
    "fieldtype": "Data",
    "label": "Final UTR Number",
    "search_index": 1
+  },
+  {
+   "fieldname": "ma_bill_no",
+   "fieldtype": "Data",
+   "label": "MA Bill No"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-23 16:11:25.429865",
+ "modified": "2024-02-29 16:45:38.646245",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

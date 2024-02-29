@@ -38,6 +38,12 @@ class BillClaimKeyMapper(ClaimKeyMapper):
             claim_key = self.create_claim_key(record.claim_id,doctype,record.name)
         record.set('claim_key', claim_key[0])
 
+        ma_claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.ma_claim_id.lower().strip()}, pluck='claim_key')
+        if not ma_claim_key:
+            claim_key = self.create_claim_key(record.ma_claim_id, doctype,record.name)
+        record.set('ma_claim_key', claim_key[0])
+
+
 
 class ClaimBookClaimKeyMapper(ClaimKeyMapper):
 

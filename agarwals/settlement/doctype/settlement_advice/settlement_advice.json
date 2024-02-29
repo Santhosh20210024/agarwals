@@ -36,6 +36,7 @@
   "matched_bank_transaction",
   "matched_claimbook_record",
   "matched_bill_record",
+  "matcher_status",
   "source_file",
   "file_name",
   "claim_key",
@@ -234,10 +235,15 @@
    "fieldtype": "Data",
    "label": "CG Formatted Bill Number",
    "search_index": 1
+  },
+  {
+   "fieldname": "matcher_status",
+   "fieldtype": "Data",
+   "label": "Matcher Status"
   }
  ],
  "links": [],
- "modified": "2024-02-21 19:02:49.901329",
+ "modified": "2024-02-29 16:50:00.346544",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
