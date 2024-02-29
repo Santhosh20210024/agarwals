@@ -1,3 +1,0 @@
-from agarwals.website_downloader.downloader import Mediassist_India_Tpa_P_Ltd
-from agarwals.website_downloader.tips_vidalhealthtpa import TipsVidalHealthTpa
-

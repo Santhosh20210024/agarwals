@@ -1,9 +1,9 @@
 import frappe
 from datetime import datetime,timedelta
-from agarwals import website_downloader
+from agarwals import settlement_advice_downloader
 
 def settlement_advice_job(tpa_name,branch_code,executing_method):
-    class_name=getattr(website_downloader,executing_method)
+    class_name=getattr(settlement_advice_downloader,executing_method)
     class_name(tpa_name,branch_code).download()
     frappe.enqueue(class_name(branch_code).download,queue='long', is_async=True, job_name=f"TPA_downloader_{str(tpa_name)}_{branch_code}", timeout=3600)
 

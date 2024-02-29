@@ -1,5 +1,5 @@
 import requests
-from agarwals.website_downloader.downloader import Downloader
+from agarwals.settlement_advice_downloader.downloader import Downloader
 
 class TipsVidalHealthTpa(Downloader):
     def __init__(self,tpa_name,branch_code):
@@ -61,4 +61,3 @@ class TipsVidalHealthTpa(Downloader):
             print("downloaded",file_name)
         except Exception as e:
             self.log_error('TPA Login Credentials',self.user_name,e)
-
