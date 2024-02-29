@@ -33,7 +33,7 @@ class TipsVidalHealthTpa(Downloader):
             }
             login_response = session.post(login_url, headers=login_headers, data=login_payload,cookies=cookies)
             download_url = "https://tips.vidalhealthtpa.com/hospitallogin/hospital/reports/consolidatedreports.html?fromdate=28/11/2023&todate=26/02/2024"
-            download_payload = 'fromDate=28%2F11%2F2023&toDate=26%2F02%2F2024'
+            download_payload = 'fromDate=01%2F04%2F2023&toDate=29%2F02%2F2024'
             download_headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language': 'en-US,en;q=0.9',
