@@ -1,23 +1,28 @@
 import frappe
-import requests
-import json
 import pandas as pd
 import frappe
 import shutil
 import os
 from agarwals.utils.file_util import construct_file_url
-from agarwals.utils.path_data import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH
 
 class Downloader():
     tpa=''
     branch_code=''
     def __init__(self):
-            credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
-            if credential_doc:
-                self.user_name = credential_doc[0].user_name
-                self.password = credential_doc[0].password
-            else:
-                self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
+        if credential_doc:
+            self.user_name = credential_doc[0].user_name
+            self.password = credential_doc[0].password
+        else:
+            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+        self.PROJECT_FOLDER = "DrAgarwals"
+        self.HOME_PATH = "Home/DrAgarwals"
+        self.SHELL_PATH = "private/files"
+        self.SUB_DIR = ["Extract", "Transform", "Load", "Bin"]
+        self.SITE_PATH=frappe.get_single("Control Panel").site_path
+        self.is_binary=False
+        self.is_json=False
+        
         
     def delete_backend_files(self,file_path=None):
         if os.path.exists(file_path):
@@ -31,14 +36,14 @@ class Downloader():
             self.create_fileupload(file_url)
     
     def move_and_create_file_record(self,file_name):
-        shutil.move(file_name,  construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]))
+        shutil.move(file_name,  construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0]))
         file=frappe.new_doc("File")
-        file.folder = construct_file_url(HOME_PATH, SUB_DIR[0])
+        file.folder = construct_file_url(self.HOME_PATH, self.SUB_DIR[0])
         file.is_private=1
-        file.file_url= "/" + construct_file_url(SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0], file_name)
+        file.file_url= "/" + construct_file_url(self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name)
         file.save(ignore_permissions=True)
-        self.delete_backend_files(file_path=construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0],file_name))
-        file_url="/"+construct_file_url(SHELL_PATH, file_name)
+        self.delete_backend_files(file_path=construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0],file_name))
+        file_url="/"+construct_file_url(self.SHELL_PATH, file_name)
         frappe.db.commit()
         return file_url
         
@@ -63,4 +68,25 @@ class Downloader():
         error_log.set('reference_name', reference_name)
         error_log.set('error_message', error_message)
         error_log.save()
+    
+    def download(self):
+        try:
+            content = self.get_content()
+            file_name=self.get_file_details()
+            if content:
+                self.write_file(file_name=file_name,content=content)
+        except Exception as e:
+            self.log_error('TPA Login Credentials',self.user_name,e)
+    
+    def get_content():
+        return None
+    
+    def get_file_details():
+        return None
+    
+    def write_file(self,file_name,content):
+        if self.is_binary:
+            self.write_binary(file_name,content)
+        if self.is_json:
+            self.write_Json(file_name,content)
         
