@@ -2,7 +2,7 @@ import requests
 import json
 from agarwals.settlement_advice_downloader.downloader import Downloader
 
-class Tnnhis_Mdindia(Downloader):
+class TnnhisMdIndia(Downloader):
     tpa='MD India Healthcare TPA Service Ltd'
     def __init__(self,branch_code):
         self.branch_code=branch_code
