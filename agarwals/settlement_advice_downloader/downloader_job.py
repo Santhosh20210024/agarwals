@@ -2,10 +2,11 @@ import frappe
 from datetime import datetime,timedelta
 from agarwals import settlement_advice_downloader
 
+# @frappe.whitelist(allow_guest=True)
 def settlement_advice_job(tpa_name,branch_code,executing_method):
     class_name=getattr(settlement_advice_downloader,executing_method)
-    class_name(tpa_name,branch_code).download()
-    frappe.enqueue(class_name(branch_code).download,queue='long', is_async=True, job_name=f"TPA_downloader_{str(tpa_name)}_{branch_code}", timeout=3600)
+    # class_name(tpa_name,branch_code).download()
+    frappe.enqueue(class_name(tpa_name, branch_code).download,queue='long', is_async=True, job_name=f"TPA_downloader_{str(tpa_name)}_{branch_code}", timeout=3600)
 
 @frappe.whitelist(allow_guest=True)
 def execute_download_job():    
