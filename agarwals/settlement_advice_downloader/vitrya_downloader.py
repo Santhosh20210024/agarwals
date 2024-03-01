@@ -1,7 +1,6 @@
 import frappe
 import pandas as pd
 import requests
-from datetime import datetime,timedelta
 from agarwals.settlement_advice_downloader.downloader import Downloader
 
 class VitryaDownloader(Downloader):
@@ -11,15 +10,13 @@ class VitryaDownloader(Downloader):
         self.user_name = None
         self.password = None
 
-    def get_user_credentials_tpa_and_branch(self):
-        tpa_credential_doc = frappe.get_list("TPA Login Credentials", filters={'portal': self.portal}, fields='*')
-        time_exc = datetime.now()
-        for tpa_credential in tpa_credential_doc:
-            if tpa_credential.exectution_time:
-                if (time_exc - timedelta(minutes=2)).time() < tpa_credential.exectution_time.time() <= time_exc.time():
-                    return tpa_credential['branch_code'], tpa_credential['tpa'], tpa_credential['user_name'], \
-                    tpa_credential['encrypted_password']
-        return None, None, None, None
+    def set_username_and_password(self):
+        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
+        if credential_doc:
+            self.user_name = credential_doc[0].user_name
+            self.password = credential_doc[0].encrypted_password
+        else:
+            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
 
     def get_web_token(self):
         login_url = "https://a2s.starhealth.in/rules-engine/api/v1/user/signin"
@@ -40,7 +37,6 @@ class VitryaDownloader(Downloader):
         if download_response.status_code == 200 and download_response.content:
             return download_response.content
         return None
-
 
     def get_content(self):
         web_token = self.get_web_token()

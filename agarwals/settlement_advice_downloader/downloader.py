@@ -9,12 +9,8 @@ class Downloader():
     tpa=''
     branch_code=''
     def __init__(self):
-        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
-        if credential_doc:
-            self.user_name = credential_doc[0].user_name
-            self.password = credential_doc[0].password
-        else:
-            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+        self.user_name = None
+        self.password = None        
         self.PROJECT_FOLDER = "DrAgarwals"
         self.HOME_PATH = "Home/DrAgarwals"
         self.SHELL_PATH = "private/files"
@@ -23,7 +19,14 @@ class Downloader():
         self.is_binary=False
         self.is_json=False
         
-        
+    def set_username_and_password(self)  :
+        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
+        if credential_doc:
+            self.user_name = credential_doc[0].user_name
+            self.password = credential_doc[0].password
+        else:
+            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+            
     def delete_backend_files(self,file_path=None):
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -47,7 +50,7 @@ class Downloader():
         frappe.db.commit()
         return file_url
         
-    def write_Json(self,file_name=None,content=None):
+    def write_json(self,file_name=None,content=None):
         if file_name and content:
             content_df=pd.DataFrame(content)
             content_df.to_excel(file_name)
@@ -69,24 +72,27 @@ class Downloader():
         error_log.set('error_message', error_message)
         error_log.save()
     
-    def download(self):
-        try:
-            content = self.get_content()
-            file_name=self.get_file_details()
-            if content:
-                self.write_file(file_name=file_name,content=content)
-        except Exception as e:
-            self.log_error('TPA Login Credentials',self.user_name,e)
-    
     def get_content():
         return None
     
-    def get_file_details():
-        return None
+    def get_file_details(self):
+        file_name = f"{self.tpa.replace(' ','').lower()}_{self.user_name}_{self.branch_code}.xlsx"
+        self.is_binary=True
+        return file_name
     
     def write_file(self,file_name,content):
         if self.is_binary:
             self.write_binary(file_name,content)
         if self.is_json:
-            self.write_Json(file_name,content)
+            self.write_json(file_name,content)
         
+    def download(self):
+        try:
+            content = self.get_content()
+            file_name=self.get_file_details()
+            if content and file_name:
+                self.write_file(file_name=file_name,content=content)
+            else:
+                self.log_error('TPA Login Credentials',self.user_name,"No Content or File Name")    
+        except Exception as e:
+            self.log_error('TPA Login Credentials',self.user_name,e)

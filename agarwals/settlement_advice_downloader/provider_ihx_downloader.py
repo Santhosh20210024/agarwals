@@ -82,8 +82,3 @@ class ProviderIhx(Downloader):
             self.log_error('TPA Login Credentials', self.user_name, "No Data")
             return None
         return content
-    
-    def get_file_details(self):
-        file_name=f"{self.tpa}_{self.branch_code}.xlsx"
-        self.is_binary=True
-        return file_name

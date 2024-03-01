@@ -57,14 +57,14 @@ class TipsVidalHealthTpa(Downloader):
             return None
         return download_response.content
     
+    def get_file_details(self):
+        file_name = f"{self.tpa.replace(' ','').lower()}_{self.user_name}_{self.branch_code}.xls"
+        self.is_binary=True
+        return file_name
+    
     def get_content(self):
         content = self.get_content_from_site()
         if not content:
             self.log_error('TPA Login Credentials', self.user_name, "No Data")
             return None
         return content
-    
-    def get_file_details(self):
-        file_name=f"{self.tpa}_{self.branch_code}.xls"
-        self.is_binary=True
-        return file_name
