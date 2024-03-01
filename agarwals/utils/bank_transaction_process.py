@@ -72,6 +72,9 @@ def create_bank_transaction(transaction_list):
                 save_trans_doc(trans_doc)
                 continue
 
+            if int(transaction.get('withdrawal')) != 0:
+                continue
+
             if transaction.get('update_reference_number') != None and transaction.get('retry') == 1:
                 bank_trans_doc = frappe.get_doc('Bank Transaction', transaction.reference_number)
 
@@ -140,7 +143,7 @@ def tag_skipped():
 
 def bank_transaction_process(tag):
     pending_transaction = [] 
-    for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'tag' : tag, 'staging_status' : ['!=', 'Processed'], 'withdrawal': ['=', 0] }, fields = "*" ):
+    for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'tag' : tag, 'staging_status' : ['!=', 'Processed']}, fields = "*" ):
         if transaction.staging_status == "Warning":
             if transaction.get('update_reference_number') != None and transaction.retry == 1:
                 pending_transaction.append(transaction)
@@ -159,7 +162,7 @@ def bank_transaction_process(tag):
     for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'staging_status' : ['=', 'Processed'], 'update_reference_number' : ['!=', None], 'retry': 1}):
         pending_transaction.append(transaction)
     
-    chunk_size = 10000
+    chunk_size = 1000
     for i in range(0, len(pending_transaction), chunk_size):
         frappe.enqueue(staging_batch_operation, queue='long', is_async=True, timeout=18000, chunk = pending_transaction[i:i + chunk_size])
 

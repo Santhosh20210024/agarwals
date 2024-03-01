@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "source",
+  "file_name",
   "claim_id",
   "bill_number",
   "utr_number",
@@ -43,7 +44,7 @@
   {
    "fieldname": "utr_number",
    "fieldtype": "Data",
-   "label": "Utr Number",
+   "label": "UTR Number",
    "read_only": 1,
    "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
@@ -141,11 +142,18 @@
    "fieldtype": "Data",
    "label": "Final UTR Number",
    "read_only": 1
+  },
+  {
+   "fetch_from": "source.file_name",
+   "fetch_if_empty": 1,
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-26 10:59:25.664684",
+ "modified": "2024-02-28 18:02:03.118017",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
