@@ -34,7 +34,7 @@ class BillClaimKeyMapper(ClaimKeyMapper):
     def map_claim_keys(self, record):
         doctype = self.get_doctype()
         
-        if record.claim_id != '' and record.claim_id != '0':
+        if str(record.claim_id).strip() != '' and record.claim_id != '0':
             claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.claim_id.lower().strip()}, pluck='claim_key')
             if not claim_key:
                 claim_key = self.create_claim_key(record.claim_id,doctype,record.name)
@@ -90,9 +90,9 @@ class SAClaimKeyMapper(BillClaimKeyMapper):
 @frappe.whitelist()
 def map_claim_key():
     n = 1000
-    bill_records = frappe.get_list("Bill", filters={'claim_key': ''},
-                                       pluck='name')
-    
+    # bill_records = frappe.get_list("Bill", filters={'claim_key': ''},
+    #                                    pluck='name')
+    bill_records = frappe.db.sql("""select name from tabBill where claim_key is NULL or ma_claim_key is NULL""")
     for i in range(0, len(bill_records), n):
         frappe.enqueue(BillClaimKeyMapper().process, job_name= "Claim Key Mapper in Bill", queue='long', is_async=True, timeout=18000, records = bill_records[i:i + n])
     
