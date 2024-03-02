@@ -70,7 +70,9 @@
   "cl_key",
   "cg_utr_number",
   "cg_formatted_utr_number",
-  "final_utr_number"
+  "final_utr_number",
+  "cg_formatted_bill_number",
+  "custom_raw_bill_number"
  ],
  "fields": [
   {
@@ -429,11 +431,21 @@
    "fieldname": "ma_bill_no",
    "fieldtype": "Data",
    "label": "MA Bill No"
+  },
+  {
+   "fieldname": "cg_formatted_bill_number",
+   "fieldtype": "Data",
+   "label": "CG Formatted Bill Number"
+  },
+  {
+   "fieldname": "custom_raw_bill_number",
+   "fieldtype": "Data",
+   "label": "custom raw bill number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-29 16:45:38.646245",
+ "modified": "2024-03-01 04:27:16.572993",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

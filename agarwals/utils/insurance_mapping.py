@@ -27,7 +27,7 @@ def advices_rfn_match():
         print("advice 2")
         frappe.db.sql("""
         update `tabBank Transaction Staging` tbts, `tabSettlement Advice` tsa set tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice'
-        where (tbts.reference_number = tsa.cg_formatted_utr_number) and tbts.tag is null and tbts.reference_number != '0';
+        where (tbts.reference_number = tsa.final_utr_number) and tbts.tag is null and tbts.reference_number != '0';
         """, values = {'tag' : INSURANCE_TAG})
 
         frappe.db.commit()
