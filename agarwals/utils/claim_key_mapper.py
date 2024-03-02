@@ -90,7 +90,7 @@ class SAClaimKeyMapper(BillClaimKeyMapper):
 @frappe.whitelist()
 def map_claim_key():
     n = 1000
-    bill_records = frappe.get_list("Bill", filters={'claim_key': '', 'claim_id': ['not in', ['', '0']]},
+    bill_records = frappe.get_list("Bill", filters={'claim_key': '',
                                        pluck='name')
     
     for i in range(0, len(bill_records), n):
