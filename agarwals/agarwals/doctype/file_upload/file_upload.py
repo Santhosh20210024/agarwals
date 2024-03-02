@@ -75,7 +75,7 @@ class Fileupload(Document):
 	def move_shell_file(self, source, destination, file_name, file_id):
 		try:
 			current_timestamp = str(frappe.utils.now()).split('.')[0]
-			timestamped_file_name = current_timestamp.replace(' ', '-').replace(':','-') + '_' + file_name
+			timestamped_file_name = file_name
 			changed_source_file_name = source.replace( file_name, timestamped_file_name )
 
 			# source name changed
