@@ -88,6 +88,7 @@ class Downloader():
         
     def download(self):
         try:
+            self.set_username_and_password()
             content = self.get_content()
             file_name=self.get_file_details()
             if content and file_name:
