@@ -18,7 +18,8 @@
   "disallowance_amount",
   "match_logic",
   "status",
-  "remarks"
+  "remarks",
+  "payment_order"
  ],
  "fields": [
   {
@@ -82,11 +83,16 @@
    "fieldname": "insurance_company_name",
    "fieldtype": "Data",
    "label": "Insurance Company Name"
+  },
+  {
+   "fieldname": "payment_order",
+   "fieldtype": "Data",
+   "label": "Payment Order"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-29 18:54:21.706657",
+ "modified": "2024-03-01 02:07:00.950052",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",
