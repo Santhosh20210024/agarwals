@@ -26,7 +26,7 @@ class Matcher:
                  matcher_record.set('tds_amount', record['tds_amount'])
                  matcher_record.set('disallowance_amount',record['disallowed_amount'])
                  frappe.db.set_value('Settlement Advice', record['sa'], 'matcher_status', 'Processed' )
-				 
+                 frappe.db.commit()
                 
             if record['bank']:
                 matcher_record.set('bank_transaction', record['bank'])
