@@ -147,6 +147,7 @@ def log_error(doctype_name, reference_name, error_message):
 @frappe.whitelist()
 def advice_transform():
         file_list_details = frappe.get_all("File upload",{"status":"Open", "document_type": "Settlement Advice"},"*")
+        
         for file in file_list_details:
             try:
                 update_status('File upload', file.name, 'In Process')
