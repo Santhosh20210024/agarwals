@@ -67,7 +67,7 @@ class Matcher:
         		or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
         	and sa.cg_formatted_bill_number  = bi.cg_formatted_bill_number 
         	and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is NULL and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
+            and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
             """
         
         ma5_bn_records = frappe.db.sql(ma5_bn, as_dict=True)
@@ -101,7 +101,7 @@ class Matcher:
 		        or cb.cl_key = sa.claim_key)
 	        and (((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) or (bi.ma_claim_key = cb.al_key or bi.ma_claim_key = cb.cl_key)) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is NULL and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
+            and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
            """
         
         ma1_cn_records = frappe.db.sql(ma1_cn,as_dict=True)
@@ -131,9 +131,9 @@ class Matcher:
 	        and (cb.al_key = sa.claim_key
 		        or cb.cl_key = sa.claim_key)
 	        and bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
-	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher` WHERE match_logic = 'MA1-1') 
+	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher` WHERE match_logic = 'MA1-CN') 
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is NULL and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
+            and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
             """
         ma1_bn_records = frappe.db.sql(ma1_bn, as_dict=True)
         
@@ -142,7 +142,7 @@ class Matcher:
         if ma1_bn_records:
             self.insert_into_matcher_table(ma1_bn_records)
 
-		# Skipped need to ask ?
+		# # Skipped need to ask ?
         ma5_cn = """select
 	        bi.name as bill,
 	        '' as cb,
@@ -163,7 +163,7 @@ class Matcher:
 		        or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
 	        and ((sa.claim_key  = bi.claim_key) or (sa.claim_key = bi.ma_claim_key) )
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is NULL and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
+            and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
             """
         ma5_cn_records = frappe.db.sql(ma5_cn, as_dict=True)
         
@@ -327,6 +327,7 @@ class Matcher:
         where
 	        (sa.claim_key = bi.claim_key or sa.claim_key = bi.ma_claim_key)
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher`)
+             and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
          """
         ma6_cn_records = frappe.db.sql(ma6_cn, as_dict=True)
         
@@ -350,6 +351,7 @@ class Matcher:
         where
 	        sa.cg_formatted_bill_number  = bi.cg_formatted_bill_number 
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher`)
+            and sa.name not in (SELECT settlement_advice FROM `tabMatcher`)
          """
         ma6_bn_records = frappe.db.sql(ma6_bn, as_dict=True)
         print(
