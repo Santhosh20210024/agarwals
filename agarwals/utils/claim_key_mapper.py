@@ -40,10 +40,13 @@ class BillClaimKeyMapper(ClaimKeyMapper):
                 if not claim_key:
                     claim_key = self.create_claim_key(record.claim_id,doctype,record.name)
                 record.set('claim_key', claim_key[0])
-        
-        if record.ma_claim_id != '0' and record.ma_claim_id is not None:
-            if str(record.ma_claim_id).strip() != '':
-                ma_claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.ma_claim_id.lower().strip()}, pluck='claim_key')
+
+        if record.ma_claim_id:
+            ma_claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.ma_claim_id.lower().strip()}, pluck='claim_key')
+
+            if not ma_claim_key:
+                ma_claim_key = self.create_claim_key(record.ma_claim_id, doctype, record.name)
+            record.set('ma_claim_key', ma_claim_key[0])
 
                 if not ma_claim_key:
                     ma_claim_key = self.create_claim_key(record.ma_claim_id, doctype, record.name)
