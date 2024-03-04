@@ -18,14 +18,16 @@ class Downloader():
         self.SITE_PATH=frappe.get_single("Control Panel").site_path
         self.is_binary=False
         self.is_json=False
+        self.credential_doc=None
+        self.last_executed_time=None
         
     def set_username_and_password(self)  :
-        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
-        if credential_doc:
-            self.user_name = credential_doc[0].user_name
-            self.password = credential_doc[0].password
+        self.credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
+        if self.credential_doc:
+            self.user_name = self.credential_doc[0].user_name
+            self.password = self.credential_doc[0].password
         else:
-            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+            self.log_error('TPA Login Credentials',None,"No Credential for the given input")
             
     def delete_backend_files(self,file_path=None):
         if os.path.exists(file_path):
@@ -49,7 +51,11 @@ class Downloader():
         file_url="/"+construct_file_url(self.SHELL_PATH, file_name)
         frappe.db.commit()
         return file_url
-        
+     
+    def insert_run_log(self, data):
+        self.credential_doc.append("run_log", data)
+        return None
+    
     def write_json(self,file_name=None,content=None):
         if file_name and content:
             content_df=pd.DataFrame(content)
@@ -63,6 +69,7 @@ class Downloader():
         file_upload_doc.payer_type=self.tpa
         file_upload_doc.upload=file_url
         file_upload_doc.save(ignore_permissions=True)
+        self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":file_upload_doc.name,"status":"Processed"})
         frappe.db.commit()
 
     def log_error(self,doctype_name, reference_name, error_message):
@@ -71,7 +78,8 @@ class Downloader():
         error_log.set('reference_name', reference_name)
         error_log.set('error_message', error_message)
         error_log.save()
-    
+        self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error"})
+
     def get_content():
         return None
     
@@ -93,7 +101,5 @@ class Downloader():
             file_name=self.get_file_details()
             if content and file_name:
                 self.write_file(file_name=file_name,content=content)
-            else:
-                self.log_error('TPA Login Credentials',self.user_name,"No Content or File Name")    
         except Exception as e:
             self.log_error('TPA Login Credentials',self.user_name,e)
