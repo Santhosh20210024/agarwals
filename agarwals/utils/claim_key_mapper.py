@@ -49,6 +49,7 @@ class BillClaimKeyMapper(ClaimKeyMapper):
                     ma_claim_key = self.create_claim_key(record.ma_claim_id, doctype, record.name)
                 record.set('ma_claim_key', ma_claim_key[0])
 
+
 class ClaimBookClaimKeyMapper(ClaimKeyMapper):
 
     def get_record_obj(self, name):
