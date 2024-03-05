@@ -34,7 +34,8 @@ def run_payment_entry():
 
     batch_number = 0
     n = int(frappe.get_single('Control Panel').payment_matching_chunk_size)
-    match_logic = tuple(frappe.get_single('Control Panel').match_logic.split(','))
+    # match_logic = tuple(frappe.get_single('Control Panel').match_logic.split(','))
+    match_logic = 'MA1-CN'
 
     # Need to change as X00
     bank_transaction_records = frappe.db.sql(
