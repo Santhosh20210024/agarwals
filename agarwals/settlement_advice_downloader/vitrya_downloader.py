@@ -4,9 +4,10 @@ import requests
 from agarwals.settlement_advice_downloader.downloader import Downloader
 
 class VitryaDownloader(Downloader):
-    def __init__(self,tpa_name,branch_code):
+    def __init__(self,tpa_name,branch_code,last_executed_time):
         self.tpa=tpa_name
         self.branch_code=branch_code
+        self.last_executed_time=last_executed_time
         Downloader.__init__(self)
 
     def set_username_and_password(self):

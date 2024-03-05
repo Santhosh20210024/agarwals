@@ -3,9 +3,10 @@ import requests
 from agarwals.settlement_advice_downloader.downloader import Downloader
 
 class StarHealthDownloader(Downloader):
-    def __init__(self,tpa_name,branch_code):
+    def __init__(self,tpa_name,branch_code, last_executed_time):
         self.tpa=tpa_name
         self.branch_code=branch_code
+        self.last_executed_time=last_executed_time
         Downloader.__init__(self)
     
     def set_username_and_password(self):
@@ -22,7 +23,7 @@ class StarHealthDownloader(Downloader):
         login_body = {"userName":self.user_name,"password":self.password}
         login_response = requests.post(login_url,headers = login_header, json = login_body)
         response_json = login_response.json()
-        if login_response.status_code == 200 and response_json['accessToken']:
+        if login_response.status_code == 200 and 'accessToken' in response_json:
             return response_json['accessToken'], response_json["hospDetails"]["hospId"]
         return None, None
 

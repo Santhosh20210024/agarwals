@@ -8,6 +8,7 @@ from agarwals.utils.file_util import construct_file_url
 class Downloader():
     tpa=''
     branch_code=''
+    last_executed_time=None
     def __init__(self):
         self.user_name = None
         self.password = None        
@@ -19,7 +20,6 @@ class Downloader():
         self.is_binary=False
         self.is_json=False
         self.credential_doc=None
-        self.last_executed_time=None
         
     def set_username_and_password(self)  :
         self.credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
@@ -69,7 +69,7 @@ class Downloader():
         file_upload_doc.payer_type=self.tpa
         file_upload_doc.upload=file_url
         file_upload_doc.save(ignore_permissions=True)
-        self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":file_upload_doc.name,"status":"Processed"})
+        self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
         frappe.db.commit()
 
     def log_error(self,doctype_name, reference_name, error_message):
@@ -99,7 +99,8 @@ class Downloader():
             self.set_username_and_password()
             content = self.get_content()
             file_name=self.get_file_details()
-            if content and file_name:
-                self.write_file(file_name=file_name,content=content)
+            if not content and not file_name:
+                self.log_error('TPA Login Credentials', self.user_name, "No Data")
+            self.write_file(file_name=file_name,content=content)
         except Exception as e:
             self.log_error('TPA Login Credentials',self.user_name,e)

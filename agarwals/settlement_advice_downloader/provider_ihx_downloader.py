@@ -2,9 +2,10 @@ import requests
 from agarwals.settlement_advice_downloader.downloader import Downloader
 
 class ProviderIhx(Downloader):
-    def __init__(self,tpa_name,branch_code):
+    def __init__(self,tpa_name,branch_code,last_executed_time):
         self.tpa=tpa_name
         self.branch_code=branch_code
+        self.last_executed_time=last_executed_time
         Downloader.__init__(self)
     
     def get_access_token_and_provider_details(self):
@@ -13,7 +14,7 @@ class ProviderIhx(Downloader):
         login_data={"userName":self.user_name,"password":self.password}
         login_response = requests.post(login_url,headers=login_header,json=login_data)
         response_json = login_response.json()
-        if login_response.status_code == 200 and response_json["accessToken"]:
+        if login_response.status_code == 200 and "accessToken" in response_json:
             return response_json["accessToken"],response_json['userDetail']['profileId'], response_json['providerDetail']['providerId'], response_json['providerDetail']['providerName'], response_json['providerDetail']['providerRohiniCode'], response_json['userDetail']['properties']['MAID']
         return None, None, None, None, None, None
     
@@ -23,7 +24,7 @@ class ProviderIhx(Downloader):
         embed_data={"applicationId":9233,"dashboardType":"IHX_Finance_Provider_New","profileId":profile_id,"providerId":provider_id,"providerName":provider_name,"rohiniCode":rohini_code}
         embed_response = requests.post(embed_url,headers=embed_header,json=embed_data)
         response_json = embed_response.json()
-        if embed_response.status_code == 200 and response_json['embedToken']['token']:
+        if embed_response.status_code == 200 and 'token' in response_json:
             return response_json['embedToken']['token']
         return None
     
@@ -79,6 +80,5 @@ class ProviderIhx(Downloader):
             return None
         content = self.get_content_from_site(embed_token, ma_id)
         if not content:
-            self.log_error('TPA Login Credentials', self.user_name, "No Data")
             return None
         return content
