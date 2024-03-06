@@ -1,7 +1,7 @@
 import shutil
 import frappe
 from frappe.core.doctype.data_import.data_import import start_import
-from agarwals.utils.path_data import SITE_PATH
+from agarwals.utils.file_util import SITE_PATH
 import os
 
 class Loader():
