@@ -30,6 +30,9 @@ def prune_columns(df, columns_to_prune):
     return df
 
 def swap_advice_amount(row):
+    row['settled_amount'] = pd.to_numeric(row['settled_amount'])
+    row['tds_amount'] = pd.to_numeric(row['tds_amount'])
+
     if row['settled_amount'] < row['tds_amount']:
         temp = row['settled_amount']
         row['settled_amount'] = row['tds_amount']
@@ -213,7 +216,8 @@ def advice_transform():
                 df = df[all_columns]
                 df["source"]=file.name
                 df = clean_data(df)
-                df = check_advice_amount(df)
+                # Amount checking
+                df = check_advice_amount(df)  
                 move_to_transform(file, df, 'Insert', 'Transform')
                 loader = Loader("Settlement Advice Staging")
                 loader.process()
