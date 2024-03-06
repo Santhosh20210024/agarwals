@@ -7,50 +7,5 @@
     "fieldtype": "Data",
     "label": "CG UTR Number",
     "insert_after": "reference_number"
-  },
-  {
-    "doctype": "Custom Field",
-    "dt": "Payment Entry",
-    "name": "Payment Entry-tds_amount",
-    "fieldname": "custom_tds_amount",
-    "fieldtype": "Currency",
-    "label": "TDS Amount",
-    "insert_after": "title"
-  },
-  {
-    "doctype": "Custom Field",
-    "dt": "Payment Entry",
-    "name": "Payment Entry-disallowed_amount",
-    "fieldname": "custom_disallowed_amount",
-    "fieldtype": "Currency",
-    "label": "Disallowed Amount",
-    "insert_after": "custom_disallowed_amount"
-  },
-  {
-    "doctype": "Custom Field",
-    "dt": "Payment Entry",
-    "name": "Payment Entry-sales_invoice",
-    "fieldname": "custom_sales_invoice",
-    "fieldtype": "Data",
-    "label": "Sales Invoice",
-    "insert_after": "naming_series"
-  },
-  {
-    "doctype": "Custom Field",
-    "dt": "Sales Invoice",
-    "name": "Sales Invoice-mrn",
-    "fieldname": "custom_mrn",
-    "fieldtype": "Data",
-    "label": "MRN",
-    "insert_after": "branch_type"
-  },
-  {
-    "doctype": "Custom Field",
-    "dt": "Payment Entry",
-    "name": "Payment Entry-sales_invoice",
-    "fieldname": "custom_sales_invoice",
-    "fieldtype": "Data",
-    "label": "Sales Invoice",
-    "insert_after": "naming_series"
   }
   ]
