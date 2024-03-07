@@ -1,12 +1,11 @@
 import requests
 from agarwals.settlement_advice_downloader.downloader import Downloader
-import datetime
 
 class ProviderIhx(Downloader):
     def __init__(self,tpa_name,branch_code,last_executed_time):
         self.tpa=tpa_name
         self.branch_code=branch_code
-        self.last_executed_time=datetime.datetime.strptime(last_executed_time, '%m-%d-%Y %H:%M:%S')
+        self.last_executed_time=last_executed_time
         Downloader.__init__(self)
     
     def get_access_token_and_provider_details(self):
