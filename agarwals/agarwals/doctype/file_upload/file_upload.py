@@ -2,14 +2,13 @@ import frappe
 import os
 from frappe.model.document import Document
 import shutil
-from agarwals.utils.doc_meta_util import get_doc_fields
-from agarwals.utils.file_util import construct_file_url
-from agarwals.utils.path_data import HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER
-import re
+from agarwals.utils.file_util import construct_file_url, HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER
+
+# Need to fix the auto increment serial number
 
 class Fileupload(Document):
 	def get_file_doc_data(self):
-		file_name = self.upload.split("/")[-1] # Need to the
+		file_name = self.upload.split("/")[-1]
 		file_doc_id = frappe.get_list("File", filters={'file_url':self.upload}, pluck='name')
 		if len(file_doc_id) < 1:
 			frappe.throw("Again upload the file.")
@@ -18,16 +17,14 @@ class Fileupload(Document):
 			return file_name, file_doc_id
 	
 	def delete_backend_files(self, file_path):
-		print("_________________________" +file_path)
 		if os.path.exists(file_path):
-			print("__________________________________deleted")
 			os.remove(file_path)
 
 	def validate_hash_content(self, file_name, file_id):
 		file_doc = frappe.get_doc('File', file_id)
 		file_ch = file_doc.content_hash
 		
-		# Verify the same hash content 
+		# verify the same hash content 
 		if file_ch:
 			file_doc_hash = frappe.get_list("File", filters = { 'content_hash':file_ch, 'attached_to_doctype': 'File upload' }, fields = [ 'name', 'attached_to_name' ], order_by = 'creation DESC')
 			file_doc_hash_filtered = []
@@ -40,7 +37,6 @@ class Fileupload(Document):
 				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name': file_doc_hash[0]['name']})
 				frappe.db.commit()
 
-				# Delete the files
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 				self.set(str(self.upload), None)
 				frappe.throw('Duplicate File Error: The file being uploaded already exists. Please check.')
@@ -66,7 +62,6 @@ class Fileupload(Document):
 				if file_name.split('.')[-1].upper() not in file_extensions:
 					self.validate_file_check(file_id, file_name, file_extensions)
 					
-
 			except Exception as e:
 				self.validate_file_check(file_id, file_name, file_extensions)
 												
@@ -75,10 +70,9 @@ class Fileupload(Document):
 	def move_shell_file(self, source, destination, file_name, file_id):
 		try:
 			current_timestamp = str(frappe.utils.now()).split('.')[0]
-			timestamped_file_name = file_name
+			timestamped_file_name = current_timestamp.replace(' ', '-').replace(':','-') + '_' + file_name
 			changed_source_file_name = source.replace( file_name, timestamped_file_name )
 
-			# source name changed
 			os.rename(source, changed_source_file_name)
 			shutil.move(changed_source_file_name, destination)
 

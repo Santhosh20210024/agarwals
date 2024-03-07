@@ -14,9 +14,7 @@ def compile_patterns(patterns):
     return '(?:%s)' % '|'.join(normalize_text(pattern) for pattern in patterns)
 
 def advices_rfn_match():
-    try:    # needd to chenage
-        
-        print("advice 1")
+    try: 
         frappe.db.sql("""
         update `tabBank Transaction Staging` tbts, `tabSettlement Advice` tsa set tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice'
         where (tbts.reference_number = tsa.cg_formatted_utr_number) and tbts.tag is null and tbts.reference_number != '0';
@@ -24,7 +22,6 @@ def advices_rfn_match():
 
         frappe.db.commit()
 
-        print("advice 2")
         frappe.db.sql("""
         update `tabBank Transaction Staging` tbts, `tabSettlement Advice` tsa set tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice'
         where (tbts.reference_number = tsa.final_utr_number) and tbts.tag is null and tbts.reference_number != '0';
@@ -32,31 +29,12 @@ def advices_rfn_match():
 
         frappe.db.commit()
     
-        print("advice 3")
         frappe.db.sql("""
         update `tabBank Transaction Staging` tbts, `tabSettlement Advice` tsa set tbts.tag = %(tag)s, tbts.based_on = 'Settlement Advice'
         where (tbts.reference_number = tsa.utr_number) and tbts.tag is null and tbts.reference_number != '0';
         """, values = {'tag' : INSURANCE_TAG})
 
         frappe.db.commit()
-
-        # frappe.db.sql(""" 
-        #     UPDATE `tabBank Transaction Staging` tbts JOIN `tabSettlement Advice` tsa ON tbts.reference_number = tsa.final_utr_number
-        #     SET tbts.tag = %(tag)s 
-        #     WHERE tbts.tag IS NULL 
-        #     AND tbts.staging_status != 'Processed'
-        #     AND tsa.final_utr_number IS NOT NULL
-        # """, values = {'tag': INSURANCE_TAG })
-
-
-        # frappe.db.sql(""" 
-        #     UPDATE `tabBank Transaction Staging` tbts JOIN `tabSettlement Advice` tsa ON TRIM(LEADING '0' FROM source_reference_number) = tsa.cg_utr_number
-        #     SET tag = %(tag)s, based_on = 'Settlement Advice' 
-        #     WHERE tbts.tag IS NULL 
-        #     AND tbts.staging_status != 'Processed'
-        #     AND tsa.cg_utr_number IS NOT NULL
-        # """, values = {'tag': INSURANCE_TAG })
-
         print("Advice Process Completed")
 
     except Exception as e:
@@ -66,20 +44,23 @@ def advices_rfn_match():
         error_log.save()
 
 def claimbook_match():
-        
-        print("claim 1")
         frappe.db.sql(""" 
         UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
         where (tbts.reference_number = cb.utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
         """, values = {'tag': INSURANCE_TAG })
         frappe.db.commit()
 
-        print("claim 2")
         frappe.db.sql(""" 
            UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
         where (tbts.reference_number = cb.final_utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
         """, values = {'tag': INSURANCE_TAG })
+
+        frappe.db.sql(""" 
+           UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
+        where (tbts.reference_number = cb.cg_formatted_utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
+        """, values = {'tag': INSURANCE_TAG })
         frappe.db.commit()
+
         print("ClaimBook Process Completed")
 
 def delete_corrs_doc(doctype_name, doc_name):
@@ -96,7 +77,6 @@ def rm_transactions():
     
     for trns_item in trns_list:
         if int(frappe.get_value('Bank Transaction', trns_item.reference_number, "allocated_amount")) == 0: #
-            # frappe.db.sql("DELETE FROM `tabBank Transaction` where name = %(reference_number)s", values = {'reference_number' : trns_item.reference_number})
             delete_corrs_doc('Bank Transaction', trns_item.reference_number)
             frappe.set_value('Bank Transaction Staging', trns_item.name, "staging_status", "Skipped" )
             frappe.db.commit()
@@ -113,7 +93,6 @@ def rm_transactions():
 @frappe.whitelist()
 def tag_insurance_pattern(doctype=None): 
     
-    # Verify the field is exsit
     if not frappe.get_meta(doctype).has_field('description'): 
         frappe.throw(f'Description field does not exist in {doctype} doctype')
 
@@ -153,14 +132,14 @@ def tag_insurance_pattern(doctype=None):
         # search is mandatory to follow
         if compressed_exclusion_patterns:
             frappe.db.sql("""
-                         UPDATE `tabBank Transaction Staging` SET tag = NULL, based_on = NULL where tag = %(_tag)s AND search REGEXP %(compressed_exclusion_patterns)s and based_on is NULL
+                         UPDATE `tabBank Transaction Staging` SET tag = NULL, based_on = NULL where tag = %(_tag)s AND search REGEXP %(compressed_exclusion_patterns)s and based_on is NULL and is_fixed != 1
                          """, values = { '_tag' : INSURANCE_TAG, 'compressed_exclusion_patterns' : compressed_exclusion_patterns})
             frappe.db.commit()
         else:
             frappe.throw('Exclusion Patterns is not found')
 
         frappe.db.sql("""
-                      UPDATE `tabBank Transaction Staging` SET based_on = 'Insurance Pattern' where tag = %(_tag)s and based_on is NULL
+                      UPDATE `tabBank Transaction Staging` SET based_on = 'Insurance Pattern' where tag = %(_tag)s and based_on is NULL and is_fixed != 1
                       """, values = {'_tag' : INSURANCE_TAG})
         frappe.db.commit()
         

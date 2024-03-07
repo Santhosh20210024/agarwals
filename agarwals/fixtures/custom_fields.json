@@ -7,5 +7,5 @@
     "fieldtype": "Data",
     "label": "CG UTR Number",
     "insert_after": "reference_number"
-    }
+  }
   ]

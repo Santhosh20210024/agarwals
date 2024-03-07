@@ -38,7 +38,11 @@ def run_payment_entry():
 
     # Need to change as X00
     bank_transaction_records = frappe.db.sql(
-        f"SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE name in (select bank_transaction from `tabMatcher` where match_logic in {match_logic} and status is null ) AND status IN ('Pending','Unreconciled')  AND LENGTH(reference_number) > 4 AND deposit > 10 AND reference_number not like 'X0%' ORDER BY unallocated_amount DESC",
+        f"SELECT name, bank_account, reference_number, date FROM `tabBank Transaction`
+          WHERE name in (select bank_transaction from `tabMatcher` where match_logic in {match_logic} and status is null )
+          AND status IN ('Pending','Unreconciled')
+          AND LENGTH(reference_number) > 4 AND deposit > 10 AND reference_number not like 'X0%'
+          ORDER BY unallocated_amount DESC",
         as_dict=True
         )
 

@@ -86,7 +86,7 @@ class PaymentEntryCreator:
 
 
     @redis_cache
-    def get_company_account(self, bank_account_name): # need to be cache
+    def get_company_account(self, bank_account_name):
         bank_account = frappe.get_doc('Bank Account', bank_account_name)
         if not bank_account.account:
             return None
@@ -105,16 +105,15 @@ class PaymentEntryCreator:
     def process(self, bank_transaction_records, match_logic):
     
         for bank_transaction_record in bank_transaction_records:
-            if not bank_transaction_record['date']:  #If Date is null skip to next record
+            if not bank_transaction_record['date']: 
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "Date is Null")
                 continue
 
             bank_account = self.get_company_account(bank_transaction_record['bank_account'])
-            if not bank_account:  #If Company Bank Account is not found skip to next record
+            if not bank_account:
                 self.log_error('Bank Transaction', bank_transaction_record['name'], "No Company Account Found")
                 continue
 
-            # matching table logic
             matcher_records = frappe.db.sql("""
                           SELECT * from `tabMatcher` where match_logic in %(logic)s AND bank_transaction = %(reference_number)s AND status is NULL order by payment_order ASC, tds_amount DESC , disallowance_amount DESC
                           """, values = {'reference_number' : bank_transaction_record.name, 'logic': match_logic}, as_dict = True)
