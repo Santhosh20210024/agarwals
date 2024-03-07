@@ -1,47 +1,47 @@
 import frappe
-import requests
-from agarwals.settlement_advice_downloader.downloader import Downloader
+from agarwals.settlement_advice_downloader.selenium_downloader import SeleniumDownloader
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+import time
 
-class StarHealthDownloader(Downloader):
-    def __init__(self,tpa_name,branch_code):
-        self.tpa=tpa_name
-        self.branch_code=branch_code
-        Downloader.__init__(self)
-    
-    def set_username_and_password(self):
-        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
-        if credential_doc:
-            self.user_name = credential_doc[0].user_name
-            self.password = credential_doc[0].encrypted_password
-        else:
-            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+class StarHealthDownloader(SeleniumDownloader):
+    def __init__(self):
+        super().__init__()
+        self.portal = "Star Health"
+        self.url = "https://spp.starhealth.in/"
 
-    def get_access_token_and_hosp_id(self):
-        login_url = "https://spp-api.starhealth.in/Provider/Login"
-        login_header = {'accept':'application/json, text/plain, */*','content-type':'application/json;charset=UTF-8'}
-        login_body = {"userName":self.user_name,"password":self.password}
-        login_response = requests.post(login_url,headers = login_header, json = login_body)
-        response_json = login_response.json()
-        if login_response.status_code == 200 and response_json['accessToken']:
-            return response_json['accessToken'], response_json["hospDetails"]["hospId"]
-        return None, None
+    def login(self):
+        print("Hello")
+        self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'input[ng-model="user.username"]')))
+        user_name = self.driver.find_element(By.CSS_SELECTOR, 'input[ng-model="user.username"]')
+        password = self.driver.find_element(By.CSS_SELECTOR, 'input[ng-model="user.password"]')
+        sign_in_button = self.driver.find_element(By.CLASS_NAME, "btn.btn-primary.btn-sh")
+        user_name.send_keys(self.user_name)
+        password.send_keys(self.password)
+        sign_in_button.click()
+        print("Logged IN")
 
-    def get_response_content(self,access_token,hosp_id):
-        download_url = "https://spp-api.starhealth.in/Provider/Search/DownloadDashboardReport"
-        download_header = {'accept':'application/json, text/plain, */*','content-type':'application/json;charset=UTF-8','accesstoken':access_token}
-        download_body = {"providerId":hosp_id,"payerId":1005326,"preferedDashBoard":"settlement"}
-        download_response = requests.post(download_url, headers=download_header, json=download_body)
-        if download_response.status_code == 200 and download_response.content:
-            return download_response.content
-        return None
+    def navigate(self):
+        self.wait.until(EC.visibility_of_element_located((By.LINK_TEXT, "Dashboard")))
+        dashboard = self.driver.find_element(By.LINK_TEXT, "Dashboard")
+        dashboard.click()
+        print("Navigated")
 
-    def get_content(self):
-        access_token, hosp_id = self.get_access_token_and_hosp_id()
-        if not access_token:
-            self.log_error('TPA Login Credentials', self.user_name, "Access Token is NULL")
-            return None
-        content = self.get_response_content(access_token,hosp_id)
-        if not content:
-            return None
-        return content
+    def download(self):
+        self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "bx.has-link.bg5.ng-scope")))
+        settled_card = self.driver.find_element(By.CLASS_NAME, "bx.has-link.bg5.ng-scope")
+        if 'Cashless claims settled' not in settled_card.get_attribute('innerHTML'):
+            return False
+        actions = ActionChains(self.driver)
+        actions.move_to_element(settled_card).perform()
+        self.wait.until(EC.visibility_of_element_located((By.LINK_TEXT, "Request report")))
+        request_report = self.driver.find_element(By.LINK_TEXT, "Request report")
+        request_report.click()
+        time.sleep(10)
+        print("Done")
+        return True
 
+@frappe.whitelist()
+def initiator():
+    StarHealthDownloader().process()
