@@ -84,7 +84,6 @@
    "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
-   "depends_on": "eval:doc.status == \"Processed\"",
    "fieldname": "claim_amount",
    "fieldtype": "Currency",
    "label": "Claim Amount",
