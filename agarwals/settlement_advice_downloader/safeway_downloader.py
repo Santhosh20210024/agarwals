@@ -36,7 +36,7 @@ class SafewayDownloader(SeleniumDownloader):
             return False
         else:
             self.wait.until(EC.visibility_of_element_located,(By.ID,"ctl00_ContentPlaceHolder1_btnExportInXLS"))
-            self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_btnExportInXLS").click() #Export
+            self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_btnExportInXLS").click() 
             time.sleep(10)
             return True
 
