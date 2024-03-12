@@ -38,7 +38,7 @@ class SalesInvoiceCreator:
                 sales_invoice_record.submit()
                 if bill_record.status == 'CANCELLED':
                     sales_invoice_record.cancel()
-                frappe.db.set_value('Bill', bill_number, 'invoice', sales_invoice_record.name)
+                frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                 frappe.db.commit()
             except Exception as e:
                 error_log = frappe.new_doc('Error Record Log')
