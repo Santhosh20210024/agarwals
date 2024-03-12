@@ -8,6 +8,7 @@ from agarwals.utils.file_util import construct_file_url
 class Downloader():
     tpa=''
     branch_code=''
+    last_executed_time=None
     def __init__(self):
         self.user_name = None
         self.password = None        
@@ -18,14 +19,15 @@ class Downloader():
         self.SITE_PATH=frappe.get_single("Control Panel").site_path
         self.is_binary=False
         self.is_json=False
+        self.credential_doc=None
         
     def set_username_and_password(self)  :
-        credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
-        if credential_doc:
-            self.user_name = credential_doc[0].user_name
-            self.password = credential_doc[0].password
+        self.credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
+        if self.credential_doc:
+            self.user_name = self.credential_doc[0].user_name
+            self.password = self.credential_doc[0].password
         else:
-            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+            self.log_error('TPA Login Credentials',None,"No Credential for the given input")
             
     def delete_backend_files(self,file_path=None):
         if os.path.exists(file_path):
@@ -49,7 +51,14 @@ class Downloader():
         file_url="/"+construct_file_url(self.SHELL_PATH, file_name)
         frappe.db.commit()
         return file_url
-        
+     
+    def insert_run_log(self, data):
+        doc=frappe.get_doc("TPA Login Credentials",self.credential_doc[0].name)
+        doc.append("run_log",data)
+        doc.save(ignore_permissions=True)
+        frappe.db.commit()
+        return None
+    
     def write_json(self,file_name=None,content=None):
         if file_name and content:
             content_df=pd.DataFrame(content)
@@ -63,6 +72,7 @@ class Downloader():
         file_upload_doc.payer_type=self.tpa
         file_upload_doc.upload=file_url
         file_upload_doc.save(ignore_permissions=True)
+        self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
         frappe.db.commit()
 
     def log_error(self,doctype_name, reference_name, error_message):
@@ -71,7 +81,9 @@ class Downloader():
         error_log.set('reference_name', reference_name)
         error_log.set('error_message', error_message)
         error_log.save()
-    
+        if reference_name:
+            self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error"})
+
     def get_content():
         return None
     
@@ -85,15 +97,39 @@ class Downloader():
             self.write_binary(file_name,content)
         if self.is_json:
             self.write_json(file_name,content)
+    
+    def get_meta_data(self, class_name, type, replace_dict):
+        meta_data_doc=frappe.get_doc("Login Meta Data Configuration",f"{class_name}-{type}", fields="*")
+        url=meta_data_doc.url
+        body=meta_data_doc.body
+        header=meta_data_doc.header
+        params=meta_data_doc.params
+        cookies=meta_data_doc.cookies 
+        for key in replace_dict.keys():
+            for value_dict in replace_dict[key]:
+                if key=="header":
+                    header=header.replace(list(value_dict.keys())[0], str(list(value_dict.values())[0]))
+                if key=="body":
+                    body=body.replace(list(value_dict.keys())[0], str(list(value_dict.values())[0]))
+                if key=="params":
+                    params=params.replace(list(value_dict.keys())[0], str(list(value_dict.values())[0]))
+                if key=="cookie":
+                    cookies=cookies.replace(list(value_dict.keys())[0], str(list(value_dict.values())[0]))
+        if params:
+            params=eval(params)
+        if body:
+            body=eval(body)
+        if cookies:
+            cookies=eval(cookies)
+        return url, eval(header), body, params, cookies
         
     def download(self):
         try:
             self.set_username_and_password()
             content = self.get_content()
             file_name=self.get_file_details()
-            if content and file_name:
-                self.write_file(file_name=file_name,content=content)
-            else:
-                self.log_error('TPA Login Credentials',self.user_name,"No Content or File Name")    
+            if not content and not file_name:
+                self.log_error('TPA Login Credentials', self.user_name, "No Data")
+            self.write_file(file_name=file_name,content=content)
         except Exception as e:
             self.log_error('TPA Login Credentials',self.user_name,e)
