@@ -43,7 +43,7 @@ class SeleniumDownloader:
         return None
 
     def download_from_web(self):
-        return False
+        return None
 
     def create_directory(self, file_name):
         os.mkdir(self.files_path + file_name)
