@@ -48,7 +48,7 @@ class SalesInvoiceCreator:
                 error_log.save()
 
     def enqueue_jobs(self, bill_number):
-        no_of_invoice_per_queue = int(frappe.get_single('Scheduler Job Configuration').no_of_records_per_chunk)
+        no_of_invoice_per_queue = int(frappe.get_single('Control Panel').payment_matching_chunk_size)
         for i in range(0, len(bill_number), no_of_invoice_per_queue):
             frappe.enqueue(self.process, queue='long', is_async=True, timeout=18000,
                            bill_numbers=bill_number[i:i + no_of_invoice_per_queue])
