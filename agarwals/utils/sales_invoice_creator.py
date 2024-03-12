@@ -7,11 +7,12 @@ class SalesInvoiceCreator:
             try:
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
                 sales_invoice_record.cancel()
+                frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
                 frappe.db.commit()
             except Exception as e:
                 error_log = frappe.new_doc('Error Record Log')
                 error_log.set('doctype_name', 'Bill')
-                error_log.set('reference_name', bill_no)
+                error_log.set('reference_name', bill)
                 error_log.set('error_message', e)
                 error_log.save()
 
