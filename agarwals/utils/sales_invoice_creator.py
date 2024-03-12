@@ -7,11 +7,12 @@ class SalesInvoiceCreator:
             try:
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
                 sales_invoice_record.cancel()
+                frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
                 frappe.db.commit()
             except Exception as e:
                 error_log = frappe.new_doc('Error Record Log')
                 error_log.set('doctype_name', 'Bill')
-                error_log.set('reference_name', bill_no)
+                error_log.set('reference_name', bill)
                 error_log.set('error_message', e)
                 error_log.save()
 
@@ -26,7 +27,7 @@ class SalesInvoiceCreator:
                 sales_invoice_record = frappe.new_doc('Sales Invoice')
                 sales_invoice_params = {'custom_bill_no': bill_record.bill_no, 'custom_mrn': bill_record.mrn,
                                         'custom_claim_id': bill_record.claim_id, 'customer': bill_record.customer,
-                                        'entity': bill_record.company, 'region': bill_record.region,
+                                        'entity': bill_record.entity, 'region': bill_record.region,
                                         'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
                                         'cost_center': bill_record.cost_center,
                                         'items': [{'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
@@ -38,7 +39,7 @@ class SalesInvoiceCreator:
                 sales_invoice_record.submit()
                 if bill_record.status == 'CANCELLED':
                     sales_invoice_record.cancel()
-                frappe.db.set_value('Bill', bill_number, 'invoice', sales_invoice_record.name)
+                frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                 frappe.db.commit()
             except Exception as e:
                 error_log = frappe.new_doc('Error Record Log')
@@ -48,7 +49,7 @@ class SalesInvoiceCreator:
                 error_log.save()
 
     def enqueue_jobs(self, bill_number):
-        no_of_invoice_per_queue = int(frappe.get_single('Scheduler Job Configuration').no_of_records_per_chunk)
+        no_of_invoice_per_queue = int(frappe.get_single('Control Panel').payment_matching_chunk_size)
         for i in range(0, len(bill_number), no_of_invoice_per_queue):
             frappe.enqueue(self.process, queue='long', is_async=True, timeout=18000,
                            bill_numbers=bill_number[i:i + no_of_invoice_per_queue])

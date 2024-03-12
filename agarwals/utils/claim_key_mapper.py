@@ -96,9 +96,8 @@ class SAClaimKeyMapper(BillClaimKeyMapper):
 @frappe.whitelist()
 def map_claim_key():
     n = 1000
-    # bill_records = frappe.get_list("Bill", filters={'claim_key': ''},
-    #                                    pluck='name')
-    bill_records = frappe.db.sql("""select name from tabBill where claim_key is NULL or ma_claim_key is NULL""", as_dict= True)
+    
+    bill_records = frappe.db.sql("""SELECT name FROM tabBill WHERE (claim_id IS NOT NULL and claim_key is NULL ) or ( ma_claim_id IS NOT NULL and ma_claim_key is NULL )""", as_dict= True)
     bill_records = [i['name'] for i in bill_records]
     
     for i in range(0, len(bill_records), n):
