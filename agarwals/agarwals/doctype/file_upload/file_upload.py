@@ -82,7 +82,7 @@ class Fileupload(Document):
 			err.doctype_name = 'File Upload'
 			err.error_message = e
 			err.save()
-			frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
+			frappe.db.sql('DELETE FROM tabFile WHERE name is %(name)s', values={'name':file_id})
 			frappe.db.commit()
 			self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 			frappe.throw('Error:' + e)
