@@ -28,11 +28,12 @@ class SeleniumDownloader:
         self.driver = None
         self.wait = None
 
-    def set_username_and_password(self)  :
+    def set_username_password_and_password(self)  :
         self.credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
         if self.credential_doc:
             self.user_name = self.credential_doc[0].user_name
             self.password = self.credential_doc[0].password
+            self.url = self.credential_doc[0].url
         else:
             self.log_error('TPA Login Credentials',None,"No Credential for the given input")
 
@@ -107,7 +108,7 @@ class SeleniumDownloader:
             self.options.add_experimental_option("prefs", prefs)
             self.driver = webdriver.Chrome(options=self.options)
             self.wait = WebDriverWait(self.driver, 10)
-            self.set_username_and_password()
+            self.set_username_password_and_password()
             self.driver.get(self.url)
             self.login()
             self.navigate()
