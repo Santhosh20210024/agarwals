@@ -12,12 +12,12 @@
  "modified": "2024-02-29 20:52:15.282766",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "MA6 -2",
+ "name": "MA6-BN",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "SELECT sa.cg_utr_number as sa_cg_utr, sa.cg_formatted_utr_number as sa_cg_formatted_utr , sa.claim_id as sa_claim_id ,sa.paid_date as sa_paid_date, tb.name as bill_no FROM tabBill tb, `tabSettlement Advice` sa ,tabMatcher tm\nWHERE tm.sales_invoice=tb.name and tm.settlement_advice=sa.name and tm.match_logic in (\"MA6-2\");",
+ "query": "SELECT sa.cg_utr_number as sa_cg_utr, sa.cg_formatted_utr_number as sa_cg_formatted_utr , sa.claim_id as sa_claim_id ,sa.paid_date as sa_paid_date, tb.name as bill_no FROM tabBill tb, `tabSettlement Advice` sa ,tabMatcher tm\nWHERE tm.sales_invoice=tb.name and tm.settlement_advice=sa.name and tm.match_logic in (\"MA6-BN\");",
  "ref_doctype": "Bill",
- "report_name": "MA6 -2",
+ "report_name": "MA6-BN",
  "report_type": "Query Report",
  "roles": [
   {

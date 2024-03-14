@@ -12,12 +12,12 @@
  "modified": "2024-02-29 20:52:15.547925",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "MA4 -2",
+ "name": "MA4-BN",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "SELECT tcb.al_number  as al_id ,tcb.final_bill_number as claim_bill_no, tcb.claim_submitted_date as claim_sub_date, tb.name as bill_no FROM tabBill tb,tabClaimBook tcb ,tabMatcher tm\nWHERE tm.sales_invoice=tb.name and tm.claimbook=tcb.name and tm.match_logic in (\"MA4-2\");",
+ "query": "SELECT tcb.al_number  as al_id ,tcb.final_bill_number as claim_bill_no, tcb.claim_submitted_date as claim_sub_date, tb.name as bill_no FROM tabBill tb,tabClaimBook tcb ,tabMatcher tm\nWHERE tm.sales_invoice=tb.name and tm.claimbook=tcb.name and tm.match_logic in (\"MA4-BN\");",
  "ref_doctype": "Bill",
- "report_name": "MA4 -2",
+ "report_name": "MA4-BN",
  "report_type": "Query Report",
  "roles": [
   {

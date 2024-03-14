@@ -12,12 +12,12 @@
  "modified": "2024-02-29 20:58:54.903625",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "MA2 -1",
+ "name": "MA3-CN",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "SELECT bt.custom_cg_utr_number as bt_utr,bt.`date` as bt_date, tcb.al_number  as al_id ,tcb.final_bill_number as claim_bill_no, tcb.claim_submitted_date as claim_sub_date, tb.name as bill_no FROM tabBill tb,tabClaimBook tcb ,`tabBank Transaction` bt ,tabMatcher tm\nWHERE tm.sales_invoice=tb.name and tm.claimbook=tcb.name and tm.bank_transaction=bt.name and tm.match_logic in (\"MA3-1\");",
+ "query": "SELECT bt.custom_cg_utr_number as bt_utr,bt.`date` as bt_date, tcb.al_number  as al_id ,tcb.final_bill_number as claim_bill_no, tcb.claim_submitted_date as claim_sub_date, tb.name as bill_no FROM tabBill tb,tabClaimBook tcb ,`tabBank Transaction` bt ,tabMatcher tm\nWHERE tm.sales_invoice=tb.name and tm.claimbook=tcb.name and tm.bank_transaction=bt.name and tm.match_logic in (\"MA3-CN\");",
  "ref_doctype": "Bill",
- "report_name": "MA2 -1",
+ "report_name": "MA3-CN",
  "report_type": "Query Report",
  "roles": [
   {
