@@ -33,7 +33,7 @@ class Fileupload(Document):
 					file_doc_hash_filtered.append(file) 
 			
 			if len(file_doc_hash_filtered) > 1:
-				frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name': file_doc_hash[0]['name']})
+				frappe.db.sql('DELETE FROM tabFile WHERE name = %(str(name))s', values={'name': file_doc_hash[0]['name']})
 				frappe.db.commit()
 
 				self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
@@ -45,7 +45,7 @@ class Fileupload(Document):
 
 	def validate_file_check(self, file_id, file_name, file_extensions):
 		frappe.delete_doc("File", file_id)
-		frappe.db.sql('DELETE FROM tabFile WHERE name in %(name)s', values={'name':file_id})
+		frappe.db.sql('DELETE FROM tabFile WHERE name = %(str(name))s', values={'name':file_id})
 		frappe.db.commit()
 
 		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
@@ -82,7 +82,7 @@ class Fileupload(Document):
 			err.doctype_name = 'File Upload'
 			err.error_message = e
 			err.save()
-			frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
+			frappe.db.sql('DELETE FROM tabFile WHERE name = %(str(name))s', values={'name':file_id})
 			frappe.db.commit()
 			self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))
 			frappe.throw('Error:' + e)
