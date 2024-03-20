@@ -6,7 +6,6 @@ from agarwals.utils.loader import Loader
 SITE_PATH = frappe.get_single('Control Panel').site_path
 
 def clean_header(list_to_clean,list_of_char_to_repalce):
-    
     cleaned_list=[]
     for header in list_to_clean:
         for char_to_replace in list_of_char_to_repalce:
