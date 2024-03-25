@@ -27,7 +27,7 @@ def get_target_df():
                       SELECT 
                           hash
                       FROM 
-                          `Settlement Advice Staging`
+                          `tabSettlement Advice Staging`
                       """
         records = frappe.db.sql(query, as_list=True)
         return pd.DataFrame(records, columns=['hash'])
@@ -127,7 +127,7 @@ def move_to_transform(file, df, type, folder, prune=True, status = 'Open'):
     if df.empty:
         return None
     if prune:
-        df = prune_columns(df)
+        df = prune_columns(df,['name', '_merge', 'hash_x', 'hash_column'])
     file_path = write_excel(df, file.upload, type,folder)
     create_file_record(file_path,folder)
     insert_in_file_upload(file_path, file.name, type, status)
@@ -181,14 +181,13 @@ def split_and_move_to_transform(source_df,file):
             new_records = source_df 
             move_to_transform(file, new_records, 'Insert', 'Transform', False)
     else:
-            merged_df = left_join(file)
+            merged_df=left_join(source_df,target_df)
             if merged_df.empty:
                 return False
             new_records = merged_df[merged_df['_merge'] == 'left_only']
             existing_df = merged_df[merged_df['_merge'] == 'both']
             move_to_transform(file, new_records, 'Insert', 'Transform', True)
             move_to_transform(file, existing_df, 'Skip', 'Bin', True, 'Skipped')
-    merged_df=left_join(source_df,target_df)
 
 @frappe.whitelist()
 def advice_transform():
