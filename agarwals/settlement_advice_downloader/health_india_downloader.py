@@ -28,7 +28,7 @@ class HealthIndiaDownloader(SeleniumDownloader):
             url = 'https://healthindiatpa.com/Provider/claimshome.aspx?type=claims_settled'
             self.driver.get(url)
 
-    def download(self):
+    def download_from_web(self):
         self.wait.until(EC.visibility_of_element_located,((By.ID,'ctl00_ContentPlaceHolder1_lnk_ExportToExcel')))
         self.driver.find_element(By.ID,'ctl00_ContentPlaceHolder1_lnk_ExportToExcel').click()
         time.sleep(10)

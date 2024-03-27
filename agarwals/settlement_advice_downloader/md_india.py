@@ -25,6 +25,7 @@ class MDIndiaDownloader(SeleniumDownloader):
         self.driver.find_element(By.LINK_TEXT,'Paid Claim Details').click()
         time.sleep(5)
 
-    def download(self):
+    def download_from_web(self):
         self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "btn-default")))
         self.driver.find_element(By.CLASS_NAME, "btn-default").click()
+        time.sleep(15)

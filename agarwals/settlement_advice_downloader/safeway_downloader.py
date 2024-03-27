@@ -24,12 +24,14 @@ class SafewayDownloader(SeleniumDownloader):
         self.wait.until(EC.visibility_of_all_elements_located((By.LINK_TEXT, "Claim MIS")))
         self.driver.find_element(By.LINK_TEXT, "Claim MIS").click()
         from_date = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_DtpFrom_Date5")
-        from_date.send_keys('02/12/2023')  # input from date
+        formated_from_date=self.from_date.strftime("%d/%m/%Y")
+        formated_to_date = self.to_date.strftime("%d/%m/%Y")
+        from_date.send_keys(formated_from_date)  # input from date
         to_date = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_Dtpto_Date5")
-        to_date.send_keys('31/03/2024')  # input to date
+        to_date.send_keys(formated_to_date)  # input to date
         self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_Button1").click() #submit
 
-    def download(self):
+    def download_from_web(self):
         self.wait.until(EC.visibility_of_element_located,((By.ID, "ctl00_ContentPlaceHolder1_lbltot")))
         record_count = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_lbltot")
         inner_html = record_count.get_attribute("innerHTML")

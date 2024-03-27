@@ -18,26 +18,29 @@ class GoodHealthDownloader(SeleniumDownloader):
         username.send_keys(self.user_name) # User name
         password = self.driver.find_element(By.ID,'txtPassword')
         password.send_keys(self.password) # Password 
-        self.self.driver.find_element(By.ID,'btnLogin').click() #login
+        self.driver.find_element(By.ID,'btnLogin').click() #login
 
     def navigate(self):
         self.driver.get('https://webace.goodhealthtpa.in/Provider/ProviderDownloadMIS.aspx')
+        time.sleep(5)
 
     def download_from_web(self):
-        self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlFromMonth").click()
-        dropdown =  self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlFromMonth")
-        dropdown.find_element(By.XPATH, "//option[. = 'Feb']").click() #From month
-        self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlFromYear").click()
-        dropdown = self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlFromYear")
-        dropdown.find_element(By.XPATH, "//option[. = '2022']").click() #From year
-        self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlToMonth").click()
-        dropdown = self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlToMonth")
-        dropdown.find_element(By.XPATH, "//option[. = 'Jun']").click() #To Month
-        self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlToYear").click()
-        dropdown =self.driver.find_element(By.ID, "ContentPlaceHolder1_ddlToYear")
-        dropdown.find_element(By.XPATH, "//option[. = '2022']").click() #To Year
-        self.driver.find_element(By.ID, "ddlClaimStatus").click()
+        from_month_year = self.from_date.strftime("%b %Y").split(" ")
+        to_month_year = self.to_date.strftime("%b %Y").split(" ")
+        from_month = self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_ddlFromMonth')))
+        from_year = self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_ddlFromYear')))
+        self.driver.execute_script("arguments[0].setAttribute('type', 'text')", from_month)
+        self.driver.execute_script("arguments[0].setAttribute('type', 'text')", from_year)
+        to_month = self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_ddlToMonth')))
+        to_year = self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_ddlToYear')))
+        self.driver.execute_script("arguments[0].setAttribute('type', 'text')", to_month)
+        self.driver.execute_script("arguments[0].setAttribute('type', 'text')", to_year)
+        from_month.send_keys(f'{from_month_year[0]}')
+        from_year.send_keys(f'{from_month_year[1]}')
+        to_month.send_keys(f'{to_month_year[0]}')
+        to_year.send_keys(f'{to_month_year[1]}')
+        time.sleep(5)
         dropdown = self.driver.find_element(By.ID, "ddlClaimStatus")
         dropdown.find_element(By.XPATH, "//option[. = 'Settled']").click()
         self.driver.find_element(By.ID,'btnSubmit').click()
-        time.sleep(5)
+        time.sleep(10)
