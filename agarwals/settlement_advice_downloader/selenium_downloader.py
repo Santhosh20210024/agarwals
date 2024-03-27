@@ -27,6 +27,8 @@ class SeleniumDownloader:
         self.files_path = SITE_PATH + "/private/files/DrAgarwals/"
         self.driver = None
         self.wait = None
+        self.from_date = None
+        self.to_date = None
 
     def set_username_password_and_password(self)  :
         self.credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
@@ -34,6 +36,8 @@ class SeleniumDownloader:
             self.user_name = self.credential_doc[0].user_name
             self.password = self.credential_doc[0].password
             self.url = self.credential_doc[0].url
+            self.from_date = self.credential_doc[0].from_date
+            self.to_date  = frappe.utils.now_datetime().date()
         else:
             self.log_error('TPA Login Credentials',None,"No Credential for the given input")
 
@@ -45,7 +49,14 @@ class SeleniumDownloader:
 
     def download_from_web(self):
         return None
-
+    
+    def insert_run_log(self, data):
+        doc=frappe.get_doc("TPA Login Credentials",self.credential_doc[0].name)
+        doc.append("run_log",data)
+        doc.save(ignore_permissions=True)
+        frappe.db.commit()
+        return None
+    
     def create_directory(self, file_name):
         os.mkdir(self.files_path + file_name)
         return self.files_path + file_name
@@ -96,24 +107,25 @@ class SeleniumDownloader:
         file_upload_doc.save(ignore_permissions=True)
         self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
         frappe.db.commit()
+
     
     def raise_exception(self,exception):
         raise Exception(exception)
     
     def download(self):
         try:
+            self.set_username_password_and_password()
             file_name = f"{self.tpa.replace(' ','').lower()}_{self.user_name}_{self.branch_code}"
             download_directory = self.create_directory(file_name)
             prefs = {"download.default_directory": download_directory + "/"}
             self.options.add_experimental_option("prefs", prefs)
             self.driver = webdriver.Chrome(options=self.options)
             self.wait = WebDriverWait(self.driver, 10)
-            self.set_username_password_and_password()
             self.driver.get(self.url)
             self.login()
             self.navigate()
             self.download_from_web()
-            if len(os.listdir(download_directory)) == 0 and len(os.listdir(download_directory)) > 1:
+            if len(os.listdir(download_directory)) == 0 or len(os.listdir(download_directory)) > 1:
                 self.raise_exception(f"Your directory {download_directory} has either no file or have multiple files")
             formatted_file_name = self.rename_downloaded_file(download_directory, file_name)
             self.move_file_to_extract(download_directory,formatted_file_name)
