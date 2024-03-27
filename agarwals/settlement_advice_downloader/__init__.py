@@ -7,3 +7,4 @@ from agarwals.settlement_advice_downloader.health_india_downloader import Health
 from agarwals.settlement_advice_downloader.safeway_downloader import  SafewayDownloader
 from agarwals.settlement_advice_downloader.good_health import GoodHealthDownloader 
 from agarwals.settlement_advice_downloader.md_india import MDIndiaDownloader
+from agarwals.settlement_advice_downloader.icici_lombard import ICICLombardDownloader
