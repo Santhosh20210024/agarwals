@@ -9,7 +9,10 @@
  "field_order": [
   "bill",
   "tds",
-  "disallowance"
+  "disallowance",
+  "posting_date",
+  "source_file",
+  "file_upload"
  ],
  "fields": [
   {
@@ -26,11 +29,28 @@
    "fieldname": "disallowance",
    "fieldtype": "Currency",
    "label": "Disallowance"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fetch_from": "file_upload.file_name",
+   "fieldname": "source_file",
+   "fieldtype": "Data",
+   "label": "Source File"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "File upload",
+   "options": "File upload"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-28 10:36:06.037621",
+ "modified": "2024-03-28 10:51:01.258506",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Bill Adjustments",
