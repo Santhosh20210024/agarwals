@@ -595,3 +595,20 @@ class BankTransformer(StagingTransformer):
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
         return True
+    
+class AdjustmentTransformer(Transformer):
+    def __init__(self):
+        super().__init__()
+        self.file_type = 'Bill Adjustment'
+        self.document_type = 'Bill Adjustments'
+
+    def get_column_needed(self):
+        return ["bill","tds","disallowance","posting_date","source_file","file_upload"]
+
+    def transform(self, file):
+        self.source_df["file_upload"]=file['name']
+        configuration=frappe.get_single('Bank Configuration')
+        if "posting_date" in self.source_df.columns.values:
+            self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
+        self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
+        return True

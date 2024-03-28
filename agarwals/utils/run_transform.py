@@ -1,4 +1,4 @@
-from agarwals.utils.transformer import BillTransformer,ClaimbookTransformer,BankTransformer
+from agarwals.utils.transformer import BillTransformer,ClaimbookTransformer,BankTransformer,AdjustmentTransformer
 from agarwals.utils.payment_entry_creator import PaymentEntryCreator
 import frappe
 
@@ -25,6 +25,12 @@ def run_transform_process(type):
     elif type =="transaction":
         try:
             BankTransformer().process()
+            return "Success"
+        except Exception as e:
+            return e
+    elif type =="adjustment":
+        try:
+            AdjustmentTransformer().process()
             return "Success"
         except Exception as e:
             return e
