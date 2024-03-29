@@ -605,9 +605,21 @@ class AdjustmentTransformer(Transformer):
     def get_column_needed(self):
         return ["bill","tds","disallowance","posting_date","source_file","file_upload"]
 
+    def find_and_rename_column(self,df,list_to_check):
+        header = df.columns.values.tolist()
+        rename_value = {}
+        for head in header:
+            replace_str = head.strip().lower().replace(" ","_").replace("-","").replace("\'","").replace("\"","")
+            if replace_str in list_to_check:
+                rename_value[head] = replace_str
+            else:
+               raise Exception(f"Header is invalid {head}")
+        return df.rename(columns=rename_value)
+
     def transform(self, file):
-        self.source_df["file_upload"]=file['name']
-        configuration=frappe.get_single('Bank Configuration')
+        self.source_df["file_upload"] = file['name']
+        self.source_df = self.find_and_rename_column(self.source_df,["bill","tds","disallowance","posting_date","source_file","file_upload"])
+        configuration = frappe.get_single('Bank Configuration')
         if "posting_date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
         self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
