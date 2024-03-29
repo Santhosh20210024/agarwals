@@ -11,7 +11,8 @@
   "disallowance",
   "posting_date",
   "source_file",
-  "file_upload"
+  "file_upload",
+  "status"
  ],
  "fields": [
   {
@@ -45,11 +46,17 @@
    "fieldtype": "Link",
    "label": "File upload",
    "options": "File upload"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nProcessed\nError"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-28 11:04:19.274684",
+ "modified": "2024-03-29 12:24:23.132683",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Bill Adjustments",
