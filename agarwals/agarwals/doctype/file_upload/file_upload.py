@@ -5,7 +5,6 @@ import shutil
 from agarwals.utils.file_util import construct_file_url, HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER
 
 # Need to fix the auto increment serial number
-
 class Fileupload(Document):
 	def get_file_doc_data(self):
 		file_name = self.upload.split("/")[-1]
@@ -46,7 +45,7 @@ class Fileupload(Document):
 
 	def validate_file_check(self, file_id, file_name, file_extensions):
 		frappe.delete_doc("File", file_id)
-		frappe.db.sql('DELETE FROM tabFile WHERE name in %(name)s', values={'name':file_id})
+		frappe.db.sql('DELETE FROM tabFile WHERE name = %(name)s', values={'name':file_id})
 		frappe.db.commit()
 
 		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, file_name))

@@ -25,7 +25,8 @@
   "status",
   "date",
   "remarks",
-  "retry"
+  "retry",
+  "error_code"
  ],
  "fields": [
   {
@@ -85,7 +86,6 @@
    "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
-   "depends_on": "eval:doc.status == \"Processed\"",
    "fieldname": "claim_amount",
    "fieldtype": "Currency",
    "label": "Claim Amount",
@@ -157,6 +157,12 @@
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
    "label": "File Upload Payer"
+  },
+  {
+   "fieldname": "error_code",
+   "fieldtype": "Select",
+   "label": "Error Code",
+   "options": "\nS100\nS101\nS102\nS103\nS104"
   }
  ],
  "index_web_pages_for_search": 1,

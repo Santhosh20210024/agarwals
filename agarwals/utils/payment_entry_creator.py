@@ -128,7 +128,9 @@ class PaymentEntryCreator:
                     tds_amount = float(record.tds_amount)
                     disallowance_amount = float(record.disallowance_amount)
                     unallocated_amount = self.get_document_record('Bank Transaction', record.bank_transaction).unallocated_amount
-                    settlement_advice = self.get_document_record('Settlement Advice', record.settlement_advice)
+                    
+                    if record.settlement_advice:
+                        settlement_advice = self.get_document_record('Settlement Advice', record.settlement_advice)
                     
                     if unallocated_amount == 0:
                         break
@@ -140,20 +142,23 @@ class PaymentEntryCreator:
                     sales_invoice = self.get_document_record('Sales Invoice', record.sales_invoice)
 
                     if record.claimbook:
-                        settlement_advice.set('insurance_company_name', record.insurance_company_name)
-                        settlement_advice.set('matched_bank_transaction', bank_transaction_record['name'])
-                        settlement_advice.set('matched_claimbook_record', record.claimbook)
-                        settlement_advice.set('matched_bill_record', record.sales_invoice)
+                        if record.settlement_advice:
+                            settlement_advice.set('insurance_company_name', record.insurance_company_name)
+                            settlement_advice.set('matched_bank_transaction', bank_transaction_record['name'])
+                            settlement_advice.set('matched_claimbook_record', record.claimbook)
+                            settlement_advice.set('matched_bill_record', record.sales_invoice)
                         frappe.db.set_value('ClaimBook',record.claimbook,'matched_status','Matched')
                         frappe.db.set_value('Sales Invoice', sales_invoice.name, 'custom_insurance_name', record.insurance_company_name)
                     else:
-                        settlement_advice.set('matched_bank_transaction', bank_transaction_record['name'])
-                        settlement_advice.set('matched_bill_record',record.sales_invoice)
+                        if record.settlement_advice:
+                            settlement_advice.set('matched_bank_transaction', bank_transaction_record['name'])
+                            settlement_advice.set('matched_bill_record',record.sales_invoice)
 
-                    settlement_advice.set('tpa', sales_invoice.customer)
-                    settlement_advice.set('region', sales_invoice.region)
-                    settlement_advice.set('entity', sales_invoice.entity)
-                    settlement_advice.set('branch_type', sales_invoice.branch_type)
+                    if record.settlement_advice:
+                        settlement_advice.set('tpa', sales_invoice.customer)
+                        settlement_advice.set('region', sales_invoice.region)
+                        settlement_advice.set('entity', sales_invoice.entity)
+                        settlement_advice.set('branch_type', sales_invoice.branch_type)
 
                     if sales_invoice.outstanding_amount < settled_amount:
                         settled_amount = sales_invoice.outstanding_amount
@@ -164,30 +169,35 @@ class PaymentEntryCreator:
                             payment_entry = self.create_payment_entry_and_update_bank_transaction(
                                 bank_transaction_record, sales_invoice, bank_account, settled_amount,
                                 tds_amount)
-                            settlement_advice.set('remark', 'Disallowance amount is greater than Outstanding Amount')
+                            if record.settlement_advice:
+                                settlement_advice.set('remark', 'Disallowance amount is greater than Outstanding Amount')
                         
                         elif sales_invoice.outstanding_amount >= settled_amount + disallowance_amount:
                             payment_entry = self.create_payment_entry_and_update_bank_transaction(
                                 bank_transaction_record,
                                 sales_invoice, bank_account,
                                 settled_amount, disallowance_amount)
-                            settlement_advice.set('remark', 'TDS amount is greater than Outstanding Amount')
+                            if record.settlement_advice:
+                                settlement_advice.set('remark', 'TDS amount is greater than Outstanding Amount')
                         
                         else:
                             payment_entry = self.create_payment_entry_and_update_bank_transaction(
                                 bank_transaction_record,
                                 sales_invoice, bank_account,
                                 settled_amount)
-                            settlement_advice.set('remark', 'Both Disallowed and TDS amount is greater than Outstanding Amount')
+                            if record.settlement_advice:
+                                settlement_advice.set('remark', 'Both Disallowed and TDS amount is greater than Outstanding Amount')
                         
                         if payment_entry:
                             self.update_payment_reference(sales_invoice.name, payment_entry, record)
-                            settlement_advice.set('status', 'Partially Processed')
+                            if record.settlement_advice:
+                                settlement_advice.set('status', 'Partially Processed')
                         else:
-                            settlement_advice.set('remark', 'Unable to Create Payment Entry')
-                            settlement_advice.set('status', 'Warning')
-                        
-                        settlement_advice.save()
+                            if record.settlement_advice:
+                                settlement_advice.set('remark', 'Unable to Create Payment Entry')
+                                settlement_advice.set('status', 'Warning')
+                        if record.settlement_advice:
+                            settlement_advice.save()
                         
                     else:
                         payment_entry = self.create_payment_entry_and_update_bank_transaction(
@@ -196,19 +206,39 @@ class PaymentEntryCreator:
                             settled_amount, tds_amount, disallowance_amount)
                         if payment_entry:
                             if bank_amount == 0: #?
-                                settlement_advice.set('status', 'Fully Processed')
+                                if record.settlement_advice:
+                                    settlement_advice.set('status', 'Fully Processed')
                             else:
-                                settlement_advice.set('status', 'Partially Processed')
+                                if record.settlement_advice:
+                                    settlement_advice.set('status', 'Partially Processed')
                             
                             self.update_payment_reference(sales_invoice.name, payment_entry, record)
                         else:
-                            settlement_advice.set('remark','Unable to Create Payment Entry')
-                            settlement_advice.set('status', 'Warning')
-                            
-                        settlement_advice.save()
+                            if record.settlement_advice:
+                                settlement_advice.set('remark','Unable to Create Payment Entry')
+                                settlement_advice.set('status', 'Warning')
+                        
+                        if record.settlement_advice:
+                            settlement_advice.save()
                 
                 except Exception as e:
                     frappe.db.set_value('Matcher', record.name, 'status', 'Error')
                     frappe.db.set_value('Matcher', record.name, 'remarks', e)
 
         frappe.db.commit()
+
+
+@frappe.whitelist()
+def run_payment_entry():
+
+    batch_number = 0
+    n = int(frappe.get_single('Control Panel').payment_matching_chunk_size)
+    match_logic = tuple(frappe.get_single('Control Panel').match_logic.split(','))
+
+    # Need to change as X00
+    bank_transaction_records = frappe.db.sql(f"SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE name in (select bank_transaction from `tabMatcher` where match_logic in {match_logic} and status is null ) AND status IN ('Pending','Unreconciled') AND LENGTH(reference_number) > 4 AND deposit > 10 AND reference_number not like 'X0%' ORDER BY unallocated_amount DESC", as_dict=True)
+
+    for i in range(0, len(bank_transaction_records), n):
+        batch_number = batch_number + 1
+        frappe.enqueue(PaymentEntryCreator().process, queue='long', is_async=True, job_name="Batch" + str(batch_number), timeout=25000,
+                       bank_transaction_records = bank_transaction_records[i:i + n], match_logic = match_logic)
