@@ -4,7 +4,7 @@ import frappe.utils
 # import frappe
 from frappe.model.document import Document
 
-class BillAdjustments(Document):
+class BillAdjustment(Document):
 	def before_save(self):
 		if not self.posting_date:
 			self.posting_date=frappe.utils.nowdate()

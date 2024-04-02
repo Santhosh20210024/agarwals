@@ -1,5 +1,7 @@
 {
  "actions": [],
+ "allow_import": 1,
+ "autoname": "field:bill",
  "creation": "2024-03-28 10:36:06.037621",
  "default_view": "List",
  "doctype": "DocType",
@@ -18,7 +20,8 @@
   {
    "fieldname": "bill",
    "fieldtype": "Data",
-   "label": "Bill"
+   "label": "Bill",
+   "unique": 1
   },
   {
    "fieldname": "tds",
@@ -51,15 +54,16 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Open\nProcessed\nError"
+   "options": "Open\nProcessed\nPartially Processed\nError"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-29 12:24:23.132683",
+ "modified": "2024-04-03 01:51:15.781867",
  "modified_by": "Administrator",
  "module": "Settlement",
- "name": "Bill Adjustments",
+ "name": "Bill Adjustment",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

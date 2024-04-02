@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestBillAdjustments(FrappeTestCase):
+class TestBillAdjustment(FrappeTestCase):
 	pass
