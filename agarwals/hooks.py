@@ -141,6 +141,9 @@ scheduler_events = {
 	"*/1 * * * *": [
 		"agarwals.settlement_advice_downloader.downloader_job.execute_download_job"
 	],
+    "*/5 * * * *": [
+            "agarwals.settlement_advice_downloader.downloader_job.execute_download_job"
+        ],
 	# "daily": [
 	# 	"agarwals.tasks.daily"
 	# ],
