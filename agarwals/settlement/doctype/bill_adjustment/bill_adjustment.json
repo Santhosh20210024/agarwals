@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "autoname": "field:bill",
+ "creation": "2024-03-28 10:36:06.037621",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "bill",
+  "tds",
+  "disallowance",
+  "posting_date",
+  "source_file",
+  "file_upload",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "bill",
+   "fieldtype": "Data",
+   "label": "Bill",
+   "unique": 1
+  },
+  {
+   "fieldname": "tds",
+   "fieldtype": "Currency",
+   "label": "TDS"
+  },
+  {
+   "fieldname": "disallowance",
+   "fieldtype": "Currency",
+   "label": "Disallowance"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fetch_from": "file_upload.file_name",
+   "fieldname": "source_file",
+   "fieldtype": "Data",
+   "label": "Source File"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "File upload",
+   "options": "File upload"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nProcessed\nPartially Processed\nError"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-04-03 01:51:15.781867",
+ "modified_by": "Administrator",
+ "module": "Settlement",
+ "name": "Bill Adjustment",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "bill"
+}
