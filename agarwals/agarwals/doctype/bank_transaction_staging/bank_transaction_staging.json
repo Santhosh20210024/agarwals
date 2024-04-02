@@ -32,7 +32,11 @@
   "previous_utr",
   "retry",
   "or_check",
-  "is_fixed"
+  "is_fixed",
+  "party_details_section",
+  "payer_type",
+  "payer_name",
+  "payer_group"
  ],
  "fields": [
   {
@@ -181,11 +185,31 @@
    "fieldname": "based_on",
    "fieldtype": "Data",
    "label": "Based On"
+  },
+  {
+   "fieldname": "party_details_section",
+   "fieldtype": "Section Break",
+   "label": "Payer Details"
+  },
+  {
+   "fieldname": "payer_type",
+   "fieldtype": "Data",
+   "label": "Payer Type"
+  },
+  {
+   "fieldname": "payer_name",
+   "fieldtype": "Data",
+   "label": "Payer Name"
+  },
+  {
+   "fieldname": "payer_group",
+   "fieldtype": "Data",
+   "label": "Payer Group"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-13 11:49:04.464112",
+ "modified": "2024-04-02 16:50:38.990383",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",
