@@ -34,6 +34,9 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.description = transaction.get('description')
     bank_trans_doc.reference_number = reference_number
     bank_trans_doc.unallocated_amount = transaction.get('deposit')
+    bank_trans_doc.party_type = transaction.get('payer_type')
+    bank_trans_doc.party = transaction.get('payer_name')
+    bank_trans_doc.custom_party_group = transaction.get('payer_group')
     bank_trans_doc.submit()
     frappe.db.commit()
 
@@ -78,7 +81,7 @@ def create_bank_transaction(transaction_list):
             if transaction.get('update_reference_number') != None and transaction.get('retry') == 1:
                 bank_trans_doc = frappe.get_doc('Bank Transaction', transaction.reference_number)
 
-                if int(bank_trans_doc.allocated_amount) == 0: # status sometimes ambiguous so go with allocated amount
+                if int(bank_trans_doc.allocated_amount) == 0:
                     delete_corrs_doc('Bank Transaction', transaction.get('reference_number'))
                     if transaction.get('update_reference_number') != None and len(transaction.get('update_reference_number').strip().lstrip('0')) < 5:
                         trans_doc.staging_status = 'Error'
