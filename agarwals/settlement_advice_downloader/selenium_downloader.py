@@ -30,7 +30,7 @@ class SeleniumDownloader:
         self.from_date = None
         self.to_date = None
 
-    def set_username_password_and_password(self)  :
+    def set_username_password_and_password(self):
         self.credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
         if self.credential_doc:
             self.user_name = self.credential_doc[0].user_name
