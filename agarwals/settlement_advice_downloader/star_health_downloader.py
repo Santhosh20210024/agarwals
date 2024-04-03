@@ -20,13 +20,16 @@ class StarHealthDownloader(SeleniumDownloader):
         user_name.send_keys(self.user_name)
         password.send_keys(self.password)
         sign_in_button.click()
-
+        
     def navigate(self):
+        time.sleep(5)
         self.wait.until(EC.visibility_of_element_located((By.LINK_TEXT, "Dashboard")))
         dashboard = self.driver.find_element(By.LINK_TEXT, "Dashboard")
         dashboard.click()
+        
 
-    def download(self):
+    def download_from_web(self):
+        time.sleep(5)
         self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "bx.has-link.bg5.ng-scope")))
         settled_card = self.driver.find_element(By.CLASS_NAME, "bx.has-link.bg5.ng-scope")
         if 'Cashless claims settled' not in settled_card.get_attribute('innerHTML'):

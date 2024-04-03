@@ -18,6 +18,7 @@ class MDIndiaDownloader(SeleniumDownloader):
         self.driver.find_element(By.ID,'ProviderPassword').send_keys(self.password)
         self.driver.find_element(By.ID,'btnSubmit').click()
 
+
     def navigate(self):
         self.wait.until(EC.visibility_of_element_located,((By.XPATH, "//span[contains(@class, 'subnav-btn') and text()='Claim Details']")))
         claim_details =self.driver.find_element(By.XPATH, "//span[contains(@class, 'subnav-btn') and text()='Claim Details']")
