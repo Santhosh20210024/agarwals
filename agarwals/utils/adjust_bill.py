@@ -47,7 +47,7 @@ def save_je(je):
     frappe.db.commit()
 
 def process_bill_adjust():
-    for bill_adjt in frappe.get_list('Bill Adjustments', fields = ['bill','tds','disallowance'], filters = {'status': 'Open'}):
+    for bill_adjt in frappe.get_list('Bill Adjustment', fields = ['bill','tds','disallowance'], filters = {'status': 'Open'}):
         invoice = fetch_invoice_details(bill_adjt.bill)
         valid_tds = False
         valid_dis = False
@@ -62,7 +62,7 @@ def process_bill_adjust():
 
         except Exception as e:
             error_log = frappe.new_doc('Error Record Log')
-            error_log.set('doctype_name', 'Bill Adjustments')
+            error_log.set('doctype_name', 'Bill Adjustment')
             error_log.set('reference_name', bill_adjt.bill)
             error_log.set('error_message', '' + str(e))
             error_log.save()
@@ -77,7 +77,7 @@ def process_bill_adjust():
         
         except Exception as e:
             error_log = frappe.new_doc('Error Record Log')
-            error_log.set('doctype_name', 'Bill Adjustments')
+            error_log.set('doctype_name', 'Bill Adjustment')
             error_log.set('reference_name', bill_adjt.bill)
             error_log.set('error_message', '' + str(e))
             error_log.save()
@@ -85,35 +85,35 @@ def process_bill_adjust():
         # Need to refactor this part
         if bill_adjt.tds and bill_adjt.disallowance:
             if valid_dis and valid_tds:
-                    doc = frappe.get_doc('Bill Adjustments', bill_adjt.bill)
+                    doc = frappe.get_doc('Bill Adjustment', bill_adjt.bill)
                     doc.status = 'Processed'
                     doc.save()
             elif valid_tds or valid_dis:
-                    doc = frappe.get_doc('Bill Adjustments', bill_adjt.bill)
+                    doc = frappe.get_doc('Bill Adjustment', bill_adjt.bill)
                     doc.status = 'Partially Processed'
                     doc.save()
             else:
-                doc = frappe.get_doc('Bill Adjustments', bill_adjt.bill)
+                doc = frappe.get_doc('Bill Adjustment', bill_adjt.bill)
                 doc.status = 'Error'
                 doc.save()
 
         if bill_adjt.tds:
             if valid_tds:
-                doc = frappe.get_doc('Bill Adjustments', bill_adjt.bill)
+                doc = frappe.get_doc('Bill Adjustment', bill_adjt.bill)
                 doc.status = 'Processed'
                 doc.save()
             else:
-                doc = frappe.get_doc('Bill Adjustments', bill_adjt.bill)
+                doc = frappe.get_doc('Bill Adjustment', bill_adjt.bill)
                 doc.status = 'Error'
                 doc.save()
         
         if bill_adjt.disallowance:
             if valid_dis:
-                doc = frappe.get_doc('Bill Adjustments', bill_adjt.bill)
+                doc = frappe.get_doc('Bill Adjustment', bill_adjt.bill)
                 doc.status = 'Processed'
                 doc.save()
             else:
-                doc = frappe.get_doc('Bill Adjustments', bill_adjt.bill)
+                doc = frappe.get_doc('Bill Adjustment', bill_adjt.bill)
                 doc.status = 'Error'
                 doc.save()
 
