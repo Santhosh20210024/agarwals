@@ -124,9 +124,18 @@ class PaymentEntryCreator:
             for record in matcher_records:
                 try:
                     bank_amount = 0
-                    settled_amount = float(record.settled_amount)
-                    tds_amount = float(record.tds_amount)
-                    disallowance_amount = float(record.disallowance_amount)
+                    if record.settled_amount:
+                        settled_amount = float(record.settled_amount)
+                    else:
+                        settled_amount = 0 
+                    if record.tds_amount:
+                        tds_amount = float(record.tds_amount)
+                    else:
+                        tds_amount = 0
+                    if record.disallowance_amount:
+                        disallowance_amount = float(record.disallowance_amount)
+                    else:
+                        disallowance_amount = 0
                     unallocated_amount = self.get_document_record('Bank Transaction', record.bank_transaction).unallocated_amount
                     
                     if record.settlement_advice:
