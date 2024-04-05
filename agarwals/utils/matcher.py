@@ -12,6 +12,10 @@ class Matcher:
 
     def insert_into_matcher_table(self,records):
         for record in records:
+            if record['sa']:
+                if record.matcher_status:
+                    if record.matcher_status != 'Open':
+                        continue
             matcher_record = frappe.new_doc("Matcher")
             matcher_record.set('sales_invoice',record['bill'])
             if record['cb']:
@@ -60,7 +64,8 @@ class Matcher:
         	sa.tds_amount as tds_amount,
         	sa.disallowed_amount as disallowed_amount,
         	"MA5-BN" as logic,
-            1 as payment_order
+            1 as payment_order,
+            sa.matcher_status as matcher_status
         from
         	`tabBank Transaction` bt,
         	`tabSettlement Advice` sa,
@@ -70,7 +75,6 @@ class Matcher:
         		or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
         	and sa.cg_formatted_bill_number  = bi.cg_formatted_bill_number 
         	and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is null
             and bi.status != 'Cancelled'
             """
         
@@ -91,7 +95,8 @@ class Matcher:
 	        sa.tds_amount as tds_amount,
 	        sa.disallowed_amount as disallowed_amount,
 	        "MA1-CN" as logic,
-            2 as payment_order
+            2 as payment_order,
+            sa.matcher_status as matcher_status
         from
 	        `tabBank Transaction` bt,
 	        `tabSettlement Advice` sa,
@@ -104,7 +109,6 @@ class Matcher:
 		        or cb.cl_key = sa.claim_key)
 	        and (((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) or (bi.ma_claim_key = cb.al_key or bi.ma_claim_key = cb.cl_key)) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is null
             and bi.status != 'Cancelled'
            """
         
@@ -164,7 +168,6 @@ class Matcher:
 	        and bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher` WHERE match_logic = 'MA1-CN') 
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is null
             and bi.status != 'Cancelled'
             """
         ma1_bn_records = frappe.db.sql(ma1_bn, as_dict=True)
@@ -193,7 +196,6 @@ class Matcher:
 		        or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
 	        and ((sa.claim_key  = bi.claim_key) or (sa.claim_key = bi.ma_claim_key) )
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
-            and sa.matcher_status is null
             and bi.status != 'Cancelled'
             """
         ma5_cn_records = frappe.db.sql(ma5_cn, as_dict=True)
@@ -340,7 +342,6 @@ class Matcher:
         where
 	        (sa.claim_key = bi.claim_key or sa.claim_key = bi.ma_claim_key)
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher`)
-            and sa.matcher_status is null
             and bi.status != 'Cancelled'
          """
         ma6_cn_records = frappe.db.sql(ma6_cn, as_dict=True)
@@ -365,7 +366,6 @@ class Matcher:
         where
 	        sa.cg_formatted_bill_number  = bi.cg_formatted_bill_number 
 	        and bi.name not in (SELECT sales_invoice FROM `tabMatcher`)
-            and sa.matcher_status is null
             and bi.status != 'Cancelled'
          """
         ma6_bn_records = frappe.db.sql(ma6_bn, as_dict=True)
