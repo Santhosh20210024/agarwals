@@ -158,7 +158,9 @@
    "fieldname": "hash",
    "fieldtype": "Data",
    "label": "Hash",
-   "unique": 1,
+   "unique": 1
+  },
+  {
    "fetch_from": "source.payer_type",
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
