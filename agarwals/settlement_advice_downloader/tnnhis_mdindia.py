@@ -3,9 +3,10 @@ import json
 from agarwals.settlement_advice_downloader.downloader import Downloader
 
 class TnnhisMdIndia(Downloader):
-    def __init__(self,tpa_name,branch_code):
+    def __init__(self,tpa_name,branch_code, last_executed_time):
         self.tpa=tpa_name
         self.branch_code=branch_code
+        self.last_executed_time=last_executed_time
         Downloader.__init__(self)
         
     def get_content_from_site(self):
@@ -57,6 +58,5 @@ class TnnhisMdIndia(Downloader):
     def get_content(self):
         content = self.get_content_from_site()
         if not content:
-            self.log_error('TPA Login Credentials', self.user_name, "No Data")
             return None
         return content

@@ -4,11 +4,11 @@ import requests
 from agarwals.settlement_advice_downloader.downloader import Downloader
 
 class VitryaDownloader(Downloader):
-    def __init__(self):
-        super().__init__()
-        self.portal = "Vitraya"
-        self.user_name = None
-        self.password = None
+    def __init__(self,tpa_name,branch_code,last_executed_time):
+        self.tpa=tpa_name
+        self.branch_code=branch_code
+        self.last_executed_time=last_executed_time
+        Downloader.__init__(self)
 
     def set_username_and_password(self):
         credential_doc = frappe.db.get_list("TPA Login Credentials", filters={"branch_code":['=',self.branch_code],"tpa":['=',self.tpa]},fields="*")
@@ -16,7 +16,7 @@ class VitryaDownloader(Downloader):
             self.user_name = credential_doc[0].user_name
             self.password = credential_doc[0].encrypted_password
         else:
-            self.log_error('TPA Login Credentials',None,"No Credenntial for the given input")
+            self.log_error('TPA Login Credentials',None,"No Credential for the given input")
 
     def get_web_token(self):
         login_url = "https://a2s.starhealth.in/rules-engine/api/v1/user/signin"

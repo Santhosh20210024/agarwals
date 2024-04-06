@@ -10,6 +10,7 @@
  "field_order": [
   "source",
   "file_name",
+  "file_upload_payer",
   "claim_id",
   "bill_number",
   "utr_number",
@@ -26,7 +27,8 @@
   "date",
   "remarks",
   "retry",
-  "hash"
+  "hash",
+  "error_code"
  ],
  "fields": [
   {
@@ -156,7 +158,17 @@
    "fieldname": "hash",
    "fieldtype": "Data",
    "label": "Hash",
-   "unique": 1
+   "unique": 1,
+   "fetch_from": "source.payer_type",
+   "fieldname": "file_upload_payer",
+   "fieldtype": "Data",
+   "label": "File Upload Payer"
+  },
+  {
+   "fieldname": "error_code",
+   "fieldtype": "Select",
+   "label": "Error Code",
+   "options": "\nS100\nS101\nS102\nS103\nS104"
   }
  ],
  "index_web_pages_for_search": 1,

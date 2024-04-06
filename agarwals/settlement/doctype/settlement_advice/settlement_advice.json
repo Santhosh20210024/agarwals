@@ -10,6 +10,7 @@
  "field_order": [
   "insurance_company_name",
   "tpa",
+  "file_upload_payer",
   "region",
   "entity",
   "branch_type",
@@ -240,10 +241,16 @@
    "fieldname": "matcher_status",
    "fieldtype": "Data",
    "label": "Matcher Status"
+  },
+  {
+   "fetch_from": "source_file.payer_type",
+   "fieldname": "file_upload_payer",
+   "fieldtype": "Data",
+   "label": "File Upload Payer"
   }
  ],
  "links": [],
- "modified": "2024-02-29 16:50:00.346544",
+ "modified": "2024-03-07 13:37:12.840639",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
