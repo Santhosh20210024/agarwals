@@ -3,10 +3,36 @@ import os
 import frappe
 from datetime import date
 from agarwals.utils.loader import Loader
+import hashlib
+
 SITE_PATH = frappe.get_single('Control Panel').site_path
 
+def left_join(source_df,target_df):
+    left_on, right_on = "hash","hash"
+    merged_df = source_df.merge(target_df, left_on=left_on, right_on=right_on, how='left',
+                                        indicator=True,
+                                        suffixes=('', '_x'))
+    return merged_df
+
+def hashing_job(source_df):
+    source_df['hash_column'] = ''
+    columns_to_hash = ["claim_id","bill_number","utr_number","claim_status","claim_amount","disallowed_amount","payers_remark","settled_amount","tds_amount","paid_date"]
+    for column in columns_to_hash:
+        source_df['hash_column'] = source_df['hash_column'].astype(str) + source_df[column].astype(str)
+    source_df['hash'] = source_df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+    return source_df
+
+def get_target_df():
+        query = f"""
+                      SELECT 
+                          hash
+                      FROM 
+                          `tabSettlement Advice Staging`
+                      """
+        records = frappe.db.sql(query, as_list=True)
+        return pd.DataFrame(records, columns=['hash'])
+
 def clean_header(list_to_clean,list_of_char_to_repalce):
-    
     cleaned_list=[]
     for header in list_to_clean:
         for char_to_replace in list_of_char_to_repalce:
@@ -27,7 +53,7 @@ def format_date(df,date_formats,date_column):
 
 def prune_columns(df, columns_to_prune):
     df = df.drop(columns=columns_to_prune, errors='ignore')
-    return df
+    return df 
 
 def swap_advice_amount(row):
     row['settled_amount'] = pd.to_numeric(row['settled_amount'])
@@ -97,9 +123,11 @@ def insert_in_file_upload(file_url, file_upload_name, type, status):
                         })
     file_upload.save(ignore_permissions=True)
 
-def move_to_transform(file, df, type, folder, status = 'Open'):
+def move_to_transform(file, df, type, folder, prune=True, status = 'Open'):
     if df.empty:
         return None
+    if prune:
+        df = prune_columns(df,['name', '_merge', 'hash_x', 'hash_column'])
     file_path = write_excel(df, file.upload, type,folder)
     create_file_record(file_path,folder)
     insert_in_file_upload(file_path, file.name, type, status)
@@ -110,7 +138,6 @@ def remove_x(item):
     elif "XX" in str(item) and len(item) > 16:
         return item.replace("XX", '')
     return item
-
 
 def format_utr(source_df):
         utr_list = source_df.fillna(0).final_utr_number.to_list()
@@ -147,10 +174,24 @@ def log_error(doctype_name, reference_name, error_message):
     error_log.set('error_message', error_message)
     error_log.save()
 
+def split_and_move_to_transform(source_df,file):
+    source_df=hashing_job(source_df)
+    target_df=get_target_df()
+    if target_df.empty: 
+            new_records = source_df 
+            move_to_transform(file, new_records, 'Insert', 'Transform', False)
+    else:
+            merged_df=left_join(source_df,target_df)
+            if merged_df.empty:
+                return False
+            new_records = merged_df[merged_df['_merge'] == 'left_only']
+            existing_df = merged_df[merged_df['_merge'] == 'both']
+            move_to_transform(file, new_records, 'Insert', 'Transform', True)
+            move_to_transform(file, existing_df, 'Skip', 'Bin', True, 'Skipped')
+
 @frappe.whitelist()
 def advice_transform():
         file_list_details = frappe.get_all("File upload",{"status":"Open", "document_type": "Settlement Advice"},"*")
-        
         for file in file_list_details:
             try:
                 update_status('File upload', file.name, 'In Process')
@@ -217,8 +258,8 @@ def advice_transform():
                 df["source"]=file.name
                 df = clean_data(df)
                 # Amount checking
-                df = check_advice_amount(df)  
-                move_to_transform(file, df, 'Insert', 'Transform')
+                df = check_advice_amount(df)
+                split_and_move_to_transform(df,file)  
                 loader = Loader("Settlement Advice Staging")
                 loader.process()
                 update_parent_status(file)

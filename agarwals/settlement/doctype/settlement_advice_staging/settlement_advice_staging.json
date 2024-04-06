@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:hash",
  "creation": "2024-01-03 11:39:31.152789",
  "default_view": "List",
  "doctype": "DocType",
@@ -26,6 +27,7 @@
   "date",
   "remarks",
   "retry",
+  "hash",
   "error_code"
  ],
  "fields": [
@@ -153,6 +155,10 @@
    "label": "File Name"
   },
   {
+   "fieldname": "hash",
+   "fieldtype": "Data",
+   "label": "Hash",
+   "unique": 1,
    "fetch_from": "source.payer_type",
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
@@ -167,10 +173,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-07 13:54:06.490260",
+ "modified": "2024-03-21 09:50:16.120912",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
