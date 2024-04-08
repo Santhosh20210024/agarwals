@@ -14,7 +14,8 @@
   "posting_date",
   "source_file",
   "file_upload",
-  "status"
+  "status",
+  "error_remark"
  ],
  "fields": [
   {
@@ -55,11 +56,16 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Open\nProcessed\nPartially Processed\nError"
+  },
+  {
+   "fieldname": "error_remark",
+   "fieldtype": "Small Text",
+   "label": "Error Remark"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-03 01:51:15.781867",
+ "modified": "2024-04-08 15:43:14.793146",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Bill Adjustment",
