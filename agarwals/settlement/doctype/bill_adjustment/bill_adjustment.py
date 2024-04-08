@@ -3,18 +3,26 @@
 import frappe.utils
 import frappe
 from frappe.model.document import Document
+import datetime
 
 class BillAdjustment(Document):
 	def before_save(self):
 		if not self.posting_date:
 			if self.name:
 				sales_doc = frappe.get_doc('Sales Invoice', self.name)
-				if sales_doc.status == 'Unpaid':
-					self.status = 'Error'
-					self.error_remark = 'Unpaid Bill'
-				elif sales_doc.status == 'Paid':
-					self.status = 'Error'
-					self.error_remark = 'Paid Bill'
-				if sales_doc.status == 'Partly Paid':
-					payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation asc")
-					self.posting_date = payment_reference[0]['posting_date'].strftime("%Y/%m/%d")
+				if sales_doc.posting_date < datetime.datetime(2023,4,1):
+					if sales_doc.status == 'Paid' or sales_doc.status == 'Partly Paid':
+						payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation asc")
+						self.posting_date = payment_reference[0]['posting_date'].strftime("%Y/%m/%d")
+					else:
+						self.posting_date = sales_doc.posting_date #else bill date
+				else:
+					if sales_doc.status == 'Unpaid':
+						self.status = 'Error'
+						self.error_remark = 'Unpaid Bill'
+					elif sales_doc.status == 'Paid':
+						self.status = 'Error'
+						self.error_remark = 'Paid Bill'
+					if sales_doc.status == 'Partly Paid':
+						payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation asc")
+						self.posting_date = payment_reference[0]['posting_date'].strftime("%Y/%m/%d")
