@@ -2,11 +2,30 @@ import frappe
 
 
 class SalesInvoiceCreator:
+    def get_payment_reference_doctype(self):
+        return {'Bank Transaction Payments':'payment_entry', 'Sales Invoice Reference':'payment_entry'}
+
+    def delete_payment_references(self, payment_entry):
+        payment_reference_doctype_and_field = self.get_payment_reference_doctypes()
+        for doctype,field in payment_reference_doctype.items():
+            frappe.db.sql(f"DELETE FROM `tab{doctype}` WHERE {field} = '{payment_entry}'")
+
+
+    def cancel_payment_entry(self, bill):
+        payment_entry_records = frappe.get_list('Payment Entry', filters={'custom_sales_invoice':bill}, pluck = 'name')
+        if not payment_entry_records:
+            return
+        for record in payment_entry_records:
+            self.delete_payment_references(record)
+            payment_entry_record = frappe.get_doc('Payment Entry', record)
+            payment_entry_record.cancel()
+
     def cancel_sales_invoice(self, cancelled_bills):
         for bill in cancelled_bills:
             try:
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
                 sales_invoice_record.cancel()
+                self.cancel_payment_entry(bill)
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
                 frappe.db.commit()
             except Exception as e:
