@@ -600,7 +600,7 @@ class AdjustmentTransformer(Transformer):
     def __init__(self):
         super().__init__()
         self.file_type = 'Bill Adjustment'
-        self.document_type = 'Bill Adjustments'
+        self.document_type = 'Bill Adjustment'
 
     def get_column_needed(self):
         return ["bill","tds","disallowance","posting_date","source_file","file_upload"]
