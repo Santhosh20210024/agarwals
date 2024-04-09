@@ -1,10 +1,10 @@
 import frappe
 from datetime import datetime
 
-def create_journal_entry(type):
+def create_journal_entry(type, date):
     je = frappe.new_doc('Journal Entry')
     je.voucher_type = type
-    je.posting_date = datetime.now().strftime("%Y-%m-%d")
+    je.posting_date = date
     return je
 
 def fetch_invoice_details(invoice):
@@ -47,14 +47,14 @@ def save_je(je):
     frappe.db.commit()
 
 def process_bill_adjust():
-    for bill_adjt in frappe.get_list('Bill Adjustment', fields = ['bill','tds','disallowance'], filters = {'status': 'Open'}):
+    for bill_adjt in frappe.get_list('Bill Adjustment', fields = ['bill','tds','disallowance','posting_date'], filters = {'status': 'Open'}):
         invoice = fetch_invoice_details(bill_adjt.bill)
         valid_tds = False
         valid_dis = False
 
         try:
             if bill_adjt.tds:
-                je = create_journal_entry('Credit Note')
+                je = create_journal_entry('Credit Note', bill_adjt.posting_date)
                 je.name = "".join([bill_adjt.bill,'-','TDS'])
                 je = add_account_entries(je, invoice, 'Debtors - A', 'TDS - A', bill_adjt.tds)
                 save_je(je)
@@ -69,7 +69,7 @@ def process_bill_adjust():
 
         try:
             if bill_adjt.disallowance:
-                je = create_journal_entry('Credit Note')
+                je = create_journal_entry('Credit Note', bill_adjt.posting_date)
                 je.name = "".join([bill_adjt.bill,'-','DIS'])
                 je = add_account_entries(je, invoice, 'Debtors - A', 'Disallowance - A', bill_adjt.disallowance)
                 save_je(je)
