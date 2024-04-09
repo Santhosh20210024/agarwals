@@ -26,7 +26,7 @@ class RoundOffCreation(JournalUtils):
 
 @frappe.whitelist()
 def run(_chunk_size):
-    chunk_size = _chunk_size
+    chunk_size = int(_chunk_size)
     rq_number = 0
     invoice = frappe.qb.DocType('Sales Invoice')
 
