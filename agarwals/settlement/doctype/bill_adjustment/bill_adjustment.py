@@ -10,7 +10,7 @@ class BillAdjustment(Document):
 		if not self.posting_date:
 			if self.name:
 				sales_doc = frappe.get_doc('Sales Invoice', self.name)
-				if sales_doc.posting_date < datetime.datetime(2023,4,1):
+				if sales_doc.posting_date < datetime.date(2023,4,1):
 					if sales_doc.status == 'Paid' or sales_doc.status == 'Partly Paid':
 						payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation asc")
 						self.posting_date = payment_reference[0]['posting_date'].strftime("%Y/%m/%d")
