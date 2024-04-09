@@ -12,7 +12,7 @@ class RoundOffCreation(JournalUtils):
             invoice_ = self.fetch_invoice_details(bill)
             try:
                 je = self.create_journal_entry('Credit Note', invoice_.posting_date)
-                je.name = "".join([invoice_.bill,'-','RND'])
+                je.name = "".join([invoice_.name,'-','RND'])
                 je = self.add_account_entries(je, invoice_, 'Debtors - A', 'Rounded Off - A', invoice_.outstanding_amount)
                 self.save_je(je)
 
