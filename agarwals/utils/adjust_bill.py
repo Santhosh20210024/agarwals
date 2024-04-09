@@ -1,8 +1,6 @@
 import frappe
 
-
-class BillAdjustmentProcess():
-
+class JournalUtils():
     def create_journal_entry(self, type, date):
         je = frappe.new_doc('Journal Entry')
         je.voucher_type = type
@@ -48,7 +46,10 @@ class BillAdjustmentProcess():
         je.submit()
         frappe.db.commit()
 
-    # Need convert in Rq Job
+class BillAdjustmentProcess(JournalUtils):
+    def __init__(self):
+       super().__init__()
+
     def process_bill_adjust(self, bill_list):
         for bill_adjt in bill_list:
             invoice = self.fetch_invoice_details(bill_adjt.bill)
