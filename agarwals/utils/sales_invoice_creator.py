@@ -1,12 +1,16 @@
 import frappe
-
+from agarwals.utils.payment_entry_cancellator import PaymentEntryCancellator
+from agarwals.utils.journal_entry_cancellator import JournalEntryCancellator
 
 class SalesInvoiceCreator:
+
     def cancel_sales_invoice(self, cancelled_bills):
         for bill in cancelled_bills:
             try:
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
                 sales_invoice_record.cancel()
+                PaymentEntryCancellator.cancel_payment_entry(bill)
+                JournalEntryCancellator.cancel_journal_entry(bill)
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
                 frappe.db.commit()
             except Exception as e:
