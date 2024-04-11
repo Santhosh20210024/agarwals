@@ -16,25 +16,24 @@ def update_untagged_search():
 
 def update_payer(customer_list):
      for customer_item in customer_list:
-        print(customer_item.customer_name)
+        print(customer_item.name)
         if customer_item.custom_payer_match:
             compressed_payer_match = compile_patterns(str(customer_item.custom_payer_match).split(','))
 
             frappe.db.sql("""
                         UPDATE `tabBank Transaction Staging` tbt SET tbt.payer_type = 'Customer', tbt.payer_name = %(payer)s, tbt.payer_group = %(payer_group)s
                         where search REGEXP %(compressed_payer_match)s AND tbt.payer_name is NULL
-                    """, values = { 'payer' : customer_item.customer_name , 'payer_group' : customer_item.customer_group , 'compressed_payer_match' :  compressed_payer_match})
+                    """, values = { 'payer' : customer_item.name , 'payer_group' : customer_item.customer_group , 'compressed_payer_match' :  compressed_payer_match})
             frappe.db.commit()
 
 
-# Here, create the custom_payer_match in Customer doctype:
 def map_payer():
 
     update_untagged_search()
-    customer_list = frappe.get_list('Customer', fields = ['customer_name', 'custom_payer_match', 'customer_group'], filters = { 'custom_payer_match': ["is", "set"], 'customer_name': ['like', '%insurance%'] })
+    customer_list = frappe.get_list('Customer', fields = ['name', 'custom_payer_match', 'customer_group'], filters = { 'custom_payer_match': ["is", "set"], 'name': ['like', '%insurance%'] })
     update_payer(customer_list)
 
-    customer_list = frappe.get_list('Customer', fields = ['customer_name', 'custom_payer_match', 'customer_group'], filters = { 'custom_payer_match': ["is", "set"], 'customer_name': ['not like', '%insurance%'] })
+    customer_list = frappe.get_list('Customer', fields = ['name', 'custom_payer_match', 'customer_group'], filters = { 'custom_payer_match': ["is", "set"], 'name': ['not like', '%insurance%'] })
     update_payer(customer_list)
     
 @frappe.whitelist()
