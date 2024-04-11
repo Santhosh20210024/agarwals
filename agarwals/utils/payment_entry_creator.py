@@ -14,6 +14,15 @@ class PaymentEntryCreator:
         error_log_record.set('error_message',error_msg)
         error_log_record.save()
 
+    def check_writeoff(self, payment_entry_record, sales_invoice):
+        if payment_entry_record.difference_amount > 0:
+            payment_entry_record.set('deductions', {'account': 'Write Off - A', 'cost_center': sales_invoice.cost_center,
+                                   'description': 'Write Off',
+                                   'branch': sales_invoice.branch, 'entity': sales_invoice.entity,
+                                   'region': sales_invoice.region, 'branch_type': sales_invoice.branch_type,
+                                   'amount': payment_entry_record.difference_amount} )
+            return payment_entry_record
+
     def create_payment_entry_and_update_bank_transaction(self, bank_transaction, sales_invoice, bank_account, settled_amount, tds_amount = 0, disallowed_amount = 0):
         payment_entries_for_same_bill = frappe.get_list('Payment Entry', filters={'custom_sales_invoice':sales_invoice.name})
         if payment_entries_for_same_bill:
@@ -27,7 +36,7 @@ class PaymentEntryCreator:
             payment_entry_record.set('custom_sales_invoice', sales_invoice.name)
             payment_entry_record.set('payment_type', 'Receive')
             payment_entry_record.set('posting_date', bank_transaction.date)
-            payment_entry_record.set('mode_of_payment', 'Bank Draft')  # Need to verify
+            payment_entry_record.set('mode_of_payment', 'Bank Draft')
             payment_entry_record.set('party_type', 'Customer')
             payment_entry_record.set('party', sales_invoice.customer)
             payment_entry_record.set('bank_account', bank_transaction.bank_account)
@@ -67,6 +76,7 @@ class PaymentEntryCreator:
 
             payment_entry_record.set('references', reference_item)
             payment_entry_record.save()
+            payment_entry_record = self.check_writeoff(payment_entry_record, sales_invoice)
             payment_entry_record.submit()
 
             bank_transaction = frappe.get_doc('Bank Transaction', bank_transaction.name)
