@@ -22,6 +22,7 @@ class PaymentEntryCreator:
                                    'region': sales_invoice.region, 'branch_type': sales_invoice.branch_type,
                                    'amount': payment_entry_record.difference_amount} )
             return payment_entry_record
+        return payment_entry_record
 
     def create_payment_entry_and_update_bank_transaction(self, bank_transaction, sales_invoice, bank_account, settled_amount, tds_amount = 0, disallowed_amount = 0):
         payment_entries_for_same_bill = frappe.get_list('Payment Entry', filters={'custom_sales_invoice':sales_invoice.name})
