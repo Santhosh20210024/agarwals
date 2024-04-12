@@ -6,7 +6,8 @@ ERROR_LOG = {
     'S101': 'UTR and claim Id is Mandaory',
     'S102': 'Settled amount is Mandatory',
     'S103': 'UTR must in Non-Exponential Formate',
-    'S104': 'System Error'
+    'S104': 'System Error',
+    'S105': 'Amount Should Not Be Negative'
 }
 
 def log_error(doctype_name, error_doc, error_message):
@@ -77,6 +78,13 @@ def settlement_advice_staging(advices):
                     advice_staging_doc.status = "Error"
                     advice_staging_doc.remarks =ERROR_LOG["S102"] 
                     advice_staging_doc.error_code = "S102"
+                    advice_staging_doc.save(ignore_permissions=True)
+                    frappe.db.commit()
+                    continue
+                if advice_staging_doc.settled_amount < 0 or advice_staging_doc.tds_amount < 0 or advice_staging_doc.disallowed_amount < 0:
+                    advice_staging_doc.status = "Error"
+                    advice_staging_doc.remarks =ERROR_LOG["S105"]
+                    advice_staging_doc.error_code = "S105"
                     advice_staging_doc.save(ignore_permissions=True)
                     frappe.db.commit()
                     continue
