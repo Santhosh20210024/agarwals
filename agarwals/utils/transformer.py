@@ -524,7 +524,8 @@ class BankTransformer(StagingTransformer):
             for token in map(str.strip, narration.split(delimiter)):
                 if len(token) == length and len(token.strip()) == length:
                     if self.utr_validation(pattern, token):
-                        return token
+                        if not token.startswith("CX"):
+                            return token
 
         return None
 
