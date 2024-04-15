@@ -552,6 +552,9 @@ class BankTransformer(StagingTransformer):
         elif "UPI" in narration:
             length = 12
             pattern = numeric
+        elif "INFT" in narration:
+            length = 12
+            pattern = numeric
         else:
             return reference
 
