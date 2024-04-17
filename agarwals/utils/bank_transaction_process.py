@@ -79,7 +79,7 @@ def create_bank_transaction(transaction_list):
             if int(transaction.get('withdrawal')) != 0:
                 continue
             
-            if transaction.get('deposit') == 1:
+            if int(transaction.get('deposit')) == 1:
                 trans_doc.staging_status = 'Error'
                 trans_doc.error = ERROR_LOG['E106']
                 trans_doc.retry = 0
