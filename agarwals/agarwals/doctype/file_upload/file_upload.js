@@ -76,13 +76,6 @@ function extract_zip(frm) {
     })
 
     extract.show()
-      // frappe.confirm(
-      //   'Do you want to extract the files ?',
-      //   function (frm) {
-      
-      //   },
-      //   function () {}
-      // );
     },  __('Action'));
   }
 }
