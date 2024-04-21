@@ -16,9 +16,20 @@
   "upload",
   "column_break_ppbz4",
   "from_bot",
+  "source",
+  "zip_status",
+  "total_count",
+  "processed_count",
   "section_break_23jfu",
   "status",
-  "transform"
+  "transform",
+  "amended_from",
+  "bank_account_mapping_section",
+  "mapping_bank",
+  "settlement_advice_mapping_section",
+  "mapping_advice",
+  "otther_mapping_section",
+  "mapping_other"
  ],
  "fields": [
   {
@@ -33,21 +44,21 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment')",
+   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment') || (doc.document_type=='Settlement Advice' && doc.payer_type ==null && doc.file_format == 'ZIP') || (doc.document_type=='Bank Statement' && doc.bank_account == null && doc.file_format == 'ZIP' )",
    "fieldname": "upload",
    "fieldtype": "Attach",
    "in_preview": 1,
    "label": "Upload"
   },
   {
-   "depends_on": "eval:doc.document_type=='Settlement Advice'",
+   "depends_on": "eval:doc.document_type=='Settlement Advice' && doc.file_format != 'ZIP'",
    "fieldname": "payer_type",
    "fieldtype": "Link",
    "label": "Payer",
    "options": "Customer"
   },
   {
-   "depends_on": "eval:doc.document_type=='Bank Statement'",
+   "depends_on": "eval:doc.document_type=='Bank Statement' && doc.file_format != 'ZIP'",
    "fieldname": "bank_account",
    "fieldtype": "Link",
    "label": "Bank Account",
@@ -98,7 +109,8 @@
    "depends_on": "eval:doc.document_type=='Settlement Advice'",
    "fieldname": "from_bot",
    "fieldtype": "Check",
-   "label": "From Bot"
+   "label": "From Bot",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_ppbz4",
@@ -107,11 +119,90 @@
   {
    "fieldname": "section_break_23jfu",
    "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.status=='Zip'",
+   "fieldname": "total_count",
+   "fieldtype": "Data",
+   "label": "Total Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "File upload",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:doc.status == 'Zip' && doc.document_type == 'Bank Statement';",
+   "fieldname": "bank_account_mapping_section",
+   "fieldtype": "Section Break",
+   "label": "Bank Transaction Mapping"
+  },
+  {
+   "fieldname": "mapping_bank",
+   "fieldtype": "Table",
+   "label": "Mapping",
+   "options": "Bank Account Mapping"
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:doc.status == 'Zip' && doc.document_type == 'Settlement Advice';",
+   "fieldname": "settlement_advice_mapping_section",
+   "fieldtype": "Section Break",
+   "label": "Settlement Advice Mapping"
+  },
+  {
+   "fieldname": "mapping_advice",
+   "fieldtype": "Table",
+   "label": "Mapping",
+   "options": "Settlement Advice Mapping"
+  },
+  {
+   "depends_on": "eval:doc.status == 'Zip'",
+   "fieldname": "processed_count",
+   "fieldtype": "Data",
+   "label": "Processed Count"
+  },
+  {
+   "default": "Open",
+   "depends_on": "eval:doc.status == 'Zip'",
+   "fieldname": "zip_status",
+   "fieldtype": "Select",
+   "label": "Zip Status",
+   "options": "\nOpen\nProcessed\nExtracting\nExtracted\nProcessing",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:doc.status == 'Zip' && ( doc.document_type == 'Claim Book' || doc.document_type == 'Debtors Report')",
+   "fieldname": "otther_mapping_section",
+   "fieldtype": "Section Break",
+   "label": "Otther Mapping"
+  },
+  {
+   "fieldname": "mapping_other",
+   "fieldtype": "Table",
+   "label": "Mapping",
+   "options": "Other Mapping"
+  },
+  {
+   "depends_on": "eval:doc.source != null",
+   "fieldname": "source",
+   "fieldtype": "Link",
+   "label": "Source",
+   "options": "File upload",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-17 16:49:06.993805",
+ "modified": "2024-04-22 00:54:58.140033",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
