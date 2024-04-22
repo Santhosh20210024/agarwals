@@ -106,7 +106,7 @@ class Matcher:
 	        (sa.cg_utr_number = bt.custom_cg_utr_number
 		        or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
 	        and (sa.claim_key is not null and (cb.al_key = sa.claim_key
-		        or cb.cl_key = sa.claim_key)
+		        or cb.cl_key = sa.claim_key))
 	        and (((bi.claim_key = cb.al_key or bi.claim_key = cb.cl_key) or (bi.ma_claim_key = cb.al_key or bi.ma_claim_key = cb.cl_key)) and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
 	        and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
             and bi.status != 'Cancelled'
