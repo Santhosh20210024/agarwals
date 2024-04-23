@@ -20,6 +20,23 @@ const verify_read_only = (frm) => {
 function extract_zip(frm) {
   if (frm.doc.status == 'Zip') {
     frm.add_custom_button(__('Extract Zip'), function (frm) {
+      if(cur_frm.doc.document_type == 'Claim Book' || cur_frm.doc.document_type == 'Debtors Report'){
+        frappe.call({
+          method: 'agarwals.agarwals.doctype.file_upload.file_upload.run_extractor',
+          args: {
+            fid: cur_frm.docname,
+            ffield: null
+          },
+          freeze: true,
+          freeze_message: "Files are Extracting....",
+          callback: function (r) {
+            if (r.message) {
+              frappe.msgprint(r.message)
+            }
+          }
+        });
+      }
+      else{
       let fields = undefined
       if(cur_frm.doc.document_type == 'Settlement Advice'){
         fields = {
@@ -27,10 +44,10 @@ function extract_zip(frm) {
           fieldname: 'payer',
           fieldtype: 'Link',
           options: 'Customer',
-          description: 'if you want to map all the files with this payer name'}
-     
+          description: 'if you want to map all the files with this payer name'
         }
-        if(cur_frm.doc.document_type == 'Bank Statement'){
+        }
+      if(cur_frm.doc.document_type == 'Bank Statement'){
         fields =  {
           label: 'Bank Account',
           fieldname: 'bank_account',
@@ -76,7 +93,7 @@ function extract_zip(frm) {
     })
 
     extract.show()
-    },  __('Action'));
+    }},  __('Action'));
   }
 }
 
