@@ -22,9 +22,9 @@ class PeriodCloserbyEntity(Document):
 			if last_posted_date:
 				if last_posted_date >= datetime.strptime(self.posting_date, '%Y-%m-%d').date():
 					frappe.msgprint("Posting date must be always greater than 'Last Closing Date'","Error",True,indicator="red")
-				if datetime.strptime(self.posting_date, '%Y-%m-%d').date() > date.today():
-					frappe.msgprint("Posting date cannot be Future Date", "Error", True,indicator="red")
-			else:
-				if datetime.strptime(self.posting_date, '%Y-%m-%d').date() > date.today():
-					frappe.msgprint("Posting date cannot be Future Date", "Error", True,indicator="red")
+			# 	if datetime.strptime(self.posting_date, '%Y-%m-%d').date() > date.today():
+			# 		frappe.msgprint("Posting date cannot be Future Date", "Error", True,indicator="red")
+			# else:
+			# 	if datetime.strptime(self.posting_date, '%Y-%m-%d').date() > date.today():
+			# 		frappe.msgprint("Posting date cannot be Future Date", "Error", True,indicator="red")
 

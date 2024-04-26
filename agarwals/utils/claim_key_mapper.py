@@ -67,6 +67,7 @@ class ClaimBookClaimKeyMapper(ClaimKeyMapper):
                 if not claim_key:
                     claim_key = self.create_claim_key(record.al_number,doctype,record.name)
                 record.set('al_key', claim_key[0])
+        
         if record.cl_number != '0' and record.cl_number is not None:
             if str(record.cl_number).strip() != '':
                 claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.cl_number.lower().strip()}, pluck='claim_key')
@@ -97,7 +98,12 @@ class SAClaimKeyMapper(BillClaimKeyMapper):
 def map_claim_key():
     n = 1000
     
-    bill_records = frappe.db.sql("""SELECT name FROM tabBill WHERE (claim_id IS NOT NULL and claim_key is NULL ) or ( ma_claim_id IS NOT NULL and ma_claim_key is NULL )""", as_dict= True)
+    # Skipping the bill claim_id and ma_claim_id which are 0, Avoiding the queue
+    bill_records = frappe.db.sql("""SELECT name FROM tabBill 
+                                 WHERE ( claim_id != 0 and claim_id IS NOT NULL and claim_key is NULL ) 
+                                 or ( ma_claim_id != 0 and ma_claim_id IS NOT NULL and ma_claim_key is NULL )""", 
+                                 as_dict= True)
+    
     bill_records = [i['name'] for i in bill_records]
     
     for i in range(0, len(bill_records), n):
