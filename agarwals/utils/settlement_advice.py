@@ -77,9 +77,15 @@ def clean_data(df):
         return df
         
 def update_status(doctype, name, status):
-    frappe.db.set_value(doctype,name,'status',status)
-    frappe.db.commit()
-    
+        if doctype == 'File upload':
+            doc = frappe.get_doc('File upload',name)
+            doc.status = status 
+            doc.save()
+            frappe.db.commit()
+        else:
+            frappe.db.set_value(doctype,name,'status',status)
+            frappe.db.commit()
+          
 def update_parent_status(file):
     file_record = frappe.get_doc('File upload',file.name)
     transform_records = file_record.transform
