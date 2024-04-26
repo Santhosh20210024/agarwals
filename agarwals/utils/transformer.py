@@ -168,8 +168,15 @@ class Transformer:
         self.source_df['hash'] = self.source_df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
 
     def update_status(self, doctype, name, status):
-        frappe.db.set_value(doctype,name,'status',status)
-        frappe.db.commit()
+        if doctype == 'File upload':
+            doc = frappe.get_doc(name)
+            doc.status = status 
+            doc.save()
+            frappe.db.commit()
+        else:
+            frappe.db.set_value(doctype,name,'status',status)
+            frappe.db.commit()
+            
 
     def update_parent_status(self,file):
         file_record = frappe.get_doc('File upload',file['name'])
