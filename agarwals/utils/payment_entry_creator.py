@@ -87,7 +87,7 @@ class PaymentEntryCreator:
 
             payment_entry_record.set('references', reference_item)
             payment_entry_record.save()
-            payment_entry_record = self.check_writeoff(payment_entry_record, sales_invoice)
+            # payment_entry_record = self.check_writeoff(payment_entry_record, sales_invoice)
             payment_entry_record.submit()
 
 
