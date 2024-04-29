@@ -54,6 +54,7 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Status",
    "options": "Open\nIn Process\nPartial Success\nSuccess\nError"
   },
@@ -97,7 +98,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-26 14:42:14.097511",
+ "modified": "2024-04-29 11:16:03.441110",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
