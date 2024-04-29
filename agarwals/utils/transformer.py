@@ -169,7 +169,7 @@ class Transformer:
 
     def update_status(self, doctype, name, status):
         if doctype == 'File upload':
-            doc = frappe.get_doc(name)
+            doc = frappe.get_doc('File upload',name)
             doc.status = status 
             doc.save()
             frappe.db.commit()
