@@ -166,8 +166,8 @@ def bank_transaction_process(tag):
         if transaction.staging_status == 'Open': 
             pending_transaction.append(transaction)
         
-        if transaction.staging_status == 'Skipped': 
-            pending_transaction.append(transaction)
+        # if transaction.staging_status == 'Skipped': 
+        #     pending_transaction.append(transaction)
 
     # also Check if there is any change in the processed entrys retry
     for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'staging_status' : ['=', 'Processed'], 'update_reference_number' : ['!=', None], 'retry': 1}):

@@ -54,13 +54,13 @@ class PaymentEntryCreator:
             payment_entry_record.set('branch_type', sales_invoice.branch_type)
             payment_entry_record.set('custom_due_date', sales_invoice.posting_date)
 
-            period_closing = frappe.get_list('Period Closing', filter={'entity': bank_transaction.custom_entity}, order_by = 'creation desc', plunk = 'posting_date')
+            # period_closing = frappe.get_list('Period Closing', filters={'entity': bank_transaction.custom_entity}, order_by = 'creation desc', plunk = 'posting_date')
 
-            if len(period_closing) > 1:
-                if period_closing[0] < bank_transaction.date:
-                    payment_entry_record.set('posting_date', utils.today())
-            else:
-                payment_entry_record.set('posting_date', bank_transaction.date)
+            # if len(period_closing) > 1:
+            #     if period_closing[0] < bank_transaction.date:
+            #         payment_entry_record.set('posting_date', utils.today())
+            # else:
+            #     payment_entry_record.set('posting_date', bank_transaction.date)
 
             if tds_amount > 0:
                 deductions.append({'account': 'TDS - A', 'cost_center': sales_invoice.cost_center, 'description': 'TDS',
@@ -270,10 +270,7 @@ def run_payment_entry():
     n = int(frappe.get_single('Control Panel').payment_matching_chunk_size)
     m_logic = tuple(frappe.get_single('Control Panel').match_logic.split(','))
 
-    bank_trans_records = frappe.db.sql(f"SELECT name, bank_account, reference_number, date FROM `tabBank Transaction`
-                                        WHERE name in (select bank_transaction from `tabMatcher` where match_logic in {m_logic} and status is null )
-                                        AND status IN ('Pending','Unreconciled') AND LENGTH(reference_number) > 4 
-                                        AND deposit > 10 AND reference_number not like 'X0%' ORDER BY unallocated_amount DESC", as_dict=True)
+    bank_trans_records = frappe.db.sql(f"SELECT name, bank_account, reference_number, date FROM `tabBank Transaction` WHERE name in (select bank_transaction from `tabMatcher` where match_logic in {m_logic} and status is null ) AND status IN ('Pending','Unreconciled') AND LENGTH(reference_number) > 4 AND deposit > 10 ORDER BY unallocated_amount DESC", as_dict=True)
 
     for i in range(0, len(bank_trans_records), n):
         batch_no = batch_no + 1
