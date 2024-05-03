@@ -50,6 +50,25 @@ class BillAdjustmentProcess(JournalUtils):
     def __init__(self):
        super().__init__()
 
+    # Unit-Tested
+    def update_invoice_reference(self, 
+                                 sales_invoice, 
+                                 date, 
+                                 je_name, 
+                                 tds_amount = 0, 
+                                 disallowance_amount = 0):
+        
+        sales_doc = self.fetch_invoice_details(sales_invoice)
+        allocated_amount = tds_amount if tds_amount else disallowance_amount
+        sales_doc.append('custom_reference', {'entry_type': 'Journal Entry'
+                                              ,'entry_name': je_name
+                                              ,'tds_amount': tds_amount
+                                              ,'disallowance_amount': disallowance_amount
+                                              ,'allocated_amount': allocated_amount
+                                              ,'utr_date': date })
+        sales_doc.save()
+        frappe.db.commit()
+
     def process_bill_adjust(self, bill_list):
         for bill_adjt in bill_list:
             invoice = self.fetch_invoice_details(bill_adjt.bill)
@@ -62,6 +81,8 @@ class BillAdjustmentProcess(JournalUtils):
                     je.name = "".join([bill_adjt.bill,'-','TDS'])
                     je = self.add_account_entries(je, invoice, 'Debtors - A', 'TDS - A', bill_adjt.tds)
                     self.save_je(je)
+
+                    self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name, tds_amount= bill_adjt.tds)
                     valid_tds = True
 
             except Exception as e:
@@ -69,6 +90,7 @@ class BillAdjustmentProcess(JournalUtils):
                 error_log.set('doctype_name', 'Bill Adjustment')
                 error_log.set('reference_name', bill_adjt.bill)
                 error_log.set('error_message', '' + str(e))
+                bill_adjt.error_remark = str(e)
                 error_log.save()
 
             try:
@@ -77,6 +99,8 @@ class BillAdjustmentProcess(JournalUtils):
                     je.name = "".join([bill_adjt.bill,'-','DIS'])
                     je = self.add_account_entries(je, invoice, 'Debtors - A', 'Disallowance - A', bill_adjt.disallowance)
                     self.save_je(je)
+                    
+                    self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name, disallowance_amount= bill_adjt.disallowance)
                     valid_dis = True
             
             except Exception as e:
@@ -84,8 +108,10 @@ class BillAdjustmentProcess(JournalUtils):
                 error_log.set('doctype_name', 'Bill Adjustment')
                 error_log.set('reference_name', bill_adjt.bill)
                 error_log.set('error_message', '' + str(e))
+                bill_adjt.error_remark = str(e)
                 error_log.save()
 
+ 
             # Need to refactor this part
             if bill_adjt.tds and bill_adjt.disallowance:
                 if valid_dis and valid_tds:
@@ -123,11 +149,14 @@ class BillAdjustmentProcess(JournalUtils):
 
 @frappe.whitelist()
 def run_bill_adjust():
+    print("Hi")
     n = 100
     batch_number=0
     bills = frappe.get_list('Bill Adjustment', fields = ['bill','tds','disallowance','posting_date'], filters = {'status': 'Open'})
 
-    for _index in range(0, len(bills), n):
-        batch_number = batch_number + 1
-        frappe.enqueue(BillAdjustmentProcess().process_bill_adjust, queue='long', is_async=True, job_name="BillAdjustmentBatch" + str(batch_number), timeout=25000,
-                       bill_list = bills[_index:_index + n])
+    test_method = BillAdjustmentProcess()
+    test_method.process_bill_adjust(bills)
+    # for _index in range(0, len(bills), n):
+    #     batch_number = batch_number + 1
+    #     frappe.enqueue(BillAdjustmentProcess().process_bill_adjust, queue='long', is_async=True, job_name="BillAdjustmentBatch" + str(batch_number), timeout=25000,
+    #                    bill_list = bills[_index:_index + n])
