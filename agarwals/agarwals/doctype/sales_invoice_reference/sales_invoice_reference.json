@@ -7,7 +7,8 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "payment_entry",
+  "entry_type",
+  "entry_name",
   "paid_amount",
   "tds_amount",
   "disallowance_amount",
@@ -37,14 +38,6 @@
    "label": "Allocated Amount"
   },
   {
-   "fieldname": "payment_entry",
-   "fieldtype": "Link",
-   "label": "Payment Entry",
-   "options": "Payment Entry",
-   "search_index": 1,
-   "width": "30"
-  },
-  {
    "fieldname": "tds_amount",
    "fieldtype": "Currency",
    "label": "TDS Amount",
@@ -60,12 +53,26 @@
    "fieldname": "utr_date",
    "fieldtype": "Date",
    "label": "UTR Date"
+  },
+  {
+   "fieldname": "entry_type",
+   "fieldtype": "Link",
+   "label": "Entry Type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "entry_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Entry Name",
+   "options": "entry_type",
+   "search_index": 1,
+   "width": "30"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-04-26 12:21:07.102690",
+ "modified": "2024-05-03 10:38:37.065400",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Sales Invoice Reference",
