@@ -149,14 +149,11 @@ class BillAdjustmentProcess(JournalUtils):
 
 @frappe.whitelist()
 def run_bill_adjust():
-    print("Hi")
     n = 100
     batch_number=0
     bills = frappe.get_list('Bill Adjustment', fields = ['bill','tds','disallowance','posting_date'], filters = {'status': 'Open'})
 
-    test_method = BillAdjustmentProcess()
-    test_method.process_bill_adjust(bills)
-    # for _index in range(0, len(bills), n):
-    #     batch_number = batch_number + 1
-    #     frappe.enqueue(BillAdjustmentProcess().process_bill_adjust, queue='long', is_async=True, job_name="BillAdjustmentBatch" + str(batch_number), timeout=25000,
-    #                    bill_list = bills[_index:_index + n])
+    for _index in range(0, len(bills), n):
+        batch_number = batch_number + 1
+        frappe.enqueue(BillAdjustmentProcess().process_bill_adjust, queue='long', is_async=True, job_name="BillAdjustmentBatch" + str(batch_number), timeout=25000,
+                       bill_list = bills[_index:_index + n])
