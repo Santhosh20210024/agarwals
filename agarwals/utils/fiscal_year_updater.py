@@ -3,7 +3,6 @@ import datetime
 
 def update_year_in_invoice(invoice, year):
     fiscal_years = []
-    print(year)
     for i in year:
         fiscal_years.append({'year':i})
     try:
@@ -22,7 +21,6 @@ def update_year():
     for i in range(0, len(sales_invoices), 1000):
         frappe.enqueue(update_fiscal_year, queue='long', is_async=True, timeout=18000,
                        sales_invoices=sales_invoices[i:i + 1000])
-        print('Enqueued')
 
 def update_fiscal_year(sales_invoices):
     for invoice in sales_invoices:
