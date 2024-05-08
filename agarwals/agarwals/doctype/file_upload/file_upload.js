@@ -3,8 +3,7 @@ var set_css = function () {
   document.querySelectorAll("[data-fieldname='upload']")[1].style.backgroundColor = "#2490EF";
   document.querySelectorAll("[data-fieldname='upload']")[1].style.color = "white";
   document.querySelectorAll("[data-action='delete_rows']")[0].style.display = "None";
-  document.querySelector("[data-fieldname='zip_status']").querySelector("[class='control-input-wrapper']").querySelector("[class='control-value like-disabled-input']").style.color="Green"
-       
+   
 }
 
 // Read Only Validation
@@ -133,6 +132,7 @@ frappe.ui.form.on('File upload', {
     set_css()
   },
   refresh: function (frm) {
+	change_zip_status_color()
     extract_zip(frm)
     process_zip(frm)
     verify_read_only(frm)
@@ -150,3 +150,15 @@ style.textContent = `
     display: none;
 }`;
 document.head.appendChild(style);
+
+var change_zip_status_color=function(){
+	const code=document.querySelector("[data-fieldname='zip_status']").querySelector("[class='control-input-wrapper']").querySelector("[class='control-value like-disabled-input']")
+	var status=code.innerHTML
+	console.log(status)
+	 if (status=="Processed" || status=="Processing"){
+	  code.style.color="Green"
+	 } 
+	 else if(status=="Extracted" || status=="Extracting"){
+		  code.style.color="Red"
+	 } 
+}
