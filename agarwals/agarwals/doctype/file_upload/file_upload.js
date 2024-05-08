@@ -2,7 +2,9 @@
 var set_css = function () {
   document.querySelectorAll("[data-fieldname='upload']")[1].style.backgroundColor = "#2490EF";
   document.querySelectorAll("[data-fieldname='upload']")[1].style.color = "white";
-  document.querySelectorAll("[data-action='delete_rows']")[1].style.display = "None";
+  document.querySelectorAll("[data-action='delete_rows']")[0].style.display = "None";
+  document.querySelector("[data-fieldname='zip_status']").querySelector("[class='control-input-wrapper']").querySelector("[class='control-value like-disabled-input']").style.color="Green"
+       
 }
 
 // Read Only Validation

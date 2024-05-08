@@ -361,7 +361,8 @@ def run_extractor(fid, ffield):
 			frappe.throw('Already Extracted !')
 
 	if not ffield.strip(): ffield = None
-	frappe.enqueue(extract_zip_files, job_name="ZipFileExtracting",  queue='long', is_async=True, timeout=18000, fid = fid, ffield = ffield)
+	# frappe.enqueue(extract_zip_files, job_name="ZipFileExtracting",  queue='long', is_async=True, timeout=18000, fid = fid, ffield = ffield)
+	extract_zip_files(fid=fid,ffield=ffield)
 
 def process_zip_entries(fid):
 
