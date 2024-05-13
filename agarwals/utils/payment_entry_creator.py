@@ -24,30 +24,45 @@ class PaymentEntryCreator:
 
     def process_difference_amount(self, pe_doc, si_doc):
         deductions = []
-        deduction_amount = pe_doc.custom_disallowed_amount + pe_doc.tds_amount
-        difference_amount = pe_doc.total_allocated_amount - pe_doc.paid_amount - deduction_amount
+        disallowance_amount = float(pe_doc.custom_disallowed_amount) if pe_doc.custom_disallowed_amount else 0 
+        tds_amount = float(pe_doc.custom_tds_amount) if pe_doc.custom_tds_amount else 0 
+        deduction_amount = disallowance_amount + tds_amount
+        difference_amount = pe_doc.total_allocated_amount - (pe_doc.paid_amount + deduction_amount)
         
         if difference_amount:
             if difference_amount < 0:
                 pe_doc.total_allocated_amount += difference_amount
             else:
-                deductions.append(self.add_deduction('WriteOff - A', si_doc, "WriteOff", difference_amount))
-
+                prdoc = frappe.new_doc('Payment Entry Deduction')
+                prdoc.account =  "Write Off - A"
+                prdoc.cost_center= si_doc.cost_center
+                prdoc.description = "Write Off"
+                prdoc.branch = si_doc.branch
+                prdoc.entity = si_doc.entity
+                prdoc.branch_type = si_doc.branch_type
+                prdoc.amount = difference_amount
+                prdoc.parent = pe_doc.name
+                prdoc.parentfield = 'deductions'
+                prdoc.parenttype = 'Payment Entry'
+                prdoc.save()
+                frappe.db.commit()
+                deductions.append(prdoc)
         if deductions:
-            pe_doc.append('deductions', deductions)
+            pe_doc.deductions.append(deductions)
         return pe_doc
 
     def process_rounding_off(self, pe_doc, si_doc):
-        deductions = []
+        deductions = pe_doc.deductions
         si_outstanding_amount = frappe.get_value('Sales Invoice', si_doc.name, 'outstanding_amount')
         si_allocated_amount = pe_doc.references[0].allocated_amount
         si_outstanding_amount = si_outstanding_amount - si_allocated_amount
  
         if si_outstanding_amount <= 9.9:
-            deductions.append(self.add_deduction('Write Off - A', si_doc, 'WriteOff', si_outstanding_amount))
+            deductions.append(self.add_deduction('Write Off - A', si_doc, 'WriteOff', round(float(si_outstanding_amount),2)))
  
         if deductions:
-            pe_doc.append('deductions', deductions)
+            pe_doc.references[0].allocated_amount += round(float(si_outstanding_amount),2)
+            pe_doc.set("deductions",deductions)
         
         return pe_doc
    
@@ -60,14 +75,14 @@ class PaymentEntryCreator:
     def create_payment_entry(self, name, si_doc,  bank_account, bt_doc, settled_amount):
         pe_doc = frappe.new_doc('Payment Entry')
         pe_doc.set('name',name)
-        pe_doc.set('custom_si_doc', si_doc.name)
+        pe_doc.set('custom_sales_invoice', si_doc.name)
         pe_doc.set('payment_type', 'Receive')
         pe_doc.set('mode_of_payment', 'Bank Draft')
         pe_doc.set('party_type', 'Customer')
         pe_doc.set('party', si_doc.customer)
         pe_doc.set('bank_account', bt_doc.bank_account)
         pe_doc.set('paid_to', bank_account)
-        pe_doc.set('paid_from', 'Debt_docors - A')
+        pe_doc.set('paid_from', 'Debtors - A')
         pe_doc.set('paid_amount', settled_amount)
         pe_doc.set('received_amount', settled_amount)
         pe_doc.set('reference_no', bt_doc.reference_number)
@@ -82,7 +97,7 @@ class PaymentEntryCreator:
     
     def get_entry_name(self, si_doc):
         existing_payment_entries = frappe.get_list('Payment Entry'
-                                   ,filters={'custom_si_doc':si_doc.name})
+                                   ,filters={'custom_sales_invoice':si_doc.name})
        
         if existing_payment_entries:
             name = si_doc.name + "-" + str(len(existing_payment_entries))
@@ -126,9 +141,9 @@ class PaymentEntryCreator:
                 'reference_name': si_doc.name,
                 'allocated_amount': settled_amount + tds_amount + disallowed_amount
             }]
-            pe_doc.set('references', reference_item)
+            pe_doc.set('references', reference_item) #tested
 
-            if tds_amount > 0:
+            if tds_amount > 0: # tested
                 deductions.append(self.add_deduction('TDS - A', si_doc, 'TDS', tds_amount))
                 pe_doc.set('custom_tds_amount', tds_amount)
  
@@ -138,14 +153,11 @@ class PaymentEntryCreator:
  
             if deductions:
                 pe_doc.set('deductions', deductions)
- 
-            pe_doc.save()
-            frappe.db.commit()
 
-            pe_doc = self.get_document_record('Payment Entry', pe_doc.name) #Should I take after save or not ?
             pe_doc = self.process_rounding_off(pe_doc, si_doc)
-            pe_doc = self.process_payment_entry(pe_doc, si_doc)
+            pe_doc.save()
             pe_doc.submit()
+            frappe.db.commit()
             
             self.update_trans_reference(bt_doc, pe_doc)
             frappe.db.commit()
@@ -169,7 +181,7 @@ class PaymentEntryCreator:
             return None
         return bank_account.account
    
-    def update_invoice_reference(self, si_doc, payment_entry, record):
+    def update_invoice_reference(self, si_doc, payment_entry, record): #tested
         sales_doc = self.get_document_record('Sales Invoice', si_doc)
         sales_doc.append('custom_reference', {'entry_type': 'Payment Entry', 'entry_name': payment_entry.name, 'paid_amount': payment_entry.paid_amount,
                                               'tds_amount': payment_entry.custom_tds_amount, 'disallowance_amount': payment_entry.custom_disallowed_amount,
@@ -179,6 +191,7 @@ class PaymentEntryCreator:
         sales_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'settlement_advice': record.settlement_advice})
         frappe.db.set_value('Matcher', record.name, 'status', 'Processed')
         sales_doc.save()
+        frappe.db.commit()
  
     def process(self, bt_doc_records, match_logic):
         """Process: Create payment entry based on the matcher logic ( MA1-CN, MA3-CN, MA5-BN ) only
@@ -187,10 +200,10 @@ class PaymentEntryCreator:
            Return: None
         """
 
-        if not len(bt_doc_records):
+        if not len(bt_doc_records): #tested
             return
  
-        for transaction_record in bt_doc_records:
+        for transaction_record in bt_doc_records: #tested
             if not transaction_record['date']:
                 self.add_log_error('Bank Transaction', transaction_record['name'], "Date is Null")
                 continue
@@ -205,37 +218,38 @@ class PaymentEntryCreator:
             matcher_records = frappe.db.sql("""
                           SELECT * from `tabMatcher`
                           where match_logic in %(logic)s
-                          AND bt_doc = %(reference_number)s
-                          AND status not in ('Processed', 'Error') 
+                          AND bank_transaction = %(reference_number)s
+                          AND status = 'Open' 
                           order by payment_order ASC, tds_amount DESC , disallowance_amount DESC"""
                           ,values = {'reference_number' : transaction_record.name, 'logic': match_logic}
-                          ,as_dict = True)
+                          ,as_dict = True) #tested
  
-            if matcher_records:
+            if matcher_records: #tested
                 frappe.db.set_value('Bank Transaction', transaction_record['name'], 'custom_advice_status', 'Found')
  
             for record in matcher_records:
                 try:
-                    unallocated_amount = self.get_document_record('Bank Transaction', record.bt_doc).unallocated_amount 
-                    if unallocated_amount == 0: # Already Reconciled
+                    unallocated_amount = self.get_document_record('Bank Transaction', record.bank_transaction).unallocated_amount 
+                    # frappe.msgprint(frappe.db.get_value('Bank Transaction', record.bank_transaction, 'status'))
+                    if frappe.db.get_value('Bank Transaction', record.bank_transaction, 'status') == 'Reconciled': # Already Reconciled
                         self.update_matcher_log(record.name, 'Error', 'Already Reconciled')
                         continue
 
-                    si_doc = self.get_document_record('Sales Invoice', record.si_doc)
-                    if si_doc.status == 'Paid':
+                    si_doc = self.get_document_record('Sales Invoice', record.sales_invoice)
+                    if si_doc.status == 'Paid': # test
                         self.update_matcher_log(record.name, 'Error', 'Already Paid Bill')
                         continue
 
-                    if si_doc.status == 'Cancelled':
+                    if si_doc.status == 'Cancelled': #test
                         self.update_matcher_log(record.name, 'Error', 'Cancelled Bill')
                         continue
 
-                    bank_amount = 0
-                    settled_amount = float(record.settled_amount) if record.settled_amount else 0 
-                    tds_amount = float(record.tds_amount) if record.tds_amount else 0 
-                    disallowance_amount = float(record.disallowance_amount) if record.disallowance_amount else 0 
+                    bank_amount = 0 #tested
+                    settled_amount = round(float(record.settled_amount),2) if record.settled_amount else 0 
+                    tds_amount = round(float(record.tds_amount),2) if record.tds_amount else 0 
+                    disallowance_amount = round(float(record.disallowance_amount),2) if record.disallowance_amount else 0 
                
-                    if record.settlement_advice:
+                    if record.settlement_advice: #tested
                         settlement_advice = self.get_document_record('Settlement Advice', record.settlement_advice)
                         settlement_advice.set('tpa', si_doc.customer)
                         settlement_advice.set('region', si_doc.region)
@@ -251,14 +265,14 @@ class PaymentEntryCreator:
                     if record.claimbook:
                         if record.settlement_advice:
                             settlement_advice.set('insurance_company_name', record.insurance_company_name)
-                            settlement_advice.set('matched_bt_doc', transaction_record['name'])
+                            settlement_advice.set('matched_bank_transaction', transaction_record['name'])
                             settlement_advice.set('matched_claimbook_record', record.claimbook)
                             settlement_advice.set('matched_bill_record', record.si_doc)
                         frappe.db.set_value('ClaimBook', record.claimbook, 'matched_status', 'Matched')
                         frappe.db.set_value('Sales Invoice', si_doc.name, 'custom_insurance_name', record.insurance_company_name)
                     else:
                         if record.settlement_advice:
-                            settlement_advice.set('matched_bt_doc', transaction_record['name'])
+                            settlement_advice.set('matched_bank_transaction', transaction_record['name'])
                             settlement_advice.set('matched_bill_record',record.si_doc)
  
                     if si_doc.outstanding_amount < settled_amount:
@@ -344,29 +358,29 @@ class PaymentEntryCreator:
  
  
 @frappe.whitelist()
-def run_payment_entry(): 
+def run_payment_entry():  # tested
     """"Chunk and matcher logic configurations are handled in Control Panel Side"""
     seq_no = 0 
     chunk_size, m_logic = int(frappe.get_single('Control Panel').payment_matching_chunk_size), tuple(frappe.get_single('Control Panel').match_logic.split(',')) 
 
     bt_doc_records = frappe.db.sql("""SELECT name, bank_account, reference_number, date FROM `tabBank Transaction`
-                                            WHERE name in ( select bt_doc from `tabMatcher` where match_logic in %(m_logic)s and status != 'Processed' )
-                                            AND status IN ('Pending','Unreconciled') AND LENGTH(reference_number) > 4 AND deposit > 8 AND unallocated_amount != 0 ORDER BY unallocated_amount DESC"""
-                                            ,values = { "m_logic" : m_logic }
-                                            ,as_dict=True)
+                                   WHERE name in ( select bank_transaction from `tabMatcher` where match_logic in %(m_logic)s and status = 'Open' )
+                                   AND LENGTH(reference_number) > 4 AND deposit > 8 ORDER BY unallocated_amount DESC"""
+                                   ,values = { "m_logic" : m_logic }
+                                   ,as_dict=True)
  
-    payment = PaymentEntryCreator()
-    payment.process(bt_doc_records = bt_doc_records, match_logic = m_logic)
+    # payment = PaymentEntryCreator()
+    # payment.process(bt_doc_records = bt_doc_records, match_logic = m_logic)
  
-    # for record in range(0, len(bt_doc_records), chunk_size):
-    #     seq_no = seq_no + 1
-    #     frappe.enqueue(PaymentEntryCreator().process
-    #                    ,queue='long'
-    #                    ,is_async=True
-    #                    ,job_name="Batch" + str(seq_no)
-    #                    ,timeout=25000
-    #                    ,bt_doc_records = bt_doc_records[record:record + chunk_size]
-    #                    ,match_logic = m_logic)
+    for record in range(0, len(bt_doc_records), chunk_size):
+        seq_no = seq_no + 1
+        frappe.enqueue(PaymentEntryCreator().process
+                       ,queue='long'
+                       ,is_async=True
+                       ,job_name="Batch" + str(seq_no)
+                       ,timeout=25000
+                       ,bt_doc_records = bt_doc_records[record:record + chunk_size]
+                       ,match_logic = m_logic)
  
  
 # ------------------ Changes need to change in payment entry flow ----------------------
