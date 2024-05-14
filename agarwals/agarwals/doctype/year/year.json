@@ -1,7 +1,8 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2024-05-06 18:10:23.908903",
+ "autoname": "field:year",
+ "creation": "2024-05-03 09:55:40.970761",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -12,20 +13,33 @@
  "fields": [
   {
    "fieldname": "year",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Year",
-   "options": "Year"
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
- "istable": 1,
  "links": [],
- "modified": "2024-05-06 18:10:23.908903",
+ "modified": "2024-05-06 18:09:14.055824",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "Sales Invoice Fiscal Year",
+ "name": "Year",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
- "permissions": [],
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
