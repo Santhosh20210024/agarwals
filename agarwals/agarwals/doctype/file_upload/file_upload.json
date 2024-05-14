@@ -12,6 +12,7 @@
   "document_type",
   "payer_type",
   "bank_account",
+  "wb_date",
   "upload",
   "file",
   "status",
@@ -31,7 +32,7 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment')",
+   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment')||(doc.document_type == \"Write Back\"&& doc.wb_date != null)",
    "fieldname": "upload",
    "fieldtype": "Attach",
    "in_preview": 1,
@@ -54,7 +55,6 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
-   "hidden": 1,
    "label": "Status",
    "options": "Open\nIn Process\nPartial Success\nSuccess\nError"
   },
@@ -66,7 +66,7 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "File Type",
-   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment"
+   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment\nWrite Back\nWrite Off"
   },
   {
    "depends_on": "eval:doc.upload !=null ",
@@ -94,11 +94,17 @@
    "fieldname": "is_bot",
    "fieldtype": "Check",
    "label": "Is Bot"
+  },
+  {
+   "depends_on": "eval:doc.document_type == \"Write Back\"",
+   "fieldname": "wb_date",
+   "fieldtype": "Date",
+   "label": "Writeback Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-29 11:16:03.441110",
+ "modified": "2024-05-15 17:10:20.792767",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",

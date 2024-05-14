@@ -27,6 +27,17 @@ frappe.ui.form.on('File upload', {
 	 }
 });
 
+//date validation
+frappe.ui.form.on('File upload', {
+    date:function(frm){
+        frappe.call({
+            method:"agarwals.agarwals.doctype.fileupload.fileupload.date_validation",
+            args:{
+                writeback_date : frm.doc.date
+            }
+        })
+    }
+})
 // upload button
 frappe.ui.form.on('File upload', {
 	refresh: function (frm) {
