@@ -1,0 +1,278 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-05-14 16:59:40.131832",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "date",
+  "year",
+  "month",
+  "column_break_fgbnp",
+  "region",
+  "column_break_zivl2",
+  "entity",
+  "column_break_zumpx",
+  "branch_type",
+  "status",
+  "bank_account",
+  "company",
+  "section_break_nkyaw",
+  "deposit",
+  "withdrawal",
+  "column_break_vfcov",
+  "currency",
+  "section_break_o3mrw",
+  "description",
+  "reference_number",
+  "column_break_mv5lu",
+  "transaction_id",
+  "transaction_type",
+  "section_break_uz3ao",
+  "payment_entries",
+  "section_break_zpbte",
+  "cg_utr_number",
+  "allocated_amount",
+  "amended_from",
+  "column_break_ra7rc",
+  "unallocated_amount",
+  "party_section",
+  "party_type",
+  "party",
+  "column_break_gyq36",
+  "bank_party_name",
+  "bank_party_account_number",
+  "bank_party_iban"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "WB-.YYYY.-"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "column_break_fgbnp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Created\nProcessed\nCancelled"
+  },
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Data",
+   "label": "Bank Account",
+   "options": "Bank Account"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "section_break_nkyaw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "deposit",
+   "fieldtype": "Currency",
+   "label": "Deposit",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "withdrawal",
+   "fieldtype": "Currency",
+   "label": "Withdrawal",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_vfcov",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "section_break_o3mrw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number"
+  },
+  {
+   "fieldname": "column_break_mv5lu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "transaction_id",
+   "fieldtype": "Data",
+   "label": "Transaction ID"
+  },
+  {
+   "fieldname": "transaction_type",
+   "fieldtype": "Data",
+   "label": "Transaction Type"
+  },
+  {
+   "fieldname": "section_break_uz3ao",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "payment_entries",
+   "fieldtype": "Table",
+   "label": "Payment Entries",
+   "options": "Bank Transaction Payments"
+  },
+  {
+   "fieldname": "section_break_zpbte",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "allocated_amount",
+   "fieldtype": "Currency",
+   "label": "Allocated Amount",
+   "options": "currency"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Bank Transaction"
+  },
+  {
+   "fieldname": "column_break_ra7rc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "unallocated_amount",
+   "fieldtype": "Currency",
+   "label": "Unallocated Amount",
+   "options": "currency"
+  },
+  {
+   "fieldname": "party_section",
+   "fieldtype": "Data",
+   "label": "Payment From / To"
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Link",
+   "label": "Party Type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "party",
+   "fieldtype": "Dynamic Link",
+   "label": "Party",
+   "options": "party_type"
+  },
+  {
+   "fieldname": "column_break_gyq36",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bank_party_name",
+   "fieldtype": "Data",
+   "label": "Party Name/Account Holder (Bank Statement)"
+  },
+  {
+   "fieldname": "bank_party_account_number",
+   "fieldtype": "Data",
+   "label": "Party Account No. (Bank Statement)"
+  },
+  {
+   "fieldname": "bank_party_iban",
+   "fieldtype": "Data",
+   "label": "Party IBAN (Bank Statement)"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "label": "Year",
+   "options": "Year"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Link",
+   "label": "Month",
+   "options": "Month"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Data",
+   "label": "Region"
+  },
+  {
+   "fieldname": "column_break_zivl2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "entity",
+   "fieldtype": "Data",
+   "label": "Entity"
+  },
+  {
+   "fieldname": "column_break_zumpx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch_type",
+   "fieldtype": "Data",
+   "label": "Branch Type"
+  },
+  {
+   "fieldname": "cg_utr_number",
+   "fieldtype": "Data",
+   "label": "CG UTR Number"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-05-14 19:45:20.114491",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Write Back",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
