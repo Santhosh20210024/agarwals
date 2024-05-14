@@ -118,7 +118,7 @@ before_install = "agarwals.utils.create_folders.folder_structure_creation"
 
 override_doctype_class = {
 #	"ToDo": "custom_app.overrides.CustomToDo"
-     "Sales Invoice":"agarwals.Overrides.Sales_Invoice_Override.SalesInvoiceOverride"
+     "Sales Invoice":"agarwals.overrides.sales_invoice_override.SalesInvoiceOverride"
  }
 
 # Document Events

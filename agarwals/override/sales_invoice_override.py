@@ -1676,7 +1676,6 @@ class SalesInvoiceOverride(SellingController):
 
 		outstanding_amount = flt(self.outstanding_amount, self.precision("outstanding_amount"))
 		total = get_total_in_party_account_currency(self)
-		print("-------------------------------------------------------------------------------SalesInvoiceOverride")
 		if not status:
 			if self.docstatus == 2:
 				status = "Cancelled"
