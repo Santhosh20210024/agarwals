@@ -643,8 +643,8 @@ class WritebackTransformer(Transformer):
         self.document_type = 'Write Back'
 
     def get_column_needed(self):
-        return ["Reference Number","Date","Region","Entity","Branch Type","Deposit","WithDrawl","Bank Account","Description","custom_cg_utr_number",
-                "Transaction ID","Transaction Type","Allocated Amount ","Unallocated Amount","Party Type","Party"]
+        return ["reference_number","date","region","entity","branch_type","deposit","withdrawal","bank_account","description","custom_cg_utr_number",
+                "transaction_id","transaction_type","allocated_amount","unallocated_amount","party_type","party","file_upload"]
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -659,9 +659,6 @@ class WritebackTransformer(Transformer):
 
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,["bill","tds","disallowance","posting_date","source_file","file_upload"])
-        # configuration = frappe.get_single('Bank Configuration')
-        # if "posting_date" in self.source_df.columns.values:
-            # self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
+        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
         self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
         return True

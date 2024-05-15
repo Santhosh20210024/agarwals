@@ -46,7 +46,8 @@
   "column_break_gyq36",
   "bank_party_name",
   "bank_party_account_number",
-  "bank_party_iban"
+  "bank_party_iban",
+  "file_upload"
  ],
  "fields": [
   {
@@ -68,7 +69,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Created\nProcessed\nCancelled"
+   "options": "Created\nProcessed\nError\nCancelled"
   },
   {
    "fieldname": "bank_account",
@@ -247,11 +248,16 @@
    "fieldname": "cg_utr_number",
    "fieldtype": "Data",
    "label": "CG UTR Number"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Data",
+   "label": "File Upload"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-14 19:45:20.114491",
+ "modified": "2024-05-15 00:06:11.154504",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Back",
