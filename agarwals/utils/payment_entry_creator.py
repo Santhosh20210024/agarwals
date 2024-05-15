@@ -211,10 +211,16 @@ class PaymentEntryCreator:
  
             for record in matcher_records:
                 try:
-                    if float(record.settled_amount) < 0 or float(record.tds_amount) < 0 or float(record.disallowance_amount) < 0:
+                    
+                    bank_amount = 0 
+                    settled_amount = round(float(record.settled_amount),2) if record.settled_amount else 0 
+                    tds_amount = round(float(record.tds_amount),2) if record.tds_amount else 0 
+                    disallowance_amount = round(float(record.disallowance_amount),2) if record.disallowance_amount else 0 
+                    
+                    if float(settled_amount) < 0 or float(tds_amount) < 0 or float(disallowance_amount) < 0:
                         self.update_matcher_log(record.name, 'Error', 'Amount Should Not Be Negative')
                         continue
-                        
+                    
                     unallocated_amount = self.get_document_record('Bank Transaction', record.bank_transaction).unallocated_amount 
                     if frappe.db.get_value('Bank Transaction', record.bank_transaction, 'status') == 'Reconciled': # Already Reconciled
                         self.update_matcher_log(record.name, 'Error', 'Already Reconciled')
@@ -225,6 +231,11 @@ class PaymentEntryCreator:
                         continue
 
                     si_doc = self.get_document_record('Sales Invoice', record.sales_invoice)
+                    
+                    if si_doc.total < (settled_amount + tds_amount + disallowance_amount):
+                        self.update_matcher_log(record.name, 'Error', 'Claim amount lesser than the cumulative of other amounts')
+                        continue
+                
                     if si_doc.status == 'Paid': 
                         self.update_matcher_log(record.name, 'Error', 'Already Paid Bill')
                         continue
@@ -233,10 +244,6 @@ class PaymentEntryCreator:
                         self.update_matcher_log(record.name, 'Error', 'Cancelled Bill')
                         continue
 
-                    bank_amount = 0 
-                    settled_amount = round(float(record.settled_amount),2) if record.settled_amount else 0 
-                    tds_amount = round(float(record.tds_amount),2) if record.tds_amount else 0 
-                    disallowance_amount = round(float(record.disallowance_amount),2) if record.disallowance_amount else 0 
                
                     if record.settlement_advice: 
                         settlement_advice = self.get_document_record('Settlement Advice', record.settlement_advice)
@@ -352,7 +359,7 @@ def run_payment_entry():
     chunk_size, m_logic = int(frappe.get_single('Control Panel').payment_matching_chunk_size), tuple(frappe.get_single('Control Panel').match_logic.split(',')) 
     bt_doc_records = frappe.db.sql("""SELECT name, bank_account, reference_number, date FROM `tabBank Transaction`
                                    WHERE name in ( select bank_transaction from `tabMatcher` where match_logic in %(m_logic)s and status = 'Open' )
-                                   AND LENGTH(reference_number) > 4 AND deposit > 8 ORDER BY unallocated_amount DESC"""
+                                   AND LENGTH(reference_number) > 4 AND status in ('Pending','Unreconciled') AND deposit > 8 ORDER BY unallocated_amount DESC"""
                                    ,values = { "m_logic" : m_logic }
                                    ,as_dict=True)
  
