@@ -109,9 +109,10 @@ def settlement_advice_staging(advices):
 @frappe.whitelist()
 def process():
         advices_list = frappe.db.sql("SELECT name FROM `tabSettlement Advice Staging` tsas WHERE status = 'Open' OR (status = 'Error' AND retry=1);",as_list=True)
-        n = 1000
-        for i in range(0, len(advices_list), n):
-              frappe.enqueue(settlement_advice_staging, queue='long', is_async=True, job_name="settlement advice staging", timeout=25000,
-                       advices = advices_list[i:i + n])
+        settlement_advice_staging(advices_list)
+        # n = 1000
+        # for i in range(0, len(advices_list), n):
+        #       frappe.enqueue(settlement_advice_staging, queue='long', is_async=True, job_name="settlement advice staging", timeout=25000,
+        #                advices = advices_list[i:i + n])
         
         
