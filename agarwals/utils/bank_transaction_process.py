@@ -38,6 +38,7 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.party_type = transaction.get('payer_type')
     bank_trans_doc.party = transaction.get('payer_name')
     bank_trans_doc.custom_party_group = transaction.get('payer_group')
+    bank_trans_doc.custom_based_on = transaction.get('based_on')
     bank_trans_doc.submit()
     frappe.db.commit()
 
