@@ -508,7 +508,7 @@ class BankTransformer(StagingTransformer):
         return valid
 
     def get_column_needed(self):
-        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number']
+        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number','internal_id']
 
     def get_configuration(self):
         return frappe.get_single('Bank Configuration')
