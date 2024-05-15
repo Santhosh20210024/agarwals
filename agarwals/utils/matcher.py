@@ -73,8 +73,7 @@ class Matcher:
         where
         	(sa.cg_utr_number = bt.custom_cg_utr_number
         		or sa.cg_formatted_utr_number = bt.custom_cg_utr_number )
-        	and sa.cg_formatted_bill_number  = bi.cg_formatted_bill_number 
-        	and CONCAT(bi.name,'-',bt.name) not in (SELECT name FROM `tabMatcher`)
+        	and sa.cg_formatted_bill_number  = bi.cg_formatted_bill_number
             and bi.status != 'Cancelled'
             """
         
