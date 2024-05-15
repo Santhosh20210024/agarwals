@@ -23,36 +23,6 @@ class PaymentEntryCreator:
                       ,'allocated_amount': pe_doc.paid_amount})
         bt_doc.submit()
 
-    # @DeprecationWarning
-    # def process_difference_amount(self, pe_doc, si_doc):
-    #     deductions = []
-    #     disallowance_amount = float(pe_doc.custom_disallowed_amount) if pe_doc.custom_disallowed_amount else 0 
-    #     tds_amount = float(pe_doc.custom_tds_amount) if pe_doc.custom_tds_amount else 0 
-    #     deduction_amount = disallowance_amount + tds_amount
-    #     difference_amount = pe_doc.total_allocated_amount - (pe_doc.paid_amount + deduction_amount)
-        
-    #     if difference_amount:
-    #         if difference_amount < 0:
-    #             pe_doc.total_allocated_amount += difference_amount
-    #         else:
-    #             prdoc = frappe.new_doc('Payment Entry Deduction')
-    #             prdoc.account =  "Write Off - A"
-    #             prdoc.cost_center= si_doc.cost_center
-    #             prdoc.description = "Write Off"
-    #             prdoc.branch = si_doc.branch
-    #             prdoc.entity = si_doc.entity
-    #             prdoc.branch_type = si_doc.branch_type
-    #             prdoc.amount = difference_amount
-    #             prdoc.parent = pe_doc.name
-    #             prdoc.parentfield = 'deductions'
-    #             prdoc.parenttype = 'Payment Entry'
-    #             prdoc.save()
-    #             frappe.db.commit()
-    #             deductions.append(prdoc)
-    #     if deductions:
-    #         pe_doc.deductions.append(deductions)
-    #     return pe_doc
-
     def process_rounding_off(self, pe_doc, si_doc): 
         deductions = []
         si_outstanding_amount = frappe.get_value('Sales Invoice', si_doc.name, 'outstanding_amount')
@@ -109,7 +79,7 @@ class PaymentEntryCreator:
         
         return name
    
-    def validate_entity_closer(self, bt_doc): # Need to test
+    def get_posting_date(self, bt_doc): # Need to test
         closing_date_list = frappe.get_list('Period Closer by Entity',
                                             filters={'entity': bt_doc.custom_entity}
                                             ,order_by = 'creation desc'
@@ -138,7 +108,7 @@ class PaymentEntryCreator:
                                                ,bt_doc
                                                ,settled_amount)
             
-            pe_doc.set('posting_date', self.validate_entity_closer(bt_doc))
+            pe_doc.set('posting_date', self.get_posting_date(bt_doc))
             reference_item = [{
                 'reference_doctype': 'Sales Invoice',
                 'reference_name': si_doc.name,
@@ -146,7 +116,7 @@ class PaymentEntryCreator:
             }]
             pe_doc.set('references', reference_item) 
 
-            if tds_amount > 0: ed
+            if tds_amount > 0:
                 deductions.append(self.add_deduction('TDS - A', si_doc, 'TDS', tds_amount))
                 pe_doc.set('custom_tds_amount', tds_amount)
  
