@@ -211,6 +211,10 @@ class PaymentEntryCreator:
  
             for record in matcher_records:
                 try:
+                    if float(record.settled_amount) < 0 or float(record.tds_amount) < 0 or float(record.disallowance_amount) < 0:
+                        self.update_matcher_log(record.name, 'Error', 'Amount Should Not Be Negative')
+                        continue
+                        
                     unallocated_amount = self.get_document_record('Bank Transaction', record.bank_transaction).unallocated_amount 
                     if frappe.db.get_value('Bank Transaction', record.bank_transaction, 'status') == 'Reconciled': # Already Reconciled
                         self.update_matcher_log(record.name, 'Error', 'Already Reconciled')
