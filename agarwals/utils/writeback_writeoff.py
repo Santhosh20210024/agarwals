@@ -3,9 +3,8 @@ from agarwals.utils.adjust_bill import JournalUtils
 from datetime import datetime
 
 @frappe.whitelist()
-def create_writeback_jv():
-    # "status": ["=", ["Created"]]
-    writeback_list = get_doc_list("Write Back", {}, ["*"])
+def journal_entry_creation():
+    writeback_list = get_doc_list("Write Back", {"status":["=",["Created","Error"]]}, ["*"])
     for writeback in writeback_list:
         try:
             file_upload_name = writeback.file_upload
@@ -18,18 +17,10 @@ def create_writeback_jv():
             je = create_journal_entry("Journal Entry", str(posting_date), writeback.reference_number)
             append_child_table = add_account_entries(je, writeback, company_account)
             jv.save_je(append_child_table)
-            writeback_doc = frappe.get_doc("Write Back", writeback.name)
-            writeback_doc.status = "Processed"
-            writeback_doc.save()
+            writeback.status = "Processed"
+            writeback.save()
         except Exception as e:
-            writeback_doc = frappe.get_doc("Write Back", writeback.name)
-            writeback_doc.status = "Error"
-            writeback_doc.save()
-            error_log = frappe.new_doc('Error Record Log')
-            error_log.set('doctype_name', 'Journal Entry')
-            error_log.set('reference_name', writeback.name)
-            error_log.set('error_message', '' + str(e))
-            error_log.save()
+            print("error", e)
 
 
 def add_account_entries(je, writeback,company_account):
@@ -53,7 +44,6 @@ def add_account_entries(je, writeback,company_account):
 
 def create_journal_entry(type, date, ref_no):
         je = frappe.new_doc('Journal Entry')
-        je.name = ref_no
         je.voucher_type = type
         je.posting_date = date
         je.cheque_no = ref_no
@@ -62,8 +52,3 @@ def create_journal_entry(type, date, ref_no):
 def get_doc_list(doctype,filters,fields):
     doc_list = frappe.get_all(doctype,filters,fields)
     return doc_list
-
-
-
-def create_writeoff_jv():
-    writeoff_list = get_doc_list("Write Off", {}, ["*"])
