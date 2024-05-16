@@ -4,8 +4,7 @@ from datetime import datetime
 
 @frappe.whitelist()
 def create_writeback_jv():
-    # "status": ["=", ["Created"]]
-    writeback_list = get_doc_list("Write Back", {}, ["*"])
+    writeback_list = get_doc_list("Write Back", {"status": ["=", ["Created"]]}, ["*"])
     for writeback in writeback_list:
         try:
             file_upload_name = writeback.file_upload
