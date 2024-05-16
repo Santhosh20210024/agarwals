@@ -132,8 +132,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nCreated\nUnpaid\nError\nCancelled",
-   "read_only": 1
+   "options": "\nCreated\nProcessed\nError\nCancelled"
   },
   {
    "depends_on": "eval: doc.status == \"CANCELLED\"",
@@ -361,7 +360,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-16 14:22:10.482303",
+ "modified": "2024-05-16 16:19:28.497168",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Off",
