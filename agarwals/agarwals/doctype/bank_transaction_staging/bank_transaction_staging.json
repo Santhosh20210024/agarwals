@@ -36,7 +36,8 @@
   "party_details_section",
   "payer_type",
   "payer_name",
-  "payer_group"
+  "payer_group",
+  "internal_id"
  ],
  "fields": [
   {
@@ -205,6 +206,11 @@
    "fieldname": "payer_group",
    "fieldtype": "Data",
    "label": "Payer Group"
+  },
+  {
+   "fieldname": "internal_id",
+   "fieldtype": "Data",
+   "label": "Internal ID"
   }
  ],
  "index_web_pages_for_search": 1,

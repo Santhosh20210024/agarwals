@@ -170,12 +170,12 @@
    "fieldname": "error_code",
    "fieldtype": "Select",
    "label": "Error Code",
-   "options": "\nS100\nS101\nS102\nS103\nS104"
+   "options": "\nS100\nS101\nS102\nS103\nS104\nS105"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-21 09:50:16.120912",
+ "modified": "2024-05-15 20:15:30.775142",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
