@@ -28,8 +28,9 @@
   "claim_status",
   "column_break_notl",
   "category",
-  "payer",
+  "payer_name",
   "customer",
+  "customer_group",
   "amount_section",
   "bill_amount",
   "discount",
@@ -55,7 +56,8 @@
   "sales_invoice_status",
   "invoice_amount",
   "outstanding_amount",
-  "cg_formatted_bill_number"
+  "cg_formatted_bill_number",
+  "file_upload"
  ],
  "fields": [
   {
@@ -130,7 +132,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nRAISED\nCANCELLED",
+   "options": "\nCreated\nUnpaid\nError\nCancelled",
    "read_only": 1
   },
   {
@@ -177,12 +179,6 @@
    "fieldname": "category",
    "fieldtype": "Data",
    "label": "Category",
-   "read_only": 1
-  },
-  {
-   "fieldname": "payer",
-   "fieldtype": "Data",
-   "label": "Payer",
    "read_only": 1
   },
   {
@@ -338,6 +334,23 @@
    "fieldtype": "Data",
    "label": "CG Formatted Bill Number",
    "search_index": 1
+  },
+  {
+   "fieldname": "customer_group",
+   "fieldtype": "Link",
+   "label": "Customer Group",
+   "options": "Customer Group"
+  },
+  {
+   "fieldname": "payer_name",
+   "fieldtype": "Data",
+   "label": "Payer Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Data",
+   "label": "File Upload"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -348,7 +361,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-14 17:00:51.665576",
+ "modified": "2024-05-16 14:22:10.482303",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Off",

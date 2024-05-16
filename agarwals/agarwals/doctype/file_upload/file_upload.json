@@ -13,6 +13,7 @@
   "payer_type",
   "bank_account",
   "wb_date",
+  "wo_date",
   "upload",
   "file",
   "status",
@@ -32,7 +33,7 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment')||(doc.document_type == \"Write Back\"&& doc.wb_date != null)",
+   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment')||(doc.document_type == \"Write Back\"&& doc.wb_date != null)||(doc.document_type == \"Write Off\"&& doc.wo_date != null)",
    "fieldname": "upload",
    "fieldtype": "Attach",
    "in_preview": 1,
@@ -100,11 +101,17 @@
    "fieldname": "wb_date",
    "fieldtype": "Date",
    "label": "Writeback Date"
+  },
+  {
+   "depends_on": "eval:doc.document_type == \"Write Off\"",
+   "fieldname": "wo_date",
+   "fieldtype": "Date",
+   "label": "Writeoff Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-15 17:10:20.792767",
+ "modified": "2024-05-16 12:08:27.788863",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
