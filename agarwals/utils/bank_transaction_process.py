@@ -9,7 +9,8 @@ ERROR_LOG = {
     'E102': 'E102: Both Deposit and Withdrawn should not be empty',
     'E103': 'E103: Should verify the reference number',
     'E104': 'E104: Previously processed and already Reconciled Bank Transaction',
-    'E105': 'E105: Invalidate Update Reference Number'
+    'E105': 'E105: Invalidate Update Reference Number',
+    'E106': 'E106: Deposit Amount must exceed 1 Rupee'
 }
 
 def check_warning(trans_doc, transaction, bnk_trans_ref): 
@@ -37,6 +38,8 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.party_type = transaction.get('payer_type')
     bank_trans_doc.party = transaction.get('payer_name')
     bank_trans_doc.custom_party_group = transaction.get('payer_group')
+    bank_trans_doc.custom_based_on = transaction.get('based_on')
+    bank_trans_doc.custom_internal_id = transaction.get('internal_id')
     bank_trans_doc.submit()
     frappe.db.commit()
 
@@ -77,19 +80,26 @@ def create_bank_transaction(transaction_list):
 
             if int(transaction.get('withdrawal')) != 0:
                 continue
-
+            
+            if int(transaction.get('deposit')) == 1:
+                trans_doc.staging_status = 'Error'
+                trans_doc.error = ERROR_LOG['E106']
+                trans_doc.retry = 0
+                save_trans_doc(trans_doc)
+                continue
+                
             if transaction.get('update_reference_number') != None and transaction.get('retry') == 1:
                 bank_trans_doc = frappe.get_doc('Bank Transaction', transaction.reference_number)
 
                 if int(bank_trans_doc.allocated_amount) == 0:
-                    delete_corrs_doc('Bank Transaction', transaction.get('reference_number'))
-                    if transaction.get('update_reference_number') != None and len(transaction.get('update_reference_number').strip().lstrip('0')) < 5:
+                    if transaction.get('update_reference_number') != None and len(transaction.get('update_reference_number').strip().lstrip('0')) <= 3:
                         trans_doc.staging_status = 'Error'
                         trans_doc.error = ERROR_LOG['E105']
                         trans_doc.retry = 0  
                         save_trans_doc(trans_doc)
                         continue
-                        
+                    
+                    delete_corrs_doc('Bank Transaction', transaction.get('reference_number'))   
                     create_bank_trans_doc(transaction, transaction.get('update_reference_number'))
                     trans_doc = frappe.get_doc('Bank Transaction Staging', transaction.name )
                     trans_doc.previous_utr = transaction.get('reference_number')
@@ -109,7 +119,7 @@ def create_bank_transaction(transaction_list):
 
             elif transaction.get('retry') == 1:
                 if transaction.get('date') is not None:
-                    if transaction.reference_number is None or len(transaction.get('reference_number').strip().lstrip('0')) < 5:
+                    if transaction.reference_number is None or len(transaction.get('reference_number').strip().lstrip('0')) <= 3:
                         transaction.reference_number = '0'
 
                     bnk_trans_ref = create_bank_trans_doc(transaction)
@@ -118,7 +128,7 @@ def create_bank_transaction(transaction_list):
                     frappe.db.commit()
             
             else: 
-                if transaction.reference_number is None or len(transaction.get('reference_number').strip().lstrip('0')) < 5:
+                if transaction.reference_number is None or len(transaction.get('reference_number').strip().lstrip('0')) <= 3:
                     transaction.reference_number = '0'
 
                 bnk_trans_ref = create_bank_trans_doc(transaction)
@@ -158,8 +168,8 @@ def bank_transaction_process(tag):
         if transaction.staging_status == 'Open': 
             pending_transaction.append(transaction)
         
-        if transaction.staging_status == 'Skipped': 
-            pending_transaction.append(transaction)
+        # if transaction.staging_status == 'Skipped': 
+        #     pending_transaction.append(transaction)
 
     # also Check if there is any change in the processed entrys retry
     for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'staging_status' : ['=', 'Processed'], 'update_reference_number' : ['!=', None], 'retry': 1}):

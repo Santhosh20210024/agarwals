@@ -168,8 +168,15 @@ class Transformer:
         self.source_df['hash'] = self.source_df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
 
     def update_status(self, doctype, name, status):
-        frappe.db.set_value(doctype,name,'status',status)
-        frappe.db.commit()
+        if doctype == 'File upload':
+            doc = frappe.get_doc('File upload',name)
+            doc.status = status 
+            doc.save()
+            frappe.db.commit()
+        else:
+            frappe.db.set_value(doctype,name,'status',status)
+            frappe.db.commit()
+            
 
     def update_parent_status(self,file):
         file_record = frappe.get_doc('File upload',file['name'])
@@ -501,7 +508,7 @@ class BankTransformer(StagingTransformer):
         return valid
 
     def get_column_needed(self):
-        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number']
+        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number','internal_id']
 
     def get_configuration(self):
         return frappe.get_single('Bank Configuration')
@@ -524,7 +531,8 @@ class BankTransformer(StagingTransformer):
             for token in map(str.strip, narration.split(delimiter)):
                 if len(token) == length and len(token.strip()) == length:
                     if self.utr_validation(pattern, token):
-                        return token
+                        if not token.startswith("CX"):
+                            return token
 
         return None
 
@@ -549,6 +557,9 @@ class BankTransformer(StagingTransformer):
             length = 12
             pattern = alphanumeric_pattern
         elif "UPI" in narration:
+            length = 12
+            pattern = numeric
+        elif "INFT" in narration:
             length = 12
             pattern = numeric
         else:

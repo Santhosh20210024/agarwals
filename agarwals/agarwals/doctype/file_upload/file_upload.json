@@ -15,7 +15,6 @@
   "bank_account",
   "upload",
   "column_break_ppbz4",
-  "from_bot",
   "source",
   "zip_status",
   "total_count",
@@ -30,6 +29,7 @@
   "mapping_advice",
   "otther_mapping_section",
   "mapping_other"
+  "is_bot"
  ],
  "fields": [
   {
@@ -103,14 +103,6 @@
    "fieldtype": "Select",
    "label": "File Format",
    "options": "\nEXCEL\nZIP"
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:doc.document_type=='Settlement Advice'",
-   "fieldname": "from_bot",
-   "fieldtype": "Check",
-   "label": "From Bot",
-   "read_only": 1
   },
   {
    "fieldname": "column_break_ppbz4",
@@ -198,6 +190,14 @@
    "label": "Source",
    "options": "File upload",
    "read_only": 1
+   "label": "File Name"
+  },
+  {
+   "depends_on": "eval:doc.document_type=='Settlement Advice'",
+   "default": "0",
+   "fieldname": "is_bot",
+   "fieldtype": "Check",
+   "label": "Is Bot"
   }
  ],
  "index_web_pages_for_search": 1,

@@ -70,6 +70,7 @@ class Downloader():
         file_upload_doc=frappe.new_doc("File upload")
         file_upload_doc.document_type="Settlement Advice"
         file_upload_doc.payer_type=self.tpa
+        file_upload_doc.is_bot = 1
         file_upload_doc.upload=file_url
         file_upload_doc.save(ignore_permissions=True)
         self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
