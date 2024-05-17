@@ -13,6 +13,8 @@
   "document_type",
   "payer_type",
   "bank_account",
+  "wb_date",
+  "wo_date",
   "upload",
   "column_break_ppbz4",
   "source",
@@ -44,7 +46,8 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment') || (doc.document_type=='Settlement Advice' && doc.payer_type ==null && doc.file_format == 'ZIP') || (doc.document_type=='Bank Statement' && doc.bank_account == null && doc.file_format == 'ZIP' )",
+
+   "depends_on": "eval:(doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment') || (doc.document_type=='Settlement Advice' && doc.payer_type ==null && doc.file_format == 'ZIP') || (doc.document_type=='Bank Statement' && doc.bank_account == null && doc.file_format == 'ZIP' )||(doc.document_type == \"Write Back\"&& doc.wb_date != null)||(doc.document_type == \"Write Off\"&& doc.wo_date != null)",
    "fieldname": "upload",
    "fieldtype": "Attach",
    "in_preview": 1,
@@ -80,7 +83,7 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "File Type",
-   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment"
+   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment\nWrite Back\nWrite Off"
   },
   {
    "depends_on": "eval:doc.upload !=null ",
@@ -198,11 +201,23 @@
    "fieldname": "is_bot",
    "fieldtype": "Check",
    "label": "Is Bot"
+  },
+  {
+   "depends_on": "eval:doc.document_type == \"Write Back\"",
+   "fieldname": "wb_date",
+   "fieldtype": "Date",
+   "label": "Writeback Date"
+  },
+  {
+   "depends_on": "eval:doc.document_type == \"Write Off\"",
+   "fieldname": "wo_date",
+   "fieldtype": "Date",
+   "label": "Writeoff Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-22 00:54:58.140033",
+ "modified": "2024-05-17 11:24:41.521639",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",

@@ -7,6 +7,10 @@ import openpyxl
 from frappe.model.document import Document
 from agarwals.utils.file_util import construct_file_url, HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER
 
+
+
+
+
 class Fileupload(Document):
 	""" Fileupload is the custom class mainly created for handling the agarwals files"""
 
@@ -434,3 +438,4 @@ def run_zip_entires(fid):
 	# process_zip_entries()
 	frappe.set_value('File upload', fid, 'zip_status', 'Processing')
 	frappe.enqueue(process_zip_entries, job_name="ZipFileProcessing", queue='long', is_async=True, timeout=18000, fid = fid)
+

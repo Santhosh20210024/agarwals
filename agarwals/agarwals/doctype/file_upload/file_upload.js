@@ -36,7 +36,12 @@ function process(frm) {
           });
 })
 
+
+
+// upload button
+
 }
+
 frappe.ui.form.on('File upload', {
     extract: function(frm) {
             extract(frm);	
