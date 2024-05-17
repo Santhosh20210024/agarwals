@@ -24,7 +24,6 @@
   "consultant",
   "claim_details_sb",
   "claim_id",
-  "ma_claim_id",
   "claim_status",
   "column_break_notl",
   "category",
@@ -42,8 +41,6 @@
   "claim_amount",
   "claim_amount_due",
   "hash_value",
-  "claim_key",
-  "ma_claim_key",
   "physical_submission_details_section",
   "column_break_fvwc",
   "verified",
@@ -52,11 +49,7 @@
   "column_break_ahot",
   "final_submission_date",
   "invoice",
-  "invoice_status",
-  "sales_invoice_status",
-  "invoice_amount",
   "outstanding_amount",
-  "cg_formatted_bill_number",
   "file_upload"
  ],
  "fields": [
@@ -159,11 +152,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "ma_claim_id",
-   "fieldtype": "Data",
-   "label": "MA Claim ID"
-  },
-  {
    "fieldname": "claim_status",
    "fieldtype": "Select",
    "label": "Claim Status",
@@ -252,17 +240,6 @@
    "label": "Hash Value"
   },
   {
-   "fieldname": "claim_key",
-   "fieldtype": "Data",
-   "label": "Claim Key",
-   "search_index": 1
-  },
-  {
-   "fieldname": "ma_claim_key",
-   "fieldtype": "Data",
-   "label": "MA Claim Key"
-  },
-  {
    "fieldname": "physical_submission_details_section",
    "fieldtype": "Section Break",
    "label": "Physical Submission Details"
@@ -305,34 +282,10 @@
    "read_only": 1
   },
   {
-   "fieldname": "invoice_status",
-   "fieldtype": "Select",
-   "label": "Invoice Status",
-   "options": "\nRAISED\nCANCELLED"
-  },
-  {
-   "fetch_from": "invoice.status",
-   "fieldname": "sales_invoice_status",
-   "fieldtype": "Data",
-   "label": "Sales Invoice Status"
-  },
-  {
-   "fetch_from": "invoice.total",
-   "fieldname": "invoice_amount",
-   "fieldtype": "Currency",
-   "label": "Invoice Amount"
-  },
-  {
    "fetch_from": "invoice.outstanding_amount",
    "fieldname": "outstanding_amount",
    "fieldtype": "Currency",
    "label": "Outstanding Amount"
-  },
-  {
-   "fieldname": "cg_formatted_bill_number",
-   "fieldtype": "Data",
-   "label": "CG Formatted Bill Number",
-   "search_index": 1
   },
   {
    "fieldname": "customer_group",
@@ -360,7 +313,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-16 16:19:28.497168",
+ "modified": "2024-05-17 10:57:02.827629",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Off",

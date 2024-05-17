@@ -72,6 +72,7 @@ def update_doc_status(doctype,docname, status):
     document = frappe.get_doc(doctype, docname)
     document.status = status
     document.save()
+
 def set_writeback_account_data(writeback,company_account, amount):
     credit_data = {
                 'account': company_account,
@@ -90,10 +91,12 @@ def set_writeback_account_data(writeback,company_account, amount):
                 'debit_in_account_currency': amount,
                 'user_remark': f"writeback_name:{writeback.name},file_upload_name:{writeback.file_upload},bank_transaction:{writeback.reference_number}"}
     return credit_data, debit_data
+
 def add_account_entries(je,credit_data, debit_data):
         je.append('accounts', credit_data)
         je.append('accounts', debit_data)
         return je
+
 def create_journal_entry(type, date, ref_no):
         je = frappe.new_doc('Journal Entry')
         je.voucher_type = type
@@ -101,9 +104,11 @@ def create_journal_entry(type, date, ref_no):
         je.cheque_no = ref_no
         je.cheque_date = datetime.now()
         return je
+
 def get_doc_list(doctype,filters,fields):
     doc_list = frappe.get_all(doctype,filters,fields)
     return doc_list
+
 
 @frappe.whitelist()
 def create_writeoff_jv():
