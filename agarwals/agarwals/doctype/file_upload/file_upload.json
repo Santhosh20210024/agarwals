@@ -16,11 +16,14 @@
   "wb_date",
   "wo_date",
   "upload",
+  "is_bot",
   "column_break_ppbz4",
   "source",
   "zip_status",
   "total_count",
   "processed_count",
+  "extract",
+  "process",
   "section_break_23jfu",
   "status",
   "transform",
@@ -30,8 +33,7 @@
   "settlement_advice_mapping_section",
   "mapping_advice",
   "other_mapping_section",
-  "mapping_other",
-  "is_bot"
+  "mapping_other"
  ],
  "fields": [
   {
@@ -190,17 +192,28 @@
    "depends_on": "eval:doc.source != null",
    "fieldname": "source",
    "fieldtype": "Link",
-   "label": "Source",
+   "label": "File Name",
    "options": "File upload",
-   "read_only": 1,
-   "label": "File Name"
+   "read_only": 1
   },
   {
-   "depends_on": "eval:doc.document_type=='Settlement Advice'",
    "default": "0",
+   "depends_on": "eval:doc.document_type=='Settlement Advice'",
    "fieldname": "is_bot",
    "fieldtype": "Check",
    "label": "Is Bot"
+  },
+  {
+   "depends_on": "eval:doc.zip_status == 'Open' && doc.file_format == 'ZIP' && doc.upload != null",
+   "fieldname": "extract",
+   "fieldtype": "Button",
+   "label": "Extract"
+  },
+  {
+   "depends_on": "eval:doc.zip_status==\"Extracted\" && doc.file_format == 'ZIP'",
+   "fieldname": "process",
+   "fieldtype": "Button",
+   "label": "Process"
   },
   {
    "depends_on": "eval:doc.document_type == \"Write Back\"",
@@ -217,7 +230,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-17 11:24:41.521639",
+ "modified": "2024-05-17 13:46:31.312156",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",

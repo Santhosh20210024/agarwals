@@ -217,7 +217,7 @@ class Fileupload(Document):
 
 		# To avoid the entire validation for non-open files		
 		if self.status in ['In Process', 'Partial Success', 'Success', 'Error' ]:
-			frappe.throw("Can't change the entries once it's processed")
+			return
 
 		if self.status == 'Zip' and self.zip_status in ['Open', 'Extracting', 'Extracted', 'Processed', 'Processing']:
 			return
