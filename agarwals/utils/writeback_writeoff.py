@@ -22,7 +22,7 @@ def create_writeback_jv():
                         company_account_list = get_doc_list("Bank Account",{"name":account_name},["*"])
                         company_account = company_account_list[0].account
                         # init je
-                        je = create_journal_entry("Journal Entry", str(posting_date), writeback.reference_number)
+                        je = create_journal_entry("Journal Entry", str(posting_date), writeback.reference_number,"WB")
                         # append account_details
                         credit_data, debit_data = set_writeback_account_data(writeback, company_account,bank_transaction.unallocated_amount)
                         append_child_table = add_account_entries(je,credit_data, debit_data)
@@ -97,8 +97,9 @@ def add_account_entries(je,credit_data, debit_data):
         je.append('accounts', debit_data)
         return je
 
-def create_journal_entry(type, date, ref_no):
+def create_journal_entry(type, date, ref_no, doctype):
         je = frappe.new_doc('Journal Entry')
+        je.name = f"{ref_no} - doctype"
         je.voucher_type = type
         je.posting_date = date
         je.cheque_no = ref_no
@@ -127,7 +128,7 @@ def create_writeoff_jv():
                         posting_date = file_upload_list[0].wo_date
                         debt_account = "Debtors - A"
                         #init je
-                        je = create_journal_entry("Journal Entry", str(posting_date), writeoff.bill_no)
+                        je = create_journal_entry("Journal Entry", str(posting_date), writeoff.bill_no, "WO")
                         je.bill_no = writeoff.name
                         je.bill_date = writeoff.bill_date
                         #append account_details
