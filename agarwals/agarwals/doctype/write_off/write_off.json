@@ -1,0 +1,339 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:bill_no",
+ "creation": "2024-05-14 17:00:51.665576",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "entity",
+  "region",
+  "cost_center",
+  "branch",
+  "branch_type",
+  "bill_no",
+  "bill_date",
+  "column_break_kire",
+  "mrn",
+  "patient_name",
+  "bedtype",
+  "status",
+  "cancelled_date",
+  "consultant",
+  "claim_details_sb",
+  "claim_id",
+  "claim_status",
+  "column_break_notl",
+  "category",
+  "payer_name",
+  "customer",
+  "customer_group",
+  "amount_section",
+  "bill_amount",
+  "discount",
+  "net_amount",
+  "paid_amount",
+  "column_break_ogdr",
+  "due_amount",
+  "refund",
+  "claim_amount",
+  "claim_amount_due",
+  "hash_value",
+  "physical_submission_details_section",
+  "column_break_fvwc",
+  "verified",
+  "column_break_xpfe",
+  "submission_date",
+  "column_break_ahot",
+  "final_submission_date",
+  "invoice",
+  "outstanding_amount",
+  "file_upload"
+ ],
+ "fields": [
+  {
+   "fieldname": "entity",
+   "fieldtype": "Link",
+   "label": "Entity",
+   "options": "Entity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Data",
+   "label": "Region",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch_type",
+   "fieldtype": "Data",
+   "label": "Branch Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bill_no",
+   "fieldtype": "Data",
+   "label": "Bill Number",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "bill_date",
+   "fieldtype": "Datetime",
+   "label": "Bill Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_kire",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mrn",
+   "fieldtype": "Data",
+   "label": "MRN",
+   "read_only": 1
+  },
+  {
+   "fieldname": "patient_name",
+   "fieldtype": "Data",
+   "label": "Patient Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bedtype",
+   "fieldtype": "Data",
+   "label": "Bed Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nCreated\nProcessed\nError\nCancelled"
+  },
+  {
+   "depends_on": "eval: doc.status == \"CANCELLED\"",
+   "fieldname": "cancelled_date",
+   "fieldtype": "Datetime",
+   "label": "Cancelled Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "consultant",
+   "fieldtype": "Data",
+   "label": "Consultant",
+   "read_only": 1
+  },
+  {
+   "fieldname": "claim_details_sb",
+   "fieldtype": "Section Break",
+   "label": "Claim Details"
+  },
+  {
+   "fieldname": "claim_id",
+   "fieldtype": "Data",
+   "label": "Claim ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "claim_status",
+   "fieldtype": "Select",
+   "label": "Claim Status",
+   "options": "\nFull Due\nNo Due\nPartial Due\n\\N",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_notl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "payer.payer_final_name",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount_section",
+   "fieldtype": "Section Break",
+   "label": "Amount"
+  },
+  {
+   "fieldname": "bill_amount",
+   "fieldtype": "Currency",
+   "label": "Bill Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Currency",
+   "label": "Discount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "net_amount",
+   "fieldtype": "Currency",
+   "label": "Net Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ogdr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "due_amount",
+   "fieldtype": "Currency",
+   "label": "Due Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "refund",
+   "fieldtype": "Currency",
+   "label": "Refund",
+   "read_only": 1
+  },
+  {
+   "fieldname": "claim_amount",
+   "fieldtype": "Currency",
+   "label": "Claim Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "claim_amount_due",
+   "fieldtype": "Currency",
+   "label": "Claim Amount Due",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hash_value",
+   "fieldtype": "Read Only",
+   "hidden": 1,
+   "label": "Hash Value"
+  },
+  {
+   "fieldname": "physical_submission_details_section",
+   "fieldtype": "Section Break",
+   "label": "Physical Submission Details"
+  },
+  {
+   "fieldname": "column_break_fvwc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "verified",
+   "fieldtype": "Check",
+   "label": "Verified"
+  },
+  {
+   "fieldname": "column_break_xpfe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "submission_date",
+   "fieldtype": "Datetime",
+   "label": "Submission Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ahot",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "final_submission_date",
+   "fieldtype": "Datetime",
+   "label": "Final Submission Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "invoice",
+   "fieldtype": "Link",
+   "label": "Invoice",
+   "options": "Sales Invoice",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "invoice.outstanding_amount",
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "label": "Outstanding Amount"
+  },
+  {
+   "fieldname": "customer_group",
+   "fieldtype": "Link",
+   "label": "Customer Group",
+   "options": "Customer Group"
+  },
+  {
+   "fieldname": "payer_name",
+   "fieldtype": "Data",
+   "label": "Payer Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Data",
+   "label": "File Upload"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "Sales Invoice",
+   "link_fieldname": "name"
+  }
+ ],
+ "modified": "2024-05-17 10:57:02.827629",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Write Off",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

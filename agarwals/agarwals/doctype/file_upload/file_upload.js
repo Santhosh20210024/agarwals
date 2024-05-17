@@ -35,7 +35,8 @@ function process(frm) {
             }
           });
 })
-}
+
+
 frappe.ui.form.on('File upload', {
     extract: function(frm) {
             extract(frm);	
