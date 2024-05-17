@@ -127,23 +127,25 @@ class Fileupload(Document):
 	def on_trash(self):
 		self.delete_backend_files(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0] , self.upload.split("/")[-1]))
 
-@frappe.whitelist()
-def date_validation(writeback_date):
-	pattern = "(\d+)-(\d+)-(\d+)"
-	control_panel = frappe.get_single("Control Panel")
-	cp_end_date = control_panel.date
-	write_back_date, write_back_month,write_back_year = split_date(pattern, writeback_date)
-	cp_date, cp_month, cp_year = split_date(pattern,cp_end_date)
 
-	if write_back_date != cp_date and write_back_month != cp_month:
-		frappe.throw("Please select the date/month specified in the control panel")
-
-def split_date(pattern, full_date):
-	try:
-		re_date = re.findall(pattern, full_date)
-		date = re_date[2]
-		month = re_date[1]
-		year = re_date[0]
-		return date, month, year
-	except Exception as e:
-		frappe.throw("could not process date/Date is invalid in file upload")
+# if customer needs validation for date
+# @frappe.whitelist()
+# def date_validation(writeback_date):
+# 	pattern = "(\d+)-(\d+)-(\d+)"
+# 	control_panel = frappe.get_single("Control Panel")
+# 	cp_end_date = control_panel.date
+# 	write_back_date, write_back_month,write_back_year = split_date(pattern, writeback_date)
+# 	cp_date, cp_month, cp_year = split_date(pattern,cp_end_date)
+#
+# 	if write_back_date != cp_date and write_back_month != cp_month:
+# 		frappe.throw("Please select the date/month specified in the control panel")
+#
+# def split_date(pattern, full_date):
+# 	try:
+# 		re_date = re.findall(pattern, full_date)
+# 		date = re_date[2]
+# 		month = re_date[1]
+# 		year = re_date[0]
+# 		return date, month, year
+# 	except Exception as e:
+# 		frappe.throw("could not process date/Date is invalid in file upload")
