@@ -189,7 +189,7 @@
    "fieldtype": "Link",
    "label": "Source",
    "options": "File upload",
-   "read_only": 1
+   "read_only": 1,
    "label": "File Name"
   },
   {
