@@ -15,10 +15,6 @@ const verify_read_only = (frm) => {
   frm.set_df_property("file", "read_only", isOldDocument);
   frm.set_df_property("file_format", "read_only", isOldDocument);
 }
-frappe.ui.form.on('File upload', {
-    }
-    }
-);
 function process(frm) {
 	frappe.confirm(
         'Are you sure you want to perform this action ?',
