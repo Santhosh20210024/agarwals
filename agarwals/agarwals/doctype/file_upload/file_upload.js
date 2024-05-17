@@ -15,10 +15,6 @@ const verify_read_only = (frm) => {
   frm.set_df_property("file", "read_only", isOldDocument);
   frm.set_df_property("file_format", "read_only", isOldDocument);
 }
-frappe.ui.form.on('File upload', {
-    }
-    }
-);
 function process(frm) {
 	frappe.confirm(
         'Are you sure you want to perform this action ?',
@@ -39,14 +35,12 @@ function process(frm) {
             }
           });
 })
-
 }
 frappe.ui.form.on('File upload', {
     extract: function(frm) {
             extract(frm);	
         },process: function(frm) {
             process(frm);
-        
     }
 }
 ); 
@@ -80,23 +74,32 @@ frappe.ui.form.on('File upload',{
   }
 });
 
-function update_payer_button(frm){
-	var addButton = document.createElement('button');
-	addButton.innerText = 'Update';
-	addButton.className = 'btn btn-xs btn-secondary grid-add-row';
-	
-	addButton.addEventListener('click', function() {
-		 update_payer(frm)
-	});
-	if(frm.doc.document_type=="Bank Statement"){
-	var gridButtons = frm.fields_dict['mapping_bank'].grid.wrapper.find('.grid-buttons');
-	gridButtons.append(addButton);
-	}
-	if(frm.doc.document_type=="Settlement Advice"){
-		var gridButtons = frm.fields_dict['mapping_advice'].grid.wrapper.find('.grid-buttons');
-	    gridButtons.append(addButton);
+function update_payer_button(frm) {
+    var addButton = document.createElement('button');
+    addButton.innerText = 'Update';
+    addButton.className = 'btn btn-xs btn-secondary grid-add-row custom-update-button'; // Added a unique class
+    
+    addButton.addEventListener('click', function() {
+        update_payer(frm);
+    });
+
+    if (frm.doc.document_type == "Bank Statement") {
+        var gridButtons = frm.fields_dict['mapping_bank'].grid.wrapper.find('.grid-buttons');
+        // Check if the button is already present
+        if (gridButtons.find('.custom-update-button').length === 0) {
+            gridButtons.append(addButton);
+        }
+        console.log("-------------", gridButtons);
+    }
+    if (frm.doc.document_type == "Settlement Advice") {
+        var gridButtons = frm.fields_dict['mapping_advice'].grid.wrapper.find('.grid-buttons');
+        // Check if the button is already present
+        if (gridButtons.find('.custom-update-button').length === 0) {
+            gridButtons.append(addButton);
+        }
+    }
 }
-}
+
 var style = document.createElement('style');
 style.textContent = `
   .btn.btn-secondary.btn-sm.btn-modal-secondary {
@@ -140,7 +143,9 @@ function update_payer(frm){
 				frappe.model.set_value("Settlement Advice Mapping",child_row[i],"payer_name",values.payer)
 				frm.refresh_field("mapping_advice")
 			   }
-		   d.hide();
+		     frm.doc.save()
+			 d.hide();
+
         }
     });
     d.show();
