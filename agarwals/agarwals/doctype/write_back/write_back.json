@@ -54,10 +54,12 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "Created",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Created\nProcessed\nError\nCancelled"
+   "options": "Created\nProcessed\nError\nCancelled",
+   "read_only": 1
   },
   {
    "fieldname": "bank_account",
@@ -183,7 +185,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-17 10:54:26.500547",
+ "modified": "2024-05-17 17:54:31.886970",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Back",

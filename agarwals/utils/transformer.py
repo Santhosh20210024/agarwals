@@ -671,7 +671,7 @@ class WriteoffTransformer(Transformer):
 
     def get_column_needed(self):
         return ["bill_no","bill_date","customer","customer_group","claim_amount","outstanding_amount","branch","entity","region","mrn",
-                "patient_name","claim_id","ma_claim_id","payer_name","status","file_upload"]
+                "patient_name","claim_id","ma_claim_id","payer_name","file_upload"]
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
