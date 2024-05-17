@@ -1,4 +1,3 @@
-// Added for the Upload Button
 var set_css = function () {
   document.querySelectorAll("[data-fieldname='upload']")[1].style.backgroundColor = "#2490EF";
   document.querySelectorAll("[data-fieldname='upload']")[1].style.color = "white";
@@ -37,11 +36,17 @@ function process(frm) {
 })
 
 
+
+// upload button
+
+}
+
 frappe.ui.form.on('File upload', {
     extract: function(frm) {
             extract(frm);	
         },process: function(frm) {
             process(frm);
+        
     }
 }
 ); 
@@ -75,32 +80,23 @@ frappe.ui.form.on('File upload',{
   }
 });
 
-function update_payer_button(frm) {
-    var addButton = document.createElement('button');
-    addButton.innerText = 'Update';
-    addButton.className = 'btn btn-xs btn-secondary grid-add-row custom-update-button'; // Added a unique class
-    
-    addButton.addEventListener('click', function() {
-        update_payer(frm);
-    });
-
-    if (frm.doc.document_type == "Bank Statement") {
-        var gridButtons = frm.fields_dict['mapping_bank'].grid.wrapper.find('.grid-buttons');
-        // Check if the button is already present
-        if (gridButtons.find('.custom-update-button').length === 0) {
-            gridButtons.append(addButton);
-        }
-        console.log("-------------", gridButtons);
-    }
-    if (frm.doc.document_type == "Settlement Advice") {
-        var gridButtons = frm.fields_dict['mapping_advice'].grid.wrapper.find('.grid-buttons');
-        // Check if the button is already present
-        if (gridButtons.find('.custom-update-button').length === 0) {
-            gridButtons.append(addButton);
-        }
-    }
+function update_payer_button(frm){
+	var addButton = document.createElement('button');
+	addButton.innerText = 'Update';
+	addButton.className = 'btn btn-xs btn-secondary grid-add-row';
+	
+	addButton.addEventListener('click', function() {
+		 update_payer(frm)
+	});
+	if(frm.doc.document_type=="Bank Statement"){
+	var gridButtons = frm.fields_dict['mapping_bank'].grid.wrapper.find('.grid-buttons');
+	gridButtons.append(addButton);
+	}
+	if(frm.doc.document_type=="Settlement Advice"){
+		var gridButtons = frm.fields_dict['mapping_advice'].grid.wrapper.find('.grid-buttons');
+	    gridButtons.append(addButton);
 }
-
+}
 var style = document.createElement('style');
 style.textContent = `
   .btn.btn-secondary.btn-sm.btn-modal-secondary {
@@ -144,9 +140,7 @@ function update_payer(frm){
 				frappe.model.set_value("Settlement Advice Mapping",child_row[i],"payer_name",values.payer)
 				frm.refresh_field("mapping_advice")
 			   }
-		     frm.doc.save()
-			 d.hide();
-
+		   d.hide();
         }
     });
     d.show();
@@ -179,4 +173,3 @@ if(frm.doc.document_type=="Bank Statement"){
     d.show();
 }}
 }
-	
