@@ -27,8 +27,8 @@
   "mapping_bank",
   "settlement_advice_mapping_section",
   "mapping_advice",
-  "otther_mapping_section",
-  "mapping_other"
+  "other_mapping_section",
+  "mapping_other",
   "is_bot"
  ],
  "fields": [
@@ -173,7 +173,7 @@
   {
    "collapsible": 1,
    "depends_on": "eval:doc.status == 'Zip' && ( doc.document_type == 'Claim Book' || doc.document_type == 'Debtors Report')",
-   "fieldname": "otther_mapping_section",
+   "fieldname": "other_mapping_section",
    "fieldtype": "Section Break",
    "label": "Otther Mapping"
   },
