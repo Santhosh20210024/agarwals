@@ -372,7 +372,7 @@ def process(args):
         seq_no = 0
         chunk_size = int(args["chunk_size"])
         m_logic = tuple(frappe.get_single('Control Panel').match_logic.split(','))
-        bt_doc_records = frappe.db.sql("""SELECT name, bank_account, reference_number, date FROM `tabBank Transaction`
+        bt_doc_records = frappe.db.sql("""SELECT name, bank_account, reference_number, date, custom_entity FROM `tabBank Transaction`
                                    WHERE name in ( select bank_transaction from `tabMatcher` where match_logic in %(m_logic)s and status = 'Open' )
                                    AND LENGTH(reference_number) > 4 AND status in ('Pending','Unreconciled') AND deposit > 8 ORDER BY unallocated_amount DESC"""
                                    ,values = { "m_logic" : m_logic }
