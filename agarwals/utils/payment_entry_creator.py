@@ -362,15 +362,13 @@ def run_payment_entry():
                                    AND LENGTH(reference_number) > 4 AND status in ('Pending','Unreconciled') AND deposit > 8 ORDER BY unallocated_amount DESC"""
                                    ,values = { "m_logic" : m_logic }
                                    ,as_dict=True)
-    doc = PaymentEntryCreator()
-    doc.process(bt_doc_records = bt_doc_records, match_logic= m_logic)
- 
-    # for record in range(0, len(bt_doc_records), chunk_size):
-    #     seq_no = seq_no + 1
-    #     frappe.enqueue(PaymentEntryCreator().process
-    #                    ,queue='long'
-    #                    ,is_async=True
-    #                    ,job_name="Batch" + str(seq_no)
-    #                    ,timeout=25000
-    #                    ,bt_doc_records = bt_doc_records[record:record + chunk_size]
-    #                    ,match_logic = m_logic)
+    
+    for record in range(0, len(bt_doc_records), chunk_size):
+        seq_no = seq_no + 1
+        frappe.enqueue(PaymentEntryCreator().process
+                       ,queue='long'
+                       ,is_async=True
+                       ,job_name="Batch" + str(seq_no)
+                       ,timeout=25000
+                       ,bt_doc_records = bt_doc_records[record:record + chunk_size]
+                       ,match_logic = m_logic)
