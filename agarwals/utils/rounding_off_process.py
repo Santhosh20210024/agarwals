@@ -1,5 +1,5 @@
 import frappe
-from agarwals.utils.adjust_bill import JournalUtils
+from agarwals.reconciliation.step.adjust_bill import JournalUtils
 
 
 class RoundOffCreation(JournalUtils):

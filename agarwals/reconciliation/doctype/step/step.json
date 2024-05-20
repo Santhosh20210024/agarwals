@@ -1,0 +1,138 @@
+{
+ "actions": [],
+ "autoname": "format: STP-{YY}-{MM}-{DD}-{##########}",
+ "creation": "2024-04-02 16:14:27.058157",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "method",
+  "priority",
+  "start_time",
+  "end_time",
+  "job_id",
+  "status",
+  "parameter",
+  "replace_value",
+  "stop_if_error",
+  "number_of_workers",
+  "queue"
+ ],
+ "fields": [
+  {
+   "fieldname": "method",
+   "fieldtype": "Select",
+   "label": "Method",
+   "options": "\nagarwals.reconciliation.step.transform\nagarwals.reconciliation.step.sales_invoice_creator\nagarwals.reconciliation.step.insurance_tagger\nagarwals.reconciliation.step.payer_match\nagarwals.reconciliation.step.transcation_creator\nagarwals.reconciliation.step.advice_creator\nagarwals.reconciliation.step.claim_key_mapper\nagarwals.reconciliation.step.matcher\nagarwals.reconciliation.step.payment_entry_creator\nagarwals.reconciliation.step.adjust_bill\nagarwals.reconciliation.step.advice_downloader",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "job_id",
+   "fieldtype": "Link",
+   "label": "Job ID",
+   "options": "Job",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nInProgress\nProcessed\nError"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "stop_if_error",
+   "fieldtype": "Check",
+   "label": "Stop if error",
+   "read_only": 1
+  },
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Code",
+   "label": "Parameter",
+   "read_only": 1
+  },
+  {
+   "fieldname": "replace_value",
+   "fieldtype": "Code",
+   "label": "Replace Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "queue",
+   "fieldtype": "Data",
+   "label": "Queue"
+  },
+  {
+   "fieldname": "number_of_workers",
+   "fieldtype": "Int",
+   "label": "Number of Workers"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "link_doctype": "Chunk",
+   "link_fieldname": "step_id"
+  }
+ ],
+ "modified": "2024-05-17 17:27:19.146890",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Step",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Open"
+  },
+  {
+   "color": "Yellow",
+   "title": "InProgress"
+  },
+  {
+   "color": "Green",
+   "title": "Processed"
+  },
+  {
+   "color": "Red",
+   "title": "Error"
+  }
+ ]
+}
