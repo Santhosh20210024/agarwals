@@ -1,7 +1,6 @@
 import frappe
 import shutil
 import zipfile
-import magic
 import os
 import openpyxl
 from frappe.model.document import Document
@@ -86,31 +85,6 @@ class Fileupload(Document):
 				fid = corres_fdoc[0]['name']
 				err = 'Duplicate File Error: The file being uploaded already exists. Please check.'
 				self.del_file_record(fid, fname, err)
-
-	
-	def is_valid_excel_file(self, fname, fid):
-		if os.path.exists(construct_file_url(SITE_PATH, SHELL_PATH, fname)):
-			mime = magic.Magic(mime=True)
-			file_mime = mime.from_file(construct_file_url(SITE_PATH, SHELL_PATH, fname))
-			print(file_mime)
-			if file_mime not in [
-			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # XLSX
-			'application/vnd.ms-excel',                                           # XLS
-			'text/csv',                                                           # CSV
-			'application/vnd.ms-excel.sheet.binary.macroenabled.12',              # XLSB
-			]:
-				err = "Excel File is Invalid!"
-				self.del_file_record(fid, fname, err)
-
-	def is_valid_zip_file(self, fname, fid):
-		if os.path.exists(construct_file_url(SITE_PATH, SHELL_PATH, fname)):
-			mime = magic.Magic(mime=True)
-			file_mime = mime.from_file(construct_file_url(SITE_PATH, SHELL_PATH, fname))
-			if file_mime not in [
-			 'application/zip'    												# ZIP
-			]:
-				err = "Zip File is Invalid!"
-				self.del_file_record(fid, fname, err)
 	
 	def validate_file_format(self, fname, fid):
 		file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
@@ -122,15 +96,14 @@ class Fileupload(Document):
 
 		if self.file_format == 'EXCEL':
 			if extension in ['XLSX','XLS','CSV','XLSB']:
-				self.is_valid_excel_file(fname, fid)
+				return
 			else:
 				err = f"EXCEL Format: Should upload files such as ('XLSX', 'XLS','CSV','XLSB')"
 				self.del_file_record(fid, fname, err)
 
 		if self.file_format == 'ZIP':
 			if extension == self.file_format:
-				self.is_valid_zip_file(fname, fid)
-				# self.is_duplicate_file(fname, fid)
+				return
 			else:
 				err = f"ZIP Format: Should upload zip file only"
 				self.del_file_record(fid, fname, err)
@@ -420,7 +393,7 @@ def process_zip_entries(fid):
 	frappe.db.commit()
 
 @frappe.whitelist()
-def run_zip_entires(fid):
+def process_zip_entires(fid):
 	fdoc = frappe.get_doc('File upload', fid)
 
 	if fdoc.zip_status == 'Processed':
@@ -435,7 +408,8 @@ def run_zip_entires(fid):
 	if fdoc.document_type == 'Bank Statement':
 		if len(frappe.get_list('Bank Account Mapping', filters= {'parent': fid, 'bank_account':['=', '']})) > 0:
 			frappe.throw("Please select bank account for all the mapping records")
+
 	# process_zip_entries()
 	frappe.set_value('File upload', fid, 'zip_status', 'Processing')
-	frappe.enqueue(process_zip_entries, job_name="ZipFileProcessing", queue='long', is_async=True, timeout=18000, fid = fid)
+	frappe.enqueue(process_zip_entries, job_name = "ZipFileProcessing", queue = 'long', is_async = True, timeout = 18000, fid = fid)
 
