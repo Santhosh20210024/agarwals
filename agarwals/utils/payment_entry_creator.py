@@ -232,7 +232,7 @@ class PaymentEntryCreator:
 
                     si_doc = self.get_document_record('Sales Invoice', record.sales_invoice)
                     
-                    if si_doc.total < (settled_amount + tds_amount + disallowance_amount):
+                    if si_doc.outstanding_amount < (settled_amount + tds_amount + disallowance_amount):
                         self.update_matcher_log(record.name, 'Error', 'Claim amount lesser than the cumulative of other amounts')
                         continue
                 
@@ -273,7 +273,7 @@ class PaymentEntryCreator:
                     if si_doc.outstanding_amount < settled_amount:
                         settled_amount = si_doc.outstanding_amount
  
-                    if si_doc.outstanding_amount < settled_amount + tds_amount + disallowance_amount:
+                    if si_doc.total < settled_amount + tds_amount + disallowance_amount:
                        
                         if si_doc.outstanding_amount >= settled_amount + tds_amount:
                             payment_entry = self.process_payment_entry(
@@ -357,12 +357,12 @@ def run_payment_entry():
     """"Chunk and matcher logic configurations are handled in Control Panel Side"""
     seq_no = 0 
     chunk_size, m_logic = int(frappe.get_single('Control Panel').payment_matching_chunk_size), tuple(frappe.get_single('Control Panel').match_logic.split(',')) 
-    bt_doc_records = frappe.db.sql("""SELECT name, bank_account, reference_number, date FROM `tabBank Transaction`
+    bt_doc_records = frappe.db.sql("""SELECT name, bank_account, reference_number, date, custom_entity FROM `tabBank Transaction`
                                    WHERE name in ( select bank_transaction from `tabMatcher` where match_logic in %(m_logic)s and status = 'Open' )
                                    AND LENGTH(reference_number) > 4 AND status in ('Pending','Unreconciled') AND deposit > 8 ORDER BY unallocated_amount DESC"""
                                    ,values = { "m_logic" : m_logic }
                                    ,as_dict=True)
- 
+    
     for record in range(0, len(bt_doc_records), chunk_size):
         seq_no = seq_no + 1
         frappe.enqueue(PaymentEntryCreator().process
