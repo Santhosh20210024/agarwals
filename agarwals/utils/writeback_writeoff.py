@@ -99,7 +99,7 @@ def add_account_entries(je,credit_data, debit_data):
 
 def create_journal_entry(type, date, ref_no, doctype):
         je = frappe.new_doc('Journal Entry')
-        je.name = f"{ref_no} - {doctype}"
+        je.name = f"{ref_no}-{doctype}"
         je.voucher_type = type
         je.posting_date = date
         je.cheque_no = ref_no
