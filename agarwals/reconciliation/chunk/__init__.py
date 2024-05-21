@@ -1,7 +1,7 @@
 import frappe
 
 def create_chunk(step_id):
-    if not step_id:
+    if not step_id or step_id == '':
         return None
     chunk = frappe.new_doc("Chunk")
     chunk.step_id = step_id
@@ -10,7 +10,7 @@ def create_chunk(step_id):
     return chunk
 
 def update_status(chunk, status):
-    if not chunk:
+    if not chunk or chunk == '':
         return None
     chunk.status = status
     chunk.save()

@@ -243,6 +243,7 @@ def is_document_naming_rule(doctype):
 @frappe.whitelist()
 def process(args):
     try:
+        args = cast_to_dic(args)
         tag = 'Credit Payment'
         if not is_document_naming_rule('Bank Transaction'):
             frappe.msgprint("Document Naming Rule is not set for the Bank Transaction")
