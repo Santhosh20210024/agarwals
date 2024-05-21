@@ -98,7 +98,11 @@ class SeleniumDownloader:
         except Exception as E:
             self.log_error('Settlement Advice Downloader UI',self.tpa, E)
 
-
+    def extract_table_data(self, table_id):
+        table = self.wait.until(EC.presence_of_element_located((By.ID, table_id)))
+        table_html = table.get_attribute('outerHTML')
+        with open(f'{self.download_directory}/{self.tpa}.html', 'w') as file:
+            file.write(table_html)
     def attach_captcha_img(self,file_url=None):
         captcha_reference_doc = frappe.get_doc('Settlement Advice Downloader UI',self.captcha_tpa_doc)
         captcha_reference_doc.captcha_img =  file_url
