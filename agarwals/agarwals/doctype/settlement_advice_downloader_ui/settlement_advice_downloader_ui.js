@@ -20,7 +20,7 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 			frm.save()
 			frm.refresh()
 			frappe.call({
-				method: 'agarwals.reconciliation.step.download_settlement_advice.download_captcha_settlement_advice',
+				method: 'agarwals.reconciliation.step.advice_downloader.download_captcha_settlement_advice',
 				args: {
 					'captcha_tpa_doc': frm.doc.name
 				}

@@ -1,5 +1,5 @@
 import frappe
-from agarwals.reconciliation.step.download_settlement_advice.selenium_downloader import SeleniumDownloader
+from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By

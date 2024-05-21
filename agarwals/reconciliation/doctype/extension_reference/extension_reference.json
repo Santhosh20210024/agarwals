@@ -1,0 +1,38 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-05-20 14:26:59.987456",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "extension",
+  "path"
+ ],
+ "fields": [
+  {
+   "fieldname": "extension",
+   "fieldtype": "Link",
+   "label": "Extension",
+   "options": "Extension Configuration"
+  },
+  {
+   "fetch_from": "extension.path",
+   "fieldname": "path",
+   "fieldtype": "Data",
+   "label": "Path"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-05-20 14:27:09.363397",
+ "modified_by": "Administrator",
+ "module": "reconciliation",
+ "name": "Extension Reference",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

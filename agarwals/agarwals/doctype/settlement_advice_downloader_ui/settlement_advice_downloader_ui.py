@@ -15,7 +15,7 @@ class SettlementAdviceDownloaderUI(Document):
         if self.isNew() == False:
             return
 
-        logins = frappe.get_all('TPA Login Credentials', {'tpa': self.tpa_name, 'is_captcha': 1,'is_enable':1},
+        logins = frappe.get_all('TPA Login Credentials', {'tpa': self.tpa_name,'is_enable':1},
                                 'name')
         if logins:
             for i in range(0, len(logins)):
@@ -34,8 +34,6 @@ class SettlementAdviceDownloaderUI(Document):
 
     def before_save(self):
         self.get_logins()
-
-
 
 
 @frappe.whitelist()

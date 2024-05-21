@@ -46,15 +46,20 @@ class SeleniumDownloader:
         self.tpa = ''
         self.is_captcha = False
         self.is_headless = True
+        self.incoming_file_type = ''
+        self.max_wait_time = 0
 
     def construct_file_url(*args):
         list_of_items = []
         for arg in args:
             if type(arg)==str:
                 list_of_items.append(arg)
-
         formatted_url = '/'.join(list_of_items)
         return formatted_url
+
+    def get_configuration_value(self,field_name):
+        value = frappe.db.get_value("SA Downloader Configuration",{"name":self.executing_child_class},field_name)
+        return value if value else None
 
     def set_self_variables(self, tpa_doc ,child = None, parent = None):
         self.credential_doc = tpa_doc
@@ -65,8 +70,13 @@ class SeleniumDownloader:
             self.url = self.credential_doc.url
             self.from_date = self.credential_doc.from_date
             self.to_date = frappe.utils.now_datetime().date()
-            self.is_captcha = True if self.credential_doc.is_captcha == 1 else False
-            self.is_headless = True if self.credential_doc.is_headless == 1 else False
+            if frappe.db.exists("SA Downloader Configuration",{"name":self.executing_child_class}):
+                self.is_captcha = True if self.get_configuration_value('is_captcha') == 1 else False
+                self.is_headless = True if self.get_configuration_value('is_headless') == 1 else False
+                self.incoming_file_type = self.get_configuration_value('incoming_file_type')
+                self.max_wait_time = self.get_configuration_value('captcha_entry_duration')
+            else:
+                self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
                 self.child_reference_name = child
                 self.captcha_tpa_doc = parent
@@ -77,7 +87,7 @@ class SeleniumDownloader:
     def get_captcha_value(self):
         try:
             captcha = ''
-            end_time = time.time() + 60
+            end_time = time.time() + self.max_wait_time
             while time.time() < end_time:
                 frappe.db.commit()
                 captcha_value = frappe.db.sql(f"SELECT captcha FROM `tabSettlement Advice Downloader UI` WHERE name = '{self.captcha_tpa_doc}'",as_dict = True)
@@ -180,14 +190,14 @@ class SeleniumDownloader:
 
     def download_from_web(self):
         return None
-    
+
     def insert_run_log(self, data):
         doc=frappe.get_doc("TPA Login Credentials",self.credential_doc.name)
         doc.append("run_log",data)
         doc.save(ignore_permissions=True)
         frappe.db.commit()
         return None
-    
+
     def create_download_directory(self):
         self.file_name = f"{self.credential_doc.name.replace(' ', '').lower()}"
         file_path = self.files_path + self.file_name
@@ -200,7 +210,7 @@ class SeleniumDownloader:
         formatted_file_name = file_name + "." + extension
         os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name)
         return formatted_file_name
-        
+
     def move_file_to_extract(self, download_directory, formatted_file_name):
         shutil.move(download_directory + "/" + formatted_file_name, self.files_path + "Extract/" + formatted_file_name)
 
@@ -222,7 +232,7 @@ class SeleniumDownloader:
         file_url = "/" + self.construct_file_url(self.SHELL_PATH, file_name)
         frappe.db.commit()
         return file_url
-    
+
     def log_error(self,doctype_name, reference_name, error_message):
         error_log = frappe.new_doc('Error Record Log')
         error_log.set('doctype_name', doctype_name)
@@ -235,13 +245,14 @@ class SeleniumDownloader:
         if reference_name:
             self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error"})
             frappe.db.commit()
-            
+
     def create_fileupload(self,file_url,file_name):
         file_upload_doc=frappe.new_doc("File upload")
         file_upload_doc.document_type="Settlement Advice"
         file_upload_doc.payer_type=self.credential_doc.tpa
         file_upload_doc.upload=file_url
         file_upload_doc.is_bot = 1
+        file_upload_doc.file_format = 'EXCEL'
         file_upload_doc.save(ignore_permissions=True)
         self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
         frappe.db.commit()
@@ -257,7 +268,6 @@ class SeleniumDownloader:
         if self.is_captcha == True:
             if e:
                 self.update_tpa_reference('Error')
-                self.log_error('Settlement Advice Downloader UI',self.tpa, e)
             else:
                 self.update_tpa_reference('Completed')
             self.delete_captcha_images()
@@ -268,15 +278,13 @@ class SeleniumDownloader:
         pass
 
     def convert_file_format(self,original_file,formated_file):
-        control_pannel = frappe.db.sql(f"SELECT * FROM `tabSettlement Advice File Format Reference` WHERE class = '{self.executing_child_class}' ",as_dict = True)
-        if control_pannel:
-            if  control_pannel[0].get('file_type') == 'HTML':
-                data = pd.read_html(original_file)
-                if len(data) ==1:
-                    data[0].to_excel(formated_file,index=False)
-                else:
-                    self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-            self.delete_backend_files(original_file)
+        if  self.incoming_file_type == 'HTML':
+            data = pd.read_html(original_file)
+            if len(data) ==1:
+                data[0].to_excel(formated_file,index=False)
+            else:
+                self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
+        self.delete_backend_files(original_file)
 
     def _download(self):
         self.download_from_web()
@@ -294,6 +302,16 @@ class SeleniumDownloader:
 
         file_url = self.create_file_record(formatted_file_name)
         self.create_fileupload(file_url, self.file_name)
+
+    def add_driver_argument(self):
+        if self.is_headless == True:
+            self.options.add_argument("--headless=new")
+        frappe.db.commit()
+        extension_path = (frappe.db.sql("SELECT path FROM `tabExtension Reference` WHERE parent = 'CarehealthDownloader' ",
+                                  as_dict=True))
+        if extension_path:
+            for i in range(len(extension_path)):
+                self.options.add_argument(f'--load-extension={extension_path[i].path}')
 
     def download(self, tpa_doc, chunk_doc=None, child=None, parent=None):
         try:
@@ -314,8 +332,10 @@ class SeleniumDownloader:
         self.create_download_directory()
         prefs = {"download.default_directory": self.download_directory + "/"}
         self.options.add_experimental_option("prefs", prefs)
-        if self.is_headless == True:
-            self.options.add_argument("--headless")
+        if frappe.db.exists("SA Downloader Configuration", {"name": self.executing_child_class}):
+            self.add_driver_argument()
+        else:
+            self.raise_exception(" SA Downloader Configuration not found ")
         self.driver = webdriver.Chrome(options=self.options)
         self.wait = WebDriverWait(self.driver,  10)
 
