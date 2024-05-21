@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-04-12 11:21:12.271455",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "method",
+  "priority",
+  "stop_if_error",
+  "parameter",
+  "replace_value",
+  "number_of_workers",
+  "queue"
+ ],
+ "fields": [
+  {
+   "fieldname": "method",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Method",
+   "options": "\nagarwals.reconciliation.step.transform\nagarwals.reconciliation.step.sales_invoice_creator\nagarwals.reconciliation.step.insurance_tagger\nagarwals.reconciliation.step.payer_match\nagarwals.reconciliation.step.transcation_creator\nagarwals.reconciliation.step.advice_creator\nagarwals.reconciliation.step.claim_key_mapper\nagarwals.reconciliation.step.matcher\nagarwals.reconciliation.step.payment_entry_creator\nagarwals.reconciliation.step.adjust_bill\nagarwals.reconciliation.step.advice_downloader",
+   "reqd": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Priority",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "stop_if_error",
+   "fieldtype": "Check",
+   "label": "Stop If Error"
+  },
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Code",
+   "label": "Parameter"
+  },
+  {
+   "fieldname": "replace_value",
+   "fieldtype": "Code",
+   "label": "Replace Value"
+  },
+  {
+   "fieldname": "number_of_workers",
+   "fieldtype": "Int",
+   "label": "Number of Workers"
+  },
+  {
+   "fieldname": "queue",
+   "fieldtype": "Data",
+   "label": "Queue"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-05-17 17:27:55.807660",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Step Configuration",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

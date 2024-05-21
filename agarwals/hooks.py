@@ -136,11 +136,12 @@ override_doctype_class = {
 # Scheduled Tasks
 # ---------------
 
-scheduler_events = {
-    "cron":{
-	"*/1 * * * *": [
-		"agarwals.settlement_advice_downloader.downloader_job.execute_download_job"
-	],
+# scheduler_events = {
+#     "cron":{
+# 	"*/5 0 * * *":[
+# 		"agarwals.utils.invoice_update.status_update"
+# 	]
+
 	# "daily": [
 	# 	"agarwals.tasks.daily"
 	# ],
@@ -153,8 +154,8 @@ scheduler_events = {
 	# "monthly": [
 	# 	"agarwals.tasks.monthly"
 	# ],
-    }
-}
+#     }
+# }
 
 # Testing
 # -------
