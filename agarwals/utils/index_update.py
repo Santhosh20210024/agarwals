@@ -9,4 +9,4 @@ def update_index():
 		columns=(index_doc.indexing_columns).split(",")
 		for column in columns:
 			frappe.db.sql("""CREATE INDEX IF NOT EXISTS {index_column}_cg ON `tab{table}` ({column})""".format(index_column=column,table=table,column=column))
-	print("finished")
+	
