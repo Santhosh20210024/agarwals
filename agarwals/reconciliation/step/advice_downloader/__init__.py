@@ -19,6 +19,9 @@ from agarwals.reconciliation.step.advice_downloader.bajaj_allianz import BajajAl
 from agarwals.reconciliation.step.advice_downloader.paramount import ParamountDownloader
 from agarwals.reconciliation.step.advice_downloader.care_health import CarehealthDownloader
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
+from agarwals.reconciliation.step.advice_downloader.fhpl import FHPLDownloader
+
+
 
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
@@ -56,18 +59,22 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             login_ref = login_ref_query[0]
             doc_name = (login_ref.tpa_login_credentials)
             if doc_name:
-                login  = frappe.get_all('TPA Login Credentials',{'name': doc_name},['*'])[0]
-                frappe.db.sql(f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'InProgress' WHERE name = '{login_ref.name}' ")
+                login = frappe.get_all('TPA Login Credentials', {'name': doc_name}, ['*'])[0]
+                frappe.db.sql(
+                    f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'InProgress' WHERE name = '{login_ref.name}' ")
                 frappe.db.commit()
                 target = eval(login.executing_method)
-                target().download(tpa_doc = login ,child = login_ref.name,parent = captcha_tpa_doc)
+                target().download(tpa_doc=login, child=login_ref.name, parent=captcha_tpa_doc)
         else:
             frappe.msgprint(" No Login in Open Status ")
     except Exception as e:
         login_ref = login_ref_query[0]
-        log_error(e,'Settlement Advice Downloader UI',login_ref.name)
-        if (frappe.db.sql(f"SELECT status FROM `tabSettlement Advice Downloader UI Logins` WHERE name = '{login_ref.name}'",as_dict=True)[0].status == "InProgress"):
-            frappe.db.sql(f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'Error' WHERE name = '{login_ref.name}' ")
+        log_error(e, 'Settlement Advice Downloader UI', login_ref.name)
+        if (frappe.db.sql(
+                f"SELECT status FROM `tabSettlement Advice Downloader UI Logins` WHERE name = '{login_ref.name}'",
+                as_dict=True)[0].status == "InProgress"):
+            frappe.db.sql(
+                f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'Error' WHERE name = '{login_ref.name}' ")
             frappe.db.commit()
 
 

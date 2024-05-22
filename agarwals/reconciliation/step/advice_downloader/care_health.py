@@ -15,7 +15,7 @@ class CarehealthDownloader(SeleniumDownloader):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'UserName')))
         self.driver.find_element(By.ID, 'UserName').send_keys(self.user_name)  # Username
         self.driver.find_element(By.ID, 'Password').send_keys(self.password)  # password
-        time.sleep(60)
+        time.sleep(self.max_wait_time)
         self.driver.find_element(By.CLASS_NAME, 'btn-primary').click()
     def navigate(self):
         modal = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "modal-content")))

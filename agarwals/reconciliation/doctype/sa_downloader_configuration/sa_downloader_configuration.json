@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "autoname": "format:",
+ "creation": "2024-05-20 14:07:28.518530",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tpa_name",
+  "class_name",
+  "incoming_file_type",
+  "captcha_entry_duration",
+  "column_break_wdivc",
+  "is_captcha",
+  "is_headless",
+  "section_break_xrzm5",
+  "extension"
+ ],
+ "fields": [
+  {
+   "fieldname": "tpa_name",
+   "fieldtype": "Link",
+   "label": "TPA Name",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "incoming_file_type",
+   "fieldtype": "Select",
+   "label": "Incoming File Type",
+   "options": "\nExcel\nHTML"
+  },
+  {
+   "fieldname": "section_break_xrzm5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "extension",
+   "fieldtype": "Table",
+   "label": "Extension",
+   "options": "Extension Reference"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_captcha",
+   "fieldtype": "Check",
+   "label": "is captcha"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_headless",
+   "fieldtype": "Check",
+   "label": "is headless"
+  },
+  {
+   "fieldname": "column_break_wdivc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "class_name",
+   "fieldtype": "Select",
+   "label": "Class",
+   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader"
+  },
+  {
+   "default": "60",
+   "depends_on": "eval:doc.is_captcha == 1",
+   "fieldname": "captcha_entry_duration",
+   "fieldtype": "Int",
+   "label": "Waiting time for captcha entry(In sec)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-05-22 09:45:49.197439",
+ "modified_by": "Administrator",
+ "module": "reconciliation",
+ "name": "SA Downloader Configuration",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
