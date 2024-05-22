@@ -7,7 +7,7 @@ from selenium.webdriver.common.alert import Alert
 import time
 
 
-class FhplDownloader(SeleniumDownloader):
+class FHPLDownloader(SeleniumDownloader):
     def __init__(self):
         SeleniumDownloader.__init__(self)
 
@@ -25,8 +25,7 @@ class FhplDownloader(SeleniumDownloader):
         count = self.driver.find_element(By.ID,'ContentPlaceHolder1_TabContainer1_tbClaimssettled_lblClaimssettled')
         print(count.text)
         time.sleep(5)
-        if int((count.text).split('(')[1].split(')')[0]) == 0:
-            self.extract_table_data('ContentPlaceHolder1_TabContainer1_tbClaimsprocessedwaitingforpayment_grdClaimsprocessedwaitingforpayment')
-
+        if int((count.text).split('(')[1].split(')')[0]) != 0:
+            self.extract_table_data('ContentPlaceHolder1_TabContainer1_tbClaimssettled_grdClaimssettled')
         else:
             self.log_error('Settlement Advice Downloader UI', self.tpa, "No Record Found")

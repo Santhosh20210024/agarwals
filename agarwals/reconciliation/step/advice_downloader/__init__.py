@@ -19,7 +19,7 @@ from agarwals.reconciliation.step.advice_downloader.bajaj_allianz import BajajAl
 from agarwals.reconciliation.step.advice_downloader.paramount import ParamountDownloader
 from agarwals.reconciliation.step.advice_downloader.care_health import CarehealthDownloader
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
-from agarwals.reconciliation.step.advice_downloader.fhpl import FhplDownloader
+from agarwals.reconciliation.step.advice_downloader.fhpl import FHPLDownloader
 
 
 
