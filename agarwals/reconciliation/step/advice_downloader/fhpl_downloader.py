@@ -23,7 +23,6 @@ class FHPLDownloader(SeleniumDownloader):
 
     def download_from_web(self):
         count = self.driver.find_element(By.ID,'ContentPlaceHolder1_TabContainer1_tbClaimssettled_lblClaimssettled')
-        print(count.text)
         time.sleep(5)
         if int((count.text).split('(')[1].split(')')[0]) != 0:
             self.extract_table_data('ContentPlaceHolder1_TabContainer1_tbClaimssettled_grdClaimssettled')

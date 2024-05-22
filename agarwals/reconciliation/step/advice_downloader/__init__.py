@@ -3,25 +3,23 @@ from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.reconciliation.step.advice_downloader.provider_ihx_downloader import ProviderIhx
-from agarwals.reconciliation.step.advice_downloader.tips_vidalhealthtpa import TipsVidalHealthTpa
-from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia import TnnhisMdIndia
+from agarwals.reconciliation.step.advice_downloader.tips_vidal_health_downloader import TipsVidalHealth
+from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia_downloader import TnnhisMdIndia
 from agarwals.reconciliation.step.advice_downloader.star_health_downloader import StarHealthDownloader
 from agarwals.reconciliation.step.advice_downloader.vitrya_downloader import VitryaDownloader
 from agarwals.reconciliation.step.advice_downloader.health_india_downloader import HealthIndiaDownloader
 from agarwals.reconciliation.step.advice_downloader.safeway_downloader import SafewayDownloader
-from agarwals.reconciliation.step.advice_downloader.good_health import GoodHealthDownloader
-from agarwals.reconciliation.step.advice_downloader.md_india import MDIndiaDownloader
-from agarwals.reconciliation.step.advice_downloader.icici_lombard import ICICLombardDownloader
-from agarwals.reconciliation.step.advice_downloader.star_vitraya import StarVitrayaDownloader
+from agarwals.reconciliation.step.advice_downloader.good_health_downloader import GoodHealthDownloader
+from agarwals.reconciliation.step.advice_downloader.md_india_downloader import MDIndiaDownloader
+from agarwals.reconciliation.step.advice_downloader.icici_lombard_downloader import ICICLombardDownloader
+from agarwals.reconciliation.step.advice_downloader.star_vitraya_downloader import StarVitrayaDownloader
 from agarwals.reconciliation.step.advice_downloader.vidalhealth_downloader import VidalHealthDownloader
 from agarwals.reconciliation.step.advice_downloader.vidalhealth_downloader import VidalHealthDownloader
-from agarwals.reconciliation.step.advice_downloader.bajaj_allianz import BajajAllianzDownloader
-from agarwals.reconciliation.step.advice_downloader.paramount import ParamountDownloader
-from agarwals.reconciliation.step.advice_downloader.care_health import CarehealthDownloader
+from agarwals.reconciliation.step.advice_downloader.bajaj_allianz_downloader import BajajAllianzDownloader
+from agarwals.reconciliation.step.advice_downloader.paramount_downloader import ParamountDownloader
+from agarwals.reconciliation.step.advice_downloader.care_health_downloader import CarehealthDownloader
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
-from agarwals.reconciliation.step.advice_downloader.fhpl import FHPLDownloader
-
-
+from agarwals.reconciliation.step.advice_downloader.fhpl_downloader import FHPLDownloader
 
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
