@@ -1,7 +1,7 @@
 import requests
 from agarwals.reconciliation.step.advice_downloader.downloader import Downloader
 
-class TipsVidalHealthTpa(Downloader):
+class TipsVidalHealth(Downloader):
     def __init__(self):
         Downloader.__init__(self)
         

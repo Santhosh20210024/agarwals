@@ -57,9 +57,7 @@ class SeleniumDownloader:
         formatted_url = '/'.join(list_of_items)
         return formatted_url
 
-    def get_configuration_value(self,field_name):
-        value = frappe.db.get_value("SA Downloader Configuration",{"name":self.executing_child_class},field_name)
-        return value if value else None
+
 
     def set_self_variables(self, tpa_doc ,child = None, parent = None):
         self.credential_doc = tpa_doc
@@ -71,10 +69,11 @@ class SeleniumDownloader:
             self.from_date = self.credential_doc.from_date
             self.to_date = frappe.utils.now_datetime().date()
             if frappe.db.exists("SA Downloader Configuration",{"name":self.executing_child_class}):
-                self.is_captcha = True if self.get_configuration_value('is_captcha') == 1 else False
-                self.is_headless = True if self.get_configuration_value('is_headless') == 1 else False
-                self.incoming_file_type = self.get_configuration_value('incoming_file_type')
-                self.max_wait_time = self.get_configuration_value('captcha_entry_duration')
+                configuration_values = frappe.db.sql(f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",as_dict=True)[0]
+                self.is_captcha = True if configuration_values.is_captcha == 1 else False
+                self.is_headless = True if configuration_values.is_headless == 1 else False
+                self.incoming_file_type = configuration_values.incoming_file_type
+                self.max_wait_time = configuration_values.captcha_entry_duration
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
@@ -312,10 +311,10 @@ class SeleniumDownloader:
             self.options.add_argument("--headless=new")
         frappe.db.commit()
         extension_path = (frappe.db.sql("SELECT path FROM `tabExtension Reference` WHERE parent = 'CarehealthDownloader' ",
-                                  as_dict=True))
+                                  pluck='path'))
         if extension_path:
-            for i in range(len(extension_path)):
-                self.options.add_argument(f'--load-extension={extension_path[i].path}')
+            for path in extension_path:
+                self.options.add_argument(f'--load-extension={path}')
 
     def download(self, tpa_doc, chunk_doc=None, child=None, parent=None):
         try:
