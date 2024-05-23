@@ -6,9 +6,14 @@ from agarwals.utils.error_handler import log_error
 
 class Matcher:
     def add_log_error(self, doctype, name, error):
+        if len(name)>=140:
+            name = name[0:130]
+        if len(error)>=140:
+            error = error[0:139]
         error_log = frappe.new_doc('Error Record Log')
         error_log.set('doctype_name',doctype)
         error_log.set('reference_name', name)
+        error_log.set('error_message', error)
         error_log.save()
        
     def update_payment_order(self, matcher_record, record):
@@ -67,30 +72,76 @@ class Matcher:
                 if record['cb']:
                     matcher_record.set('name', self.get_matcher_name(record['bill'], record['cb']))
                 else:
-                    matcher_record.set('name', self.get_matcher_name(record['bill'], record['cb']))
+                    matcher_record.set('name', self.get_matcher_name(record['bill'], record['sa']))
                     
             matcher_record.set('match_logic', record['logic'])
             matcher_record.set('status', 'Open')
 
             try:
                 matcher_record.save()
-                frappe.db.set_value('Settlement Advice', record['sa'], 'status', 'Not Processed')
-                frappe.db.set_value('Settlement Advice', record['sa'], 'matcher_id', matcher_record.name)
+                if record['sa']:
+                    update_query = """
+                                    UPDATE `tabSettlement Advice`
+                                    SET status = %(status)s, matcher_id = %(matcher_id)s
+                                    WHERE name = %(name)s
+                                """
+                    frappe.db.sql(update_query, values = { 'status' : 'Not Processed', 'matcher_id' : matcher_record.name, 'name': matcher_record.settlement_advice})
+                    frappe.db.commit()
 
             except Exception as e:
-                self.update_advice_status(record, 'Error', str(e))
+                if record['sa']:
+                    update_query = """
+                                        UPDATE `tabSettlement Advice`
+                                        SET status = %(status)s, remark = %(remark)s
+                                        WHERE name = %(name)s
+                                    """
+                    frappe.db.sql(update_query, values = { 'status' : 'Warning', 'remark' : str(e), 'name': matcher_record.settlement_advice})
+                    frappe.db.commit()
                 self.add_log_error('Matcher', matcher_record.name, str(e))
                 
         frappe.db.commit()
 
     def delete_other_entries(self):
         match_logic = ('MA5-BN', 'MA3-CN', 'MA1-CN') # Important Tag
-        frappe.db.sql("""Update `tabSettlement Advice` SET status = 'Open' where status = 'Not Processed'""")
         frappe.db.sql("""Delete from `tabMatcher` where match_logic not in %(match_logic)s""" , values = {'match_logic' : match_logic})
+        frappe.db.sql("""Update `tabSettlement Advice` SET status = 'Open', remark = NULL where status = 'Not Processed'""")
+        frappe.db.sql("""Update `tabSettlement Advice` SET status = 'Open', remark = NULL where remark = 'Check the bill number'""")
         frappe.db.commit()
+    
+    def update_advice_entries(self):
+        # Update the settlement advice which does not have bill no
+        update_query = """
+                        UPDATE `tabSettlement Advice`
+                        SET status = %(status)s, remark = %(remark)s
+                        WHERE (bill_no is null or bill_no ='')
+                    """
+        frappe.db.sql(update_query, values = { 'status' : 'Warning', 'remark' : 'Bill Number Not Found'})
+        frappe.db.commit()
+    
+    def update_validate_entries(self):
+        update_query = """
+            UPDATE `tabSettlement Advice` tsa LEFT JOIN `tabSales Invoice` tsi on tsa.bill_no = tsi.name SET tsa.status = 'Warning', tsa.remark = 'Check the bill number' 
+            WHERE tsi.name is NULL and tsa.status = 'Open'
+        """
+        frappe.db.sql(update_query, values = { 'status' : 'Warning', 'remark' : 'Check the bill number'})
 
+    
+    def execute_cursors(self, query_list):
+        for query_item in query_list:
+            chunk_size = 10000
+            while True:
+                print(query_item)
+                query = f"{query_item} LIMIT {chunk_size}"
+                records = frappe.db.sql(query, as_dict = True)
+                if len(records) == 0:
+                    break
+                
+                self.create_matcher_record(records)
+        self.update_validate_entries()
+        
     def process(self):
         self.delete_other_entries()
+        self.update_advice_entries()
         update_utr_in_separate_column()
         update_bill_no_separate_column()
         
@@ -121,11 +172,8 @@ class Matcher:
                     ON CONCAT(bi.name, "-", bt.name) = mt.name
                 WHERE
                     mt.name IS NULL
-                    AND sa.status = 'Open';
+                    AND sa.status = 'Open'
                 """
-
-        ma5_bn_records = frappe.db.sql(ma5_bn, as_dict=True)
-        if ma5_bn_records: self.create_matcher_record(ma5_bn_records)
 
         ma1_cn = """
                 SELECT
@@ -159,12 +207,9 @@ class Matcher:
                     ON CONCAT(bi.name, "-", bt.name) = mt.name
                 WHERE
                     mt.name IS NULL
-                    AND sa.status = 'Open';
+                    AND sa.status = 'Open'
                 """
-        
-        ma1_cn_records = frappe.db.sql(ma1_cn, as_dict=True)
-        if ma1_cn_records: self.create_matcher_record(ma1_cn_records)
-		    
+
         ma3_cn = """
                 SELECT
                 bi.name as bill,
@@ -194,9 +239,6 @@ class Matcher:
                     mt.name IS NULL
                 """
 
-        ma3_cn_records = frappe.db.sql(ma3_cn, as_dict=True)
-        if ma3_cn_records: self.create_matcher_record(ma3_cn_records)
-			
         ma1_bn = """SELECT
                     bi.name as bill,
                     cb.name as cb,
@@ -222,13 +264,11 @@ class Matcher:
                     ON (cb.cg_formatted_bill_number is not null and (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number))
                 LEFT JOIN
                     `tabMatcher` mt
-                    ON bi.name = mt.sales_invoice AND mt.match_logic = 'MA1-CN'
+                    ON CONCAT(bi.name, "-", bt.name) = mt.name
                 WHERE
-                    mt.sales_invoice IS NULL
-                    AND sa.status = 'Open';
+                    mt.name IS NULL
+                    AND sa.status = 'Open'
                 """
-        ma1_bn_records = frappe.db.sql(ma1_bn, as_dict=True)
-        if ma1_bn_records: self.create_matcher_record(ma1_bn_records)
 
         ma5_cn = """SELECT
                     bi.name as bill,
@@ -239,27 +279,20 @@ class Matcher:
                     sa.settled_amount as settled_amount,
                     sa.tds_amount as tds_amount,
                     sa.disallowed_amount as disallowed_amount,
-                    "MA5-CN" as logic
+                    "MA5-CN" as logic,
+                    sa.status as status
                 FROM
                     `tabBank Transaction` bt
-                JOIN
-                    `tabSettlement Advice` sa
-                    ON (sa.cg_utr_number = bt.custom_cg_utr_number 
-                    OR sa.cg_formatted_utr_number = bt.custom_cg_utr_number)
-                JOIN
-                    `tabBill` bi
-                    ON (sa.claim_key = bi.claim_key 
-                    OR sa.claim_key = bi.ma_claim_key)
-                LEFT JOIN
-                    `tabMatcher` mt
-                    ON CONCAT(bi.name, '-', bt.name) = mt.name
+                JOIN `tabSettlement Advice` sa ON
+                    (sa.cg_utr_number = bt.custom_cg_utr_number
+                        OR sa.cg_formatted_utr_number = bt.custom_cg_utr_number)
+                JOIN `tabBill` bi ON
+                    (sa.claim_key = bi.claim_key
+                        OR sa.claim_key = bi.ma_claim_key)
                 WHERE
-                    mt.name IS NULL
-                    AND sa.status = 'Open'
-            """
-        ma5_cn_records = frappe.db.sql(ma5_cn, as_dict=True)
-        if ma5_cn_records: self.create_matcher_record(ma5_cn_records)
-
+                    sa.status = 'Open'
+                """
+        
         ma2_cn = """SELECT
                     bi.name as bill,
                     cb.name as cb,
@@ -269,7 +302,8 @@ class Matcher:
                     sa.settled_amount as settled_amount,
                     sa.tds_amount as tds_amount,
                     sa.disallowed_amount as disallowed_amount,
-                    "MA2-CN" as logic
+                    "MA2-CN" as logic,
+                    sa.status as status
                 FROM
                     `tabClaimBook` cb
                 JOIN
@@ -282,15 +316,11 @@ class Matcher:
                     AND (bi.cg_formatted_bill_number = cb.cg_formatted_bill_number)
                 LEFT JOIN
                     `tabMatcher` mt
-                    ON bi.name = mt.sales_invoice
+                    ON CONCAT(bi.name, '-', cb.name) = mt.name
                 WHERE
-                    mt.sales_invoice IS NULL
-                    AND sa.status = 'Open';
+                    mt.name is null
+                    AND sa.status = 'Open'
          """
-
-        ma2_cn_records = frappe.db.sql(ma2_cn, as_dict=True)
-        if ma2_cn_records: self.create_matcher_record(ma2_cn_records)
-
         ma2_bn = """SELECT
                     bi.name as bill,
                     cb.name as cb,
@@ -300,7 +330,8 @@ class Matcher:
                     sa.settled_amount as settled_amount,
                     sa.tds_amount as tds_amount,
                     sa.disallowed_amount as disallowed_amount,
-                    "MA2-BN" as logic
+                    "MA2-BN" as logic,
+                    sa.status as status
                 FROM
                     `tabClaimBook` cb
                 JOIN
@@ -311,13 +342,11 @@ class Matcher:
                     ON bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
                 LEFT JOIN
                     `tabMatcher` mt
-                    ON bi.name = mt.sales_invoice
+                    ON CONCAT(bi.name, '-', cb.name) = mt.name
                 WHERE
-                    mt.sales_invoice IS NULL
-                    AND sa.status = 'Open';
+                        mt.name is null
+                        AND sa.status = 'Open'
          """
-        ma2_bn_records = frappe.db.sql(ma2_bn, as_dict=True)
-        if ma2_bn_records: self.create_matcher_record(ma2_bn_records)
 
         ma3_bn = """SELECT
                 bi.name as bill,
@@ -341,9 +370,54 @@ class Matcher:
             WHERE
                 mt.name IS NULL
          """
-        ma3_bn_records = frappe.db.sql(ma3_bn, as_dict=True)
-        if ma3_bn_records: self.create_matcher_record(ma3_bn_records)
-
+        
+        ma6_cn = """
+                SELECT
+                    bi.name as bill,
+                    '' as cb,
+                    '' as bank,
+                    sa.name as sa,
+                    sa.settled_amount as settled_amount,
+                    sa.tds_amount as tds_amount,
+                    sa.disallowed_amount as disallowed_amount,
+                    "MA6-CN" as logic,
+                    sa.status as status
+                FROM
+                    `tabSettlement Advice` sa
+                JOIN
+                    `tabBill` bi
+                    ON (sa.claim_key = bi.claim_key OR sa.claim_key = bi.ma_claim_key)
+                LEFT JOIN
+                    `tabMatcher` mt
+                    ON CONCAT(bi.name, '-', sa.name) = mt.name
+                WHERE
+                    mt.name is null
+                    AND sa.status = 'Open'
+                """
+        
+        ma6_bn = """SELECT
+                    bi.name as bill,
+                    '' as cb,
+                    sa.name as sa,
+                    '' as bank,
+                    sa.settled_amount as settled_amount,
+                    sa.tds_amount as tds_amount,
+                    sa.disallowed_amount as disallowed_amount,
+                    "MA6-BN" as logic,
+                    sa.status as status
+                FROM
+                    `tabSettlement Advice` sa
+                JOIN
+                    `tabBill` bi
+                    ON sa.cg_formatted_bill_number = bi.cg_formatted_bill_number
+                LEFT JOIN
+                    `tabMatcher` mt
+                    ON CONCAT(bi.name, '-', sa.name) = mt.name
+                WHERE
+                    mt.name is null
+                    AND sa.status = 'Open'
+            """
+        
         ma4_cn = """SELECT
                     bi.name as bill,
                     cb.name as cb,
@@ -359,14 +433,12 @@ class Matcher:
                         OR (bi.ma_claim_key = cb.al_key OR bi.ma_claim_key = cb.cl_key))
                         AND bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
                     LEFT JOIN
-                        `tabMatcher` mt
-                        ON bi.name = mt.sales_invoice
+                    `tabMatcher` mt
+                    ON CONCAT(bi.name, '-', cb.name) = mt.name and bi.name = mt.sales_invoice
                     WHERE
-                        mt.sales_invoice IS NULL
+                        mt.name is null
+                        AND mt.sales_invoice is null
                 """
-
-        ma4_cn_records = frappe.db.sql(ma4_cn, as_dict=True)
-        if ma4_cn_records: self.create_matcher_record(ma4_cn_records)
 
         ma4_bn = """SELECT
                     bi.name as bill,
@@ -381,89 +453,34 @@ class Matcher:
                         `tabBill` bi
                         ON bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
                     LEFT JOIN
-                        `tabMatcher` mt
-                        ON bi.name = mt.sales_invoice
+                    `tabMatcher` mt
+                    ON CONCAT(bi.name, '-', cb.name) = mt.name and bi.name = mt.sales_invoice
                     WHERE
-                        mt.sales_invoice IS NULL
-                """
+                        mt.name is null
+                        AND mt.sales_invoice is null
+                 """
 
-        ma4_bn_records = frappe.db.sql(ma4_bn, as_dict=True)
-        if ma4_bn_records: self.create_matcher_record(ma4_bn_records)
 
-        ma6_cn = """
-                SELECT
-                    bi.name as bill,
-                    '' as cb,
-                    '' as bank,
-                    sa.name as sa,
-                    sa.settled_amount as settled_amount,
-                    sa.tds_amount as tds_amount,
-                    sa.disallowed_amount as disallowed_amount,
-                    "MA6-CN" as logic
-                FROM
-                    `tabSettlement Advice` sa
-                JOIN
-                    `tabBill` bi
-                    ON (sa.claim_key = bi.claim_key OR sa.claim_key = bi.ma_claim_key)
-                LEFT JOIN
-                    `tabMatcher` mt
-                    ON bi.name = mt.sales_invoice
-                WHERE
-                    mt.sales_invoice IS NULL
-                    AND sa.status = 'Open';
-                """
-
-        ma6_cn_records = frappe.db.sql(ma6_cn, as_dict=True)
-        if ma6_cn_records: self.create_matcher_record(ma6_cn_records)
-
-        ma6_bn = """SELECT
-                    bi.name as bill,
-                    '' as cb,
-                    sa.name as sa,
-                    '' as bank,
-                    sa.settled_amount as settled_amount,
-                    sa.tds_amount as tds_amount,
-                    sa.disallowed_amount as disallowed_amount,
-                    "MA6-BN" as logic
-                FROM
-                    `tabSettlement Advice` sa
-                JOIN
-                    `tabBill` bi
-                    ON sa.cg_formatted_bill_number = bi.cg_formatted_bill_number
-                LEFT JOIN
-                    `tabMatcher` mt
-                    ON bi.name = mt.sales_invoice
-                WHERE
-                    mt.sales_invoice IS NULL
-                    AND sa.status = 'Open';
-            """
-        ma6_bn_records = frappe.db.sql(ma6_bn, as_dict=True)
-        if ma6_bn_records: self.create_matcher_record(ma6_bn_records)
+        query_list = [ma1_cn, ma5_bn, ma3_cn, ma1_bn, ma5_cn, ma2_cn, ma2_bn, ma6_cn, ma6_bn, ma3_bn, ma4_cn, ma4_bn]
+        self.execute_cursors(query_list)
 
 @frappe.whitelist()
 def update_matcher():
-    #frappe.enqueue(Matcher().process(), queue = "long", is_async = True,  job_name = "matcher_batch_process" , timeout = 25000 )
     Matcher().process()
 
-
-# Intially, the settlement Advice M.Status is Open
-# Then, for unmatched part is Unmatched 
-# Then, for matched 
-# We have to clear the Unmatched as Settlement Advices
-# @frappe.whitelist()
-# def process(args):
-#     try:
-#         args=cast_to_dic(args)
-#         chunk_doc = chunk.create_chunk(args["step_id"])
-#         chunk.update_status(chunk_doc, "InProgress")
-#         try:
-#             update_utr_in_separate_column()
-#             update_bill_no_separate_column()
-#             Matcher().process()
-#             chunk.update_status(chunk_doc, "Processed")
-#         except Exception as e:
-#             chunk.update_status(chunk_doc, "Error")
-#     except Exception as e:
-#         chunk_doc = chunk.create_chunk(args["step_id"])
-#         chunk.update_status(chunk_doc, "Error")
-#         log_error(e,'Step')
+@frappe.whitelist()
+def process(args):
+    try:
+        args=cast_to_dic(args)
+        chunk_doc = chunk.create_chunk(args["step_id"])
+        chunk.update_status(chunk_doc, "InProgress")
+        try:
+            Matcher().process()
+            chunk.update_status(chunk_doc, "Processed")
+            frappe.msgprint("Processed")
+        except Exception as e:
+            chunk.update_status(chunk_doc, "Error")
+    except Exception as e:
+        chunk_doc = chunk.create_chunk(args["step_id"])
+        chunk.update_status(chunk_doc, "Error")
+        log_error(e,'Step')
