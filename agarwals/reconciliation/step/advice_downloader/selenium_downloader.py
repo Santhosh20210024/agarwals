@@ -281,6 +281,7 @@ class SeleniumDownloader:
         pass
 
     def convert_file_format(self,original_file,formated_file):
+        #HTML
         if  self.incoming_file_type == 'HTML':
             data = pd.read_html(original_file)
             if len(data) ==1:
