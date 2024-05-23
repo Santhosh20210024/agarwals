@@ -1,4 +1,2 @@
-pandas~=2.2.2
+pandas
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'
-frappe~=0.0.1
-setuptools~=68.2.0
