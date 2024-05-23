@@ -13,18 +13,21 @@ class FHPLDownloader(SeleniumDownloader):
 
     def login(self):
         self.driver.maximize_window()
-        self.wait.until(EC.presence_of_element_located((By.ID,'txtUserName'))).send_keys(self.user_name)
-        self.wait.until(EC.presence_of_element_located((By.ID,'txtPassword'))).send_keys(self.password)
-        self.driver.find_element(By.ID,'btnLogIn').click()
+        self.wait.until(EC.presence_of_element_located((By.ID, 'ContentPlaceHolder1_txtUserName'))).send_keys(
+            self.user_name)
+        self.wait.until(EC.presence_of_element_located((By.ID, 'ContentPlaceHolder1_txtPassword'))).send_keys(
+            self.password)
+        self.driver.find_element(By.ID, 'ContentPlaceHolder1_btnLogin').click()
         time.sleep(5)
 
     def navigate(self):
-        self.wait.until(EC.element_to_be_clickable((By.ID, 'mnClaimsDashboard'))).click()
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_txtDateFrom'))).send_keys(
+            self.from_date.strftime("%m/%d/%Y"))
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_txtDateTo'))).send_keys(
+            self.to_date.strftime("%m/%d/%Y"))
+        self.wait.until(EC.visibility_of_element_located((By.NAME, 'ctl00$ContentPlaceHolder1$btnSearch'))).click()
+        time.sleep(2)
 
     def download_from_web(self):
-        count = self.driver.find_element(By.ID,'ContentPlaceHolder1_TabContainer1_tbClaimssettled_lblClaimssettled')
-        time.sleep(5)
-        if int((count.text).split('(')[1].split(')')[0]) != 0:
-            self.extract_table_data('ContentPlaceHolder1_TabContainer1_tbClaimssettled_grdClaimssettled')
-        else:
-            self.log_error('Settlement Advice Downloader UI', self.tpa, "No Record Found")
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_btnPortToExcel'))).click()
+        time.sleep(10)

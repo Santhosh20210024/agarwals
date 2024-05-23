@@ -287,7 +287,7 @@ class SeleniumDownloader:
                 data[0].to_excel(formated_file,index=False)
             else:
                 self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-        self.delete_backend_files(original_file)
+            self.delete_backend_files(original_file)
 
     def _download(self):
         self.download_from_web()
