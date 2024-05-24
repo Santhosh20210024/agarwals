@@ -13,9 +13,9 @@
  "fields": [
   {
    "fieldname": "doctype_name",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Doctype Name",
-   "options": "Bill\nClaimBook\nClaim Key\nSettlement Advice\nBank Transaction\nBank Transaction Staging\nMatcher"
+   "options": "DocType"
   },
   {
    "fieldname": "indexing_columns",
@@ -25,7 +25,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-21 16:01:45.806251",
+ "modified": "2024-05-24 16:05:13.236831",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Index Updation",
