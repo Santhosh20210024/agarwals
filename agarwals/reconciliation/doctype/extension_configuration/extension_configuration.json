@@ -26,9 +26,9 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-20 13:24:21.566011",
+ "modified": "2024-05-24 10:45:18.863312",
  "modified_by": "Administrator",
- "module": "reconciliation",
+ "module": "Reconciliation",
  "name": "Extension Configuration",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
@@ -48,5 +48,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
