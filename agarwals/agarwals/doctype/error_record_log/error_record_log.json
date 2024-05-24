@@ -20,7 +20,7 @@
   },
   {
    "fieldname": "error_message",
-   "fieldtype": "Text",
+   "fieldtype": "Long Text",
    "label": "Error Message"
   },
   {
@@ -31,7 +31,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-20 21:12:38.710573",
+ "modified": "2024-05-23 15:16:52.545277",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Error Record Log",

@@ -38,6 +38,7 @@
   "matched_claimbook_record",
   "matched_bill_record",
   "matcher_status",
+  "matcher_id",
   "source_file",
   "file_name",
   "claim_key",
@@ -247,10 +248,15 @@
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
    "label": "File Upload Payer"
+  },
+  {
+   "fieldname": "matcher_id",
+   "fieldtype": "Data",
+   "label": "Matcher ID"
   }
  ],
  "links": [],
- "modified": "2024-03-07 13:37:12.840639",
+ "modified": "2024-05-22 12:16:04.882152",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
