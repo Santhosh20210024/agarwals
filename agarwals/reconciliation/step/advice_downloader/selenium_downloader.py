@@ -281,13 +281,14 @@ class SeleniumDownloader:
         pass
 
     def convert_file_format(self,original_file,formated_file):
+        #HTML
         if  self.incoming_file_type == 'HTML':
             data = pd.read_html(original_file)
             if len(data) ==1:
                 data[0].to_excel(formated_file,index=False)
             else:
                 self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-        self.delete_backend_files(original_file)
+            self.delete_backend_files(original_file)
 
     def _download(self):
         self.download_from_web()
