@@ -60,7 +60,7 @@
    "fieldname": "class_name",
    "fieldtype": "Select",
    "label": "Class",
-   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader"
+   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nRelianceGeneralDownloader"
   },
   {
    "default": "60",
@@ -72,9 +72,9 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-22 09:45:49.197439",
+ "modified": "2024-05-23 15:23:27.356768",
  "modified_by": "Administrator",
- "module": "reconciliation",
+ "module": "Reconciliation",
  "name": "SA Downloader Configuration",
  "naming_rule": "Expression",
  "owner": "Administrator",

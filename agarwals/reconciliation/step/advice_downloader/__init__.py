@@ -20,7 +20,7 @@ from agarwals.reconciliation.step.advice_downloader.paramount_downloader import 
 from agarwals.reconciliation.step.advice_downloader.care_health_downloader import CarehealthDownloader
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from agarwals.reconciliation.step.advice_downloader.fhpl_downloader import FHPLDownloader
-
+from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader import RelianceGeneralDownloader
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
     frappe.enqueue(class_name().download,queue = args["queue"], is_async = True, job_name = f"TPA_downloader_{str(tpa_doc.name)}", timeout = 3600, tpa_doc = tpa_doc, chunk_doc = chunk_doc)
