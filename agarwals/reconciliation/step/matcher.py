@@ -105,18 +105,9 @@ class Matcher:
         match_logic = ('MA5-BN', 'MA3-CN', 'MA1-CN') # Important Tag
         frappe.db.sql("""Delete from `tabMatcher` where match_logic not in %(match_logic)s""" , values = {'match_logic' : match_logic})
         frappe.db.sql("""Update `tabSettlement Advice` SET status = 'Open', remark = NULL where status = 'Not Processed'""")
-        frappe.db.sql("""Update `tabSettlement Advice` SET status = 'Open', remark = NULL where remark = 'Check the bill number'""")
+        frappe.db.sql("""Update `tabSettlement Advice` SET status = 'Open', remark = NULL where remark in ( 'Check the bill number', 'Bill Number Not Found')""")
         frappe.db.commit()
     
-    def update_advice_entries(self):
-        # Update the settlement advice which does not have bill no
-        update_query = """
-                        UPDATE `tabSettlement Advice`
-                        SET status = %(status)s, remark = %(remark)s
-                        WHERE (bill_no is null or bill_no ='')
-                    """
-        frappe.db.sql(update_query, values = { 'status' : 'Warning', 'remark' : 'Bill Number Not Found'})
-        frappe.db.commit()
     
     def update_validate_entries(self):
         update_query = """
@@ -124,6 +115,14 @@ class Matcher:
             WHERE tsi.name is NULL and tsa.status = 'Open'
         """
         frappe.db.sql(update_query, values = { 'status' : 'Warning', 'remark' : 'Check the bill number'})
+
+        update_query = """
+                        UPDATE `tabSettlement Advice`
+                        SET status = %(status)s, remark = %(remark)s
+                        WHERE (bill_no is null or bill_no ='')
+                    """
+        frappe.db.sql(update_query, values = { 'status' : 'Warning', 'remark' : 'Bill Number Not Found'})
+        frappe.db.commit()
 
     
     def execute_cursors(self, query_list):
@@ -141,7 +140,6 @@ class Matcher:
         
     def process(self):
         self.delete_other_entries()
-        self.update_advice_entries()
         update_utr_in_separate_column()
         update_bill_no_separate_column()
         
