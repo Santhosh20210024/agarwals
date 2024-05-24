@@ -10,6 +10,7 @@ class NivaBupaDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
 
     def login(self):
+        self.driver.maximize_window()
         user = self.wait.until(EC.visibility_of_element_located((By.ID,'email')))
         user.send_keys(self.user_name)
         password = self.wait.until(EC.visibility_of_element_located((By.ID,'password')))
