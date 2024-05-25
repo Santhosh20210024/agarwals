@@ -1,36 +1,34 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:extension__name",
- "creation": "2024-05-20 13:20:28.959404",
+ "creation": "2024-05-21 15:20:02.725990",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "extension__name",
-  "path"
+  "doctype_name",
+  "indexing_columns"
  ],
  "fields": [
   {
-   "fieldname": "extension__name",
-   "fieldtype": "Data",
-   "label": "Extension  Name",
-   "unique": 1
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "label": "Doctype Name",
+   "options": "DocType"
   },
   {
-   "fieldname": "path",
+   "fieldname": "indexing_columns",
    "fieldtype": "Small Text",
-   "label": "Path"
+   "label": "Indexing  Columns"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-24 10:45:18.863312",
+ "modified": "2024-05-24 16:05:13.236831",
  "modified_by": "Administrator",
- "module": "Reconciliation",
- "name": "Extension Configuration",
- "naming_rule": "By fieldname",
+ "module": "Agarwals",
+ "name": "Index Updation",
  "owner": "Administrator",
  "permissions": [
   {
@@ -48,6 +46,5 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "track_changes": 1
+ "states": []
 }

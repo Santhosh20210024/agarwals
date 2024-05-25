@@ -65,8 +65,6 @@ class SeleniumDownloader:
             self.user_name = self.credential_doc.user_name
             self.password = self.credential_doc.password
             self.executing_child_class = self.credential_doc.executing_method
-            self.url = self.credential_doc.url
-            self.from_date = self.credential_doc.from_date
             self.to_date = frappe.utils.now_datetime().date()
             if frappe.db.exists("SA Downloader Configuration",{"name":self.executing_child_class}):
                 configuration_values = frappe.db.sql(f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",as_dict=True)[0]
@@ -74,6 +72,8 @@ class SeleniumDownloader:
                 self.is_headless = True if configuration_values.is_headless == 1 else False
                 self.incoming_file_type = configuration_values.incoming_file_type
                 self.max_wait_time = configuration_values.captcha_entry_duration
+                self.url = configuration_values.website_url
+                self.from_date = configuration_values.from_date
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
@@ -102,6 +102,7 @@ class SeleniumDownloader:
         table_html = table.get_attribute('outerHTML')
         with open(f'{self.download_directory}/{self.tpa}.html', 'w') as file:
             file.write(table_html)
+
     def attach_captcha_img(self,file_url=None):
         captcha_reference_doc = frappe.get_doc('Settlement Advice Downloader UI',self.captcha_tpa_doc)
         captcha_reference_doc.captcha_img =  file_url
@@ -281,13 +282,14 @@ class SeleniumDownloader:
         pass
 
     def convert_file_format(self,original_file,formated_file):
+        #HTML
         if  self.incoming_file_type == 'HTML':
             data = pd.read_html(original_file)
             if len(data) ==1:
                 data[0].to_excel(formated_file,index=False)
             else:
                 self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-        self.delete_backend_files(original_file)
+            self.delete_backend_files(original_file)
 
     def _download(self):
         self.download_from_web()

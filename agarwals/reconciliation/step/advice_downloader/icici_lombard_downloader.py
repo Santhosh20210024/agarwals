@@ -10,12 +10,23 @@ class ICICLombardDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
         
     def login(self):
+        self.driver.maximize_window()
         self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
         self.driver.find_element(By.ID,'username').send_keys(self.user_name)  #Username
         self.driver.find_element(By.ID,'password').send_keys(self.password) #password
-        captcha = self.driver.find_element(By.XPATH,"//h5[@style='font-size:20px;color:red;user-select:none']").get_attribute("innerHTML")
-        self.driver.find_element(By.ID,'clientCaptcha').send_keys(captcha.strip())
-        self.driver.find_element(By.ID,'btnLogin').click()
+        # captcha = self.driver.find_element(By.XPATH,"//h5[@style='font-size:20px;color:red;user-select:none']").get_attribute("innerHTML")
+        captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
+        if captcha:
+            self.get_captcha_image(captcha)
+            captcha_value = self.get_captcha_value()
+            if captcha_value != None:
+                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_value)
+                self.driver.find_element(By.ID, 'btnLogin').click()
+            else:
+                self.update_tpa_reference("Retry")
+                self.raise_exception("No Captcha Value Found")
+        else:
+            self.raise_exception(" No Captcha Image Found ")
 
     def navigate(self):
         try:

@@ -12,6 +12,8 @@
   "incoming_file_type",
   "captcha_entry_duration",
   "column_break_wdivc",
+  "website_url",
+  "from_date",
   "is_captcha",
   "is_headless",
   "section_break_xrzm5",
@@ -60,7 +62,7 @@
    "fieldname": "class_name",
    "fieldtype": "Select",
    "label": "Class",
-   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nRelianceGeneralDownloader"
+   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader"
   },
   {
    "default": "60",
@@ -68,11 +70,21 @@
    "fieldname": "captcha_entry_duration",
    "fieldtype": "Int",
    "label": "Waiting time for captcha entry(In sec)"
+  },
+  {
+   "fieldname": "website_url",
+   "fieldtype": "Data",
+   "label": " Website URL"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-23 15:23:27.356768",
+ "modified": "2024-05-24 12:00:42.440537",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
@@ -94,5 +106,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

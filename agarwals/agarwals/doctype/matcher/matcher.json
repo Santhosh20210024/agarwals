@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "prompt",
  "creation": "2024-02-20 19:47:41.424633",
@@ -92,7 +93,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-01 02:07:00.950052",
+ "modified": "2024-05-22 12:56:38.287312",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",
