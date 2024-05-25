@@ -62,7 +62,7 @@
    "fieldname": "class_name",
    "fieldtype": "Select",
    "label": "Class",
-   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader"
+   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader"
   },
   {
    "default": "60",

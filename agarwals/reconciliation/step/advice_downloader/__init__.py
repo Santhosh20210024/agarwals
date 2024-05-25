@@ -20,6 +20,7 @@ from agarwals.reconciliation.step.advice_downloader.paramount_downloader import 
 from agarwals.reconciliation.step.advice_downloader.care_health_downloader import CarehealthDownloader
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from agarwals.reconciliation.step.advice_downloader.fhpl_downloader import FHPLDownloader
+from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader import RelianceGeneralDownloader
 from agarwals.reconciliation.step.advice_downloader.niva_bupa_downloader import NivaBupaDownloader
 
 def download_advice(tpa_doc, chunk_doc, args):
