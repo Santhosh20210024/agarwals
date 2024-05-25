@@ -3,6 +3,7 @@ from agarwals.utils.updater import update_bill_no_separate_column, update_utr_in
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.index_update import update_index
 
 class Matcher:
     def add_log_error(self, doctype, name, error):
@@ -139,6 +140,7 @@ class Matcher:
         self.update_validate_entries()
         
     def process(self):
+        update_index() 
         self.delete_other_entries()
         update_utr_in_separate_column()
         update_bill_no_separate_column()
