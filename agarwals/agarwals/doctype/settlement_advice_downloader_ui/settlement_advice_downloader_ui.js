@@ -18,17 +18,20 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 	next:function(frm) {
 		if (frm.doc.status == 'InProgress') {
 			frm.save()
-			frm.refresh()
+			frm.toggle_display('next',0)
 			frappe.call({
 				method: 'agarwals.reconciliation.step.advice_downloader.download_captcha_settlement_advice',
 				args: {
 					'captcha_tpa_doc': frm.doc.name
+				},callback:function(r){
+					frm.toggle_display('next',1)
 				}
 			})
 
 		}
 	},
 	after_save:function(frm){
+			frm.refresh()
 			if(frm.doc.retry_invalid_captcha == 1){
 			frappe.call({
 				method:"agarwals.agarwals.doctype.settlement_advice_downloader_ui.settlement_advice_downloader_ui.update_logins",
@@ -52,4 +55,7 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 	}
 
 
+
+
 });
+
