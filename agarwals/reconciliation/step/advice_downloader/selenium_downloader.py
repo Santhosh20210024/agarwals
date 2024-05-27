@@ -48,6 +48,7 @@ class SeleniumDownloader:
         self.is_headless = True
         self.incoming_file_type = ''
         self.max_wait_time = 0
+        self.sandbox_mode = True
 
     def construct_file_url(*args):
         list_of_items = []
@@ -74,6 +75,7 @@ class SeleniumDownloader:
                 self.max_wait_time = configuration_values.captcha_entry_duration
                 self.url = configuration_values.website_url
                 self.from_date = configuration_values.from_date
+                self.sandbox_mode = True if configuration_values.sandbox_mode == 1 else False
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
@@ -184,6 +186,7 @@ class SeleniumDownloader:
 
     def _login(self):
         self.driver.get(self.url)
+        self.driver.maximize_window()
         return self.login()
 
     def login(self):
@@ -309,10 +312,13 @@ class SeleniumDownloader:
         self.create_fileupload(file_url, self.file_name)
 
     def add_driver_argument(self):
+        if self.sandbox_mode == False:
+            self.options.add_argument('--no-sandbox')
+            self.options.add_argument('--disable-dev-shm-usage')
         if self.is_headless == True:
             self.options.add_argument("--headless=new")
         frappe.db.commit()
-        extension_path = (frappe.db.sql("SELECT path FROM `tabExtension Reference` WHERE parent = 'CarehealthDownloader' ",
+        extension_path = (frappe.db.sql(f"SELECT path FROM `tabExtension Reference` WHERE parent = '{self.executing_child_class}' ",
                                   pluck='path'))
         if extension_path:
             for path in extension_path:

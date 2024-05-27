@@ -12,7 +12,6 @@ class FHPLDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
 
     def login(self):
-        self.driver.maximize_window()
         self.wait.until(EC.presence_of_element_located((By.ID, 'ContentPlaceHolder1_txtUserName'))).send_keys(
             self.user_name)
         self.wait.until(EC.presence_of_element_located((By.ID, 'ContentPlaceHolder1_txtPassword'))).send_keys(

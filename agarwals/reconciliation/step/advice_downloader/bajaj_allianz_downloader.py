@@ -17,7 +17,6 @@ class BajajAllianzDownloader(SeleniumDownloader):
         captcha_img = self.wait.until(EC.visibility_of_element_located((By.ID, 'valicode')))
         if captcha_img:
             self.get_captcha_image(captcha_img)
-            self.driver.maximize_window()
             captcha = self.get_captcha_value()
             if captcha != None:
                 captcha_entry = self.wait.until(

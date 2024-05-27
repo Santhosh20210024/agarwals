@@ -10,7 +10,6 @@ class ParamountDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
 
     def login(self):
-        self.driver.maximize_window()
         username = self.wait.until(EC.visibility_of_element_located((By.ID,'txtUserName')))
         username.send_keys(self.user_name)
         pwd = self.wait.until((EC.visibility_of_element_located((By.ID,'txtPassword'))))
