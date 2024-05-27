@@ -11,7 +11,6 @@ class CarehealthDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
 
     def login(self):
-        self.driver.maximize_window()
         self.wait.until(EC.visibility_of_element_located((By.ID, 'UserName')))
         self.driver.find_element(By.ID, 'UserName').send_keys(self.user_name)  # Username
         self.driver.find_element(By.ID, 'Password').send_keys(self.password)  # password

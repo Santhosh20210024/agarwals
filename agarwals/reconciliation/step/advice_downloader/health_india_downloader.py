@@ -18,12 +18,14 @@ class HealthIndiaDownloader(SeleniumDownloader):
         self.driver.find_element(By.ID,'ctl00_ContentPlaceHolder1_btnLogin').click()
 
     def navigate(self):
+        time.sleep(5)
         claim_count =self.driver.find_element(By.ID,'ctl00_ContentPlaceHolder1_lblsettled').get_attribute("innerHTML")
         if  claim_count == 0:
             self.raise_exception("Claim count should not be 0")
         else:
-            url = 'https://healthindiatpa.com/Provider/claimshome.aspx?type=claims_settled'
-            self.driver.get(url)
+            panel_footers = self.driver.find_elements(By.CSS_SELECTOR, '.panel-footer')
+            panel_footers[-1].click()
+            time.sleep(5)
 
     def download_from_web(self):
         self.wait.until(EC.visibility_of_element_located,((By.ID,'ctl00_ContentPlaceHolder1_lnk_ExportToExcel')))

@@ -10,7 +10,6 @@ class ICICLombardDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
         
     def login(self):
-        self.driver.maximize_window()
         self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
         self.driver.find_element(By.ID,'username').send_keys(self.user_name)  #Username
         self.driver.find_element(By.ID,'password').send_keys(self.password) #password

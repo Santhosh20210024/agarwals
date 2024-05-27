@@ -14,7 +14,6 @@ class RelianceGeneralDownloader(SeleniumDownloader):
 
 
     def login(self):
-        self.driver.maximize_window()
         username = self.wait.until(EC.presence_of_element_located((By.ID, 'txtUsername')))
         pwd = self.wait.until(EC.presence_of_element_located((By.ID, 'txtPassword')))
         username.send_keys(self.user_name)
