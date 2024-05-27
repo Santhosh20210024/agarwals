@@ -9,7 +9,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "source",
+  "file_upload",
   "file",
   "date",
   "transaction_status",
@@ -115,12 +115,6 @@
    "label": "Modifications"
   },
   {
-   "fieldname": "source",
-   "fieldtype": "Link",
-   "label": "Source File Id",
-   "options": "File upload"
-  },
-  {
    "depends_on": "eval:doc.staging_status == 'Warning'",
    "fieldname": "update_reference_number",
    "fieldtype": "Data",
@@ -218,11 +212,17 @@
    "fieldtype": "Link",
    "label": "Transform",
    "options": "Transform"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "Source File Id",
+   "options": "File upload"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-27 10:53:58.145251",
+ "modified": "2024-05-27 11:32:35.869985",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",

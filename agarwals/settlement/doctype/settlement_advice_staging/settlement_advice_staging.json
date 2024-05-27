@@ -8,7 +8,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "source",
+  "file_upload",
   "file_name",
   "file_upload_payer",
   "claim_id",
@@ -122,13 +122,6 @@
    "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
-   "fieldname": "source",
-   "fieldtype": "Link",
-   "label": "Source",
-   "options": "File upload",
-   "read_only": 1
-  },
-  {
    "fieldname": "disallowed_amount",
    "fieldtype": "Currency",
    "label": "Disallowed Amount",
@@ -178,11 +171,18 @@
    "fieldtype": "Link",
    "label": "Transform",
    "options": "Transform"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "Source",
+   "options": "File upload",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-27 10:57:48.039803",
+ "modified": "2024-05-27 11:44:51.804905",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",

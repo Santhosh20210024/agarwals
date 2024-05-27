@@ -39,7 +39,7 @@
   "matched_bill_record",
   "matcher_status",
   "matcher_id",
-  "source_file",
+  "file_upload",
   "file_name",
   "claim_key",
   "cg_formatted_bill_number",
@@ -140,12 +140,6 @@
    "fieldname": "final_utr_number",
    "fieldtype": "Data",
    "label": "Final UTR Number"
-  },
-  {
-   "fieldname": "source_file",
-   "fieldtype": "Link",
-   "label": "Source File",
-   "options": "File upload"
   },
   {
    "fieldname": "reference_section",
@@ -260,10 +254,16 @@
    "fieldtype": "Link",
    "label": "Transform",
    "options": "Transform"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "Source File",
+   "options": "File upload"
   }
  ],
  "links": [],
- "modified": "2024-05-27 10:59:14.227484",
+ "modified": "2024-05-27 11:45:24.560812",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
