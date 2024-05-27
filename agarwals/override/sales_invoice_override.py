@@ -537,12 +537,25 @@ class SalesInvoiceOverride(SellingController):
 		
 
 	def update_total_tds_disallowance(self):
-		child_docs=frappe.db.sql(""" SELECT sum(tds_amount) total_tds,sum(disallowance_amount) total_dis from `tabSales Invoice Reference` where parent='{name}'""".format(name=self.name),as_dict=True)
-		print(child_docs)
+		child_docs=frappe.db.sql(""" 
+						   SELECT 
+						        sum(tds_amount) total_tds,sum(disallowance_amount) total_dis 
+						    FROM
+						        `tabSales Invoice Reference` 
+						    WHERE parent='{name}'
+						   
+						   """.format(name=self.name),as_dict=True)
 		
 		if self.custom_total_disallowance != child_docs[0]['total_dis'] or self.custom_total_tds != child_docs[0]['total_tds']:
-			frappe.db.sql("""UPDATE `tabSales Invoice` set custom_total_tds='{total_tds}' , custom_total_disallowance='{total_dis}' where name='{name}'""".format(name=self.name,total_dis=child_docs[0]['total_dis'],total_tds=child_docs[0]['total_tds']))
-			frappe.db.commit()
+					frappe.db.sql("""
+						 UPDATE 
+						 	 `tabSales Invoice` 
+						 SET
+						 	  custom_total_tds='{total_tds}' , custom_total_disallowance='{total_dis}' 
+						 WHERE
+						      name='{name}'""".format(name=self.name,total_dis=child_docs[0]['total_dis'],total_tds=child_docs[0]['total_tds']))
+					
+					frappe.db.commit()
 			
 
 	def on_update_after_submit(self):
