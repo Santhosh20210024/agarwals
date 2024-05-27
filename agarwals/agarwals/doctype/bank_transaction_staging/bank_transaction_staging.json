@@ -37,7 +37,8 @@
   "payer_type",
   "payer_name",
   "payer_group",
-  "internal_id"
+  "internal_id",
+  "transform"
  ],
  "fields": [
   {
@@ -211,11 +212,17 @@
    "fieldname": "internal_id",
    "fieldtype": "Data",
    "label": "Internal ID"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-02 16:50:38.990383",
+ "modified": "2024-05-27 10:53:58.145251",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",

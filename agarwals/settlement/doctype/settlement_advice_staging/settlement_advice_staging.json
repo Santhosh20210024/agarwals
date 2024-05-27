@@ -28,7 +28,8 @@
   "remarks",
   "retry",
   "hash",
-  "error_code"
+  "error_code",
+  "transform"
  ],
  "fields": [
   {
@@ -171,11 +172,17 @@
    "fieldtype": "Select",
    "label": "Error Code",
    "options": "\nS100\nS101\nS102\nS103\nS104\nS105"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-15 20:15:30.775142",
+ "modified": "2024-05-27 10:57:48.039803",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
