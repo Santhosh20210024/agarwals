@@ -542,8 +542,8 @@ class SalesInvoiceOverride(SellingController):
 						        sum(tds_amount) total_tds,sum(disallowance_amount) total_dis 
 						    FROM
 						        `tabSales Invoice Reference` 
-						    WHERE parent='{name}'
-						   
+						    WHERE 
+						   		parent='{name}'
 						   """.format(name=self.name),as_dict=True)
 		
 		if self.custom_total_disallowance != child_docs[0]['total_dis'] or self.custom_total_tds != child_docs[0]['total_tds']:
@@ -553,7 +553,8 @@ class SalesInvoiceOverride(SellingController):
 						 SET
 						 	  custom_total_tds='{total_tds}' , custom_total_disallowance='{total_dis}' 
 						 WHERE
-						      name='{name}'""".format(name=self.name,total_dis=child_docs[0]['total_dis'],total_tds=child_docs[0]['total_tds']))
+						      name='{name}
+				         '""".format(name=self.name,total_dis=child_docs[0]['total_dis'],total_tds=child_docs[0]['total_tds']))
 					
 					frappe.db.commit()
 			
