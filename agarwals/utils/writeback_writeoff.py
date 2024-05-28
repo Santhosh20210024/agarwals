@@ -189,6 +189,6 @@ def reconcile_document_writeoff(doctype, docname, payment_document,payment_entry
     bank_transaction_doc.append(child_table, {
         "entry_type": payment_document,
         "entry_name": payment_entry,
-        "paid_amount": allocated_amount
+        "writeoff_amount": allocated_amount
     })
     bank_transaction_doc.save()
