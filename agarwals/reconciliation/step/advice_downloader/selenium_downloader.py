@@ -107,11 +107,11 @@ class SeleniumDownloader:
 
     def attach_captcha_img(self,file_url=None):
         captcha_reference_doc = frappe.get_doc('Settlement Advice Downloader UI',self.captcha_tpa_doc)
-        captcha_reference_doc.captcha_img =  file_url
+        captcha_reference_doc.captcha_img = file_url
         captcha_reference_doc.captcha = ''
         captcha_reference_doc.save()
         frappe.db.commit()
-        captcha_reference_doc.reload()
+
 
     def create_captcha_file(self):
         file_doc = frappe.new_doc("File")
