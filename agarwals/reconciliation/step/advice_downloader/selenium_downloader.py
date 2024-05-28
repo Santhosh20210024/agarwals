@@ -115,6 +115,7 @@ class SeleniumDownloader:
         # frappe.publish_realtime('eventsts', {} , user=frappe.session.user)
 
 
+
     def create_captcha_file(self):
         file_doc = frappe.new_doc("File")
         file_doc.file_name = f"{self.tpa}_{frappe.utils.now_datetime()}captcha.png"
