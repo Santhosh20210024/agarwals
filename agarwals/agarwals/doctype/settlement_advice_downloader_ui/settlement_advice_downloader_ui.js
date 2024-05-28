@@ -53,10 +53,6 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 			"margin": "0 auto",
 			"display": "block"
 		});
-	},
-
-	reload_doc:function (){
-			frm.reload_doc()
 	}
 
 
