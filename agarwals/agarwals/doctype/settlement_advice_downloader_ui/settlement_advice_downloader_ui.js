@@ -24,6 +24,7 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 				args: {
 					'captcha_tpa_doc': frm.doc.name
 				},callback:function(r){
+					frm.refresh()
 					frm.toggle_display('next',1)
 				}
 			})
@@ -52,10 +53,20 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 			"margin": "0 auto",
 			"display": "block"
 		});
+	},
+
+	reload_doc:function (){
+			frm.reload_doc()
 	}
 
 
-
-
 });
+frappe.realtime.on("eventsts", function(response) {
+	if (cur_frm && cur_frm.doc.doctype === 'Settlement Advice Downloader UI') {
+		console.log("its working dude")
+        cur_frm.reload_doc();
+    }
+});
+
+
 
