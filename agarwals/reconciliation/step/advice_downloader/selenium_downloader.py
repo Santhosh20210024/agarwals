@@ -111,6 +111,7 @@ class SeleniumDownloader:
         captcha_reference_doc.captcha = ''
         captcha_reference_doc.save()
         frappe.db.commit()
+        captcha_reference_doc.reload()
 
 
     def create_captcha_file(self):
