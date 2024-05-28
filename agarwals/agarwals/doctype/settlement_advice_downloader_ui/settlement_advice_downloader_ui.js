@@ -24,6 +24,7 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 				args: {
 					'captcha_tpa_doc': frm.doc.name
 				},callback:function(r){
+					frm.refresh()
 					frm.toggle_display('next',1)
 				}
 			})
@@ -55,7 +56,17 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 	}
 
 
-
-
 });
+frappe.realtime.on("eventsts", function(response) {
+	console.log("websocket Triggered")
+	if (cur_frm && cur_frm.doc.doctype === 'Settlement Advice Downloader UI') {
+		console.log("doctype identified")
+        cur_frm.reload_doc();
+    }
+	else{
+		console.log(' Could not find the doctype ')
+	}
+});
+
+
 
