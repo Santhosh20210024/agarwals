@@ -29,7 +29,8 @@
   "retry",
   "hash",
   "error_code",
-  "transform"
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -142,7 +143,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "source.file_name",
+   "fetch_from": "file_upload.file",
    "fetch_if_empty": 1,
    "fieldname": "file_name",
    "fieldtype": "Data",
@@ -155,7 +156,7 @@
    "unique": 1
   },
   {
-   "fetch_from": "source.payer_type",
+   "fetch_from": "file_upload.payer_type",
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
    "label": "File Upload Payer"
@@ -170,7 +171,8 @@
    "fieldname": "transform",
    "fieldtype": "Link",
    "label": "Transform",
-   "options": "Transform"
+   "options": "Transform",
+   "read_only": 1
   },
   {
    "fieldname": "file_upload",
@@ -178,11 +180,17 @@
    "label": "Source",
    "options": "File upload",
    "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-27 11:44:51.804905",
+ "modified": "2024-05-29 18:18:19.508224",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",

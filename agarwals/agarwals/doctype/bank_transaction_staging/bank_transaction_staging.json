@@ -38,7 +38,8 @@
   "payer_name",
   "payer_group",
   "internal_id",
-  "transform"
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -154,7 +155,7 @@
    "label": "Previous utr"
   },
   {
-   "fetch_from": "source.file",
+   "fetch_from": "file_upload.file",
    "fieldname": "file",
    "fieldtype": "Data",
    "label": "File Name"
@@ -211,18 +212,26 @@
    "fieldname": "transform",
    "fieldtype": "Link",
    "label": "Transform",
-   "options": "Transform"
+   "options": "Transform",
+   "read_only": 1
   },
   {
    "fieldname": "file_upload",
    "fieldtype": "Link",
    "label": "Source File Id",
-   "options": "File upload"
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-27 11:32:35.869985",
+ "modified": "2024-05-29 18:33:32.902852",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",

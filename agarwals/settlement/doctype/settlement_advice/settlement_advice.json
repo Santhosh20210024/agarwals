@@ -43,7 +43,8 @@
   "file_name",
   "claim_key",
   "cg_formatted_bill_number",
-  "transform"
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -210,7 +211,7 @@
    "options": "Bill"
   },
   {
-   "fetch_from": "source_file.file",
+   "fetch_from": "file_upload.file",
    "fieldname": "file_name",
    "fieldtype": "Data",
    "label": "File Name"
@@ -239,7 +240,7 @@
    "label": "Matcher Status"
   },
   {
-   "fetch_from": "source_file.payer_type",
+   "fetch_from": "file_upload.payer_type",
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
    "label": "File Upload Payer"
@@ -253,17 +254,25 @@
    "fieldname": "transform",
    "fieldtype": "Link",
    "label": "Transform",
-   "options": "Transform"
+   "options": "Transform",
+   "read_only": 1
   },
   {
    "fieldname": "file_upload",
    "fieldtype": "Link",
    "label": "Source File",
-   "options": "File upload"
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2024-05-27 11:45:24.560812",
+ "modified": "2024-05-29 18:32:06.616509",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

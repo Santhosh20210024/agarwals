@@ -56,7 +56,8 @@
   "outstanding_amount",
   "cg_formatted_bill_number",
   "file_upload",
-  "transform"
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -344,13 +345,21 @@
    "fieldname": "file_upload",
    "fieldtype": "Link",
    "label": "File Upload",
-   "options": "File upload"
+   "options": "File upload",
+   "read_only": 1
   },
   {
    "fieldname": "transform",
    "fieldtype": "Link",
    "label": "Transform",
-   "options": "Transform"
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -361,7 +370,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-27 10:49:57.109707",
+ "modified": "2024-05-29 18:11:04.895100",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
