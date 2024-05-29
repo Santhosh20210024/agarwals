@@ -352,16 +352,20 @@ class BillTransformer(DirectTransformer):
         super().__init__()
         self.file_type = 'Debtors Report'
         self.document_type = 'Bill'
+        self.hashing = 1
 
     def load_target_df(self):
         query = f"""
                      SELECT 
-                         name, status
+                         name, hash
                      FROM 
                          `tab{self.document_type}`
                      """
         records = frappe.db.sql(query, as_list=True)
-        self.target_df = pd.DataFrame(records,columns = ['name','status'])
+        self.target_df = pd.DataFrame(records,columns = ['name','hash'])
+
+    def get_columns_to_hash(self):
+        return ['Status', 'Claim Reference ID']
 
     def get_join_columns(self):
         left_df_column = 'Bill No'
@@ -369,13 +373,13 @@ class BillTransformer(DirectTransformer):
         return left_df_column, right_df_column
 
     def get_columns_to_prune(self):
-        return ['name', '_merge', 'status']
+        return ['name', '_merge', 'hash_x', 'hash_column']
 
     def get_columns_to_check(self):
-        return {'Status': 'status'}
+        return {'hash': 'hash_x'}
 
     def get_column_needed(self):
-        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID']
+        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash']
 
 class ClaimbookTransformer(DirectTransformer):
     def __init__(self):

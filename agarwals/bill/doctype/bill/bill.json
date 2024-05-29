@@ -39,7 +39,7 @@
   "refund",
   "claim_amount",
   "claim_amount_due",
-  "hash_value",
+  "hash",
   "claim_key",
   "ma_claim_key",
   "physical_submission_details_section",
@@ -109,7 +109,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nRAISED\nCANCELLED",
+   "options": "\nRAISED\nCANCELLED\nCANCELLED AND DELETED",
    "read_only": 1
   },
   {
@@ -199,12 +199,6 @@
    "fieldtype": "Currency",
    "label": "Claim Amount Due",
    "read_only": 1
-  },
-  {
-   "fieldname": "hash_value",
-   "fieldtype": "Read Only",
-   "hidden": 1,
-   "label": "Hash Value"
   },
   {
    "fieldname": "consultant",
@@ -337,6 +331,12 @@
    "fieldname": "ma_claim_key",
    "fieldtype": "Data",
    "label": "MA Claim Key"
+  },
+  {
+   "fieldname": "hash",
+   "fieldtype": "Read Only",
+   "hidden": 1,
+   "label": "Hash"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -347,7 +347,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-02-29 23:02:48.542363",
+ "modified": "2024-05-27 14:38:08.790168",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
