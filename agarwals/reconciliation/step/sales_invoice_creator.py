@@ -34,6 +34,7 @@ class SalesInvoiceCreator:
                     bill_record.save()
                     sales_invoice_record = frappe.new_doc('Sales Invoice')
                     sales_invoice_params = {'custom_bill_no': bill_record.bill_no, 'custom_mrn': bill_record.mrn,
+                                            'custom_patient_name': bill_record.patient_name, 'custom_ma_claim_id': bill_record.ma_claim_id,
                                             'custom_claim_id': bill_record.claim_id, 'customer': bill_record.customer,
                                             'entity': bill_record.entity, 'region': bill_record.region,
                                             'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
