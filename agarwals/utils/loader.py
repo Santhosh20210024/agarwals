@@ -100,7 +100,7 @@ class Loader():
                 import_name = self.load_data(import_type, file)
                 import_status = self.get_import_status(import_name)
                 if import_status == 'Pending' or import_status == 'Error':
-                    self.update('Transform', file['name'], 'Error')
+                    self.update('Transform', file['name'], 'Error', errored_count = frappe.get_doc('Data Import', import_name).payload_count)
                 else:
                     processed, not_processed = frappe.db.count('Data Import Log', {'success': 1,
                                                                                    'data_import': import_name}), frappe.db.count(

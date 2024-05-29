@@ -149,7 +149,7 @@ class Transformer:
         if self.clean_utr == 1:
             self.format_utr(self.utr_column_name)
         transform = self.create_transform_record(file['name'])
-        df["source"] = file['name']
+        df["file_upload"] = file['name']
         df["transform"] = transform.name
         file_path = self.write_excel(df, file['upload'], type,folder)
         self.create_file_record(file_path,folder)
@@ -164,6 +164,7 @@ class Transformer:
             else:
                 self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
                 self.update_status('File upload', file['name'], 'Error')
+            self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
             self.log_error(self.document_type, file['name'], e)
             self.update_status('File upload', file['name'], 'Error')
@@ -319,7 +320,7 @@ class Transformer:
                 chunk_doc = chunk.create_chunk(args["step_id"])
                 chunk.update_status(chunk_doc, "InProgress")
                 self.update_status('File upload', file['name'], 'In Process')
-                self.load_source_df(file,self.header)
+                self.load_source_df(file, self.header)
                 try:
                     if self.source_df.empty:
                         self.log_error(self.document_type, file['name'], 'The File is Empty')
@@ -400,7 +401,7 @@ class BillTransformer(DirectTransformer):
         return {'hash': 'hash_x'}
 
     def get_column_needed(self):
-        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash']
+        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash', 'file_upload', 'transform', 'index']
 
 class ClaimbookTransformer(DirectTransformer):
     def __init__(self):
@@ -436,7 +437,7 @@ class ClaimbookTransformer(DirectTransformer):
         return {'hash': 'hash_x'}
 
     def get_column_needed(self):
-        return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size','final_utr_number','hash', 'source', 'transform']
+        return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size','final_utr_number','hash', 'file_upload', 'transform', 'index']
 
 class StagingTransformer(Transformer):
     def __init__(self):
@@ -519,9 +520,11 @@ class BankTransformer(StagingTransformer):
         identified_header_row = [self.trim_and_lower(column) for column in
                                  self.source_df.loc[header_row_index].to_list() if
                                  'nan' not in str(column) and str(column) != '*' and str(column) != '.']
+        identified_header_row.pop()
         for key, columns in source_column_list.items():
             columns = [self.trim_and_lower(column) for column in columns]
             if set(identified_header_row) == set(columns):
+                identified_header_row.append("index")
                 return key, header_row_index, identified_header_row
         return 'Not Identified', 0, []
 
@@ -538,7 +541,7 @@ class BankTransformer(StagingTransformer):
         return valid
 
     def get_column_needed(self):
-        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number','internal_id']
+        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number','internal_id', 'file_upload', 'transform', 'index']
 
     def get_configuration(self):
         return frappe.get_single('Bank Configuration')
@@ -644,7 +647,7 @@ class AdjustmentTransformer(Transformer):
         self.document_type = 'Bill Adjustment'
 
     def get_column_needed(self):
-        return ["bill","tds","disallowance","posting_date","source_file","file_upload"]
+        return ["bill","tds","disallowance","posting_date","source_file", 'file_upload', 'transform', 'index']
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -659,7 +662,7 @@ class AdjustmentTransformer(Transformer):
 
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,["bill","tds","disallowance","posting_date","source_file","file_upload"])
+        self.source_df = self.find_and_rename_column(self.source_df,["bill","tds","disallowance","posting_date","source_file", 'file_upload', 'transform', 'index'])
         configuration = frappe.get_single('Bank Configuration')
         if "posting_date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
@@ -674,7 +677,7 @@ class WritebackTransformer(Transformer):
 
     def get_column_needed(self):
         return ["reference_number","date","region","entity","branch_type","deposit","withdrawal","bank_account","description","custom_cg_utr_number",
-                "transaction_id","transaction_type","allocated_amount","unallocated_amount","party_type","party","file_upload"]
+                "transaction_id","transaction_type","allocated_amount","unallocated_amount","party_type","party", 'file_upload', 'transform', 'index']
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -701,7 +704,7 @@ class WriteoffTransformer(Transformer):
 
     def get_column_needed(self):
         return ["bill_no","bill_date","customer","customer_group","claim_amount","outstanding_amount","branch","entity","region","mrn",
-                "patient_name","claim_id","ma_claim_id","payer_name","file_upload"]
+                "patient_name","claim_id","ma_claim_id","payer_name", 'file_upload', 'transform', 'index']
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -740,7 +743,7 @@ class BankBulkTransformer(BankTransformer):
     def transform(self, file):
         self.source_df["source"] = file['name']
         self.source_df = self.find_and_rename_column(self.source_df,
-                                                     ['date','narration', 'deposit','withdrawal','internal_id','utr_number','bank_account','source'])
+                                                     ['date','narration', 'deposit','withdrawal','internal_id','utr_number','bank_account', 'file_upload', 'transform', 'index'])
         configuration = frappe.get_single('Bank Configuration')
         if "date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df, eval(configuration.date_formats), 'date')

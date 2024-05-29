@@ -8,6 +8,11 @@ from agarwals.reconciliation import chunk
 
 SITE_PATH = frappe.get_single('Control Panel').site_path
 
+source_df = pd.DataFrame()
+new_records = pd.DataFrame()
+modified_records = pd.DataFrame()
+unmodified_records = pd.DataFrame()
+
 def left_join(source_df,target_df):
     left_on, right_on = "hash","hash"
     merged_df = source_df.merge(target_df, left_on=left_on, right_on=right_on, how='left',
@@ -52,9 +57,19 @@ def format_date(df,date_formats,date_column):
     df = prune_columns(df,[col for col in df.columns if 'date_' in col or col == 'formatted_date' or col == 'original_date'])
     return df
 
-def prune_columns(df, columns_to_prune):
+def trim_and_lower(word):
+    return str(word).strip().lower().replace(' ', '')
+
+def prune_columns(df, columns):
+    columns_to_prune = []
+    for column in columns:
+        if column in df.columns:
+            columns_to_prune.append(column)
+    unnamed_columns = [trim_and_lower(column) for column in df.columns if 'unnamed' in column]
+    if unnamed_columns:
+        columns_to_prune.extend(unnamed_columns)
     df = df.drop(columns=columns_to_prune, errors='ignore')
-    return df 
+    return df
 
 def swap_advice_amount(row):
     row['settled_amount'] = pd.to_numeric(row['settled_amount'])
@@ -76,7 +91,7 @@ def clean_data(df):
         df = format_date(df,eval(frappe.get_single('Bank Configuration').date_formats),'paid_date')
         format_utr(df)
         return df
-        
+
 def update_status(doctype, name, status):
         if doctype == 'File upload':
             doc = frappe.get_doc('File upload',name)
@@ -86,6 +101,19 @@ def update_status(doctype, name, status):
         else:
             frappe.db.set_value(doctype,name,'status',status)
             frappe.db.commit()
+
+def update_count(doctype, name):
+    global source_df
+    global new_records
+    global unmodified_records
+    global modified_records
+    file_record = frappe.get_doc(doctype, name)
+    file_record.total_records = len(source_df)
+    file_record.insert_records = len(new_records)
+    file_record.update_records = len(modified_records)
+    file_record.skipped_records = len(unmodified_records)
+    file_record.save(ignore_permissions=True)
+    frappe.db.commit()
 
 def update_parent_status(file):
     file_record = frappe.get_doc('File upload',file.name)
@@ -99,8 +127,28 @@ def update_parent_status(file):
         update_status('File upload', file.name, 'Partial Success')
     else:
         update_status('File upload', file.name, 'Success')
-        
+    update_count('File upload', file.name)
+
+def convert_into_common_format(df,columns_to_select):
+    columns = []
+    for column in columns_to_select:
+        if column in df.columns:
+            columns.append(column)
+        else:
+            df[column] = ''
+    return df
+
+def reorder_columns(column_orders,df):
+    df = convert_into_common_format(df,column_orders)
+    return df[column_orders]
+
+def get_column_needed():
+    return ["claim_id", "claim_amount", "utr_number", "disallowed_amount", "payer_remark", "settled_amount","tds_amount", "claim_status", "paid_date", "bill_number", "final_utr_number", "hash", "file_upload", "transform", "index"]
+
 def write_excel(df, file_path, type, target_folder):
+    column_orders = get_column_needed()
+    if column_orders:
+        df = reorder_columns(column_orders, df)
     excel_file_path = file_path.replace(file_path.split('.')[-1],'xlsx')
     file_path = excel_file_path.replace('Extract', target_folder).replace('.xlsx','_' + type + '.xlsx')
     file_path_to_write = SITE_PATH + file_path
@@ -118,26 +166,37 @@ def create_file_record(file_url,folder):
     file.save()
     frappe.db.set_value('File',file.name,'file_url',file_url)
 
-def insert_in_file_upload(file_url, file_upload_name, type, status):
+def insert_in_file_upload(file_url, file_upload_name, type, status, transform_child):
     file_upload = frappe.get_doc('File upload', file_upload_name)
-    file_upload.append('transform',
-                        {
-                            'date': date.today(),
-                            'document_type': "Settlement Advice Staging",
-                            'type': type,
-                            'file_url': file_url,
-                            'status': status
-                        })
+    transform_child.update({
+        'type': type,
+        'file_url': file_url,
+        'status': status
+    })
+    file_upload.transform.append(transform_child)
     file_upload.save(ignore_permissions=True)
+
+def create_transform_record(file_upload_name):
+    file_upload = frappe.get_doc('File upload', file_upload_name)
+    transform = file_upload.append('transform',
+                                   {
+                                       'date': date.today(),
+                                       'document_type': "Settlement Advice Staging",
+                                   })
+    file_upload.save(ignore_permissions=True)
+    return transform
 
 def move_to_transform(file, df, type, folder, prune=True, status = 'Open'):
     if df.empty:
         return None
     if prune:
         df = prune_columns(df,['name', '_merge', 'hash_x', 'hash_column'])
+    transform = create_transform_record(file['name'])
+    df["file_upload"] = file['name']
+    df["transform"] = transform.name
     file_path = write_excel(df, file.upload, type,folder)
     create_file_record(file_path,folder)
-    insert_in_file_upload(file_path, file.name, type, status)
+    insert_in_file_upload(file_path, file.name, type, status, transform)
 
 def remove_x(item):
     if "XXXXXXX" in str(item):
@@ -181,9 +240,13 @@ def log_error(doctype_name, reference_name, error_message):
     error_log.set('error_message', error_message)
     error_log.save()
 
-def split_and_move_to_transform(source_df,file):
-    source_df=hashing_job(source_df)
+def split_and_move_to_transform(df,file):
+    global source_df
+    global new_records
+    global unmodified_records
+    source_df=hashing_job(df)
     target_df=get_target_df()
+    source_df["index"] = [i for i in range(2, len(df) + 2)]
     if target_df.empty: 
             new_records = source_df 
             move_to_transform(file, new_records, 'Insert', 'Transform', False)
@@ -192,9 +255,9 @@ def split_and_move_to_transform(source_df,file):
             if merged_df.empty:
                 return False
             new_records = merged_df[merged_df['_merge'] == 'left_only']
-            existing_df = merged_df[merged_df['_merge'] == 'both']
+            unmodified_records = merged_df[merged_df['_merge'] == 'both']
             move_to_transform(file, new_records, 'Insert', 'Transform', True)
-            move_to_transform(file, existing_df, 'Skip', 'Bin', True, 'Skipped')
+            move_to_transform(file, unmodified_records, 'Skip', 'Bin', True, 'Skipped')
 
 @frappe.whitelist()
 def process(args):
@@ -268,7 +331,6 @@ def process(args):
                         if every_column not in df.columns:
                             df[every_column] = ""
                     df = df[all_columns]
-                    df["source"]=file.name
                     df = clean_data(df)
                     # Amount checking
                     df = check_advice_amount(df)
