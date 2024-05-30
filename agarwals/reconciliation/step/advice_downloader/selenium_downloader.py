@@ -95,6 +95,7 @@ class SeleniumDownloader:
                 if captcha_value[0].captcha:
                     captcha = captcha_value[0].captcha
                     break
+                time.sleep(5)
             return captcha if captcha !='' else None
         except Exception as E:
             self.log_error('Settlement Advice Downloader UI',self.tpa, E)
@@ -112,7 +113,7 @@ class SeleniumDownloader:
         captcha_reference_doc.save()
         frappe.db.commit()
         captcha_reference_doc.reload()
-        # frappe.publish_realtime('eventsts', {} , user=frappe.session.user)
+
 
 
 
@@ -182,7 +183,14 @@ class SeleniumDownloader:
         try:
             status_query = frappe.db.sql(f"SELECT status FROM `tabSettlement Advice Downloader UI Logins` WHERE name = '{self.child_reference_name}' ",as_dict = True)
             if status_query[0].status == 'InProgress':
-                frappe.db.sql(f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = '{status}' WHERE name = '{self.child_reference_name}' ")
+                parent_doc = frappe.get_doc('Settlement Advice Downloader UI', self.captcha_tpa_doc)
+                parent_doc.captcha_img = ''
+                doc = frappe.get_doc("Settlement Advice Downloader UI Logins", self.child_reference_name)
+                doc.update({
+                    "status":status
+                })
+                parent_doc.logins.append(doc)
+                parent_doc.save(ignore_permissions = True)
                 frappe.db.commit()
         except Exception as E:
             self.log_error('Settlement Advice Downloader UI',self.tpa, E)

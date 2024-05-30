@@ -60,8 +60,14 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             doc_name = (login_ref.tpa_login_credentials)
             if doc_name:
                 login = frappe.get_all('TPA Login Credentials', {'name': doc_name}, ['*'])[0]
-                frappe.db.sql(
-                    f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'InProgress' WHERE name = '{login_ref.name}' ")
+                # frappe.msgprint("Going for query")
+                parent_doc = frappe.get_doc('Settlement Advice Downloader UI', captcha_tpa_doc)
+                doc = frappe.get_doc("Settlement Advice Downloader UI Logins", login_ref.name)
+                doc.update({
+                    "status":"InProgress"
+                })
+                parent_doc.logins.append(doc)
+                parent_doc.save(ignore_permissions = True)
                 frappe.db.commit()
                 target = eval(login.executing_method)
                 target().download(tpa_doc=login, child=login_ref.name, parent=captcha_tpa_doc)
