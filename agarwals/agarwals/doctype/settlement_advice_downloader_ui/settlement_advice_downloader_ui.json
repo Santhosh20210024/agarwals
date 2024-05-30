@@ -53,6 +53,7 @@
   {
    "fieldname": "captcha_img",
    "fieldtype": "Attach",
+   "hidden": 1,
    "label": "captcha Image"
   },
   {
@@ -107,7 +108,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-29 20:57:43.239634",
+ "modified": "2024-05-30 11:22:56.614187",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Settlement Advice Downloader UI",

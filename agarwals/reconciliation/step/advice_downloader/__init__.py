@@ -60,7 +60,6 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             doc_name = (login_ref.tpa_login_credentials)
             if doc_name:
                 login = frappe.get_all('TPA Login Credentials', {'name': doc_name}, ['*'])[0]
-                # frappe.msgprint("Going for query")
                 parent_doc = frappe.get_doc('Settlement Advice Downloader UI', captcha_tpa_doc)
                 doc = frappe.get_doc("Settlement Advice Downloader UI Logins", login_ref.name)
                 doc.update({

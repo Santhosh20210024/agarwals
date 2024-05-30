@@ -2,12 +2,9 @@
 // For license information, please see license.txt
 
 var interval_ID = ""
-var i = 0
 frappe.ui.form.on('Settlement Advice Downloader UI', {
 
-		refresh:function(frm) {
-			i = i+1
-			console.log(i)
+	refresh:function(frm) {
         if (frm.doc.captcha_img && frm.doc.captcha_img != '') {
 			var captchaField = frm.fields_dict['captcha_html'].$wrapper;
 			captchaField.empty();
@@ -16,7 +13,7 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 			if (interval_ID != "") {
 				clearInterval(interval_ID)
 				interval_ID = ""
-				console.log("Intrval stopped")
+
 			}
 
         }
@@ -32,7 +29,6 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 			if (frm.doc.disable_auto_refresh == 0){
              interval_ID = setInterval(function() {
                 cur_frm.reload_doc()
-				 console.log("Time Interval Triggered")
             }, 5000);
 			}
 			frappe.call({
