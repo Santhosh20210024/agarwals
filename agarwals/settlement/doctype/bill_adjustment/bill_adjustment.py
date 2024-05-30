@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 import frappe.utils
 import frappe
+from agarwals.agarwals.doctype import file_records
 from frappe.model.document import Document
 import datetime
 
@@ -26,3 +27,7 @@ class BillAdjustment(Document):
 					if sales_doc.status == 'Partly Paid':
 						payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation asc")
 						self.posting_date = payment_reference[0]['posting_date'].strftime("%Y/%m/%d")
+
+	def on_update(self):
+		file_records.create(file_upload=self.file_upload, transform=self.transform, reference_doc="Bill Adjustment",
+							record=self.name, index = self.index)
