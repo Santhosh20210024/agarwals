@@ -35,7 +35,9 @@
   "party_type",
   "party",
   "column_break_gyq36",
-  "file_upload"
+  "file_upload",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -63,7 +65,7 @@
   },
   {
    "fieldname": "bank_account",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Bank Account",
    "options": "Bank Account"
   },
@@ -179,13 +181,25 @@
   },
   {
    "fieldname": "file_upload",
-   "fieldtype": "Data",
-   "label": "File Upload"
+   "fieldtype": "Link",
+   "label": "File Upload",
+   "options": "File upload"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform"
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-17 17:54:31.886970",
+ "modified": "2024-05-30 11:53:20.657509",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Back",

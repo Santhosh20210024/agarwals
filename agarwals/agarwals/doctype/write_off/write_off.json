@@ -50,7 +50,9 @@
   "final_submission_date",
   "invoice",
   "outstanding_amount",
-  "file_upload"
+  "file_upload",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -303,8 +305,23 @@
   },
   {
    "fieldname": "file_upload",
-   "fieldtype": "Data",
-   "label": "File Upload"
+   "fieldtype": "Link",
+   "label": "File Upload",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -315,7 +332,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-17 17:52:39.061438",
+ "modified": "2024-05-30 11:48:13.752577",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Off",
