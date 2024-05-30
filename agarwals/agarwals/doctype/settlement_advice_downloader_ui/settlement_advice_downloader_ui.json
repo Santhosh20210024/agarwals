@@ -15,6 +15,7 @@
   "captcha_html",
   "captcha_img",
   "captcha",
+  "disable_auto_refresh",
   "column_break_2r8om",
   "column_break_zcbaz",
   "next",
@@ -80,6 +81,7 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Status",
    "options": "InProgress\nCompleted\nPartially Completed\nCancelled\nError"
   },
@@ -95,11 +97,18 @@
    "fieldname": "retry_invalid_captcha",
    "fieldtype": "Check",
    "label": "Retry Invalid Captcha"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_auto_refresh",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Disable Auto Refresh"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-16 16:31:10.545535",
+ "modified": "2024-05-30 11:22:56.614187",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Settlement Advice Downloader UI",
