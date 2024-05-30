@@ -183,23 +183,26 @@
    "fieldname": "file_upload",
    "fieldtype": "Link",
    "label": "File Upload",
-   "options": "File upload"
+   "options": "File upload",
+   "read_only": 1
   },
   {
    "fieldname": "transform",
    "fieldtype": "Link",
    "label": "Transform",
-   "options": "Transform"
+   "options": "Transform",
+   "read_only": 1
   },
   {
    "fieldname": "index",
    "fieldtype": "Int",
-   "label": "File Index"
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-30 11:53:20.657509",
+ "modified": "2024-05-30 15:02:01.013442",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Write Back",
