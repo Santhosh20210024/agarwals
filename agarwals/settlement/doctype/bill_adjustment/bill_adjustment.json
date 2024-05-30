@@ -13,9 +13,11 @@
   "disallowance",
   "posting_date",
   "source_file",
-  "file_upload",
   "status",
-  "error_remark"
+  "error_remark",
+  "file_upload",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -49,7 +51,8 @@
    "fieldname": "file_upload",
    "fieldtype": "Link",
    "label": "File upload",
-   "options": "File upload"
+   "options": "File upload",
+   "read_only": 1
   },
   {
    "fieldname": "status",
@@ -61,11 +64,24 @@
    "fieldname": "error_remark",
    "fieldtype": "Small Text",
    "label": "Error Remark"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-08 15:43:14.793146",
+ "modified": "2024-05-30 11:48:36.012638",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Bill Adjustment",

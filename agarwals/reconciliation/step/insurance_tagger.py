@@ -41,16 +41,16 @@ def advices_rfn_match():
 
 def claimbook_match():
         frappe.db.sql(""" 
-        UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
+        UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb set tbts.tag = %(tag)s, tbts.based_on = 'ClaimBook'
         where (tbts.reference_number = cb.utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
         """, values = {'tag': INSURANCE_TAG })
         frappe.db.commit()
         frappe.db.sql(""" 
-           UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
+           UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb set tbts.tag = %(tag)s, tbts.based_on = 'ClaimBook'
         where (tbts.reference_number = cb.final_utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
         """, values = {'tag': INSURANCE_TAG })
         frappe.db.sql(""" 
-           UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb
+           UPDATE `tabBank Transaction Staging` tbts ,`tabClaimBook` cb set tbts.tag = %(tag)s, tbts.based_on = 'ClaimBook'
         where (tbts.reference_number = cb.cg_formatted_utr_number) and tbts.tag is null and tbts.reference_number != '0' and cb.utr_number != '0';
         """, values = {'tag': INSURANCE_TAG })
         frappe.db.commit()

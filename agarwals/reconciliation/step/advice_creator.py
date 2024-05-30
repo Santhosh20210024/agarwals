@@ -1,8 +1,9 @@
 import frappe
 from datetime import date
+
+from agarwals.agarwals.doctype import file_records
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
-from agarwals.utils.error_handler import log_error
 
 ERROR_LOG = { 
     'S100': 'Settlement Advice Already Exist',
@@ -37,7 +38,7 @@ def insert_record_in_settlement_advice(doc_to_insert):
             name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id + "-" + str(len(settlement_advices))
         else:
             name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id
-        frappe.get_doc({
+        sa_doc = frappe.get_doc({
             "doctype": "Settlement Advice",
             "name": name,
             "claim_id": doc_to_insert.claim_id,
@@ -50,15 +51,20 @@ def insert_record_in_settlement_advice(doc_to_insert):
             "tds_amount": doc_to_insert.tds_amount,
             "settled_amount": doc_to_insert.settled_amount,
             "paid_date": doc_to_insert.paid_date,
-            "source_file":doc_to_insert.source,
+            "file_upload": doc_to_insert.file_upload,
+            "transform": doc_to_insert.transform,
+            "index": doc_to_insert.index,
             "source": "TPA",
             "status": "Open",   
         }).insert(ignore_permissions=True)
         doc_to_insert.status = "Processed"
         doc_to_insert.save(ignore_permissions=True)
         frappe.db.commit()
+        file_records.create(file_upload = sa_doc.file_upload,
+                            transform = sa_doc.transform, reference_doc = sa_doc.doctype,
+                            record = sa_doc.name, index = sa_doc.index)
     except Exception as e:
-        log_error('Settlement Advice Staging',doc_to_insert,e)
+        log_error('Settlement Advice Staging', doc_to_insert, e)
 
 def settlement_advice_staging(advices, chunk_doc):
     chunk.update_status(chunk_doc, "InProgress")
@@ -114,8 +120,8 @@ def settlement_advice_staging(advices, chunk_doc):
 
 @frappe.whitelist()
 def process(args):
+    args = cast_to_dic(args)
     try:
-        args=cast_to_dic(args)
         advices_list = frappe.db.sql("SELECT name FROM `tabSettlement Advice Staging` tsas WHERE status = 'Open' OR (status = 'Error' AND retry=1);",as_list=True)
         n = int(args["chunk_size"])
         if advices_list:
@@ -127,6 +133,7 @@ def process(args):
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
     except Exception as e:
+        from agarwals.utils.error_handler import log_error
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")
         log_error(e,'Step')

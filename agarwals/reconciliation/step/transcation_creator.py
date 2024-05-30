@@ -1,5 +1,7 @@
 import frappe
 import traceback
+
+from agarwals.agarwals.doctype import file_records
 from agarwals.reconciliation import chunk
 from datetime import datetime as dt
 from agarwals.utils.str_to_dict import cast_to_dic
@@ -43,8 +45,14 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.custom_party_group = transaction.get('payer_group')
     bank_trans_doc.custom_based_on = transaction.get('based_on')
     bank_trans_doc.custom_internal_id = transaction.get('internal_id')
+    bank_trans_doc.custom_file_upload = transaction.get('file_upload')
+    bank_trans_doc.custom_transform = transaction.get('transform')
+    bank_trans_doc.custom_index = transaction.get('index')
     bank_trans_doc.submit()
     frappe.db.commit()
+    file_records.create(file_upload=bank_trans_doc.custom_file_upload,
+                        transform=bank_trans_doc.custom_transform, reference_doc=bank_trans_doc.doctype,
+                        record=bank_trans_doc.name, index=bank_trans_doc.custom_index)
     if reference_number == '0':
         return bank_trans_doc.name
     
@@ -142,6 +150,7 @@ def staging_batch_operation(records, chunk_doc):
         create_bank_transaction(records)
         chunk.update_status(chunk_doc, "Processed")
     except Exception as e:
+        log_error(e, 'Bank Transaction Staging')
         chunk.update_status(chunk_doc, "Error")
 
 def tag_skipped():

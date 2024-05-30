@@ -8,7 +8,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "source",
+  "file_upload",
   "file_name",
   "file_upload_payer",
   "claim_id",
@@ -28,7 +28,9 @@
   "remarks",
   "retry",
   "hash",
-  "error_code"
+  "error_code",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -121,13 +123,6 @@
    "read_only_depends_on": "eval:doc.status == \"Processed\""
   },
   {
-   "fieldname": "source",
-   "fieldtype": "Link",
-   "label": "Source",
-   "options": "File upload",
-   "read_only": 1
-  },
-  {
    "fieldname": "disallowed_amount",
    "fieldtype": "Currency",
    "label": "Disallowed Amount",
@@ -148,7 +143,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "source.file_name",
+   "fetch_from": "file_upload.file",
    "fetch_if_empty": 1,
    "fieldname": "file_name",
    "fieldtype": "Data",
@@ -161,7 +156,7 @@
    "unique": 1
   },
   {
-   "fetch_from": "source.payer_type",
+   "fetch_from": "file_upload.payer_type",
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
    "label": "File Upload Payer"
@@ -171,11 +166,31 @@
    "fieldtype": "Select",
    "label": "Error Code",
    "options": "\nS100\nS101\nS102\nS103\nS104\nS105"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "Source",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-15 20:15:30.775142",
+ "modified": "2024-05-29 18:18:19.508224",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",

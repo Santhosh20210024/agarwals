@@ -1,4 +1,5 @@
 import frappe
+from agarwals.agarwals.doctype import file_records
 from frappe.utils.caching import redis_cache
 from frappe import utils
 from datetime import date
@@ -73,7 +74,7 @@ class PaymentEntryCreator:
     def get_entry_name(self, si_doc):
         existing_payment_entries = frappe.get_list('Payment Entry'
                                    ,filters={'custom_sales_invoice':si_doc.name})
-        
+
         name = si_doc.name + "-" + str(len(existing_payment_entries)) if existing_payment_entries else si_doc.name
         return name
 
@@ -96,7 +97,7 @@ class PaymentEntryCreator:
                               ,bank_account
                               ,settled_amount
                               ,tds_amount = 0
-                              ,disallowed_amount = 0):
+                              ,disallowed_amount = 0, ref_doc = None):
         try:
             deductions = []
             name = self.get_entry_name(si_doc = si_doc)
@@ -126,12 +127,18 @@ class PaymentEntryCreator:
                 pe_doc.set('deductions', deductions)
 
             pe_doc = self.process_rounding_off(pe_doc, si_doc)
+            pe_doc.set('custom_file_upload', ref_doc.file_upload)
+            pe_doc.set('custom_transform', ref_doc.transform)
+            pe_doc.set('custom_index', ref_doc.index)
             pe_doc.save()
             pe_doc.submit()
             frappe.db.commit()
 
             self.update_trans_reference(bt_doc, pe_doc)
             frappe.db.commit()
+            file_records.create(file_upload=pe_doc.custom_file_upload,
+                                transform=pe_doc.custom_transform, reference_doc=pe_doc.doctype,
+                                record=pe_doc.name, index=pe_doc.custom_index)
             return pe_doc
 
         except Exception as err:
@@ -140,7 +147,7 @@ class PaymentEntryCreator:
 
     def get_document_record(self, doctype, name):
         return frappe.get_doc(doctype,name)
-    
+
     def update_advice_log(self, advice, status, msg):
         frappe.set_value('Settlement Advice', advice, 'status', status)
         frappe.set_value('Settlement Advice', advice, 'remark', msg)
@@ -169,7 +176,7 @@ class PaymentEntryCreator:
                                            'utr_number': payment_entry.reference_no, 'utr_date': payment_entry.reference_date,
                                            'created_date': created_date, 'bank_region': bt_doc[0].custom_region,
                                            'bank_entity': bt_doc[0].custom_entity, 'bank_account_number': payment_entry.bank_account })
-        
+
         if record.settlement_advice:
             si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'settlement_advice': record.settlement_advice})
         else:
@@ -219,6 +226,10 @@ class PaymentEntryCreator:
 
                 for record in matcher_records:
                     try:
+                        if record.match_logic in ["MA3-CN", "MA3-BN","MA4-CN","MA4-BN"]:
+                            ref_doc = self.get_document_record('ClaimBook', record.claimbook)
+                        else:
+                            ref_doc = self.get_document_record('Settlement Advice', record.settlement_advice)
                         bank_amount = 0
                         settled_amount = round(float(record.settled_amount), 2) if record.settled_amount else 0
                         tds_amount = round(float(record.tds_amount), 2) if record.tds_amount else 0
@@ -230,7 +241,7 @@ class PaymentEntryCreator:
                             if record.settlement_advice:
                                 self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
                             continue
- 
+
                         unallocated_amount = self.get_document_record('Bank Transaction',
                                                                         record.bank_transaction).unallocated_amount
                         if frappe.db.get_value('Bank Transaction', record.bank_transaction, 'status') == 'Reconciled':  # Already Reconciled
@@ -239,30 +250,30 @@ class PaymentEntryCreator:
                             if record.settlement_advice:
                                 self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
                             continue
-    
+
                         if not record.settled_amount:
                             err_msg = 'Settled Amount Should Not Be Zero'
                             self.update_matcher_log(record.name, 'Error', err_msg)
                             if record.settlement_advice:
                                 self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
                             continue
-    
+
                         si_doc = self.get_document_record('Sales Invoice', record.sales_invoice)
-    
+
                         if si_doc.total < (settled_amount + tds_amount + disallowance_amount):
                             err_msg = 'Claim amount lesser than the cumulative of other amounts'
                             self.update_matcher_log(record.name, 'Error', err_msg)
                             if record.settlement_advice:
                                 self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
                             continue
-    
+
                         if si_doc.status == 'Paid':
                             err_msg = 'Already Paid Bill'
                             self.update_matcher_log(record.name, 'Error', err_msg)
                             if record.settlement_advice:
                                 self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
                             continue
-    
+
                         if si_doc.status == 'Cancelled':
                             err_msg = 'Cancelled Bill'
                             self.update_matcher_log(record.name, 'Error', err_msg)
@@ -307,7 +318,8 @@ class PaymentEntryCreator:
                                     , si_doc
                                     , bank_account
                                     , settled_amount
-                                    , tds_amount)
+                                    , tds_amount
+                                    , ref_doc = ref_doc)
 
                                 if record.settlement_advice:
                                     settlement_advice.set('remark',
@@ -319,7 +331,8 @@ class PaymentEntryCreator:
                                     , si_doc
                                     , bank_account
                                     , settled_amount
-                                    , disallowance_amount)
+                                    , disallowance_amount
+                                    , ref_doc = ref_doc)
 
                                 if record.settlement_advice:
                                     settlement_advice.set('remark', 'TDS amount is greater than Outstanding Amount')
@@ -329,7 +342,8 @@ class PaymentEntryCreator:
                                     transaction_record
                                     , si_doc
                                     , bank_account
-                                    , settled_amount)
+                                    , settled_amount
+                                    , ref_doc = ref_doc)
 
                                 if record.settlement_advice:
                                     settlement_advice.set('remark',
@@ -355,7 +369,8 @@ class PaymentEntryCreator:
                                 , bank_account
                                 , settled_amount
                                 , tds_amount
-                                , disallowance_amount)
+                                , disallowance_amount
+                                , ref_doc = ref_doc)
 
                             if payment_entry:
                                 if bank_amount == 0:  # Added due to the validation ( settled_amount = allocated_amount )
@@ -380,6 +395,7 @@ class PaymentEntryCreator:
             frappe.db.commit()
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
+            log_error(e, 'Matcher')
             chunk.update_status(chunk_doc, "Error")
 
 def update_reconciled_status():
@@ -394,12 +410,12 @@ def update_reconciled_status():
                             tbt.status = 'Reconciled'
                             and tma.match_logic in ('MA1-CN', 'MA5-BN')
                             and tma.status = 'Open'""")
-     
+
      frappe.db.sql("""update `tabMatcher` tma join `tabBank Transaction` tbt on 
                     tma.bank_transaction = tbt.name set tma.status = 'Error',
                     tma.remarks = 'Already Reconciled' where tbt.status = 'Reconciled'
                     and tma.match_logic = 'MA3-CN' and tma.status = 'Open'""")
-     
+
      frappe.db.commit()
 
 
@@ -429,7 +445,7 @@ def process(args):
                                , timeout = 25000
                                , bt_doc_records = bt_doc_records[record:record + chunk_size]
                                , match_logic = m_logic, chunk_doc = chunk_doc)
-            
+
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")

@@ -77,6 +77,15 @@ class Loader():
             except Exception as e:
                 self.log_error('Transform', file['name'], e)
 
+    def update_count(self, doctype, name, processed_count = 0, errored_count = 0):
+        frappe.db.set_value(doctype, name, "processed_records", processed_count)
+        frappe.db.set_value(doctype, name, "errored_records", errored_count)
+        frappe.db.commit()
+
+    def update(self, doctype, name, status, processed_count = 0, errored_count = 0):
+        self.update_status(doctype, name, status)
+        self.update_count(doctype, name, processed_count, errored_count)
+
     def process(self):
         files = self.get_files_to_load()
         if files == []:
@@ -91,17 +100,18 @@ class Loader():
                 import_name = self.load_data(import_type, file)
                 import_status = self.get_import_status(import_name)
                 if import_status == 'Pending' or import_status == 'Error':
-                    self.update_status('Transform', file['name'], 'Error')
+                    self.update('Transform', file['name'], 'Error', errored_count = frappe.get_doc('Data Import', import_name).payload_count)
                 else:
-                    self.update_status('Transform', file['name'], import_status)
+                    processed, not_processed = frappe.db.count('Data Import Log', {'success': 1,
+                                                                                   'data_import': import_name}), frappe.db.count(
+                        'Data Import Log', {'success': 0, 'data_import': import_name})
+                    self.update('Transform', file['name'], import_status, processed, not_processed)
                 self.update_file_url(file, target_file, import_name)
                 self.delete_file_in_outside_folder(file_name,file)
             except Exception as e:
                 self.update_status('Transform', file['name'], 'Error')
                 self.log_error('Transform', file['name'], e)
             self.move_file(SITE_PATH + source_file, SITE_PATH + target_file)
-
-
 
 
 

@@ -9,7 +9,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "source",
+  "file_upload",
   "file",
   "date",
   "transaction_status",
@@ -37,7 +37,9 @@
   "payer_type",
   "payer_name",
   "payer_group",
-  "internal_id"
+  "internal_id",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -114,12 +116,6 @@
    "label": "Modifications"
   },
   {
-   "fieldname": "source",
-   "fieldtype": "Link",
-   "label": "Source File Id",
-   "options": "File upload"
-  },
-  {
    "depends_on": "eval:doc.staging_status == 'Warning'",
    "fieldname": "update_reference_number",
    "fieldtype": "Data",
@@ -159,7 +155,7 @@
    "label": "Previous utr"
   },
   {
-   "fetch_from": "source.file",
+   "fetch_from": "file_upload.file",
    "fieldname": "file",
    "fieldtype": "Data",
    "label": "File Name"
@@ -211,11 +207,31 @@
    "fieldname": "internal_id",
    "fieldtype": "Data",
    "label": "Internal ID"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "Source File Id",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-02 16:50:38.990383",
+ "modified": "2024-05-29 18:33:32.902852",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",

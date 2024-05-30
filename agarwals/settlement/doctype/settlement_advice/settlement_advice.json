@@ -39,10 +39,12 @@
   "matched_bill_record",
   "matcher_status",
   "matcher_id",
-  "source_file",
+  "file_upload",
   "file_name",
   "claim_key",
-  "cg_formatted_bill_number"
+  "cg_formatted_bill_number",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -141,12 +143,6 @@
    "label": "Final UTR Number"
   },
   {
-   "fieldname": "source_file",
-   "fieldtype": "Link",
-   "label": "Source File",
-   "options": "File upload"
-  },
-  {
    "fieldname": "reference_section",
    "fieldtype": "Section Break",
    "label": "Reference"
@@ -215,7 +211,7 @@
    "options": "Bill"
   },
   {
-   "fetch_from": "source_file.file",
+   "fetch_from": "file_upload.file",
    "fieldname": "file_name",
    "fieldtype": "Data",
    "label": "File Name"
@@ -244,7 +240,7 @@
    "label": "Matcher Status"
   },
   {
-   "fetch_from": "source_file.payer_type",
+   "fetch_from": "file_upload.payer_type",
    "fieldname": "file_upload_payer",
    "fieldtype": "Data",
    "label": "File Upload Payer"
@@ -253,10 +249,30 @@
    "fieldname": "matcher_id",
    "fieldtype": "Data",
    "label": "Matcher ID"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "Source File",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2024-05-22 12:16:04.882152",
+ "modified": "2024-05-29 18:32:06.616509",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

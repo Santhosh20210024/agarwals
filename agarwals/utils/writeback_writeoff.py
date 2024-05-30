@@ -27,7 +27,7 @@ def create_writeback_jv():
                         credit_data, debit_data = set_writeback_account_data(bank_transaction, company_account,bank_transaction.unallocated_amount)
                         append_child_table = add_account_entries(je,credit_data, debit_data)
                         # save jv
-                        jv.save_je(append_child_table)
+                        jv.save_je(append_child_table, writeback)
                         # update document
                             #banktransaction
                         reconcile_document("Bank Transaction",writeback.reference_number,"Journal Entry",je.name,bank_transaction.unallocated_amount,"payment_entries")
@@ -159,7 +159,7 @@ def create_writeoff_jv():
                         credit_data, debit_data = set_writeoff_account_data(sales_invoice, debt_account,sales_invoice.outstanding_amount)
                         append_child_table = add_account_entries(je, credit_data, debit_data)
                         #save jv
-                        jv.save_je(append_child_table)
+                        jv.save_je(append_child_table, writeoff)
                         #update document
                             #sales invoice
                         reconcile_document_writeoff("Sales Invoice",writeoff.name,"Journal Entry",je.name,sales_invoice.outstanding_amount,"custom_reference")

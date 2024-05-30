@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{file_upload}-{reference_doc}-{record}",
+ "creation": "2024-05-23 19:49:02.995432",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "file_upload",
+  "transform",
+  "reference_doc",
+  "record",
+  "index",
+  "job"
+ ],
+ "fields": [
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "File Upload",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_doc",
+   "fieldtype": "Link",
+   "label": "Reference Doc",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "record",
+   "fieldtype": "Dynamic Link",
+   "label": "Record",
+   "options": "reference_doc",
+   "read_only": 1
+  },
+  {
+   "fieldname": "job",
+   "fieldtype": "Link",
+   "label": "Job",
+   "options": "Job",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "Index",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-05-29 18:09:38.293569",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "File Records",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

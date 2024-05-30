@@ -54,7 +54,10 @@
   "sales_invoice_status",
   "invoice_amount",
   "outstanding_amount",
-  "cg_formatted_bill_number"
+  "cg_formatted_bill_number",
+  "file_upload",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -337,6 +340,26 @@
    "fieldtype": "Read Only",
    "hidden": 1,
    "label": "Hash"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "File Upload",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -347,7 +370,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-27 14:38:08.790168",
+ "modified": "2024-05-29 18:11:04.895100",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
