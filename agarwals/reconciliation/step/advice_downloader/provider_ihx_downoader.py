@@ -19,6 +19,7 @@ class ProviderIhxDownloader(SeleniumDownloader):
         pwd.send_keys(self.password)
         login_button = self.driver.find_element(By.XPATH, "//button[@class='ant-btn ant-btn-primary login-btn']")
         login_button.click()
+        # ToDo To identify invalid username password
         # try:
         #     # Wait for the error message to be visible
         #     error_message = self.wait.until(
@@ -89,3 +90,4 @@ class ProviderIhxDownloader(SeleniumDownloader):
         export_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@data-testid='export-btn']")))
         export_button.click()
         self.driver.switch_to.default_content()
+        time.sleep(10)
