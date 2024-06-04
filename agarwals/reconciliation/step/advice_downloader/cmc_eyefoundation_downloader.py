@@ -33,7 +33,8 @@ class CMCEyeFoundationDownloader(SeleniumDownloader):
         payment_mis_link.click()
 
         # Switch to the iframe
-        iframe = self.wait.until(EC.presence_of_element_located((By.NAME, '_ddajaxtabsiframe-countrydivcontainer')))
+        iframe = self.wait.until(EC.presence_of_element_located((
+            By.NAME, '_ddajaxtabsiframe-countrydivcontainer')))
         self.driver.switch_to.frame(iframe)
         # Select "Coimbatore" in the district dropdown
         district_dropdown = self.wait.until(EC.presence_of_element_located((By.ID, 'DdlDistrict')))
