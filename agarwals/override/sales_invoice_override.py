@@ -539,7 +539,7 @@ class SalesInvoiceOverride(SellingController):
 	def update_total_tds_disallowance(self):
 		child_docs=frappe.db.sql(""" 
 						   SELECT 
-						        sum(tds_amount) total_tds,sum(disallowance_amount) total_dis 
+						        sum(tds_amount) total_tds,sum(disallowance_amount) total_dis ,sum(writeoff_amount) writeoff
 						    FROM
 						        `tabSales Invoice Reference` 
 						    WHERE 
@@ -549,6 +549,7 @@ class SalesInvoiceOverride(SellingController):
 		if self.custom_total_disallowance != child_docs[0]['total_dis'] or self.custom_total_tds != child_docs[0]['total_tds']:
 				self.custom_total_tds = child_docs[0]['total_tds']
 				self.custom_total_disallowance = child_docs[0]['total_dis']
+				self.custom_total_writeoff_amount = child_docs[0]['writeoff']
 				self.save()
 				frappe.db.commit()
 			
