@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime,timedelta
-from html2excel import ExcelParser
+# from html2excel import ExcelParser
 import os
 import shutil
 from agarwals.reconciliation import chunk
@@ -359,7 +359,7 @@ class SeleniumDownloader:
         else:
             self.raise_exception(" SA Downloader Configuration not found ")
         self.driver = webdriver.Chrome(options=self.options)
-        self.wait = WebDriverWait(self.driver,  10)
+        self.wait = WebDriverWait(self.driver,  30)
 
     def init(self):
         pass
