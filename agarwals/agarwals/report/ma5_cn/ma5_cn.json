@@ -1,0 +1,33 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2024-02-29 20:40:22.903996",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2024-05-29 17:57:05.824159",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "MA5-CN",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\r\n\ttb.name AS 'Bill',\r\n\ttb.bill_date AS 'Bill Date',\r\n\ttb.entity AS 'Bill Entity',\r\n\ttb.region AS 'Bill Region',\r\n\ttb.branch AS 'Bill Branch',\r\n\ttb.claim_amount AS 'Claim Amount',\r\n\ttb.claim_id AS 'Claim ID',\r\n\ttsa.name AS 'Settlement Advice',\r\n\ttsa.settled_amount AS 'Settled Amount',\r\n\ttsa.tds_amount AS 'TDS Amount',\r\n\ttsa.disallowed_amount AS 'Disallowed Amount',\r\n\ttbt.name AS 'UTR Number',\r\n\ttbt.deposit AS 'Deposit Amount',\r\n\ttbt.allocated_amount AS 'Allocated Amount',\r\n\ttbt.unallocated_amount AS 'UnAllocated Amount' \r\nFROM\r\n\t`tabMatcher` tm\r\nJOIN `tabBill` tb ON\r\n\ttm.sales_invoice = tb.name\r\nJOIN `tabSettlement Advice` tsa ON\r\n\ttm.settlement_advice = tsa.name\r\nJOIN `tabBank Transaction` tbt ON\r\n\ttm.bank_transaction = tbt.name\r\nWHERE\r\n\ttm.match_logic = 'MA5-CN';",
+ "ref_doctype": "Bill",
+ "report_name": "MA5-CN",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "For View"
+  },
+  {
+   "role": "For Edit"
+  }
+ ]
+}
