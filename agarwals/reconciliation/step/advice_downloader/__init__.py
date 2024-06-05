@@ -2,7 +2,7 @@ import frappe
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from agarwals.reconciliation.step.advice_downloader.provider_ihx_downloader1 import ProviderIhx
+from agarwals.reconciliation.step.advice_downloader.provider_ihx_api_downloader import ProviderIhx
 from agarwals.reconciliation.step.advice_downloader.tips_vidal_health_downloader import TipsVidalHealth
 from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia_downloader import TnnhisMdIndia
 from agarwals.reconciliation.step.advice_downloader.star_health_downloader import StarHealthDownloader
