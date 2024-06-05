@@ -575,7 +575,7 @@ class BankTransformer(StagingTransformer):
         if "IMPS" in narration:
             length = 12
             pattern = numeric
-        elif "NEFT" in narration:
+        elif "NEFT" in narration or narration.startswith('N/'):
             pattern = alphanumeric_pattern
             utr_13 = None
             utr_16 = None
