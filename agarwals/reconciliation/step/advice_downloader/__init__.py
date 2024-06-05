@@ -2,7 +2,7 @@ import frappe
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from agarwals.reconciliation.step.advice_downloader.provider_ihx_downloader import ProviderIhx
+from agarwals.reconciliation.step.advice_downloader.provider_ihx_downloader1 import ProviderIhx
 from agarwals.reconciliation.step.advice_downloader.tips_vidal_health_downloader import TipsVidalHealth
 from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia_downloader import TnnhisMdIndia
 from agarwals.reconciliation.step.advice_downloader.star_health_downloader import StarHealthDownloader
@@ -22,7 +22,8 @@ from agarwals.reconciliation.step.advice_downloader.selenium_downloader import S
 from agarwals.reconciliation.step.advice_downloader.fhpl_downloader import FHPLDownloader
 from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader import RelianceGeneralDownloader
 from agarwals.reconciliation.step.advice_downloader.niva_bupa_downloader import NivaBupaDownloader
-
+from agarwals.reconciliation.step.advice_downloader.provider_ihx_downoader import ProviderIhxDownloader
+git
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
     frappe.enqueue(class_name().download,queue = args["queue"], is_async = True, job_name = f"TPA_downloader_{str(tpa_doc.name)}", timeout = 3600, tpa_doc = tpa_doc, chunk_doc = chunk_doc)

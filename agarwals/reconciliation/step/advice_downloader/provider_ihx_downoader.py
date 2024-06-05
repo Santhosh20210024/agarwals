@@ -61,7 +61,7 @@ class ProviderIhxDownloader(SeleniumDownloader):
             (By.XPATH, "//li[@title='Reconciliation']//span[contains(text(), 'Reconciliation')]")))
         reconciliation_span.click()
 
-        time.sleep(20)
+        # time.sleep(20)
 
         # Wait for the iframe to be present
         iframe = self.wait.until(EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'app.powerbi.com')]")))
