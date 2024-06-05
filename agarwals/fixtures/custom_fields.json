@@ -7,5 +7,26 @@
     "fieldtype": "Data",
     "label": "CG UTR Number",
     "insert_after": "reference_number"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Bank Transaction",
+    "name": "Bank Transaction-yearly_due",
+    "fieldname": "custom_yearly_due",
+    "fieldtype": "Table",
+    "options": "Yearly Due",
+    "label": "Yearly Due",
+    "insert_after": "payment_entries"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-yearly_due",
+    "fieldname": "custom_yearly_due",
+    "fieldtype": "Table",
+    "options": "Yearly Due",
+    "label": "Yearly Due",
+    "insert_after": "custom_fiscal_year"
   }
-  ]
+]
+
