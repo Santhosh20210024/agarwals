@@ -79,7 +79,7 @@ class PaymentEntryCreator:
         return name
 
     def get_posting_date(self, bt_doc, si_doc):
-        closing_date_list = frappe.get_list('Period Closer by Entity',
+        closing_date_list = frappe.get_list('Period Closure by Entity',
                                             filters={'entity': si_doc.entity}
                                             ,order_by = 'creation desc'
                                             ,pluck = 'posting_date')

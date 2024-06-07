@@ -112,7 +112,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nRAISED\nCANCELLED\nCANCELLED AND DELETED",
+   "options": "\nRAISED\nCANCELLED",
    "read_only": 1
   },
   {
@@ -370,7 +370,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-29 18:11:04.895100",
+ "modified": "2024-05-29 12:18:02.701074",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
