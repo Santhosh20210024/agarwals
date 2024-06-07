@@ -51,7 +51,7 @@ class SalesInvoiceDueUpdater(YearlyDueUpdater):
         self.due_field = 'outstanding_amount'
         self.parent_doctype = "Sales Invoice"
         self.entity_field = "entity"
-        self.status = ('Cancelled','Paid')
+        self.status = ('Cancelled')
 
 class BankTransactionDueUpdater(YearlyDueUpdater):
     def __init__(self,previous_fiscal_year, current_fiscal_year,entity):
@@ -60,7 +60,7 @@ class BankTransactionDueUpdater(YearlyDueUpdater):
         self.due_field = 'unallocated_amount'
         self.parent_doctype = "Bank Transaction"
         self.entity_field = "custom_entity"
-        self.status = ('Cancelled', 'Reconciled')
+        self.status = ('Cancelled')
 
 @frappe.whitelist()
 def execute():
