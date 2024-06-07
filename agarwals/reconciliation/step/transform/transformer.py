@@ -747,7 +747,6 @@ class BankBulkTransformer(BankTransformer):
         configuration = frappe.get_single('Bank Configuration')
         if "date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df, eval(configuration.date_formats), 'date')
-        self.source_df['narration'] = self.source_df['description']
         self.extract_utr_from_narration(configuration)
         self.source_df['credit'] = self.source_df['deposit']
         self.source_df['debit'] = self.source_df['withdrawal']
