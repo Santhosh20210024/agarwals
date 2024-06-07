@@ -22,12 +22,12 @@ def create_writeback_jv():
                         company_account_list = get_doc_list("Bank Account",{"name":account_name},["*"])
                         company_account = company_account_list[0].account
                         # init je
-                        je = create_journal_entry("Journal Entry", str(posting_date), writeback.reference_number,"WB")
+                        je = create_journal_entry("Journal Entry", str(posting_date), "WB", bank_transaction)
                         # append account_details
-                        credit_data, debit_data = set_writeback_account_data(writeback, company_account,bank_transaction.unallocated_amount)
+                        credit_data, debit_data = set_writeback_account_data(bank_transaction, company_account,bank_transaction.unallocated_amount)
                         append_child_table = add_account_entries(je,credit_data, debit_data)
                         # save jv
-                        jv.save_je(append_child_table)
+                        jv.save_je(append_child_table, writeback)
                         # update document
                             #banktransaction
                         reconcile_document("Bank Transaction",writeback.reference_number,"Journal Entry",je.name,bank_transaction.unallocated_amount,"payment_entries")
@@ -73,23 +73,24 @@ def update_doc_status(doctype,docname, status):
     document.status = status
     document.save()
 
-def set_writeback_account_data(writeback,company_account, amount):
+def set_writeback_account_data(bank_transaction,company_account, amount):
     credit_data = {
-                'account': company_account,
-                'region':writeback.region,
-                'entity':writeback.entity,
-                'branch_type':writeback.branch_type,
-                'reference_type':"Bank Transaction",
-                'reference_name':writeback.reference_number,
-                'credit_in_account_currency': amount,
-                'user_remark': f"writeback_name:{writeback.name},file_upload_name:{writeback.file_upload},bank_transaction:{writeback.reference_number}"}
+
+                'account' : company_account,
+                'region' : bank_transaction.custom_region,
+                'entity' : bank_transaction.custom_entity,
+                'branch_type' : bank_transaction.custom_branch_type,
+                'reference_type' : "Bank Transaction",
+                'reference_name' : bank_transaction.name,
+                'credit_in_account_currency' : amount
+               }
     debit_data = {
-                'account': "WriteBack - A",
-                'region': writeback.region,
-                'entity': writeback.entity,
-                'branch_type': writeback.branch_type,
-                'debit_in_account_currency': amount,
-                'user_remark': f"writeback_name:{writeback.name},file_upload_name:{writeback.file_upload},bank_transaction:{writeback.reference_number}"}
+                'account' : "WriteBack - A",
+                'region' : bank_transaction.custom_region,
+                'entity' : bank_transaction.custom_entity,
+                'branch_type' : bank_transaction.custom_branch_type,
+                'debit_in_account_currency' : amount
+                }
     return credit_data, debit_data
 
 def add_account_entries(je,credit_data, debit_data):
@@ -97,14 +98,35 @@ def add_account_entries(je,credit_data, debit_data):
         je.append('accounts', debit_data)
         return je
 
-def create_journal_entry(type, date, ref_no, doctype):
-        je = frappe.new_doc('Journal Entry')
-        je.name = f"{ref_no}-{doctype}"
-        je.voucher_type = type
-        je.posting_date = date
-        je.cheque_no = ref_no
-        je.cheque_date = datetime.now()
-        return je
+def create_journal_entry(type, posting_date, doctype, parent):
+    je = frappe.new_doc('Journal Entry')
+    je.name = f"{parent.name}-{doctype}"
+    je.voucher_type = type
+    je.posting_date = posting_date
+    je.custom_party_type = "Customer"
+    if doctype == "WB":
+        je.custom_entity = parent.custom_entity
+        je.custom_party = parent.party
+        je.custom_party_group = parent.custom_party_group
+        je.custom_branch_type = parent.custom_branch_type
+        je.custom_utr_date = parent.date
+        je.custom_region = parent.custom_region
+        je.cheque_no = parent.name
+        je.cheque_date = parent.date
+
+    elif doctype == "WO":
+        je.custom_sales_invoice = parent.name
+        je.custom_entity = parent.entity
+        je.custom_branch = parent.branch
+        je.custom_bill_date = parent.posting_date
+        je.custom_party = parent.customer
+        je.custom_region = parent.region
+        je.custom_party_group = parent.customer_group
+        je.custom_branch_type = parent.branch_type
+
+    return je
+
+
 
 def get_doc_list(doctype,filters,fields):
     doc_list = frappe.get_all(doctype,filters,fields)
@@ -120,6 +142,8 @@ def create_writeoff_jv():
             if sales_invoice.status == "Unpaid" or "Partly Paid" :
                 if sales_invoice.outstanding_amount <= int(writeoff.outstanding_amount) + 10:
                     if sales_invoice.outstanding_amount != 0 :
+                        #get_sales_invoice_date
+                        sales_invoice_date = sales_invoice.posting_date
                         #init save_je class
                         jv = JournalUtils()
                         #get file_upload_list
@@ -128,14 +152,14 @@ def create_writeoff_jv():
                         posting_date = file_upload_list[0].wo_date
                         debt_account = "Debtors - A"
                         #init je
-                        je = create_journal_entry("Journal Entry", str(posting_date), writeoff.bill_no, "WO")
+                        je = create_journal_entry("Journal Entry", str(posting_date), "WO",sales_invoice)
                         je.bill_no = writeoff.name
                         je.bill_date = writeoff.bill_date
                         #append account_details
-                        credit_data, debit_data = set_writeoff_account_data(writeoff, debt_account,sales_invoice.outstanding_amount)
+                        credit_data, debit_data = set_writeoff_account_data(sales_invoice, debt_account,sales_invoice.outstanding_amount)
                         append_child_table = add_account_entries(je, credit_data, debit_data)
                         #save jv
-                        jv.save_je(append_child_table)
+                        jv.save_je(append_child_table, writeoff)
                         #update document
                             #sales invoice
                         reconcile_document_writeoff("Sales Invoice",writeoff.name,"Journal Entry",je.name,sales_invoice.outstanding_amount,"custom_reference")
@@ -159,26 +183,26 @@ def create_writeoff_jv():
             update_doc_status("Write Off", writeoff.name, "Error")
 
 
-def set_writeoff_account_data(writeoff,debt_account,amount):
+
+def set_writeoff_account_data(sales_invoice,debt_account,amount):
     credit_data = {
                 'account': debt_account,
                 'party_type': "Customer",
-                'party': writeoff.customer,
-                'region':writeoff.region,
-                'entity':writeoff.entity,
-                'branch':writeoff.branch,
+                'party': sales_invoice.customer,
+                'region':sales_invoice.region,
+                'entity':sales_invoice.entity,
+                'branch':sales_invoice.branch,
                 'credit_in_account_currency': amount,
                 'reference_type': 'Sales Invoice',
-                'reference_name': writeoff.name,
-                'user_remark': f"writeoff_name:{writeoff.name},file_upload_name:{writeoff.file_upload}"
+                'reference_name': sales_invoice.name
+
     }
     debit_data = {
                 'account': "Write Off - A",
                 'debit_in_account_currency': amount,
-                'region': writeoff.region,
-                'entity': writeoff.entity,
-                'branch': writeoff.branch,
-                'user_remark': f"writeoff_name:{writeoff.name},file_upload_name:{writeoff.file_upload}"
+                'region': sales_invoice.region,
+                'entity': sales_invoice.entity,
+                'branch': sales_invoice.branch
     }
     return credit_data, debit_data
 

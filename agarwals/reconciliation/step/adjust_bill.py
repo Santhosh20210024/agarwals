@@ -1,4 +1,5 @@
 import frappe
+from agarwals.agarwals.doctype import file_records
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
@@ -40,13 +41,19 @@ class JournalUtils():
         'cost_center': invoice.cost_center,
         'branch_type': invoice.branch_type
         })
-
         return je
 
-    def save_je(self, je):
+    def save_je(self, je, parent_doc = None):
+        if parent_doc:
+            je.custom_file_upload = parent_doc.transform
+            je.custom_transform = parent_doc.transform
+            je.custom_index = parent_doc.index
         je.save()
         je.submit()
         frappe.db.commit()
+        if parent_doc:
+            file_records.create(file_upload=je.custom_file_upload, transform=je.custom_transform, reference_doc=je.doctype,
+                                record=je.name, index=je.custom_index)
 
 class BillAdjustmentProcess(JournalUtils):
     def __init__(self):
@@ -83,7 +90,7 @@ class BillAdjustmentProcess(JournalUtils):
                         je = self.create_journal_entry('Credit Note', bill_adjt.posting_date)
                         je.name = "".join([bill_adjt.bill,'-','TDS'])
                         je = self.add_account_entries(je, invoice, 'Debtors - A', 'TDS - A', bill_adjt.tds)
-                        self.save_je(je)
+                        self.save_je(je, bill_adjt)
                         self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name,
                                                       tds_amount=bill_adjt.tds)
                         valid_tds = True
@@ -99,7 +106,7 @@ class BillAdjustmentProcess(JournalUtils):
                         je = self.create_journal_entry('Credit Note', bill_adjt.posting_date)
                         je.name = "".join([bill_adjt.bill,'-','DIS'])
                         je = self.add_account_entries(je, invoice, 'Debtors - A', 'Disallowance - A', bill_adjt.disallowance)
-                        self.save_je(je)
+                        self.save_je(je, bill_adjt)
                         self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name,
                                                       disallowance_amount=bill_adjt.disallowance)
                         valid_dis = True

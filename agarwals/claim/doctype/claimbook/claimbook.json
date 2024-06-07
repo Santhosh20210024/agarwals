@@ -72,7 +72,10 @@
   "cg_formatted_utr_number",
   "final_utr_number",
   "cg_formatted_bill_number",
-  "custom_raw_bill_number"
+  "custom_raw_bill_number",
+  "file_upload",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -441,11 +444,31 @@
    "fieldname": "custom_raw_bill_number",
    "fieldtype": "Data",
    "label": "custom raw bill number"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "File upload",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "File Index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-01 04:27:16.572993",
+ "modified": "2024-05-29 18:11:51.866177",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

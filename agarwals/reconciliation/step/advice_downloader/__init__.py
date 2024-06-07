@@ -2,7 +2,7 @@ import frappe
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from agarwals.reconciliation.step.advice_downloader.provider_ihx_downloader import ProviderIhx
+from agarwals.reconciliation.step.advice_downloader.provider_ihx_api_downloader import ProviderIhx
 from agarwals.reconciliation.step.advice_downloader.tips_vidal_health_downloader import TipsVidalHealth
 from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia_downloader import TnnhisMdIndia
 from agarwals.reconciliation.step.advice_downloader.star_health_downloader import StarHealthDownloader
@@ -22,7 +22,7 @@ from agarwals.reconciliation.step.advice_downloader.selenium_downloader import S
 from agarwals.reconciliation.step.advice_downloader.fhpl_downloader import FHPLDownloader
 from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader import RelianceGeneralDownloader
 from agarwals.reconciliation.step.advice_downloader.niva_bupa_downloader import NivaBupaDownloader
-
+from agarwals.reconciliation.step.advice_downloader.provider_ihx_downoader import ProviderIhxDownloader
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
     frappe.enqueue(class_name().download,queue = args["queue"], is_async = True, job_name = f"TPA_downloader_{str(tpa_doc.name)}", timeout = 3600, tpa_doc = tpa_doc, chunk_doc = chunk_doc)
@@ -60,8 +60,13 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             doc_name = (login_ref.tpa_login_credentials)
             if doc_name:
                 login = frappe.get_all('TPA Login Credentials', {'name': doc_name}, ['*'])[0]
-                frappe.db.sql(
-                    f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'InProgress' WHERE name = '{login_ref.name}' ")
+                parent_doc = frappe.get_doc('Settlement Advice Downloader UI', captcha_tpa_doc)
+                doc = frappe.get_doc("Settlement Advice Downloader UI Logins", login_ref.name)
+                doc.update({
+                    "status":"InProgress"
+                })
+                parent_doc.logins.append(doc)
+                parent_doc.save(ignore_permissions = True)
                 frappe.db.commit()
                 target = eval(login.executing_method)
                 target().download(tpa_doc=login, child=login_ref.name, parent=captcha_tpa_doc)

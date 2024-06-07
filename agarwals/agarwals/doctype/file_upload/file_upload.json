@@ -18,6 +18,10 @@
   "upload",
   "is_bot",
   "column_break_ppbz4",
+  "total_records",
+  "insert_records",
+  "update_records",
+  "skipped_records",
   "source",
   "zip_status",
   "total_count",
@@ -225,11 +229,39 @@
    "fieldname": "wo_date",
    "fieldtype": "Date",
    "label": "Writeoff Date"
+  },
+  {
+   "depends_on": "eval:doc.upload != null ",
+   "fieldname": "total_records",
+   "fieldtype": "Int",
+   "label": "Total Records",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.upload != null ",
+   "fieldname": "insert_records",
+   "fieldtype": "Int",
+   "label": "Insert Records",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.upload != null ",
+   "fieldname": "update_records",
+   "fieldtype": "Int",
+   "label": "Update Records",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.upload != null ",
+   "fieldname": "skipped_records",
+   "fieldtype": "Int",
+   "label": "Skipped Records",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-22 14:29:33.909757",
+ "modified": "2024-05-24 19:17:34.479192",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",

@@ -1,4 +1,5 @@
 import frappe
+from agarwals.agarwals.doctype import file_records
 from agarwals.utils.payment_entry_cancellator import PaymentEntryCancellator
 from agarwals.utils.journal_entry_cancellator import JournalEntryCancellator
 from agarwals.reconciliation import chunk
@@ -9,12 +10,20 @@ class SalesInvoiceCreator:
     def cancel_sales_invoice(self, cancelled_bills):
         for bill in cancelled_bills:
             try:
+                bill_record = frappe.get_doc('Bill', bill)
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
+                sales_invoice_record.custom_file_upload = bill_record.file_upload
+                sales_invoice_record.custom_transform = bill_record.transform
+                sales_invoice_record.custom_index = bill_record.index
+                sales_invoice_record.save(ignore_permissions=True)
                 sales_invoice_record.cancel()
                 PaymentEntryCancellator().cancel_payment_entry(bill)
                 JournalEntryCancellator().cancel_journal_entry(bill)
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
                 frappe.db.commit()
+                file_records.create(file_upload=sales_invoice_record.file_upload,
+                                    transform=sales_invoice_record.transform, reference_doc=sales_invoice_record.doctype,
+                                    record=bill, index=sales_invoice_record.index)
             except Exception as e:
                 error_log = frappe.new_doc('Error Record Log')
                 error_log.set('doctype_name', 'Bill')
@@ -41,7 +50,10 @@ class SalesInvoiceCreator:
                                             'cost_center': bill_record.cost_center,
                                             'items': [{'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
                                             'set_posting_time': 1, 'posting_date': bill_record.bill_date,
-                                            'due_date': bill_record.bill_date}
+                                            'due_date': bill_record.bill_date,
+                                            'custom_file_upload': bill_record.file_upload,
+                                            'custom_transform': bill_record.transform,
+                                            'custom_index': bill_record.index}
                     for key, value in sales_invoice_params.items():
                         sales_invoice_record.set(key, value)
                     sales_invoice_record.save()
@@ -50,6 +62,9 @@ class SalesInvoiceCreator:
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
+                    file_records.create(file_upload=sales_invoice_record.custom_file_upload,
+                                        transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
+                                        record=bill_number, index=sales_invoice_record.custom_index)
                 except Exception as e:
                     error_log = frappe.new_doc('Error Record Log')
                     error_log.set('doctype_name', 'Bill')

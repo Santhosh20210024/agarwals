@@ -1,13 +1,21 @@
 // Copyright (c) 2024, Agarwals and contributors
 // For license information, please see license.txt
 
+var interval_ID = ""
 frappe.ui.form.on('Settlement Advice Downloader UI', {
-		refresh:function(frm) {
-        if (frm.doc.captcha_img) {
+
+	refresh:function(frm) {
+        if (frm.doc.captcha_img && frm.doc.captcha_img != '') {
 			var captchaField = frm.fields_dict['captcha_html'].$wrapper;
 			captchaField.empty();
 			var imgElement = $('<img>').attr('src', frm.doc.captcha_img);
 			captchaField.append(imgElement);
+			if (interval_ID != "") {
+				clearInterval(interval_ID)
+				interval_ID = ""
+
+			}
+
         }
 		else{
 			var captchaField = frm.fields_dict['captcha_html'].$wrapper;
@@ -17,15 +25,20 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
     },
 	next:function(frm) {
 		if (frm.doc.status == 'InProgress') {
-			frm.save()
 			frm.toggle_display('next',0)
+			if (frm.doc.disable_auto_refresh == 0){
+             interval_ID = setInterval(function() {
+                cur_frm.reload_doc()
+            }, 5000);
+			}
 			frappe.call({
 				method: 'agarwals.reconciliation.step.advice_downloader.download_captcha_settlement_advice',
 				args: {
 					'captcha_tpa_doc': frm.doc.name
 				},callback:function(r){
-					frm.refresh()
 					frm.toggle_display('next',1)
+					cur_frm.reload_doc()
+
 				}
 			})
 
@@ -53,20 +66,25 @@ frappe.ui.form.on('Settlement Advice Downloader UI', {
 			"margin": "0 auto",
 			"display": "block"
 		});
+	},
+	disable_auto_refresh:function (frm){
+			if(frm.doc.disable_auto_refresh == 1){
+				if(interval_ID != ""){
+					console.log("stoped Interval")
+					clearInterval(intervalID)
+				}
+				else{
+					frappe.msgprint(" Auto Refresh Not Activated ")
+				}
+			}
 	}
 
 
+
+
+
 });
-// frappe.realtime.on("eventsts", function(response) {
-// 	console.log("websocket Triggered")
-// 	if (cur_frm && cur_frm.doc.doctype === 'Settlement Advice Downloader UI') {
-// 		console.log("doctype identified")
-//         cur_frm.reload_doc();
-//     }
-// 	else{
-// 		console.log(' Could not find the doctype ')
-// 	}
-// });
+
 
 
 
