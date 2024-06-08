@@ -39,7 +39,7 @@ class YearlyDueUpdater:
 
     def process(self):
         self.update_previous_year_due()
-        records = frappe.db.sql(f"SELECT name FROM `{self.parent_table}` WHERE status != '{self.status}' and custom_entity = '{self.entity}'",pluck = 'name')
+        records = frappe.db.sql(f"SELECT name FROM `{self.parent_table}` WHERE status != '{self.status}' and '{self.entity_field}' = '{self.entity}'",pluck = 'name')
         for i in range(0, len(records), 100):
             frappe.enqueue(self.update_current_fiscal_year, queue='long', is_async=True, timeout=18000,
                            records=records[i:i + 100])
