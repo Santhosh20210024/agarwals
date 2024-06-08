@@ -2,7 +2,7 @@ import frappe
 import os
 
 from agarwals.utils.file_util import HOME_PATH,SUB_DIR,SITE_PATH,PROJECT_FOLDER,INNER_SUB_DIR
-
+from agarwals.utils.error_handler import log_error
 #SITE PATH
 SITE_PATH = os.getcwd() + frappe.get_site_path()[1:] + "/private/files/"
 
@@ -59,3 +59,25 @@ def folder_structure_creation():
                 os.mkdir(get_file_path(parent_folder_item,sub_folder_item))
 
     print("-------- File Structure Completed --------")
+
+
+@frappe.whitelist()
+def create_sa_folders():
+    path = frappe.get_single("Control Panel").site_path + "/private/files/DrAgarwals/Settlement Advice"
+    alredy_exits = False
+    try:
+        if os.path.exists(path):
+            folder_names = set(frappe.db.sql("SELECT tpa FROM `tabTPA Login Credentials` ",pluck ="tpa"))
+            for name in folder_names:
+                folder = path + "/" +name
+                if not os.path.exists(folder):
+                    os.mkdir(folder)
+                else:
+                    log_error(error = f"Folder {name} Already Exists")
+                    alredy_exits = True
+            return "folder created" if alredy_exits == False else "folder already exists"
+        else:
+            return "path not found"
+    except Exception as e:
+        log_error(error = e)
+        return "unexpected error occurs"
