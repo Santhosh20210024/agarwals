@@ -39,7 +39,7 @@ class YearlyDueUpdater:
 
     def process(self):
         self.update_previous_year_due()
-        records = frappe.db.sql(f"SELECT name FROM `{self.parent_table}` WHERE status != {self.status} and custom_entity = '{self.entity}'",pluck = 'name')
+        records = frappe.db.sql(f"SELECT name FROM `{self.parent_table}` WHERE status != '{self.status}' and custom_entity = '{self.entity}'",pluck = 'name')
         for i in range(0, len(records), 100):
             frappe.enqueue(self.update_current_fiscal_year, queue='long', is_async=True, timeout=18000,
                            records=records[i:i + 100])
@@ -51,7 +51,7 @@ class SalesInvoiceDueUpdater(YearlyDueUpdater):
         self.due_field = 'outstanding_amount'
         self.parent_doctype = "Sales Invoice"
         self.entity_field = "entity"
-        self.status = 'Cancelled'
+        self.status = ('Cancelled')
 
 class BankTransactionDueUpdater(YearlyDueUpdater):
     def __init__(self,previous_fiscal_year, current_fiscal_year,entity):
@@ -60,7 +60,7 @@ class BankTransactionDueUpdater(YearlyDueUpdater):
         self.due_field = 'unallocated_amount'
         self.parent_doctype = "Bank Transaction"
         self.entity_field = "custom_entity"
-        self.status = 'Cancelled'
+        self.status = ('Cancelled')
 
 @frappe.whitelist()
 def execute():
