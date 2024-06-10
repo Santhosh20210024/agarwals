@@ -41,15 +41,10 @@ class CholasDownloader(SeleniumDownloader):
 
         payment_status_link = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//span[@class='sidemenu-txt' and text()='Payment Status']")))
         payment_status_link.click()
-
-
-
         select_element = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//select[@formcontrolname='type']")))
-
         select = Select(select_element)
-
         select.select_by_value("Paid Claims")
-       
+
         self.from_date_date_time = self.check_date_type(self.from_date)
         self.to_date_date_time = self.check_date_type(self.to_date)
 
