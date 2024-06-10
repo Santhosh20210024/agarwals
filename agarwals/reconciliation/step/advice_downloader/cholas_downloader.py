@@ -35,6 +35,8 @@ class CholasDownloader(SeleniumDownloader):
         else:
             self.date_time =date
         return self.date_time
+
+
     def navigate(self):
 
         payment_status_link = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//span[@class='sidemenu-txt' and text()='Payment Status']")))
@@ -47,15 +49,7 @@ class CholasDownloader(SeleniumDownloader):
         select = Select(select_element)
 
         select.select_by_value("Paid Claims")
-        # if isinstance(self.from_date, str):
-        #     self.from_date_date_time = datetime.strptime(self.from_date, '%Y-%m-%d').date()
-        # else:
-        #     self.from_date_date_time = self.from_date
-        #
-        # if isinstance(self.to_date, str):
-        #     self.to_date_date_time = datetime.strptime(self.to_date, '%Y-%m-%d').date()
-        # else:
-        #     self.to_date_date_time = self.to_date
+       
         self.from_date_date_time = self.check_date_type(self.from_date)
         self.to_date_date_time = self.check_date_type(self.to_date)
 
@@ -73,6 +67,9 @@ class CholasDownloader(SeleniumDownloader):
         to_date.send_keys(self.to_date)
 
         self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn.btn-blue"))).click()
+
+
+
     def download_from_web(self):
         self.wait.until(EC.visibility_of_element_located((By.XPATH, "//input[@value='Export to Excel']"))).click()
         time.sleep(10)
