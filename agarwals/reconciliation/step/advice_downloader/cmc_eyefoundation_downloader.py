@@ -5,6 +5,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.alert import Alert
 
 
 
@@ -16,13 +17,34 @@ class CMCEyeFoundationDownloader(SeleniumDownloader):
         username = self.wait.until(EC.presence_of_element_located((By.ID, 'txtusername')))
         pwd = self.driver.find_element(By.ID, 'txtpassword')
 
-        username.send_keys("eyefoundation_dmo")
-        pwd.send_keys("H_print")
+        username.send_keys(self.user_name)
+        pwd.send_keys(self.password)
         time.sleep(20)
-        login_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'Submit1')))
-        login_button.click()
+        # login_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'Submit1')))
+        # login_button.click()
+        captcha_img = self.wait.until(EC.visibility_of_element_located((By.ID, 'imgCaptcha')))
+        if captcha_img:
+            self.get_captcha_image(captcha_img)
+            captcha = self.get_captcha_value()
+            if captcha != None:
+                captcha_entry = self.wait.until(EC.visibility_of_element_located((By.ID, "txtCaptcha")))
+                captcha_entry.send_keys(captcha)
+                self.wait.until(EC.element_to_be_clickable((By.ID, 'Submit1'))).click()
+                try:
+
+                    time.sleep(2)
+                    alert = Alert(self.driver)
+                    if alert.text == "Please Enter Correct Captcha":
+                        self.update_tpa_reference("Retry")
+                except:
+                    pass
+            else:
+                self.update_tpa_reference("Retry")
+        else:
+            self.log_error('Settlement Advice Downloader UI', self.tpa, "captcha ID NOT FOUND")
 
     def navigate(self):
+
         isprint_mis_link = self.wait.until(
             EC.presence_of_element_located((By.XPATH, "//a[@id='ctl00_a_mis']/span[text()='iSprint MIS']")))
 
@@ -56,10 +78,12 @@ class CMCEyeFoundationDownloader(SeleniumDownloader):
         # Select the option by value
         select.select_by_value("PAID")
         txt_from_date = self.wait.until(EC.presence_of_element_located((By.ID, 'txtFromDate')))
-        txt_from_date.send_keys("01/01/2024")  # Enter your desired start date
+        formated_from_date = self.from_date.strftime("%d/%m/%Y")
+        txt_from_date.send_keys(formated_from_date)  # Enter your desired start date 2024-03-25
 
         txt_to_date = self.wait.until(EC.presence_of_element_located((By.ID, 'txtToDate')))
-        txt_to_date.send_keys("29/05/2024")  # Enter your desired end date
+        formated_to_date = self.to_date.strftime("%d/%m/%Y")
+        txt_to_date.send_keys(formated_to_date)  # Enter your desired end date
 
     def download_from_web(self):
         generate_button = self.driver.find_element(By.ID, "BTNMIS")

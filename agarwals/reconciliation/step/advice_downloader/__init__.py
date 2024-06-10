@@ -22,6 +22,7 @@ from agarwals.reconciliation.step.advice_downloader.selenium_downloader import S
 from agarwals.reconciliation.step.advice_downloader.fhpl_downloader import FHPLDownloader
 from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader import RelianceGeneralDownloader
 from agarwals.reconciliation.step.advice_downloader.niva_bupa_downloader import NivaBupaDownloader
+from agarwals.reconciliation.step.advice_downloader.cmc_eyefoundation_downloader import CMCEyeFoundationDownloader
 
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
