@@ -67,7 +67,7 @@ def create_sa_folders():
     alredy_exits = False
     try:
         if os.path.exists(path):
-            folder_names = set(frappe.db.sql("SELECT tpa FROM `tabTPA Login Credentials` ",pluck ="tpa"))
+            folder_names = set(frappe.db.sql("SELECT tpa FROM `tabTPA Login Credentials` WHERE is_enable = 1",pluck ="tpa"))
             for name in folder_names:
                 folder = path + "/" +name
                 if not os.path.exists(folder):

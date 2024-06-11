@@ -59,7 +59,7 @@
    "label": "Upload"
   },
   {
-   "depends_on": "eval:doc.document_type=='Settlement Advice' && doc.file_format != 'ZIP'",
+   "depends_on": "eval:doc.document_type=='Settlement Advice' ",
    "fieldname": "payer_type",
    "fieldtype": "Link",
    "label": "Payer",
@@ -261,7 +261,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-24 19:17:34.479192",
+ "modified": "2024-06-08 18:43:53.161358",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
