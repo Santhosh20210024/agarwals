@@ -741,7 +741,7 @@ class BankBulkTransformer(BankTransformer):
         return df.rename(columns=rename_value)
 
     def transform(self, file):
-        self.source_df["source"] = file['name']
+        self.source_df["file_upload"] = file['name']
         self.source_df = self.find_and_rename_column(self.source_df,
                                                      ['date','narration', 'deposit','withdrawal','internal_id','utr_number','bank_account', 'file_upload', 'transform', 'index'])
         configuration = frappe.get_single('Bank Configuration')
