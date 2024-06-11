@@ -405,7 +405,7 @@ def update_reconciled_status():
                             tma.bank_transaction = tbt.name
                         JOIN `tabSettlement Advice` tsa on
                             tsa.name = tma.settlement_advice
-                        set tma.status = 'Error', tma.remarks = 'Already Reconciled', tsa.status = 'Error', tsa.remark = 'Already Reconciled'
+                        set tma.status = 'Error', tma.remarks = 'Already Reconciled', tsa.status = 'Warning', tsa.remark = 'Already Reconciled'
                         where
                             tbt.status = 'Reconciled'
                             and tma.match_logic in ('MA1-CN', 'MA5-BN')
