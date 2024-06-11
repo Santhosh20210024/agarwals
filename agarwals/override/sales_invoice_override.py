@@ -546,14 +546,22 @@ class SalesInvoiceOverride(SellingController):
 						   		parent='{name}'
 						   """.format(name=self.name),as_dict=True)
 		
-		if self.custom_total_disallowance != child_docs[0]['total_dis'] or self.custom_total_tds != child_docs[0]['total_tds']:
+		if self.custom_total_tds != child_docs[0]['total_tds']:
 				self.custom_total_tds = child_docs[0]['total_tds']
-				self.custom_total_disallowance = child_docs[0]['total_dis']
-				self.custom_total_writeoff_amount = child_docs[0]['writeoff']
 				self.save()
 				frappe.db.commit()
-			
 
+		if self.custom_total_disallowance != child_docs[0]['total_dis']:
+			self.custom_total_disallowance = child_docs[0]['total_dis']
+			self.save()
+			frappe.db.commit()
+
+		if self.custom_total_writeoff_amount != child_docs[0]['writeoff']:
+			self.custom_total_writeoff_amount = child_docs[0]['writeoff']
+			self.save()
+			frappe.db.commit()
+
+		
 	def on_update_after_submit(self):
 		self.update_total_tds_disallowance()
 		if hasattr(self, "repost_required"):
