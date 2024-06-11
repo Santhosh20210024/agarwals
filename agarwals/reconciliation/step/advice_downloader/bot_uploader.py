@@ -164,7 +164,7 @@ class SABotUploader:
                 log_error("Path Dose not Exits While removing the folder ")
         if self.delete_zip_folder == 1:
             if os.path.exists(self.zip_folder_path):
-                os.remove(self.zip_folder_path)
+                shutil.rmtree(self.zip_folder_path)
 
 
     def process(self):
