@@ -1714,7 +1714,7 @@ class SalesInvoiceOverride(SellingController):
 				# 	self.status = "Overdue"
 				elif 0 < outstanding_amount < total:
 					self.status = "Partly Paid"
-				elif outstanding_amount > 0 and getdate(self.due_date) >= getdate():
+				elif outstanding_amount > 0 :
 					self.status = "Unpaid"
 				# Check if outstanding amount is 0 due to credit note issued against invoice
 				elif (
