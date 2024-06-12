@@ -112,7 +112,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nRAISED\nCANCELLED",
+   "options": "\nRAISED\nCANCELLED\nCANCELLED AND DELETED",
    "read_only": 1
   },
   {
