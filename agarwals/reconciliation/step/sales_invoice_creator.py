@@ -99,7 +99,7 @@ def process(args):
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
-        new_bills = frappe.get_list('Bill', filters={'invoice': ''},pluck = 'name')
+        new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=','CANCELLED AND DELETED']},pluck = 'name')
         if new_bills:
             SalesInvoiceCreator().enqueue_jobs(new_bills,args)
         else:
