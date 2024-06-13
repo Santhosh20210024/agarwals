@@ -2,6 +2,7 @@ import frappe
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
+from agarwals.reconciliation.step.advice_downloader.bot_uploader import SABotUploader
 from agarwals.reconciliation.step.advice_downloader.provider_ihx_api_downloader import ProviderIhx
 from agarwals.reconciliation.step.advice_downloader.tips_vidal_health_downloader import TipsVidalHealth
 from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia_downloader import TnnhisMdIndia
@@ -82,6 +83,10 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             frappe.db.sql(
                 f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'Error' WHERE name = '{login_ref.name}' ")
             frappe.db.commit()
+
+@frappe.whitelist()
+def upload_sa_files():
+    SABotUploader().process()
 
 
 
