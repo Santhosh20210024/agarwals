@@ -20,6 +20,7 @@ class SABotUploader:
 
     def raise_exception(self,exception):
         raise Exception(exception)
+
     def set_self_variable(self):
         control_panel = frappe.get_single("Control Panel")
         if control_panel:
@@ -33,6 +34,7 @@ class SABotUploader:
             self.send_mail = control_panel.send_mail if control_panel.send_mail else None
             self.mail_group = control_panel.email_group if control_panel.email_group else None
             self.delete_zip_folder = control_panel.delete_zip = 1 if control_panel.delete_zip else None
+
     def convert_folder_to_zip(self):
         os.mkdir(self.zip_folder_path)
         for folder_name in self.folder_names:
@@ -45,7 +47,7 @@ class SABotUploader:
                 zip_name = self.zip_folder_path +"/"+f"{folder_name}[{frappe.utils.now_datetime()}]"
                 convert_zip = shutil.make_archive(base_name=zip_name, format="zip", root_dir=path)
 
-        if len(os.listdir(self.zip_folder_path)) < 0:
+        if len(os.listdir(self.zip_folder_path)) == 0:
             self.raise_exception(f"File Upload Failed :{self.zip_folder_path} -Zip files not found ")
 
     def login(self):
@@ -131,6 +133,7 @@ class SABotUploader:
 
     def send_notification(self,message,subject,reciver_list):
         frappe.sendmail(recipients=reciver_list,subject=subject,message=message)
+
     def generate_notification(self):
         if not self.mail_group:
             self.raise_exception("Mail Group Not Found")
@@ -165,7 +168,6 @@ class SABotUploader:
         if self.delete_zip_folder == 1:
             if os.path.exists(self.zip_folder_path):
                 shutil.rmtree(self.zip_folder_path)
-
 
     def process(self):
         try:
