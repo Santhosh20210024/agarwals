@@ -15,6 +15,7 @@ import shutil
 import pandas as pd
 import openpyxl
 import glob
+from io import StringIO
 
 class SeleniumDownloader:
     def __init__(self):
@@ -310,13 +311,20 @@ class SeleniumDownloader:
 
     def convert_file_format(self,original_file,formated_file):
         #HTML
-        if  self.incoming_file_type == 'HTML':
-            data = pd.read_html(original_file)
-            if len(data) ==1:
-                data[0].to_excel(formated_file,index=False)
+        if self.incoming_file_type == 'HTML':
+            try:
+                with open(original_file, 'r', encoding='utf-8') as file:
+                    html_content = file.read()
+                    html_io = StringIO(html_content)
+                    data = pd.read_html(html_io)
+            except Exception as e:
+                self.raise_exception(f"An error occurred while reading the file: {e}")
+            if len(data) == 1:
+                data[0].to_excel(formated_file, index=False)
+                self.delete_backend_files(original_file)
             else:
                 self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-            self.delete_backend_files(original_file)
+                self.delete_backend_files(original_file)
 
     def _download(self):
         self.download_from_web()
@@ -325,8 +333,8 @@ class SeleniumDownloader:
             if downloaded_files_count != 1:
                 self.raise_exception(f"Your directory {self.download_directory} has either no file or have multiple files")
         elif self.local_environment_mode == True:
-            if self.previous_files_count > downloaded_files_count:
-                self.raise_exception(f" File Not Found or No Record Found ")
+            if self.previous_files_count == downloaded_files_count:
+                self.raise_exception("File Not Found or No Record Found")
 
         self.convert_file_format(f"{self.download_directory}/{os.listdir(self.download_directory)[0]}",f"{self.download_directory}/{self.tpa}_formated_file.xlsx")
         self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name)
