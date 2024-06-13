@@ -18,7 +18,9 @@ class Downloader():
         self.is_json=False
         self.credential_doc=None
         self.last_executed_time = frappe.utils.now_datetime()
-
+        self.file_download_path = None
+        self.tpa_name = None
+        self.is_local_environment = False
     def construct_file_url(*args):
         list_of_items = []
         for arg in args:
@@ -28,24 +30,39 @@ class Downloader():
         formatted_url = '/'.join(list_of_items)
         return formatted_url
 
-    def set_username_and_password(self, tpa_doc):
+    def set_self_variable(self, tpa_doc):
         self.credential_doc = tpa_doc
+        control_panel = frappe.get_single("Control Panel")
         if self.credential_doc:
             self.user_name = self.credential_doc.user_name
             self.password = self.credential_doc.password
+            self.tpa_name = self.credential_doc.tpa
+            if control_panel:
+                if control_panel.local_environment == 1:
+                    self.is_local_environment = True
+                    self.file_download_path = control_panel.sa_downloader_path if control_panel.sa_downloader_path.endswith("/") else control_panel.sa_downloader_path + "/"
         else:
             self.log_error('TPA Login Credentials',None,"No Credential for the given input")
             
     def delete_backend_files(self,file_path=None):
         if os.path.exists(file_path):
             os.remove(file_path)
-    
+
+    def move_to_sadownload(self,file_name):
+        path = self.file_download_path + self.tpa_name
+        shutil.move(file_name, path)
+
+
     def write_binary(self,file_name=None,content=None):
         if file_name and content:
             with open(file_name, "wb") as file:
                 file.write(content)
-            file_url=self.move_and_create_file_record(file_name)
-            self.create_fileupload(file_url)
+            if self.is_local_environment == False:
+                file_url=self.move_and_create_file_record(file_name)
+                self.create_fileupload(file_url)
+            else:
+                self.move_to_sadownload(file_name)
+
     
     def move_and_create_file_record(self,file_name):
         shutil.move(file_name,  self.construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0]))
@@ -70,8 +87,11 @@ class Downloader():
         if file_name and content:
             content_df=pd.DataFrame(content)
             content_df.to_excel(file_name)
-            file_url=self.move_and_create_file_record(file_name)
-            self.create_fileupload(file_url)
+            if self.is_local_environment == False:
+                file_url=self.move_and_create_file_record(file_name)
+                self.create_fileupload(file_url)
+            else:
+                self.move_to_sadownload(file_name)
     
     def create_fileupload(self,file_url):
         file_upload_doc=frappe.new_doc("File upload")
@@ -139,7 +159,7 @@ class Downloader():
     def download(self, tpa_doc, chunk_doc):
         try:
             chunk.update_status(chunk_doc, "InProgress")
-            self.set_username_and_password(tpa_doc)
+            self.set_self_variable(tpa_doc)
             content = self.get_content()
             file_name=self.get_file_details()
             if not content or not file_name:
