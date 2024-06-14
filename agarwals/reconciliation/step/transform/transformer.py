@@ -575,7 +575,7 @@ class BankTransformer(StagingTransformer):
         if "IMPS" in narration:
             length = 12
             pattern = numeric
-        elif "NEFT" in narration:
+        elif "NEFT" in narration or narration.startswith('N/'):
             pattern = alphanumeric_pattern
             utr_13 = None
             utr_16 = None
@@ -741,12 +741,15 @@ class BankBulkTransformer(BankTransformer):
         return df.rename(columns=rename_value)
 
     def transform(self, file):
-        self.source_df["source"] = file['name']
+        self.source_df["file_upload"] = file['name']
         self.source_df = self.find_and_rename_column(self.source_df,
                                                      ['date','narration', 'deposit','withdrawal','internal_id','utr_number','bank_account', 'file_upload', 'transform', 'index'])
         configuration = frappe.get_single('Bank Configuration')
         if "date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df, eval(configuration.date_formats), 'date')
         self.extract_utr_from_narration(configuration)
+        self.source_df['credit'] = self.source_df['deposit']
+        self.source_df['debit'] = self.source_df['withdrawal']
+        self.add_search_column()
         self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
         return True

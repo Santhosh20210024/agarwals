@@ -5,7 +5,7 @@ import frappe.utils
 from datetime import datetime,date
 from frappe.model.document import Document
 
-class PeriodCloserbyEntity(Document):
+class PeriodClosurebyEntity(Document):
 	def get_last_posted_date(self):
 		last_posted_doc = frappe.db.get_list("Period Closer by Entity", fields="*", filters={'entity': self.entity},order_by="posting_date desc")
 		last_posted_date = last_posted_doc[0].posting_date if last_posted_doc and last_posted_doc[0].name!=self.name else None

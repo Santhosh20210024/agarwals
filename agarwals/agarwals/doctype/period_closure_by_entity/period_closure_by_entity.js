@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Agarwals and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Period Closer by Entity', {
+frappe.ui.form.on('Period Closure by Entity', {
 	entity: function(frm) {
         frm.save()
 	},

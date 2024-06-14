@@ -49,9 +49,11 @@
    "search_index": 1
   },
   {
+   "default": "Open",
    "fieldname": "status",
-   "fieldtype": "Data",
-   "label": "Status"
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nError\nProcessed"
   },
   {
    "fieldname": "remarks",

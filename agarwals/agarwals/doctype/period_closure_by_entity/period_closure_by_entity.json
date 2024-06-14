@@ -33,10 +33,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-15 17:12:29.632252",
+ "modified": "2024-05-31 14:02:44.411351",
  "modified_by": "Administrator",
  "module": "Agarwals",
- "name": "Period Closer by Entity",
+ "name": "Period Closure by Entity",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [

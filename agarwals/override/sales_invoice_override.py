@@ -534,8 +534,35 @@ class SalesInvoiceOverride(SellingController):
 
 	def on_update(self):
 		self.set_paid_amount()
+		
 
+	def update_total_tds_disallowance(self):
+		child_docs=frappe.db.sql(""" 
+						   SELECT 
+						        sum(tds_amount) total_tds,sum(disallowance_amount) total_dis ,sum(writeoff_amount) writeoff
+						    FROM
+						        `tabSales Invoice Reference` 
+						    WHERE 
+						   		parent='{name}'
+						   """.format(name=self.name),as_dict=True)
+		
+		if self.custom_total_tds != child_docs[0]['total_tds']:
+				self.custom_total_tds = child_docs[0]['total_tds']
+				self.save()
+
+		if self.custom_total_disallowance != child_docs[0]['total_dis']:
+			self.custom_total_disallowance = child_docs[0]['total_dis']
+			self.save()
+
+		if self.custom_total_writeoff_amount != child_docs[0]['writeoff']:
+			self.custom_total_writeoff_amount = child_docs[0]['writeoff']
+			self.save()
+			
+		frappe.db.commit()
+
+		
 	def on_update_after_submit(self):
+		self.update_total_tds_disallowance()
 		if hasattr(self, "repost_required"):
 			fields_to_check = [
 				"additional_discount_account",
@@ -553,6 +580,7 @@ class SalesInvoiceOverride(SellingController):
 			if self.needs_repost:
 				self.validate_for_repost()
 				self.db_set("repost_required", self.needs_repost)
+		
 
 	def set_paid_amount(self):
 		paid_amount = 0.0
@@ -1686,7 +1714,7 @@ class SalesInvoiceOverride(SellingController):
 				# 	self.status = "Overdue"
 				elif 0 < outstanding_amount < total:
 					self.status = "Partly Paid"
-				elif outstanding_amount > 0 and getdate(self.due_date) >= getdate():
+				elif outstanding_amount > 0 :
 					self.status = "Unpaid"
 				# Check if outstanding amount is 0 due to credit note issued against invoice
 				elif (

@@ -79,7 +79,7 @@ class PaymentEntryCreator:
         return name
 
     def get_posting_date(self, bt_doc, si_doc):
-        closing_date_list = frappe.get_list('Period Closer by Entity',
+        closing_date_list = frappe.get_list('Period Closure by Entity',
                                             filters={'entity': si_doc.entity}
                                             ,order_by = 'creation desc'
                                             ,pluck = 'posting_date')
@@ -405,7 +405,7 @@ def update_reconciled_status():
                             tma.bank_transaction = tbt.name
                         JOIN `tabSettlement Advice` tsa on
                             tsa.name = tma.settlement_advice
-                        set tma.status = 'Error', tma.remarks = 'Already Reconciled', tsa.status = 'Error', tsa.remark = 'Already Reconciled'
+                        set tma.status = 'Error', tma.remarks = 'Already Reconciled', tsa.status = 'Warning', tsa.remark = 'Already Reconciled'
                         where
                             tbt.status = 'Reconciled'
                             and tma.match_logic in ('MA1-CN', 'MA5-BN')
