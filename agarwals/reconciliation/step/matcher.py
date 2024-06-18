@@ -43,16 +43,24 @@ class Matcher:
             if record['sa']:
                 if record.status not in ('Open', 'Not Processed'):
                     continue
-                if frappe.get_value('Sales Invoice', record['bill'], 'status') == "Cancelled":
+                if frappe.get_value('Sales Invoice', record['bill'], 'status') == "CANCELLED":
                     self.update_advice_status(record['sa'], 'Warning', 'Cancelled Bill')
+                    continue
+                if frappe.get_value('Sales Invoice', record['bill'], 'status') == "CANCELLED AND DELETED":
+                    self.update_advice_status(record['sa'], 'Warning', 'Cancelled and deleted Bill')
                     continue
 
             matcher_record = frappe.new_doc("Matcher")
             matcher_record.set('sales_invoice', record['bill']) # Bill Is Mandatory
 
             if record['cb']:
+                if frappe.get_value('Sales Invoice', record['bill'], 'status') == "CANCELLED":
+                    continue
+                if frappe.get_value('Sales Invoice', record['bill'], 'status') == "CANCELLED AND DELETED":
+                    continue
                 matcher_record.set('claimbook', record['cb'])
                 matcher_record.set('insurance_company_name', record['insurance_name'])
+                
 
                 if record['logic'] == 'MA3-CN': # Only for the ClaimBook Operation
                     matcher_record = self.update_matcher_amount(matcher_record, record)
