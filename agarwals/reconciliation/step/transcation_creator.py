@@ -50,6 +50,7 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.custom_index = transaction.get('index')
     bank_trans_doc.submit()
     frappe.db.commit()
+    fiscal_year_update(bank_trans_doc)
     file_records.create(file_upload=bank_trans_doc.custom_file_upload,
                         transform=bank_trans_doc.custom_transform, reference_doc=bank_trans_doc.doctype,
                         record=bank_trans_doc.name, index=bank_trans_doc.custom_index)
@@ -59,6 +60,22 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     if not update_reference_number:
         return reference_number
     
+def fiscal_year_update(transaction):
+    date = transaction.get('date')
+    fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
+    yearly_due_doc = frappe.new_doc('Yearly Due')
+    yearly_due_doc.parent = transaction.get('name') 
+    yearly_due_doc.parenttype = 'Bank Transaction'
+    yearly_due_doc.due_amount = 0
+    yearly_due_doc.fiscal_year = fiscal_year[0]['name']
+    yearly_due_doc.parentfield = 'custom_yearly_due'
+    yearly_due_doc.idx = 1
+    yearly_due_doc.docstatus = 1
+    yearly_due_doc.save()
+    frappe.db.commit()
+    
+    
+
 def save_trans_doc(transaction):
     transaction.save()
     frappe.db.commit()

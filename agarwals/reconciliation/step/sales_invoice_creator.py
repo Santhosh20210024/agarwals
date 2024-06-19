@@ -62,6 +62,7 @@ class SalesInvoiceCreator:
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
+                    self.update_fiscal_year(sales_invoice_record)
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                         transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
                                         record=bill_number, index=sales_invoice_record.custom_index)
@@ -74,7 +75,21 @@ class SalesInvoiceCreator:
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
             chunk.update_status(chunk_doc, "Error")
-
+            
+    def update_fiscal_year(self,invoice):
+        date = invoice.get('date')
+        fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
+        yearly_due_doc = frappe.new_doc('Yearly Due')
+        yearly_due_doc.parent = invoice.get('name') 
+        yearly_due_doc.parenttype = 'Sales Invoice'
+        yearly_due_doc.due_amount = 0
+        yearly_due_doc.fiscal_year = fiscal_year[0]['name']
+        yearly_due_doc.parentfield = 'custom_yearly_due'
+        yearly_due_doc.idx = 1
+        yearly_due_doc.docstatus = 1
+        yearly_due_doc.save()
+        frappe.db.commit()
+        
     def enqueue_jobs(self, bill_number, args):
         no_of_invoice_per_queue = int(args["chunk_size"])
         for i in range(0, len(bill_number), no_of_invoice_per_queue):
