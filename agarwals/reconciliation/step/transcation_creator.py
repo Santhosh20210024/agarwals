@@ -61,9 +61,9 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
         return reference_number
     
 def fiscal_year_update(transaction):
-    date = transaction.get('date')
-    fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
-    yearly_due_doc = frappe.new_doc('Yearly Due')
+    date = transaction.get ('date')
+    fiscal_year = frappe.get_all ('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
+    yearly_due_doc = frappe.new_doc ('Yearly Due')
     yearly_due_doc.parent = transaction.get('name') 
     yearly_due_doc.parenttype = 'Bank Transaction'
     yearly_due_doc.due_amount = 0

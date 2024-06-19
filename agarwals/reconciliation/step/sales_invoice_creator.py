@@ -79,7 +79,7 @@ class SalesInvoiceCreator:
     def update_fiscal_year(self,invoice):
         date = invoice.get('date')
         fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
-        yearly_due_doc = frappe.new_doc('Yearly Due')
+        yearly_due_doc = frappe.new_doc ('Yearly Due')
         yearly_due_doc.parent = invoice.get('name') 
         yearly_due_doc.parenttype = 'Sales Invoice'
         yearly_due_doc.due_amount = 0
