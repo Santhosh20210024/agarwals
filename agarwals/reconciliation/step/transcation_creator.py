@@ -6,6 +6,7 @@ from agarwals.reconciliation import chunk
 from datetime import datetime as dt
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.fiscal_year_update import update_fiscal_year
 
 TAG = 'Credit Payment'
 ERROR_LOG = { 
@@ -50,7 +51,7 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.custom_index = transaction.get('index')
     bank_trans_doc.submit()
     frappe.db.commit()
-    fiscal_year_update(bank_trans_doc)
+    update_fiscal_year(bank_trans_doc,'Bank Transaction')
     file_records.create(file_upload=bank_trans_doc.custom_file_upload,
                         transform=bank_trans_doc.custom_transform, reference_doc=bank_trans_doc.doctype,
                         record=bank_trans_doc.name, index=bank_trans_doc.custom_index)
@@ -58,23 +59,7 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
         return bank_trans_doc.name
     
     if not update_reference_number:
-        return reference_number
-    
-def fiscal_year_update(transaction):
-    date = transaction.get ('date')
-    fiscal_year = frappe.get_all ('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
-    yearly_due_doc = frappe.new_doc ('Yearly Due')
-    yearly_due_doc.parent = transaction.get('name') 
-    yearly_due_doc.parenttype = 'Bank Transaction'
-    yearly_due_doc.due_amount = 0
-    yearly_due_doc.fiscal_year = fiscal_year[0]['name']
-    yearly_due_doc.parentfield = 'custom_yearly_due'
-    yearly_due_doc.idx = 1
-    yearly_due_doc.docstatus = 1
-    yearly_due_doc.save()
-    frappe.db.commit()
-    
-    
+        return reference_number  
 
 def save_trans_doc(transaction):
     transaction.save()

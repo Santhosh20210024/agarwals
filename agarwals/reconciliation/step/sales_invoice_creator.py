@@ -5,6 +5,7 @@ from agarwals.utils.journal_entry_cancellator import JournalEntryCancellator
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.fiscal_year_update import update_fiscal_year
 
 class SalesInvoiceCreator:
     def cancel_sales_invoice(self, cancelled_bills):
@@ -62,7 +63,7 @@ class SalesInvoiceCreator:
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
-                    self.update_fiscal_year(sales_invoice_record)
+                    update_fiscal_year(sales_invoice_record,'Sales Invoice')
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                         transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
                                         record=bill_number, index=sales_invoice_record.custom_index)
@@ -76,19 +77,7 @@ class SalesInvoiceCreator:
         except Exception as e:
             chunk.update_status(chunk_doc, "Error")
             
-    def update_fiscal_year(self,invoice):
-        date = invoice.get('date')
-        fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
-        yearly_due_doc = frappe.new_doc ('Yearly Due')
-        yearly_due_doc.parent = invoice.get('name') 
-        yearly_due_doc.parenttype = 'Sales Invoice'
-        yearly_due_doc.due_amount = 0
-        yearly_due_doc.fiscal_year = fiscal_year[0]['name']
-        yearly_due_doc.parentfield = 'custom_yearly_due'
-        yearly_due_doc.idx = 1
-        yearly_due_doc.docstatus = 1
-        yearly_due_doc.save()
-        frappe.db.commit()
+    
         
     def enqueue_jobs(self, bill_number, args):
         no_of_invoice_per_queue = int(args["chunk_size"])
