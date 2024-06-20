@@ -14,6 +14,7 @@
   "column_break_wdivc",
   "website_url",
   "from_date",
+  "to_date",
   "is_captcha",
   "is_headless",
   "sandbox_mode",
@@ -87,11 +88,16 @@
    "fieldname": "sandbox_mode",
    "fieldtype": "Check",
    "label": "Sandbox Mode "
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-12 10:35:58.693961",
+ "modified": "2024-06-19 15:57:05.993881",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
