@@ -239,7 +239,7 @@ class SeleniumDownloader:
         recent_downloaded_file = max(get_all_files,key=os.path.getctime)
         original_file_name = recent_downloaded_file.split('/')[-1]
         extension = original_file_name.split(".")[-1]
-        formatted_file_name = file_name + f"{self.from_date}_{self.to_date}" + "." + extension
+        formatted_file_name = file_name + f"{self.from_date}_{self.to_date}" + "." + extension if self.from_date is not None else file_name + "." + extension
         os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name)
         return formatted_file_name
 

@@ -13,7 +13,7 @@ class ProviderIhxDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
 
     def login(self):
-        username = self.wait.until(EC.presence_of_element_located((By.ID, 'login-form_username')))
+        username = self.wait.until(EC.visibility_of_element_located((By.ID, 'login-form_username')))
         pwd = self.driver.find_element(By.ID, 'login-form_password')
         username.send_keys(self.user_name)
         pwd.send_keys(self.password)
@@ -41,7 +41,7 @@ class ProviderIhxDownloader(SeleniumDownloader):
 
     def navigate(self):
         # Wait for the sidebar to be present
-        sidebar = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "ant-layout-sider")))
+        sidebar = self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-layout-sider")))
 
         # Move the mouse cursor over the sidebar to trigger expansion
         action = ActionChains(self.driver)
@@ -51,7 +51,7 @@ class ProviderIhxDownloader(SeleniumDownloader):
         self.wait.until(lambda driver: "ant-layout-sider-collapsed" not in sidebar.get_attribute("class"))
 
         # Wait for the "Reconciliation" li element to be present
-        reconciliation_li = self.wait.until(EC.presence_of_element_located((By.XPATH, "//li[@title='Reconciliation']")))
+        reconciliation_li = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//li[@title='Reconciliation']")))
 
         # Scroll the element into view if necessary
         self.driver.execute_script("arguments[0].scrollIntoView(true);", reconciliation_li)
@@ -64,16 +64,16 @@ class ProviderIhxDownloader(SeleniumDownloader):
         # time.sleep(20)
 
         # Wait for the iframe to be present
-        iframe = self.wait.until(EC.presence_of_element_located((By.XPATH, "//iframe[contains(@src, 'app.powerbi.com')]")))
+        iframe = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//iframe[contains(@src, 'app.powerbi.com')]")))
 
         # Switch focus to the iframe
         self.driver.switch_to.frame(iframe)
-        row_element = self.driver.find_element(By.CSS_SELECTOR, "div[row-index='0']")
+        row_element = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div[row-index='0']")))
         actions = ActionChains(self.driver)
         actions.move_to_element(row_element).perform()
 
         more_options_button = self.wait.until(
-            EC.presence_of_element_located(
+            EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, "button[data-testid='visual-more-options-btn']")
             )
         )
