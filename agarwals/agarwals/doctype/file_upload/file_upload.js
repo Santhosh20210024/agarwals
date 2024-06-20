@@ -110,7 +110,7 @@ function update_payer_button(frm){
   }
 
     if(frm.doc.document_type=="Settlement Advice"){
-      var gridButtons = frm.fields_dict['mapping_bank'].grid.wrapper.find('.grid-buttons');
+      var gridButtons = frm.fields_dict['mapping_advice'].grid.wrapper.find('.grid-buttons');
 
       // Check if the button is already added
       if (!gridButtons.find(`.${updateButtonClass}`).length) {
