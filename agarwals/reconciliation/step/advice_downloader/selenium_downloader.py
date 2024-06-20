@@ -73,7 +73,7 @@ class SeleniumDownloader:
             self.user_name = self.credential_doc.user_name
             self.password = self.credential_doc.password
             self.executing_child_class = self.credential_doc.executing_method
-            self.to_date = frappe.utils.now_datetime().date()
+
             if frappe.db.exists("SA Downloader Configuration",{"name":self.executing_child_class}):
                 configuration_values = frappe.db.sql(f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",as_dict=True)[0]
                 self.is_captcha = True if configuration_values.is_captcha == 1 else False
@@ -83,6 +83,7 @@ class SeleniumDownloader:
                 self.url = configuration_values.website_url
                 self.from_date = configuration_values.from_date
                 self.sandbox_mode = True if configuration_values.sandbox_mode == 1 else False
+                self.to_date = configuration_values.to_date if configuration_values.to_date else frappe.utils.now_datetime().date()
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
@@ -238,7 +239,7 @@ class SeleniumDownloader:
         recent_downloaded_file = max(get_all_files,key=os.path.getctime)
         original_file_name = recent_downloaded_file.split('/')[-1]
         extension = original_file_name.split(".")[-1]
-        formatted_file_name = file_name + "." + extension
+        formatted_file_name = file_name + f"{self.from_date}_{self.to_date}" + "." + extension if self.from_date is not None else file_name + "." + extension
         os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name)
         return formatted_file_name
 
