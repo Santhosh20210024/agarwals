@@ -254,11 +254,14 @@ class Transformer:
     def validate_header(self, header_row, source_column_list):
         return 'Not Identified', 0, []
 
+    def clean_header(self, list_to_clean):
+        return None
+
     def find_and_validate_header(self, header_list, source_column_list):
         for header in header_list:
             header_row_index = None
             for index, row in self.source_df.iterrows():
-                if self.trim_and_lower(header) in [self.trim_and_lower(column) for column in row.values]:
+                if self.trim_and_lower(header) in self.clean_header(row.values):
                     header_row_index = index
                     break
             if header_row_index is not None:
@@ -456,7 +459,7 @@ class StagingTransformer(Transformer):
     def verify_file(self,file,header_index):
         return
 
-    def extract(self,configuration,key,bank):
+    def extract(self,configuration,key,file):
         return
 
     def extract_transactions(self, column):
@@ -492,9 +495,6 @@ class StagingTransformer(Transformer):
         is_extracted = self.extract(configuration,key,file)
         if not is_extracted:
             return False
-        self.source_df = self.fill_na_as_0(self.source_df)
-        self.new_records = self.source_df
-        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
 
 
@@ -515,6 +515,9 @@ class BankTransformer(StagingTransformer):
                             ORDER BY creation"""
         files = frappe.db.sql(file_query, as_dict=True)
         return files
+
+    def clean_header(self, list_to_clean):
+        return [self.trim_and_lower(value) for value in list_to_clean]
 
     def validate_header(self, header_row_index, source_column_list):
         identified_header_row = [self.trim_and_lower(column) for column in
@@ -638,6 +641,9 @@ class BankTransformer(StagingTransformer):
         self.extract_utr_from_narration(configuration)
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
+        self.source_df = self.fill_na_as_0(self.source_df)
+        self.new_records = self.source_df
+        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
     
 class AdjustmentTransformer(Transformer):
