@@ -384,7 +384,6 @@ class SeleniumDownloader:
             self._login()
             self.navigate()
             self._download()
-            self._move_to_extract()
             self._exit()
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
