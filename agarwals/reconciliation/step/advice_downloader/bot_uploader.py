@@ -16,7 +16,8 @@ class SABotUploader:
         self.folder_names = None
         self.send_mail = None
         self.mail_group = None
-        self.delete_zip_folder = None
+        self.delete_folders_with_zip = None
+        self.delete_folders_without_zip = None
 
     def raise_exception(self,exception):
         raise Exception(exception)
@@ -33,7 +34,8 @@ class SABotUploader:
             self.folder_names = set(frappe.db.sql("SELECT tpa FROM `tabTPA Login Credentials` WHERE is_enable = 1",pluck ="tpa"))
             self.send_mail = control_panel.send_mail if control_panel.send_mail else None
             self.mail_group = control_panel.email_group if control_panel.email_group else None
-            self.delete_zip_folder = control_panel.delete_zip = 1 if control_panel.delete_zip else None
+            self.delete_folders_with_zip = control_panel.delete_zip = 1 if control_panel.delete_zip else None
+            self.delete_folders_without_zip = control_panel.delete_folder = 1 if control_panel.delete_folder else None
 
     def convert_folder_to_zip(self):
         os.mkdir(self.zip_folder_path)
@@ -159,13 +161,19 @@ class SABotUploader:
         frappe.enqueue(self.send_notification,queue='long',message=message,subject=subject,reciver_list=reciver_list)
 
     def delete_backend_file(self):
-        for folder in self.folder_names:
+        folders = os.listdir(self.sa_download_path)
+        for folder in folders:
             path = self.sa_download_path + folder
-            if os.path.exists(path):
-                shutil.rmtree(path)
-            else:
-                log_error("Path Dose not Exits While removing the folder ")
-        if self.delete_zip_folder == 1:
+            if folder not in ['Error',self.zip_folder_name]:
+                if os.path.exists(path):
+                    if folder.endswith('zip'):
+                        os.remove(path)
+                    else:
+                        shutil.rmtree(path)
+                else:
+                    log_error("Path Dose not Exits While removing the folder ")
+
+        if self.delete_folders_with_zip == 1:
             if os.path.exists(self.zip_folder_path):
                 shutil.rmtree(self.zip_folder_path)
 
@@ -177,6 +185,7 @@ class SABotUploader:
             self.upload_zip_files()
             if self.send_mail == 1:
                 self.generate_notification()
-            self.delete_backend_file()
+            if self.delete_folders_without_zip == 1 or self.delete_folders_with_zip == 1:
+                self.delete_backend_file()
         except Exception as e:
             log_error(error=e,doc_name="SA Bot Uploader")
