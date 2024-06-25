@@ -8,6 +8,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime,timedelta
 import os
 import shutil
+from twocaptcha import TwoCaptcha
 from agarwals.reconciliation import chunk
 from PIL import Image
 import os
@@ -93,20 +94,43 @@ class SeleniumDownloader:
         else:
             self.log_error('TPA Login Credentials',None,"No Credential for the given input")
 
-    def get_captcha_value(self):
+    def get_captcha_value(self,captcha_type=None,sitekey=None):
         try:
-            captcha = ''
-            end_time = time.time() + self.max_wait_time
-            while time.time() < end_time:
-                frappe.db.commit()
-                captcha_value = frappe.db.sql(f"SELECT captcha FROM `tabSettlement Advice Downloader UI` WHERE name = '{self.captcha_tpa_doc}'",as_dict = True)
-                if captcha_value[0].captcha:
-                    captcha = captcha_value[0].captcha
-                    break
-                time.sleep(5)
-            return captcha if captcha !='' else None
-        except Exception as E:
-            self.log_error('Settlement Advice Downloader UI',self.tpa, E)
+            control_panel = frappe.get_doc('Control Panel')
+            captcha_check_box = control_panel.enable_captcha_api
+            if captcha_check_box == 0:
+                captcha = ''
+                end_time = time.time() + self.max_wait_time
+                while time.time() < end_time:
+                    frappe.db.commit()
+                    captcha_value = frappe.db.sql(f"SELECT captcha FROM `tabSettlement Advice Downloader UI` WHERE name = '{self.captcha_tpa_doc}'",as_dict = True)
+                    if captcha_value[0].captcha:
+                        captcha = captcha_value[0].captcha
+                        break
+                    time.sleep(5)
+                return captcha if captcha !='' else None
+
+            elif captcha_check_box == 1:
+                #api method
+                api_key = os.getenv('APIKEY_2CAPTCHA', '624f85aaba6bbc558288fa3b5716418b')
+                solver = TwoCaptcha(api_key)
+                if captcha_type == 1:
+                    result = solver.normal(file=self.crop_img_path,
+                                           minLen=1,
+                                           maxLen=20,
+                                           phrase=1,
+                                           caseSensitive=1,
+                                           lang='en')
+                    return result['code']
+
+                elif captcha_type == "ReCaptcha":
+                    result = solver.recaptcha(
+                        sitekey=sitekey,
+                        url=self.url)
+                    return result['code']
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
 
     def extract_table_data(self, table_id):
         table = self.wait.until(EC.presence_of_element_located((By.ID, table_id)))
@@ -163,7 +187,9 @@ class SeleniumDownloader:
         img = Image.open(self.full_img_path)
         img = img.crop((left, top, right, bottom))
         img.save(self.crop_img_path)
-        self.create_captcha_file()
+        captcha_check_box = frappe.get_doc('Control Panel', "enable_captcha_api")
+        if captcha_check_box == 0:
+            self.create_captcha_file()
 
     def get_status_count(self,status):
         frappe.db.commit()

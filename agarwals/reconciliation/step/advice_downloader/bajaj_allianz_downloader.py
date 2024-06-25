@@ -17,7 +17,8 @@ class BajajAllianzDownloader(SeleniumDownloader):
         captcha_img = self.wait.until(EC.visibility_of_element_located((By.ID, 'valicode')))
         if captcha_img:
             self.get_captcha_image(captcha_img)
-            captcha = self.get_captcha_value()
+            captcha = self.get_captcha_value(captcha_type=1)
+            print("---------------------------captcha---------------------------",captcha)
             if captcha != None:
                 captcha_entry = self.wait.until(
                     EC.visibility_of_element_located((By.XPATH, "//*[@placeholder='please enter captcha']")))
@@ -25,6 +26,7 @@ class BajajAllianzDownloader(SeleniumDownloader):
                 self.wait.until(
                     EC.element_to_be_clickable((By.CSS_SELECTOR, "input.btn.bg-orange.btn-block[type='submit']"))).click()
                 try:
+
                     time.sleep(2)
                     alert = Alert(self.driver)
                     if alert.text == "enter valid captcha code":
