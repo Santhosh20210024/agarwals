@@ -25,6 +25,7 @@ from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader 
 from agarwals.reconciliation.step.advice_downloader.niva_bupa_downloader import NivaBupaDownloader
 from agarwals.reconciliation.step.advice_downloader.provider_ihx_downoader import ProviderIhxDownloader
 from agarwals.reconciliation.step.advice_downloader.eriscon_downloader import EricsonDownloader
+from agarwals.reconciliation.step.advice_downloader.cholas_downloader import CholasDownloader
 
 
 def download_advice(tpa_doc, chunk_doc, args):

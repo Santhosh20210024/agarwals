@@ -11,6 +11,8 @@
   "class_name",
   "incoming_file_type",
   "captcha_entry_duration",
+  "is_date_limit",
+  "date_limit_period",
   "column_break_wdivc",
   "website_url",
   "from_date",
@@ -62,9 +64,9 @@
   },
   {
    "fieldname": "class_name",
-   "fieldtype": "Select",
+   "fieldtype": "Autocomplete",
    "label": "Class",
-   "options": "\nProviderIhx\nTnnhisMdIndia\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nVidalHealthDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader\nProviderIhxDownloader"
+   "options": "\nProviderIhx\nTnnhisMdIndia\nHeritageDownloader\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nVidalHealthDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader\nProviderIhxDownloader"
   },
   {
    "default": "60",
@@ -93,11 +95,24 @@
    "fieldname": "to_date",
    "fieldtype": "Date",
    "label": "To Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_date_limit",
+   "fieldtype": "Check",
+   "label": "Is Date Limit"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.is_date_limit == 1",
+   "fieldname": "date_limit_period",
+   "fieldtype": "Int",
+   "label": "Enter the Period Limit in Days"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-19 15:57:05.993881",
+ "modified": "2024-06-22 18:29:20.306520",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
