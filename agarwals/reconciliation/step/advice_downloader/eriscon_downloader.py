@@ -45,20 +45,13 @@ class EricsonDownloader(SeleniumDownloader):
     def download_from_web(self):
         formated_from_date = self.from_date.strftime("%d/%m/%Y")
         formated_to_date = self.to_date.strftime("%d/%m/%Y")
-
-        
         from_date_input = self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_Content1_txtSettledFrom")))
-        
         from_date_input.send_keys(formated_from_date)
-        print("From date entered")
-        
-       
         to_date_input = self.wait.until(EC.element_to_be_clickable((By.ID, "ctl00_Content1_txtSettledTo")))
         to_date_input.click()  
         
         to_date_input = self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_Content1_txtSettledTo")))
         to_date_input.send_keys(formated_to_date)
-        print("To date entered")
         
        
         
@@ -68,3 +61,6 @@ class EricsonDownloader(SeleniumDownloader):
        
         export_button = self.wait.until(EC.element_to_be_clickable((By.ID, "ctl00_Content1_btnSettledExport")))
         self.retry_click(export_button)
+        
+       
+        
