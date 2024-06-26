@@ -25,8 +25,6 @@ class EricsonDownloader(SeleniumDownloader):
     def login(self):
         script = 'document.querySelector(\'a[data-target=".Hospital_Login"]\').click();'
         self.driver.execute_script(script)
-        print("Hospital Login clicked")
-
         user_name = self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_txtHospUserName")))
         password = self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_txtHospPassword")))
         user_name.send_keys(self.user_name)
@@ -53,14 +51,21 @@ class EricsonDownloader(SeleniumDownloader):
         to_date_input = self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_Content1_txtSettledTo")))
         to_date_input.send_keys(formated_to_date)
         
-       
-        
         search_button = self.wait.until(EC.element_to_be_clickable((By.ID, "ctl00_Content1_btnSearch")))
         self.retry_click(search_button)
-
-       
+        
         export_button = self.wait.until(EC.element_to_be_clickable((By.ID, "ctl00_Content1_btnSettledExport")))
         self.retry_click(export_button)
+        
+        logout = self.wait.until(EC.element_to_be_clickable((By.ID,'ctl00_btnlogout')))
+        self.retry_click(logout)
+          
+        
+
+
+       
+       
+       
         
        
         
