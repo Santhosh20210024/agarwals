@@ -2,16 +2,12 @@ import frappe
 import shutil
 import zipfile
 import os
-import openpyxl
 from frappe.model.document import Document
-from agarwals.utils.file_util import construct_file_url, HOME_PATH, SHELL_PATH, SUB_DIR, SITE_PATH, PROJECT_FOLDER
-
-
-
+import re
+from agarwals.utils.file_util import construct_file_url, HOME_PATH, SITE_PATH, SHELL_PATH, SUB_DIR, PROJECT_FOLDER
 
 
 class Fileupload(Document):
-	""" Fileupload is the custom class mainly created for handling the agarwals files"""
 
 	extract_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]) 
 	zip_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[-1]) 
@@ -22,13 +18,18 @@ class Fileupload(Document):
 		error_log.set('error', error)
 		error_log.save()
 
+	def extract_tpalogin_id(self, input_string, replacement):
+		pattern = r'-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.\w+'
+		result = re.sub(pattern, replacement, input_string)
+		return result
+
 	def get_fpath_fdir(self): # Used while Zip Processing
 		fname = self.upload.split('/')[-1]
 		fpath = "".join([self.zip_folder ,'/', fname])
 		fdir = "".join([self.zip_folder, '/', fname.split('.')[0]])
 		return fpath, fdir
 	
-	def get_fdoc_meta(self): # To get the info of the file uploaded initially 
+	def get_fdoc_meta(self): # To get the info of the file uploaded
 		fname = self.upload.split("/")[-1]
 		fdoc_id = frappe.get_list("File"
 								  ,filters={'file_url': self.upload}
@@ -43,7 +44,7 @@ class Fileupload(Document):
 		curr_timestamp = str(frappe.utils.now()).split('.')[0]
 		return curr_timestamp.replace(' ', '-').replace(':','-') + '_' + fname
 	
-	def del_file_record(self, fid, fname, err): # For deleting frappe file doctype record 
+	def del_file_record(self, fid, fname, err): # For deleting frappe file doctype record
 		self.del_private_file(construct_file_url(SITE_PATH, SHELL_PATH, fname))
 		frappe.delete_doc("File", fid)
 		frappe.db.commit()
@@ -120,6 +121,10 @@ class Fileupload(Document):
 		try:
 			self.set("upload", furl)
 			self.set("file", fname)
+			self.set("is_uploaded", 1)
+			if self.is_bot == 1 and self.file_format == 'EXCEL' and self.document_type == 'Settlement Advice':
+				self.tpa_login_id = self.extract_tpalogin_id(fname,'')
+
 		except Exception as e:
 			self.add_log_error('File upload', str(e))
 			self.del_file_record(fid, fname, str(e))
@@ -139,11 +144,7 @@ class Fileupload(Document):
 		and renaming the file name with current timestamp for avoiding conflicts while uploading other files'
 		"""
 		try:
-			timestamp_fname = None
-			if self.source != None:
-				timestamp_fname = fname
-			else:
-				timestamp_fname = self.get_fdate_format(fname)
+			timestamp_fname = self.get_fdate_format(fname)
 
 			# Altered_fname mainly created for using in the shutil.move and os.rename functions
 			altered_fname = source.replace(fname, timestamp_fname)
@@ -188,11 +189,8 @@ class Fileupload(Document):
 							
 	def validate(self): 
 
-		# To avoid the entire validation for non-open files		
-		if self.status in ['In Process', 'Partial Success', 'Success', 'Error' ]:
-			return
-
-		if self.status == 'Zip' and self.zip_status in ['Open', 'Extracting', 'Extracted', 'Processed', 'Processing']:
+		# God Level Validation
+		if self.is_uploaded == 1:
 			return
 		
 		if self.upload == None or self.upload == '':
@@ -253,13 +251,13 @@ class Fileupload(Document):
 							  else 'mapping_other')
 		if ffield:
 			if self.document_type == 'Settlement Advice':
-				mdoc.payer_name = ffield
+					mdoc.payer_name = ffield
+
 			if self.document_type == 'Bank Statement':
 				mdoc.bank_account = ffield
 				
 		mdoc.save()
 		frappe.db.commit()
-		print('Created')
 	
 	def update_mapping_entries(self, flist, ffield = None): 
 		try:
@@ -338,10 +336,10 @@ def run_extractor(fid, ffield):
 			frappe.throw('Already Extracted !')
 
 	if not ffield.strip(): ffield = None
-	# frappe.enqueue(extract_zip_files, job_name="ZipFileExtracting",  queue='long', is_async=True, timeout=18000, fid = fid, ffield = ffield)
-	extract_zip_files(fid=fid,ffield=ffield)
+	frappe.enqueue(extract_zip_files, job_name="ZipFileExtracting",  queue='long', is_async=True, timeout=18000, fid = fid, ffield = ffield)
+	# extract_zip_files(fid = fid,ffield = ffield)
 
-def process_zip_entries(fid):
+def zip_operation(fid):
 
 	def get_child_entries(cdoc, fid):
 		return frappe.get_list(cdoc, filters={'parent': fid}, pluck = 'name')
@@ -377,9 +375,10 @@ def process_zip_entries(fid):
 			ndoc.upload = "/" + construct_file_url(SHELL_PATH, frappe.get_value('Other Mapping', mfile, 'file_name'))
 
 		try:
-			if fdoc.is_bot == 1:
-				ndoc.is_bot = 1
+			ndoc.is_bot = fdoc.is_bot
+			ndoc.is_mail = fdoc.is_mail
 			ndoc.save()
+
 			if ndoc.document_type == 'Settlement Advice': set_child_entries_status('Settlement Advice Mapping', 'Created', ndoc.name)
 			elif ndoc.document_type == 'Bank Statement': set_child_entries_status('Bank Account Mapping', 'Created', ndoc.name)
 			else: set_child_entries_status('Other Mapping', 'Created', ndoc.name)
@@ -411,7 +410,5 @@ def process_zip_entires(fid):
 		if len(frappe.get_list('Bank Account Mapping', filters= {'parent': fid, 'bank_account':['=', '']})) > 0:
 			frappe.throw("Please select bank account for all the mapping records")
 
-	# process_zip_entries()
 	frappe.set_value('File upload', fid, 'zip_status', 'Processing')
-	frappe.enqueue(process_zip_entries, job_name = "ZipFileProcessing", queue = 'long', is_async = True, timeout = 18000, fid = fid)
-
+	frappe.enqueue(zip_operation, job_name = "ZipFileProcessing", queue = 'long', is_async = True, timeout = 18000, fid = fid)
