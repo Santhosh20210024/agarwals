@@ -81,7 +81,6 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
-   "hidden": 1,
    "label": "Status",
    "options": "InProgress\nCompleted\nPartially Completed\nCancelled\nError"
   },
@@ -108,7 +107,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-30 11:22:56.614187",
+ "modified": "2024-06-10 16:34:09.738496",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Settlement Advice Downloader UI",
