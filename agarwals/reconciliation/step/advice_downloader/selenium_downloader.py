@@ -114,20 +114,20 @@ class SeleniumDownloader:
                 #api method
                 api_key = os.getenv('APIKEY_2CAPTCHA', '624f85aaba6bbc558288fa3b5716418b')
                 solver = TwoCaptcha(api_key)
-                if captcha_type == 1:
+                if captcha_type == "Normal Captcha":
                     result = solver.normal(file=self.crop_img_path,
                                            minLen=1,
                                            maxLen=20,
                                            phrase=1,
                                            caseSensitive=1,
                                            lang='en')
-                    return result['code']
+                    return result,api_key
 
                 elif captcha_type == "ReCaptcha":
                     result = solver.recaptcha(
                         sitekey=sitekey,
                         url=self.url)
-                    return result['code']
+                    return result,api_key
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
