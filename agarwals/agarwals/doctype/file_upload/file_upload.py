@@ -377,6 +377,8 @@ def process_zip_entries(fid):
 			ndoc.upload = "/" + construct_file_url(SHELL_PATH, frappe.get_value('Other Mapping', mfile, 'file_name'))
 
 		try:
+			if fdoc.is_bot == 1:
+				ndoc.is_bot = 1
 			ndoc.save()
 			if ndoc.document_type == 'Settlement Advice': set_child_entries_status('Settlement Advice Mapping', 'Created', ndoc.name)
 			elif ndoc.document_type == 'Bank Statement': set_child_entries_status('Bank Account Mapping', 'Created', ndoc.name)
