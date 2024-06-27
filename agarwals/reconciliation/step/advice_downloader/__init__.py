@@ -2,8 +2,6 @@ import frappe
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from agarwals.reconciliation.step.advice_downloader.bot_uploader import SABotUploader
-from agarwals.reconciliation.step.advice_downloader.provider_ihx_api_downloader import ProviderIhx
 from agarwals.reconciliation.step.advice_downloader.tips_vidal_health_downloader import TipsVidalHealth
 from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia_downloader import TnnhisMdIndia
 from agarwals.reconciliation.step.advice_downloader.star_health_downloader import StarHealthDownloader
@@ -25,6 +23,7 @@ from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader 
 from agarwals.reconciliation.step.advice_downloader.niva_bupa_downloader import NivaBupaDownloader
 from agarwals.reconciliation.step.advice_downloader.provider_ihx_downoader import ProviderIhxDownloader
 from agarwals.reconciliation.step.advice_downloader.cholas_downloader import CholasDownloader
+from agarwals.reconciliation.step.advice_downloader.cmc_eyefoundation_downloader import CMCEyeFoundationDownloader
 
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
@@ -84,10 +83,6 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             frappe.db.sql(
                 f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'Error' WHERE name = '{login_ref.name}' ")
             frappe.db.commit()
-
-@frappe.whitelist()
-def upload_sa_files():
-    SABotUploader().process()
 
 
 
