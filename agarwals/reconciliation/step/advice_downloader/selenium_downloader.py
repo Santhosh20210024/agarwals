@@ -56,6 +56,7 @@ class SeleniumDownloader:
         self.is_date_limit  = 0
         self.date_limit_period = 0
         self.enable_captcha_api = None
+        self.folder_path = None
 
 
     def construct_file_url(*args):
@@ -258,7 +259,10 @@ class SeleniumDownloader:
 
     def create_download_directory(self):
         self.file_name = f"{self.credential_doc.name.replace(' ', '').lower()}"
-        self.download_directory = self.files_path + "Settlement Advice/" + self.credential_doc.tpa
+        self.folder_path = self.files_path + "Settlement Advice/" + f"{self.credential_doc.tpa}/"
+        file_path =self.folder_path + self.file_name
+        os.mkdir(file_path)
+        self.download_directory = file_path
         self.previous_files_count = len(os.listdir(self.download_directory))
 
 
@@ -267,14 +271,19 @@ class SeleniumDownloader:
         to_date = self.to_date if temp_to_date is None else temp_to_date
         get_all_files =  glob.glob(os.path.join(download_directory,'*'))
         recent_downloaded_file = max(get_all_files,key=os.path.getctime)
-        original_file_name = recent_downloaded_file.split('/')[-1]
+
+        if self.incoming_file_type == 'HTML':
+            self.convert_file_format(f"{self.download_directory}/{recent_downloaded_file.split('/')[-1]}",
+                                     f"{self.download_directory}/{self.tpa}_formated_file.xlsx")
+
+        original_file_name = recent_downloaded_file.split('/')[-1] if self.incoming_file_type == 'Excel' else f"{self.tpa}_formated_file.xlsx"
         extension = original_file_name.split(".")[-1]
         formatted_file_name = file_name + f"{from_date}_{to_date}" + "." + extension if self.from_date is not None else file_name + "." + extension
         os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name)
         return formatted_file_name
 
-    def move_file_to_extract(self, download_directory,formatted_file_name):
-        shutil.move(download_directory + "/" + formatted_file_name, self.files_path + "Extract/" + formatted_file_name)
+    def move_file(self, download_directory,formatted_file_name):
+        shutil.move(download_directory + "/" + formatted_file_name, self.folder_path + formatted_file_name)
 
     def delete_folder(self,download_directory):
         shutil.rmtree(download_directory)
@@ -321,6 +330,10 @@ class SeleniumDownloader:
         raise Exception(exception)
 
     def _exit(self, e = None):
+        if self.download_directory:
+            self.delete_folder(self.download_directory)
+            self.download_directory = None
+
         if self.driver:
             self.driver.quit()
         if e:
@@ -339,20 +352,21 @@ class SeleniumDownloader:
 
     def convert_file_format(self,original_file,formated_file):
         #HTML
-        if self.incoming_file_type == 'HTML':
-            try:
-                with open(original_file, 'r', encoding='utf-8') as file:
-                    html_content = file.read()
-                    html_io = StringIO(html_content)
-                    data = pd.read_html(html_io)
-            except Exception as e:
-                self.raise_exception(f"An error occurred while reading the file: {e}")
-            if len(data) == 1:
-                data[0].to_excel(formated_file, index=False)
-                self.delete_backend_files(original_file)
-            else:
-                self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-                self.delete_backend_files(original_file)
+        try:
+            with open(original_file, 'r', encoding='utf-8') as file:
+                html_content = file.read()
+                html_io = StringIO(html_content)
+                data = pd.read_html(html_io)
+        except Exception as e:
+            # self.delete_backend_files(original_file)
+            self.raise_exception(f"An error occurred while reading the file: {e}")
+        if len(data) == 1:
+            data[0].to_excel(formated_file, index=False)
+            self.delete_backend_files(original_file)
+        else:
+            # self.delete_backend_files(original_file)
+            self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
+
 
     def download_with_date_range(self):
         run = True
@@ -385,8 +399,8 @@ class SeleniumDownloader:
         if self.previous_files_count == downloaded_files_count:
             self.log_error(doctype_name='TPA Login Credentials', reference_name= self.user_name , error_message="File Not Found or No Record Found")
         else:
-            self.convert_file_format(f"{self.download_directory}/{os.listdir(self.download_directory)[0]}",f"{self.download_directory}/{self.tpa}_formated_file.xlsx")
             self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,temp_from_date,temp_to_date)
+            self.move_file(self.download_directory,self.formatted_file_name)
     def _move_to_extract(self):
         self.move_file_to_extract(self.download_directory,formatted_file_name=self.formatted_file_name)
         self.delete_folder(self.download_directory)
@@ -432,7 +446,7 @@ class SeleniumDownloader:
         else:
             self.raise_exception(" SA Downloader Configuration not found ")
         self.driver = webdriver.Chrome(options=self.options)
-        self.wait = WebDriverWait(self.driver,  15)
+        self.wait = WebDriverWait(self.driver,  30)
 
     def init(self):
         pass
