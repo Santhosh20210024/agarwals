@@ -50,10 +50,11 @@ class SeleniumDownloader:
         self.incoming_file_type = ''
         self.max_wait_time = 0
         self.formatted_file_name = None
-        self.local_environment_mode = False
-        self.production_environment_mode = False
         self.sandbox_mode = True
         self.previous_files_count = None
+        self.is_date_limit  = 0
+        self.date_limit_period = 0
+        self.folder_path = None
 
 
     def construct_file_url(*args):
@@ -67,13 +68,10 @@ class SeleniumDownloader:
 
     def set_self_variables(self, tpa_doc ,child = None, parent = None):
         self.credential_doc = tpa_doc
-        self.local_environment_mode = True if frappe.get_single("Control Panel").local_environment == 1 else False
-        self.production_environment_mode = True if frappe.get_single("Control Panel").production_environment == 1 else False
         if self.credential_doc:
             self.user_name = self.credential_doc.user_name
             self.password = self.credential_doc.password
             self.executing_child_class = self.credential_doc.executing_method
-            self.to_date = frappe.utils.now_datetime().date()
             if frappe.db.exists("SA Downloader Configuration",{"name":self.executing_child_class}):
                 configuration_values = frappe.db.sql(f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",as_dict=True)[0]
                 self.is_captcha = True if configuration_values.is_captcha == 1 else False
@@ -83,6 +81,9 @@ class SeleniumDownloader:
                 self.url = configuration_values.website_url
                 self.from_date = configuration_values.from_date
                 self.sandbox_mode = True if configuration_values.sandbox_mode == 1 else False
+                self.to_date = configuration_values.to_date if configuration_values.to_date else frappe.utils.now_datetime().date()
+                self.is_date_limit = configuration_values.is_date_limit
+                self.date_limit_period = configuration_values.date_limit_period
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
@@ -214,6 +215,9 @@ class SeleniumDownloader:
     def download_from_web(self):
         return None
 
+    def download_from_web_with_date_range(self,temp_from_date, temp_to_date):
+        pass
+
     def insert_run_log(self, data):
         doc=frappe.get_doc("TPA Login Credentials",self.credential_doc.name)
         doc.append("run_log",data)
@@ -223,27 +227,31 @@ class SeleniumDownloader:
 
     def create_download_directory(self):
         self.file_name = f"{self.credential_doc.name.replace(' ', '').lower()}"
-        if self.production_environment_mode == 1:
-            file_path = self.files_path + self.file_name
-            os.mkdir(file_path)
-            self.download_directory = file_path
-        elif self.local_environment_mode == 1:
-            self.download_directory = self.files_path + "Settlement Advice/" + self.credential_doc.tpa
-            self.previous_files_count = len(os.listdir(self.download_directory))
-        elif self.local_environment_mode == 1 and self.production_environment_mode == 1:
-            self.raise_exception("Please Check the Environment Setup in Configuration ")
+        self.folder_path = self.files_path + "Settlement Advice/" + f"{self.credential_doc.tpa}/"
+        file_path =self.folder_path + self.file_name
+        os.mkdir(file_path)
+        self.download_directory = file_path
+        self.previous_files_count = len(os.listdir(self.download_directory))
 
-    def rename_downloaded_file(self, download_directory, file_name):
+
+    def rename_downloaded_file(self, download_directory, file_name,temp_from_date=None,temp_to_date=None):
+        from_date = self.from_date if temp_from_date is None else temp_from_date
+        to_date = self.to_date if temp_to_date is None else temp_to_date
         get_all_files =  glob.glob(os.path.join(download_directory,'*'))
         recent_downloaded_file = max(get_all_files,key=os.path.getctime)
-        original_file_name = recent_downloaded_file.split('/')[-1]
+
+        if self.incoming_file_type == 'HTML':
+            self.convert_file_format(f"{self.download_directory}/{recent_downloaded_file.split('/')[-1]}",
+                                     f"{self.download_directory}/{self.tpa}_formated_file.xlsx")
+
+        original_file_name = recent_downloaded_file.split('/')[-1] if self.incoming_file_type == 'Excel' else f"{self.tpa}_formated_file.xlsx"
         extension = original_file_name.split(".")[-1]
-        formatted_file_name = file_name + "." + extension
+        formatted_file_name = file_name + f"{from_date}_{to_date}" + "." + extension if self.from_date is not None else file_name + "." + extension
         os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name)
         return formatted_file_name
 
-    def move_file_to_extract(self, download_directory,formatted_file_name):
-        shutil.move(download_directory + "/" + formatted_file_name, self.files_path + "Extract/" + formatted_file_name)
+    def move_file(self, download_directory,formatted_file_name):
+        shutil.move(download_directory + "/" + formatted_file_name, self.folder_path + formatted_file_name)
 
     def delete_folder(self,download_directory):
         shutil.rmtree(download_directory)
@@ -254,7 +262,7 @@ class SeleniumDownloader:
 
     def create_file_record(self, file_name):
         file = frappe.new_doc("File")
-        file.folder = self.construct_file_url(self.HOME_PATH, self.SUB_DIR[0])
+        file.folder = self.construct_file_url(self.HOME_PATH,self.SUB_DIR[0])
         file.is_private = 1
         file.file_url = "/" + self.construct_file_url(self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name)
         file.save(ignore_permissions=True)
@@ -270,10 +278,6 @@ class SeleniumDownloader:
         error_log.set('reference_name', reference_name)
         error_log.set('error_message', error_message)
         error_log.save()
-        if self.production_environment_mode == 1:
-            if self.download_directory:
-                self.delete_folder(self.download_directory)
-                self.download_directory = None
         if reference_name:
             self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error"})
             frappe.db.commit()
@@ -293,6 +297,10 @@ class SeleniumDownloader:
         raise Exception(exception)
 
     def _exit(self, e = None):
+        if self.download_directory:
+            self.delete_folder(self.download_directory)
+            self.download_directory = None
+
         if self.driver:
             self.driver.quit()
         if e:
@@ -311,33 +319,55 @@ class SeleniumDownloader:
 
     def convert_file_format(self,original_file,formated_file):
         #HTML
-        if self.incoming_file_type == 'HTML':
-            try:
-                with open(original_file, 'r', encoding='utf-8') as file:
-                    html_content = file.read()
-                    html_io = StringIO(html_content)
-                    data = pd.read_html(html_io)
-            except Exception as e:
-                self.raise_exception(f"An error occurred while reading the file: {e}")
-            if len(data) == 1:
-                data[0].to_excel(formated_file, index=False)
-                self.delete_backend_files(original_file)
+        try:
+            with open(original_file, 'r', encoding='utf-8') as file:
+                html_content = file.read()
+                html_io = StringIO(html_content)
+                data = pd.read_html(html_io)
+        except Exception as e:
+            # self.delete_backend_files(original_file)
+            self.raise_exception(f"An error occurred while reading the file: {e}")
+        if len(data) == 1:
+            data[0].to_excel(formated_file, index=False)
+            self.delete_backend_files(original_file)
+        else:
+            # self.delete_backend_files(original_file)
+            self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
+
+
+    def download_with_date_range(self):
+        run = True
+        temp_from_date = self.from_date
+        period =  self.date_limit_period - 1
+        while run:
+            self.previous_files_count = len(os.listdir(self.download_directory))
+            temp_to_date = temp_from_date + timedelta(days=period)
+            if temp_to_date >= self.to_date:
+                if temp_to_date > self.to_date:
+                    temp_to_date = self.to_date
+                self.download_from_web_with_date_range(temp_from_date,temp_to_date)
+                self.format_downloaded_file(temp_from_date,temp_to_date)
+                run = False
             else:
-                self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-                self.delete_backend_files(original_file)
+                self.download_from_web_with_date_range(temp_from_date, temp_to_date)
+                self.format_downloaded_file(temp_from_date, temp_to_date)
+                temp_from_date = temp_to_date + timedelta(days=1)
+
+
 
     def _download(self):
-        self.download_from_web()
+        if self.is_date_limit == 1 and self.date_limit_period != 0:
+            self.download_with_date_range()
+        else:
+            self.download_from_web()
+            self.format_downloaded_file()
+    def format_downloaded_file(self,temp_from_date=None,temp_to_date=None):
         downloaded_files_count = len(os.listdir(self.download_directory))
-        if self.production_environment_mode == True:
-            if downloaded_files_count != 1:
-                self.raise_exception(f"Your directory {self.download_directory} has either no file or have multiple files")
-        elif self.local_environment_mode == True:
-            if self.previous_files_count == downloaded_files_count:
-                self.raise_exception("File Not Found or No Record Found")
-
-        self.convert_file_format(f"{self.download_directory}/{os.listdir(self.download_directory)[0]}",f"{self.download_directory}/{self.tpa}_formated_file.xlsx")
-        self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name)
+        if self.previous_files_count == downloaded_files_count:
+            self.log_error(doctype_name='TPA Login Credentials', reference_name= self.user_name , error_message="File Not Found or No Record Found")
+        else:
+            self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,temp_from_date,temp_to_date)
+            self.move_file(self.download_directory,self.formatted_file_name)
     def _move_to_extract(self):
         self.move_file_to_extract(self.download_directory,formatted_file_name=self.formatted_file_name)
         self.delete_folder(self.download_directory)
@@ -346,6 +376,8 @@ class SeleniumDownloader:
         self.create_fileupload(file_url, self.file_name)
 
     def add_driver_argument(self):
+        if self.is_date_limit == 1:
+            self.options.add_experimental_option('detach', True)
         if self.sandbox_mode == False:
             self.options.add_argument('--no-sandbox')
             self.options.add_argument('--disable-dev-shm-usage')
@@ -366,8 +398,6 @@ class SeleniumDownloader:
             self._login()
             self.navigate()
             self._download()
-            if self.production_environment_mode == 1:
-                self._move_to_extract()
             self._exit()
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
@@ -387,4 +417,5 @@ class SeleniumDownloader:
 
     def init(self):
         pass
+
 
