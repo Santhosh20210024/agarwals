@@ -19,31 +19,33 @@ class CMCEyeFoundationDownloader(SeleniumDownloader):
 
         username.send_keys(self.user_name)
         pwd.send_keys(self.password)
-        time.sleep(20)
         # login_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'Submit1')))
         # login_button.click()
         captcha_img = self.wait.until(EC.visibility_of_element_located((By.ID, 'imgCaptcha')))
         if captcha_img:
             self.get_captcha_image(captcha_img)
-            captcha_captcha_apikey = self.get_captcha_value(captcha_type="Normal Captcha")
-            captcha_value = captcha_captcha_apikey[0]
-            captcha_code = captcha_value['code']
-            if captcha_code != None:
+            captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
+            a = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
+            if a != None:
                 captcha_entry = self.wait.until(EC.visibility_of_element_located((By.ID, "txtCaptcha")))
-                captcha_entry.send_keys(captcha_code)
+                captcha_entry.send_keys(a)
                 self.wait.until(EC.element_to_be_clickable((By.ID, 'Submit1'))).click()
                 try:
-
                     time.sleep(2)
                     alert = Alert(self.driver)
                     if alert.text == "Please Enter Correct Captcha":
-                        solver = TwoCaptcha(captcha_captcha_apikey[1])
-                        solver.report(captcha_value['captchaId'], False)
-                        self.update_tpa_reference("Retry")
+                        if self.enable_captcha_api == 1:
+                            solver = TwoCaptcha(captcha_api[1])
+                            solver.report(captcha_api[0]['captchaId'], False)
+                        else:
+                            self.update_tpa_reference("Retry")
+                        self.log_error('TPA Login Credentials', self.user_name, "Invalid captcha","Retry")
                 except:
                     pass
             else:
-                self.update_tpa_reference("Retry")
+                self.log_error('TPA Login Credentials', self.user_name, "Invalid captcha", "Retry")
+                if self.enable_captcha_api == 0:
+                    self.update_tpa_reference("Retry")
         else:
             self.log_error('Settlement Advice Downloader UI', self.tpa, "captcha ID NOT FOUND")
 

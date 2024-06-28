@@ -55,6 +55,7 @@ class SeleniumDownloader:
         self.previous_files_count = None
         self.is_date_limit  = 0
         self.date_limit_period = 0
+        self.enable_captcha_api = None
 
 
     def construct_file_url(*args):
@@ -84,6 +85,9 @@ class SeleniumDownloader:
                 self.to_date = configuration_values.to_date if configuration_values.to_date else frappe.utils.now_datetime().date()
                 self.is_date_limit = configuration_values.is_date_limit
                 self.date_limit_period = configuration_values.date_limit_period
+            control_panel = frappe.get_doc('Control Panel')
+            if control_panel:
+                self.enable_captcha_api = control_panel.enable_captcha_api
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
@@ -95,9 +99,9 @@ class SeleniumDownloader:
 
     def get_captcha_value(self,captcha_type=None,sitekey=None):
         try:
-            control_panel = frappe.get_doc('Control Panel')
-            captcha_check_box = control_panel.enable_captcha_api
-            if captcha_check_box == 0:
+
+
+            if self.enable_captcha_api == 0:
                 captcha = ''
                 end_time = time.time() + self.max_wait_time
                 while time.time() < end_time:
@@ -109,9 +113,12 @@ class SeleniumDownloader:
                     time.sleep(5)
                 return captcha if captcha !='' else None
 
-            elif captcha_check_box == 1:
+            elif self.enable_captcha_api == 1:
+
                 #api method
-                api_key = os.getenv('APIKEY_2CAPTCHA', '624f85aaba6bbc558288fa3b5716418b')
+                control_panel = frappe.get_doc('Control Panel')
+                api_key =control_panel.captcha_api_key
+                api_key = os.getenv('APIKEY_2CAPTCHA', api_key)
                 solver = TwoCaptcha(api_key)
                 if captcha_type == "Normal Captcha":
                     result = solver.normal(file=self.crop_img_path,
@@ -121,7 +128,6 @@ class SeleniumDownloader:
                                            caseSensitive=1,
                                            lang='en')
                     return result,api_key
-
                 elif captcha_type == "ReCaptcha":
                     result = solver.recaptcha(
                         sitekey=sitekey,
@@ -163,14 +169,14 @@ class SeleniumDownloader:
         if self.full_img_path and self.crop_img_path:
             self.delete_backend_files(self.full_img_path)
             self.delete_backend_files(self.crop_img_path)
-            file_url = frappe.db.sql(f"SELECT file_url FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ",as_dict = True)
-            if file_url:
-                self.delete_backend_files(f"{self.SITE_PATH}{file_url[0].file_url}")
-                frappe.db.sql(f"DELETE FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ")
-                frappe.db.commit()
-            else:
-                self.update_tpa_reference('Error')
-                self.log_error('Settlement Advice Downloader UI',self.tpa,"No  captcha image found to delete ")
+            if self.enable_captcha_api == 0:
+                file_url = frappe.db.sql(f"SELECT file_url FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ",as_dict = True)
+                if file_url:
+                    self.delete_backend_files(f"{self.SITE_PATH}{file_url[0].file_url}")
+                    frappe.db.sql(f"DELETE FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ")
+                    frappe.db.commit()
+                else:
+                    self.log_error('Settlement Advice Downloader UI',self.tpa,"No  captcha image found to delete ")
 
 
     def get_captcha_image(self,captcha_identifier):
@@ -186,8 +192,8 @@ class SeleniumDownloader:
         img = Image.open(self.full_img_path)
         img = img.crop((left, top, right, bottom))
         img.save(self.crop_img_path)
-        captcha_check_box = frappe.get_doc('Control Panel', "enable_captcha_api")
-        if captcha_check_box == 0:
+
+        if self.enable_captcha_api == 0:
             self.create_captcha_file()
 
     def get_status_count(self,status):
@@ -289,14 +295,15 @@ class SeleniumDownloader:
         frappe.db.commit()
         return file_url
 
-    def log_error(self,doctype_name, reference_name, error_message):
+    def log_error(self,doctype_name, reference_name, error_message,status=None):
+        status = "Error" if status == None else "Retry"
         error_log = frappe.new_doc('Error Record Log')
         error_log.set('doctype_name', doctype_name)
         error_log.set('reference_name', reference_name)
         error_log.set('error_message', error_message)
         error_log.save()
         if reference_name:
-            self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error"})
+            self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":status})
             frappe.db.commit()
 
     def create_fileupload(self,file_url,file_name):

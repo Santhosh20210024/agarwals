@@ -19,11 +19,11 @@ class ICICLombardDownloader(SeleniumDownloader):
         captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
         if captcha:
             self.get_captcha_image(captcha)
-            captcha_captcha_apikey = self.get_captcha_value(captcha_type="Normal Captcha")
-            captcha_value = captcha_captcha_apikey[0]
-            captcha_code = captcha_value['code']
-            if captcha_code != None:
-                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_code)
+            captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
+            a = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
+
+            if a != None:
+                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(a)
                 self.driver.find_element(By.ID, 'btnLogin').click()
                 try:
                     modal = self.wait.until(
@@ -31,8 +31,8 @@ class ICICLombardDownloader(SeleniumDownloader):
                     )
                     undefined_link = modal.find_element(By.XPATH, "//a[@href='/undefined']//span[text()='undefined']")
                     if undefined_link.text == "undefined":
-                       solver = TwoCaptcha(captcha_captcha_apikey[1])
-                       solver.report(captcha_value['captchaId'], False)
+                       solver = TwoCaptcha(captcha_api[1])
+                       solver.report(captcha_api[0]['captchaId'], False)
                        cancel_button = modal.find_element(By.XPATH, "//input[@type='button' and @value='Cancel']")
                        cancel_button.click()
                        self.update_tpa_reference("Retry")

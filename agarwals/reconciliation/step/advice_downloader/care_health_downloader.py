@@ -23,7 +23,7 @@ class CarehealthDownloader(SeleniumDownloader):
                                g_recaptcha_response)
         time.sleep(10)
         # Send the key to the textarea
-        g_recaptcha_response.send_keys(captcha)
+        g_recaptcha_response.send_keys(captcha[0]['code'])
         self.driver.find_element(By.CLASS_NAME, 'btn-primary').click()
     def navigate(self):
         modal = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "modal-content")))

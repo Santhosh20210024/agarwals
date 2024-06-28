@@ -19,22 +19,20 @@ class BajajAllianzDownloader(SeleniumDownloader):
         captcha_img = self.wait.until(EC.visibility_of_element_located((By.ID, 'valicode')))
         if captcha_img:
             self.get_captcha_image(captcha_img)
-            captcha_captcha_apikey = self.get_captcha_value(captcha_type="Normal Captcha")
-            captcha = captcha_captcha_apikey[0]
-            captcha_code = captcha['code']
-            if captcha != None:
+            captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
+            a = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
+            if a != None:
                 captcha_entry = self.wait.until(
                     EC.visibility_of_element_located((By.XPATH, "//*[@placeholder='please enter captcha']")))
-                captcha_entry.send_keys(captcha_code)
+                captcha_entry.send_keys(a)
                 self.wait.until(
                     EC.element_to_be_clickable((By.CSS_SELECTOR, "input.btn.bg-orange.btn-block[type='submit']"))).click()
                 try:
-
                     time.sleep(2)
                     alert = Alert(self.driver)
                     if alert.text == "enter valid captcha code":
-                        solver = TwoCaptcha(captcha_captcha_apikey[1])
-                        solver.report(captcha['captchaId'], False)
+                        solver = TwoCaptcha(captcha_api[1])
+                        solver.report(captcha_api[0]['captchaId'], False)
                         self.update_tpa_reference("Retry")
                 except:
                     pass
