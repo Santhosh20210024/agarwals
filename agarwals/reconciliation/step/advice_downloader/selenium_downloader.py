@@ -68,10 +68,7 @@ class SeleniumDownloader:
         return formatted_url
 
     def update_retry(self):
-        print("--------------------update_retry--------------------")
-        # name = self.credential_doc[0].name
         doc = frappe.get_doc('TPA Login Credentials',self.credential_doc.name)
-        print("--------------------doc--------------------",doc)
         doc.retry = 1
         doc.save()
 
