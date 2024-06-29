@@ -20,10 +20,9 @@ class ICICLombardDownloader(SeleniumDownloader):
         if captcha:
             self.get_captcha_image(captcha)
             captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
-            a = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
-
-            if a != None:
-                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(a)
+            captcha_code = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
+            if captcha_code != None:
+                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_code)
                 self.driver.find_element(By.ID, 'btnLogin').click()
                 try:
                     modal = self.wait.until(
@@ -31,17 +30,20 @@ class ICICLombardDownloader(SeleniumDownloader):
                     )
                     undefined_link = modal.find_element(By.XPATH, "//a[@href='/undefined']//span[text()='undefined']")
                     if undefined_link.text == "undefined":
-                       solver = TwoCaptcha(captcha_api[1])
-                       solver.report(captcha_api[0]['captchaId'], False)
-                       cancel_button = modal.find_element(By.XPATH, "//input[@type='button' and @value='Cancel']")
-                       cancel_button.click()
-                       self.update_tpa_reference("Retry")
+                        if self.enable_captcha_api == 1:
+                            solver = TwoCaptcha(captcha_api[1])
+                            solver.report(captcha_api[0]['captchaId'], False)
+                            self.update_retry()
+                        else:
+                            self.update_tpa_reference("Retry")
+                        self.raise_exception("Invalid Captcha")
                 except Exception as e:
                     pass
-
             else:
-                self.update_tpa_reference("Retry")
-                self.raise_exception("No Captcha Value Found")
+                self.update_retry()
+                if self.enable_captcha_api == 0:
+                    self.update_tpa_reference("Retry")
+                self.raise_exception("Invalid Captcha")
         else:
             self.raise_exception(" No Captcha Image Found ")
 

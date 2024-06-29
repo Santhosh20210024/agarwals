@@ -25,10 +25,10 @@ class CMCEyeFoundationDownloader(SeleniumDownloader):
         if captcha_img:
             self.get_captcha_image(captcha_img)
             captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
-            a = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
-            if a != None:
+            captcha_code = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
+            if captcha_code != None:
                 captcha_entry = self.wait.until(EC.visibility_of_element_located((By.ID, "txtCaptcha")))
-                captcha_entry.send_keys(a)
+                captcha_entry.send_keys(captcha_code)
                 self.wait.until(EC.element_to_be_clickable((By.ID, 'Submit1'))).click()
                 try:
                     time.sleep(2)
@@ -37,20 +37,22 @@ class CMCEyeFoundationDownloader(SeleniumDownloader):
                         if self.enable_captcha_api == 1:
                             solver = TwoCaptcha(captcha_api[1])
                             solver.report(captcha_api[0]['captchaId'], False)
+                            self.update_retry()
                         else:
                             self.update_tpa_reference("Retry")
-                        self.log_error('TPA Login Credentials', self.user_name, "Invalid captcha","Retry")
+
+                        self.raise_exception("Invalid Captcha")
                 except:
                     pass
             else:
-                self.log_error('TPA Login Credentials', self.user_name, "Invalid captcha", "Retry")
+                self.update_retry()
                 if self.enable_captcha_api == 0:
                     self.update_tpa_reference("Retry")
+                self.raise_exception("Invalid Captcha")
         else:
-            self.log_error('Settlement Advice Downloader UI', self.tpa, "captcha ID NOT FOUND")
+            self.raise_exception("Captcha ID NOT FOUND")
 
     def navigate(self):
-
         isprint_mis_link = self.wait.until(
             EC.presence_of_element_located((By.XPATH, "//a[@id='ctl00_a_mis']/span[text()='iSprint MIS']")))
 

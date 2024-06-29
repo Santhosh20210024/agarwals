@@ -67,6 +67,13 @@ class SeleniumDownloader:
         formatted_url = '/'.join(list_of_items)
         return formatted_url
 
+    def update_retry(self):
+        print("--------------------update_retry--------------------")
+        # name = self.credential_doc[0].name
+        doc = frappe.get_doc('TPA Login Credentials',self.credential_doc.name)
+        print("--------------------doc--------------------",doc)
+        doc.retry = 1
+        doc.save()
 
     def set_self_variables(self, tpa_doc ,child = None, parent = None):
         self.credential_doc = tpa_doc
@@ -304,15 +311,14 @@ class SeleniumDownloader:
         frappe.db.commit()
         return file_url
 
-    def log_error(self,doctype_name, reference_name, error_message,status=None):
-        status = "Error" if status == None else "Retry"
+    def log_error(self,doctype_name, reference_name, error_message):
         error_log = frappe.new_doc('Error Record Log')
         error_log.set('doctype_name', doctype_name)
         error_log.set('reference_name', reference_name)
         error_log.set('error_message', error_message)
         error_log.save()
         if reference_name:
-            self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":status})
+            self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error"})
             frappe.db.commit()
 
     def create_fileupload(self,file_url,file_name):
