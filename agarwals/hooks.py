@@ -125,7 +125,7 @@ override_doctype_class = {
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
+#doc_events = {
 	# "*": {
 	# 	"on_update": "method",
 	# 	"on_cancel": "method",
@@ -136,7 +136,7 @@ doc_events = {
 	# 	"after_insert": "tfs.tfs.doctype.email_extract.email_extract.segrigate_email",
 
 	# }
-}
+#}
 
 # Scheduled Tasks
 # ---------------
