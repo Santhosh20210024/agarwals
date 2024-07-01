@@ -225,7 +225,7 @@ class Transformer:
         for item in utr_list:
             item = str(item).replace('UIIC_', 'CITIN')
             item = str(item).replace('UIC_', 'CITIN')
-            if str(item).startswith('23') and len(str(item)) == 11:
+            if str(item).startswith(('23','24')) and len(str(item)) == 11:
                 item = "CITIN" + str(item)
                 new_utr_list.append(item)
             elif len(str(item)) == 9:
