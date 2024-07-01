@@ -226,7 +226,7 @@ class SeleniumDownloader:
         return None
 
     def create_download_directory(self):
-        self.file_name = f"{self.credential_doc.name.replace(' ', '').lower()}"
+        self.file_name = f"{self.credential_doc.name}"
         self.folder_path = self.files_path + "Settlement Advice/" + f"{self.credential_doc.tpa}/"
         file_path =self.folder_path + self.file_name
         os.mkdir(file_path)
