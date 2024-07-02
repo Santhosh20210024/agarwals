@@ -14,7 +14,7 @@ class AdviceTransformer(StagingTransformer):
         self.document_type = 'Settlement Advice Staging'
         self.header = None
         self.clean_utr = 1
-        self.utr_column_name = 'utr_number'
+        self.utr_column_name = 'final_utr_number'
         self.rename_value = None
         self.list_of_char_to_replace = None
 
@@ -51,13 +51,17 @@ class AdviceTransformer(StagingTransformer):
         return False
 
     def validate_header(self, header_row_index, source_column_list):
-        identified_header_row = self.clean_header(self.source_df.loc[header_row_index].to_list())
+        self.source_df.columns = self.clean_header(self.source_df.loc[header_row_index].to_list())
+        self.source_df = self.prune_columns(self.source_df)
+        identified_header_row = self.clean_header(self.source_df.columns)
+        identified_header_row.pop()
         self.rename_value = {}
         for key, value in source_column_list.items():
             p1_list, p2_list = self.get_priority_list(value)
             is_found = self.find_header_key(p1_list, identified_header_row, key)
             if not is_found and p2_list is not None:
                 self.find_header_key(p2_list, identified_header_row, key)
+        identified_header_row.append("index")
         return None, header_row_index, identified_header_row
 
     def verify_file(self, file, header_index):
@@ -82,7 +86,7 @@ class AdviceTransformer(StagingTransformer):
 
     def clean_data(self, df):
         df = self.fill_na_as_0(df)
-        df["utr_number"] = df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
+        df["final_utr_number"] = df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
             r"[\"\'?]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0")
         df["claim_id"] = df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '', regex=True).replace(
             "", "0")
