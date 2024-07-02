@@ -604,7 +604,7 @@ class BankTransformer(StagingTransformer):
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
     def extract_utr_from_narration(self, configuration):
-        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(row['narration'], row['utr_number'],eval(configuration.delimiters)), axis = 1)
+        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),eval(configuration.delimiters)), axis = 1)
 
     def add_source_and_bank_account_column(self, source, bank_account):
         self.source_df['source'] = source
