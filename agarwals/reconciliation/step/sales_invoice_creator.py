@@ -5,6 +5,7 @@ from agarwals.utils.journal_entry_cancellator import JournalEntryCancellator
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.fiscal_year_update import update_fiscal_year
 
 class SalesInvoiceCreator:
     def cancel_sales_invoice(self, cancelled_bills):
@@ -62,6 +63,7 @@ class SalesInvoiceCreator:
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
+                    update_fiscal_year(sales_invoice_record,'Sales Invoice')
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                         transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
                                         record=bill_number, index=sales_invoice_record.custom_index)
@@ -74,7 +76,9 @@ class SalesInvoiceCreator:
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
             chunk.update_status(chunk_doc, "Error")
-
+            
+    
+        
     def enqueue_jobs(self, bill_number, args):
         no_of_invoice_per_queue = int(args["chunk_size"])
         for i in range(0, len(bill_number), no_of_invoice_per_queue):
