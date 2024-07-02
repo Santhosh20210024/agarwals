@@ -135,6 +135,7 @@ class PaymentEntryCreator:
             pe_doc.set('custom_file_upload', ref_doc.file_upload)
             pe_doc.set('custom_transform', ref_doc.transform)
             pe_doc.set('custom_index', ref_doc.index)
+            pe_doc.set('custom_parent_doc',ref_doc.name)
             pe_doc.save()
             pe_doc.submit()
             frappe.db.commit()
