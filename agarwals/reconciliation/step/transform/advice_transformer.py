@@ -73,10 +73,10 @@ class AdviceTransformer(StagingTransformer):
         return ['name', '_merge', 'hash_x', 'hash_column']
 
     def get_column_name_to_convert_to_numeric(self):
-        return ['settled_amount', 'tds_amount', 'disallowed_amount']
+        return ['claim_amount', 'settled_amount', 'tds_amount', 'disallowed_amount']
 
     def get_columns_to_fill_na_as_0(self):
-        return ['settled_amount', 'tds_amount', 'disallowed_amount']
+        return ['claim_amount', 'settled_amount', 'tds_amount', 'disallowed_amount']
 
     def clean_data(self, df):
         df = self.fill_na_as_0(df)
@@ -108,9 +108,7 @@ class AdviceTransformer(StagingTransformer):
         return left_df_column, right_df_column
 
     def get_column_needed(self):
-        return ["claim_id", "claim_amount", "utr_number", "disallowed_amount", "payers_remark", "settled_amount",
-                "tds_amount", "claim_status", "paid_date", "bill_number", "final_utr_number", "hash", "file_upload",
-                "transform", "index"]
+        return ["claim_id", "cl_number", "bill_number", "mrn", "utr_number", "final_utr_number", "claim_status", "paid_date", "insurance_company", "patient_name", "insurance_policy_number", "doa", "dod", "hospital_name", "bank_account_no", "bank_name", "bank_branch", "claim_amount", "settled_amount", "tds_amount", "disallowed_amount", "payers_remark", "hash", "file_upload", "transform", "index"]
 
     def extract(self, configuration, key, file):
         self.source_df = self.source_df.rename(columns=self.rename_value)

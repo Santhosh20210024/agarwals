@@ -19,6 +19,7 @@
   "insurance_company",
   "column_break_ne4ar",
   "patient_name",
+  "insurance_policy_number",
   "date_of_admission",
   "date_of_discharge",
   "hospital_name",
@@ -431,10 +432,15 @@
    "fieldname": "settlement_details_section",
    "fieldtype": "Section Break",
    "label": "Settlement Details"
+  },
+  {
+   "fieldname": "insurance_policy_number",
+   "fieldtype": "Data",
+   "label": "Insurance Policy Number"
   }
  ],
  "links": [],
- "modified": "2024-07-03 10:51:09.389016",
+ "modified": "2024-07-03 17:14:54.006918",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

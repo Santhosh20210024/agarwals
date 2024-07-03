@@ -143,7 +143,7 @@ def reorder_columns(column_orders,df):
     return df[column_orders]
 
 def get_column_needed():
-    return ["claim_id", "claim_amount", "utr_number", "disallowed_amount", "payer_remark", "settled_amount","tds_amount", "claim_status", "paid_date", "bill_number", "final_utr_number", "hash", "file_upload", "transform", "index"]
+    return ["claim_id", "cl_number", "bill_number", "mrn", "utr_number", "final_utr_number", "claim_status", "paid_date", "insurance_company", "patient_name", "insurance_policy_number", "doa", "dod", "hospital_name", "bank_account_no", "bank_name", "bank_branch", "claim_amount", "settled_amount", "tds_amount", "disallowed_amount", "payers_remark", "hash", "file_upload", "transform", "index"]
 
 def write_excel(df, file_path, type, target_folder):
     column_orders = get_column_needed()

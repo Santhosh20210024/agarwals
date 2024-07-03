@@ -20,6 +20,7 @@
   "insurance_company",
   "column_break_ygal8",
   "patient_name",
+  "insurance_policy_number",
   "date_of_admission",
   "date_of_discharge",
   "hospital_name",
@@ -339,11 +340,16 @@
   {
    "fieldname": "section_break_payer_remark",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "insurance_policy_number",
+   "fieldtype": "Data",
+   "label": "Insurance Policy Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-02 19:47:42.132726",
+ "modified": "2024-07-03 17:14:21.028447",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
