@@ -89,6 +89,13 @@ class BillAdjustmentProcess(JournalUtils):
                     if bill_adjt.tds:
                         je = self.create_journal_entry('Credit Note', bill_adjt.posting_date)
                         je.name = "".join([bill_adjt.bill,'-','TDS'])
+                        je.custom_entity = invoice.entity
+                        je.custom_branch = invoice.branch
+                        je.custom_region = invoice.region
+                        je.custom_branch_type = invoice.branch_type
+                        je.custom_bill_date = invoice.posting_date
+                        je.custom_party_group = invoice.customer_group
+                        je.custom_party = invoice.customer
                         je = self.add_account_entries(je, invoice, 'Debtors - A', 'TDS - A', bill_adjt.tds)
                         self.save_je(je, bill_adjt)
                         self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name,
@@ -105,6 +112,13 @@ class BillAdjustmentProcess(JournalUtils):
                     if bill_adjt.disallowance:
                         je = self.create_journal_entry('Credit Note', bill_adjt.posting_date)
                         je.name = "".join([bill_adjt.bill,'-','DIS'])
+                        je.custom_entity = invoice.entity
+                        je.custom_branch = invoice.branch
+                        je.custom_region = invoice.region
+                        je.custom_branch_type = invoice.branch_type
+                        je.custom_bill_date = invoice.posting_date
+                        je.custom_party_group = invoice.customer_group
+                        je.custom_party = invoice.customer
                         je = self.add_account_entries(je, invoice, 'Debtors - A', 'Disallowance - A', bill_adjt.disallowance)
                         self.save_je(je, bill_adjt)
                         self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name,
