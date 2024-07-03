@@ -67,7 +67,7 @@ class Transformer:
             for column in columns:
                 if column in df.columns:
                     columns_to_prune.append(column)
-        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column]
+        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column or 'nan' in column]
         if unnamed_columns:
             columns_to_prune.extend(unnamed_columns)
         df = df.drop(columns=columns_to_prune, errors='ignore')
@@ -489,7 +489,7 @@ class StagingTransformer(Transformer):
             return False
 
         self.load_source_df(file, header_index)
-        self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
+        self.source_df.columns = self.clean_header(self.source_df.columns)
         self.source_df = self.prune_columns(self.source_df)
         self.source_df.columns = cleaned_header_row
         is_extracted = self.extract(configuration,key,file)
