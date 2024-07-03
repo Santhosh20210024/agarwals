@@ -33,10 +33,6 @@ def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
     frappe.enqueue(class_name().download,queue = args["queue"], is_async = True, job_name = f"TPA_downloader_{str(tpa_doc.name)}", timeout = 3600, tpa_doc = tpa_doc, chunk_doc = chunk_doc)
 
-@frappe.whitelist()
-def upload_sa_files():
-    SABotUploader().process()
-
 
 @frappe.whitelist()
 def process(args):
@@ -92,6 +88,10 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             frappe.db.sql(
                 f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'Error' WHERE name = '{login_ref.name}' ")
             frappe.db.commit()
+
+@frappe.whitelist()
+def upload_sa_files():
+    SABotUploader().process()
 
 
 
