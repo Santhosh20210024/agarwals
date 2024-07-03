@@ -93,6 +93,8 @@ class PaymentEntryCreator:
             closing_date = max(closing_date_list)
             if bt_doc.date < closing_date:
                 return utils.today()
+            else:
+                return bt_doc.date
         else:
             return bt_doc.date
 
