@@ -1,7 +1,11 @@
 import frappe
 
 def update_fiscal_year(doc,type):
-        date = doc.get('date')
+        date = None
+        if type == 'Bank Transaction':
+                date = doc.get('date')
+        else:
+                date = doc.get('posting_date')
         fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',date],'year_end_date':['>=',date]},fields=['name'])
         yearly_due_doc = frappe.new_doc ('Yearly Due')
         yearly_due_doc.parent = doc.get('name') 
