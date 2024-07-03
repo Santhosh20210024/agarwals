@@ -89,7 +89,7 @@ class AdviceTransformer(StagingTransformer):
 
 
     def get_columns_to_hash(self):
-        return ["claim_id", "bill_number", "utr_number", "claim_status", "claim_amount", "disallowed_amount",
+        return ["al_number", "bill_number", "utr_number", "claim_status", "claim_amount", "disallowed_amount",
                 "payers_remark", "settled_amount", "tds_amount"]
 
     def load_target_df(self):
@@ -108,10 +108,10 @@ class AdviceTransformer(StagingTransformer):
         return left_df_column, right_df_column
 
     def get_column_needed(self):
-        return ["claim_id", "cl_number", "bill_number", "mrn", "utr_number", "final_utr_number", "claim_status", "paid_date", "insurance_company", "patient_name", "insurance_policy_number", "doa", "dod", "hospital_name", "bank_account_no", "bank_name", "bank_branch", "claim_amount", "settled_amount", "tds_amount", "disallowed_amount", "payers_remark", "hash", "file_upload", "transform", "index"]
+        return ["al_number", "cl_number", "bill_number", "mrn", "utr_number", "final_utr_number", "claim_status", "paid_date", "insurance_company", "patient_name", "insurance_policy_number", "doa", "dod", "hospital_name", "bank_account_no", "bank_name", "bank_branch", "claim_amount", "settled_amount", "tds_amount", "disallowed_amount", "payers_remark", "hash", "file_upload", "transform", "index"]
 
     def extract(self, configuration, key, file):
-        self.source_df = self.source_df.rename(columns=self.rename_value)
+        self.source_df = self.source_df.rename(columns=self.rename_value, inplace = True)
         self.source_df = self.convert_into_common_format(self.source_df, self.get_column_needed())
         if "claim_id" not in self.source_df.columns:
             self.log_error(self.document_type, file['name'], '"No Valid data header or file is empty')
