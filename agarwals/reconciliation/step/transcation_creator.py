@@ -6,6 +6,7 @@ from agarwals.reconciliation import chunk
 from datetime import datetime as dt
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.fiscal_year_update import update_fiscal_year
 
 TAG = 'Credit Payment'
 ERROR_LOG = { 
@@ -50,6 +51,7 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.custom_index = transaction.get('index')
     bank_trans_doc.submit()
     frappe.db.commit()
+    update_fiscal_year(bank_trans_doc,'Bank Transaction')
     file_records.create(file_upload=bank_trans_doc.custom_file_upload,
                         transform=bank_trans_doc.custom_transform, reference_doc=bank_trans_doc.doctype,
                         record=bank_trans_doc.name, index=bank_trans_doc.custom_index)
@@ -57,8 +59,8 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
         return bank_trans_doc.name
     
     if not update_reference_number:
-        return reference_number
-    
+        return reference_number  
+
 def save_trans_doc(transaction):
     transaction.save()
     frappe.db.commit()

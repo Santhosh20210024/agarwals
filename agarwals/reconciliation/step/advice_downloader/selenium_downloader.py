@@ -255,14 +255,12 @@ class SeleniumDownloader:
         pass
 
     def insert_run_log(self, data):
-        doc=frappe.get_doc("TPA Login Credentials",self.credential_doc.name)
-        doc.append("run_log",data)
-        doc.save(ignore_permissions=True)
+        doc=frappe.get_doc(data).insert(ignore_permissions=True)
         frappe.db.commit()
         return None
 
     def create_download_directory(self):
-        self.file_name = f"{self.credential_doc.name.replace(' ', '').lower()}"
+        self.file_name = f"{self.credential_doc.name}"
         self.folder_path = self.files_path + "Settlement Advice/" + f"{self.credential_doc.tpa}/"
         file_path =self.folder_path + self.file_name
         os.mkdir(file_path)
@@ -315,19 +313,20 @@ class SeleniumDownloader:
         error_log.set('error_message', error_message)
         error_log.save()
         if reference_name:
-            self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error"})
+            self.insert_run_log({"doctype": "SA Downloader Run Log","last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
             frappe.db.commit()
 
-    def create_fileupload(self,file_url,file_name):
-        file_upload_doc=frappe.new_doc("File upload")
-        file_upload_doc.document_type="Settlement Advice"
-        file_upload_doc.payer_type=self.credential_doc.tpa
-        file_upload_doc.upload=file_url
-        file_upload_doc.is_bot = 1
-        file_upload_doc.file_format = 'EXCEL'
-        file_upload_doc.save(ignore_permissions=True)
-        self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
-        frappe.db.commit()
+    # May Needed in future
+    # def create_fileupload(self,file_url,file_name):
+    #     file_upload_doc=frappe.new_doc("File upload")
+    #     file_upload_doc.document_type="Settlement Advice"
+    #     file_upload_doc.payer_type=self.credential_doc.tpa
+    #     file_upload_doc.upload=file_url
+    #     file_upload_doc.is_bot = 1
+    #     file_upload_doc.file_format = 'EXCEL'
+    #     file_upload_doc.save(ignore_permissions=True)
+    #     self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
+    #     frappe.db.commit()
 
     def raise_exception(self,exception):
         raise Exception(exception)
@@ -341,6 +340,10 @@ class SeleniumDownloader:
             self.driver.quit()
         if e:
             self.log_error('TPA Login Credentials', self.user_name, e)
+        else:
+            self.insert_run_log(
+                {"doctype": "SA Downloader Run Log","last_executed_time": self.last_executed_time, "document_reference": "TPA Login Credentials",
+                 "reference_name": self.credential_doc.name, "status": "Processed","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
         if self.is_captcha == True:
             if e:
                 self.update_tpa_reference('Error')
@@ -449,7 +452,7 @@ class SeleniumDownloader:
         else:
             self.raise_exception(" SA Downloader Configuration not found ")
         self.driver = webdriver.Chrome(options=self.options)
-        self.wait = WebDriverWait(self.driver,  30)
+        self.wait = WebDriverWait(self.driver,  45)
 
     def init(self):
         pass

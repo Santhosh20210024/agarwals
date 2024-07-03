@@ -23,7 +23,12 @@ class PaymentEntryCreator:
         bt_doc.append('payment_entries',
                       {'payment_document': 'Payment Entry'
                       ,'payment_entry': pe_doc.name
-                      ,'allocated_amount': pe_doc.paid_amount})
+                      ,'allocated_amount': pe_doc.paid_amount
+                      ,'custom_bill_date':pe_doc.custom_due_date
+                      ,'custom_bill_region':pe_doc.region
+                      ,'custom_bill_branch':pe_doc.branch
+                      ,'custom_bill_branch_type':pe_doc.branch_type
+                      ,'custom_bill_entity':pe_doc.entity})
         bt_doc.submit()
 
     def process_rounding_off(self, pe_doc, si_doc):
@@ -130,6 +135,7 @@ class PaymentEntryCreator:
             pe_doc.set('custom_file_upload', ref_doc.file_upload)
             pe_doc.set('custom_transform', ref_doc.transform)
             pe_doc.set('custom_index', ref_doc.index)
+            pe_doc.set('custom_parent_doc',ref_doc.name)
             pe_doc.save()
             pe_doc.submit()
             frappe.db.commit()

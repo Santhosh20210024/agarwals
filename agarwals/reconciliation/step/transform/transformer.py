@@ -67,7 +67,7 @@ class Transformer:
             for column in columns:
                 if column in df.columns:
                     columns_to_prune.append(column)
-        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column]
+        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column or 'nan' in column]
         if unnamed_columns:
             columns_to_prune.extend(unnamed_columns)
         df = df.drop(columns=columns_to_prune, errors='ignore')
@@ -225,7 +225,7 @@ class Transformer:
         for item in utr_list:
             item = str(item).replace('UIIC_', 'CITIN')
             item = str(item).replace('UIC_', 'CITIN')
-            if str(item).startswith('23') and len(str(item)) == 11:
+            if str(item).startswith(('23','24','25','26','27','28','29','30')) and len(str(item)) == 11:
                 item = "CITIN" + str(item)
                 new_utr_list.append(item)
             elif len(str(item)) == 9:
@@ -489,7 +489,7 @@ class StagingTransformer(Transformer):
             return False
 
         self.load_source_df(file, header_index)
-        self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
+        self.source_df.columns = self.clean_header(self.source_df.columns)
         self.source_df = self.prune_columns(self.source_df)
         self.source_df.columns = cleaned_header_row
         is_extracted = self.extract(configuration,key,file)
@@ -604,7 +604,7 @@ class BankTransformer(StagingTransformer):
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
     def extract_utr_from_narration(self, configuration):
-        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(row['narration'], row['utr_number'],eval(configuration.delimiters)), axis = 1)
+        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),eval(configuration.delimiters)), axis = 1)
 
     def add_source_and_bank_account_column(self, source, bank_account):
         self.source_df['source'] = source

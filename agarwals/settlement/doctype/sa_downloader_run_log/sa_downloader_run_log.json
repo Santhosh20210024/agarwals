@@ -1,0 +1,76 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-07-03 13:29:02.000954",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "last_executed_time",
+  "status",
+  "document_reference",
+  "reference_name",
+  "parent1",
+  "tpa_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "last_executed_time",
+   "fieldtype": "Datetime",
+   "label": "Last Executed Time "
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Processed\nError"
+  },
+  {
+   "fieldname": "document_reference",
+   "fieldtype": "Data",
+   "label": "Document Reference",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Data",
+   "label": "Reference Name",
+   "options": "document_reference"
+  },
+  {
+   "fieldname": "parent1",
+   "fieldtype": "Data",
+   "label": "Parent"
+  },
+  {
+   "fieldname": "tpa_name",
+   "fieldtype": "Data",
+   "label": "TPA Name"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-03 13:29:02.000954",
+ "modified_by": "Administrator",
+ "module": "Settlement",
+ "name": "SA Downloader Run Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
