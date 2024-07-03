@@ -99,8 +99,8 @@ def process(args):
         n = int(args["chunk_size"])
         # Skipping the bill claim_id and ma_claim_id which are 0, Avoiding the queue
         bill_records = frappe.db.sql("""SELECT name FROM tabBill 
-                                     WHERE ( claim_id != 0 and claim_id IS NOT NULL and claim_key is NULL ) 
-                                     or ( ma_claim_id != 0 and ma_claim_id IS NOT NULL and ma_claim_key is NULL )""",
+                                     WHERE ( claim_id != '0' and claim_id != ' ' and claim_id IS NOT NULL and claim_key is NULL ) 
+                                     or ( ma_claim_id != '0' and ma_claim_id != ' ' and ma_claim_id IS NOT NULL and ma_claim_key is NULL ) """,
                                      as_dict=True)
 
         bill_records = [i['name'] for i in bill_records]

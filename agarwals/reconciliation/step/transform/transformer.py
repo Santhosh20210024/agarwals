@@ -67,7 +67,7 @@ class Transformer:
             for column in columns:
                 if column in df.columns:
                     columns_to_prune.append(column)
-        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column]
+        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column or 'nan' in column]
         if unnamed_columns:
             columns_to_prune.extend(unnamed_columns)
         df = df.drop(columns=columns_to_prune, errors='ignore')
@@ -225,7 +225,7 @@ class Transformer:
         for item in utr_list:
             item = str(item).replace('UIIC_', 'CITIN')
             item = str(item).replace('UIC_', 'CITIN')
-            if str(item).startswith('23') and len(str(item)) == 11:
+            if str(item).startswith(('23','24','25','26','27','28','29','30')) and len(str(item)) == 11:
                 item = "CITIN" + str(item)
                 new_utr_list.append(item)
             elif len(str(item)) == 9:
@@ -254,11 +254,14 @@ class Transformer:
     def validate_header(self, header_row, source_column_list):
         return 'Not Identified', 0, []
 
+    def clean_header(self, list_to_clean):
+        return None
+
     def find_and_validate_header(self, header_list, source_column_list):
         for header in header_list:
             header_row_index = None
             for index, row in self.source_df.iterrows():
-                if self.trim_and_lower(header) in [self.trim_and_lower(column) for column in row.values]:
+                if self.trim_and_lower(header) in self.clean_header(row.values):
                     header_row_index = index
                     break
             if header_row_index is not None:
@@ -456,7 +459,7 @@ class StagingTransformer(Transformer):
     def verify_file(self,file,header_index):
         return
 
-    def extract(self,configuration,key,bank):
+    def extract(self,configuration,key,file):
         return
 
     def extract_transactions(self, column):
@@ -486,15 +489,12 @@ class StagingTransformer(Transformer):
             return False
 
         self.load_source_df(file, header_index)
-        self.source_df.columns = [self.trim_and_lower(column) for column in self.source_df.columns]
+        self.source_df.columns = self.clean_header(self.source_df.columns)
         self.source_df = self.prune_columns(self.source_df)
         self.source_df.columns = cleaned_header_row
         is_extracted = self.extract(configuration,key,file)
         if not is_extracted:
             return False
-        self.source_df = self.fill_na_as_0(self.source_df)
-        self.new_records = self.source_df
-        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
 
 
@@ -515,6 +515,9 @@ class BankTransformer(StagingTransformer):
                             ORDER BY creation"""
         files = frappe.db.sql(file_query, as_dict=True)
         return files
+
+    def clean_header(self, list_to_clean):
+        return [self.trim_and_lower(value) for value in list_to_clean]
 
     def validate_header(self, header_row_index, source_column_list):
         identified_header_row = [self.trim_and_lower(column) for column in
@@ -601,7 +604,7 @@ class BankTransformer(StagingTransformer):
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
     def extract_utr_from_narration(self, configuration):
-        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(row['narration'], row['utr_number'],eval(configuration.delimiters)), axis = 1)
+        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),eval(configuration.delimiters)), axis = 1)
 
     def add_source_and_bank_account_column(self, source, bank_account):
         self.source_df['source'] = source
@@ -638,6 +641,9 @@ class BankTransformer(StagingTransformer):
         self.extract_utr_from_narration(configuration)
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
+        self.source_df = self.fill_na_as_0(self.source_df)
+        self.new_records = self.source_df
+        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
     
 class AdjustmentTransformer(Transformer):

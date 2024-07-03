@@ -44,7 +44,9 @@
   "claim_key",
   "cg_formatted_bill_number",
   "transform",
-  "index"
+  "index",
+  "utr_key",
+  "is_bot"
  ],
  "fields": [
   {
@@ -269,10 +271,22 @@
    "fieldtype": "Int",
    "label": "File Index",
    "read_only": 1
+  },
+  {
+   "fieldname": "utr_key",
+   "fieldtype": "Data",
+   "label": "UTR Key"
+  },
+  {
+   "default": "0",
+   "fetch_from": "file_upload.is_bot",
+   "fieldname": "is_bot",
+   "fieldtype": "Check",
+   "label": "Is Bot"
   }
  ],
  "links": [],
- "modified": "2024-05-29 18:32:06.616509",
+ "modified": "2024-06-28 14:27:43.386724",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
