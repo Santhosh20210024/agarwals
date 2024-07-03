@@ -8,6 +8,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime,timedelta
 import os
 import shutil
+from twocaptcha import TwoCaptcha
 from agarwals.reconciliation import chunk
 from PIL import Image
 import os
@@ -54,6 +55,7 @@ class SeleniumDownloader:
         self.previous_files_count = None
         self.is_date_limit  = 0
         self.date_limit_period = 0
+        self.enable_captcha_api = None
         self.folder_path = None
 
 
@@ -65,6 +67,10 @@ class SeleniumDownloader:
         formatted_url = '/'.join(list_of_items)
         return formatted_url
 
+    def update_retry(self):
+        doc = frappe.get_doc('TPA Login Credentials',self.credential_doc.name)
+        doc.retry = 1
+        doc.save()
 
     def set_self_variables(self, tpa_doc ,child = None, parent = None):
         self.credential_doc = tpa_doc
@@ -84,6 +90,9 @@ class SeleniumDownloader:
                 self.to_date = configuration_values.to_date if configuration_values.to_date else frappe.utils.now_datetime().date()
                 self.is_date_limit = configuration_values.is_date_limit
                 self.date_limit_period = configuration_values.date_limit_period
+            control_panel = frappe.get_doc('Control Panel')
+            if control_panel:
+                self.enable_captcha_api = control_panel.enable_captcha_api
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
             if child and parent is not None:
@@ -93,20 +102,45 @@ class SeleniumDownloader:
         else:
             self.log_error('TPA Login Credentials',None,"No Credential for the given input")
 
-    def get_captcha_value(self):
+    def get_captcha_value(self,captcha_type=None,sitekey=None):
         try:
-            captcha = ''
-            end_time = time.time() + self.max_wait_time
-            while time.time() < end_time:
-                frappe.db.commit()
-                captcha_value = frappe.db.sql(f"SELECT captcha FROM `tabSettlement Advice Downloader UI` WHERE name = '{self.captcha_tpa_doc}'",as_dict = True)
-                if captcha_value[0].captcha:
-                    captcha = captcha_value[0].captcha
-                    break
-                time.sleep(5)
-            return captcha if captcha !='' else None
-        except Exception as E:
-            self.log_error('Settlement Advice Downloader UI',self.tpa, E)
+
+
+            if self.enable_captcha_api == 0:
+                captcha = ''
+                end_time = time.time() + self.max_wait_time
+                while time.time() < end_time:
+                    frappe.db.commit()
+                    captcha_value = frappe.db.sql(f"SELECT captcha FROM `tabSettlement Advice Downloader UI` WHERE name = '{self.captcha_tpa_doc}'",as_dict = True)
+                    if captcha_value[0].captcha:
+                        captcha = captcha_value[0].captcha
+                        break
+                    time.sleep(5)
+                return captcha if captcha !='' else None
+
+            elif self.enable_captcha_api == 1:
+
+                #api method
+                control_panel = frappe.get_doc('Control Panel')
+                api_key =control_panel.captcha_api_key
+                api_key = os.getenv('APIKEY_2CAPTCHA', api_key)
+                solver = TwoCaptcha(api_key)
+                if captcha_type == "Normal Captcha":
+                    result = solver.normal(file=self.crop_img_path,
+                                           minLen=1,
+                                           maxLen=20,
+                                           phrase=1,
+                                           caseSensitive=1,
+                                           lang='en')
+                    return result,api_key
+                elif captcha_type == "ReCaptcha":
+                    result = solver.recaptcha(
+                        sitekey=sitekey,
+                        url=self.url)
+                    return result,api_key
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
 
     def extract_table_data(self, table_id):
         table = self.wait.until(EC.presence_of_element_located((By.ID, table_id)))
@@ -140,14 +174,14 @@ class SeleniumDownloader:
         if self.full_img_path and self.crop_img_path:
             self.delete_backend_files(self.full_img_path)
             self.delete_backend_files(self.crop_img_path)
-            file_url = frappe.db.sql(f"SELECT file_url FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ",as_dict = True)
-            if file_url:
-                self.delete_backend_files(f"{self.SITE_PATH}{file_url[0].file_url}")
-                frappe.db.sql(f"DELETE FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ")
-                frappe.db.commit()
-            else:
-                self.update_tpa_reference('Error')
-                self.log_error('Settlement Advice Downloader UI',self.tpa,"No  captcha image found to delete ")
+            if self.enable_captcha_api == 0:
+                file_url = frappe.db.sql(f"SELECT file_url FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ",as_dict = True)
+                if file_url:
+                    self.delete_backend_files(f"{self.SITE_PATH}{file_url[0].file_url}")
+                    frappe.db.sql(f"DELETE FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ")
+                    frappe.db.commit()
+                else:
+                    self.log_error('Settlement Advice Downloader UI',self.tpa,"No  captcha image found to delete ")
 
 
     def get_captcha_image(self,captcha_identifier):
@@ -163,7 +197,9 @@ class SeleniumDownloader:
         img = Image.open(self.full_img_path)
         img = img.crop((left, top, right, bottom))
         img.save(self.crop_img_path)
-        self.create_captcha_file()
+
+        if self.enable_captcha_api == 0:
+            self.create_captcha_file()
 
     def get_status_count(self,status):
         frappe.db.commit()

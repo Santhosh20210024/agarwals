@@ -13,8 +13,17 @@ class CarehealthDownloader(SeleniumDownloader):
     def login(self):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'UserName')))
         self.driver.find_element(By.ID, 'UserName').send_keys(self.user_name)  # Username
-        self.driver.find_element(By.ID, 'Password').send_keys(self.password)  # password
-        time.sleep(self.max_wait_time)
+        self.driver.find_element(By.ID, 'Password').send_keys(self.password)
+        captcha_div = self.driver.find_element(By.ID, 'CaptchaText')
+        sitekey = captcha_div.get_attribute('data-sitekey')
+        captcha = self.get_captcha_value(captcha_type="ReCaptcha",sitekey=sitekey)
+        g_recaptcha_response = self.driver.find_element(By.ID, 'g-recaptcha-response')
+        # Use JavaScript to change the style of the textarea
+        self.driver.execute_script("arguments[0].style.display = 'block'; arguments[0].style.resize = 'both';",
+                               g_recaptcha_response)
+        time.sleep(10)
+        # Send the key to the textarea
+        g_recaptcha_response.send_keys(captcha[0]['code'])
         self.driver.find_element(By.CLASS_NAME, 'btn-primary').click()
     def navigate(self):
         modal = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "modal-content")))
