@@ -19,6 +19,12 @@ class ProviderIhxDownloader(SeleniumDownloader):
         pwd.send_keys(self.password)
         login_button = self.driver.find_element(By.XPATH, "//button[@class='ant-btn ant-btn-primary login-btn']")
         login_button.click()
+
+        try:
+            skip = self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME,'skip-verification')))
+            skip.click()
+        except:
+            pass
         # ToDo To identify invalid username password
         # try:
         #     # Wait for the error message to be visible
