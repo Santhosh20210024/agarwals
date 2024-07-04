@@ -76,9 +76,7 @@ class SalesInvoiceCreator:
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
             chunk.update_status(chunk_doc, "Error")
-            
-    
-        
+
     def enqueue_jobs(self, bill_number, args):
         no_of_invoice_per_queue = int(args["chunk_size"])
         for i in range(0, len(bill_number), no_of_invoice_per_queue):
@@ -89,27 +87,27 @@ class SalesInvoiceCreator:
 @frappe.whitelist()
 def process(args):
     try:
-        args=cast_to_dic(args)
+        args = cast_to_dic(args)
         cancelled_bills = frappe.get_list('Bill', filters={'status': 'CANCELLED', 'invoice_status': 'RAISED'},
                                           pluck='name')
+        cancellation_chunk_doc = chunk.create_chunk(args["step_id"])
         if cancelled_bills:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "InProgress")
+            chunk.update_status(cancellation_chunk_doc, "InProgress")
             try:
                 SalesInvoiceCreator().cancel_sales_invoice(cancelled_bills)
-                chunk.update_status(chunk_doc, "Processed")
+                cancellation_chunk_doc_status = "Processed"
             except Exception as e:
-                chunk.update_status(chunk_doc, "Error")
+                cancellation_chunk_doc_status = "Error"
         else:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
+            cancellation_chunk_doc_status = "Processed"
         new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=','CANCELLED AND DELETED']},pluck = 'name')
         if new_bills:
-            SalesInvoiceCreator().enqueue_jobs(new_bills,args)
+            SalesInvoiceCreator().enqueue_jobs(new_bills, args)
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
+        chunk.update_status(cancellation_chunk_doc, cancellation_chunk_doc_status)
     except Exception as e:
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')
+        log_error(e, 'Step')
