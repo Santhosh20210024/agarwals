@@ -290,9 +290,14 @@ class SeleniumDownloader:
 
         original_file_name = recent_downloaded_file.split('/')[-1] if self.incoming_file_type != 'HTML' else f"{self.tpa}_formated_file.xlsx"
         extension = original_file_name.split(".")[-1]
-        formatted_file_name = file_name + f"{from_date}_{to_date}" + "." + extension if self.from_date is not None else file_name + "." + extension
-        random_number = self.generate_random_number()
-        os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name) if self.format_file_in_parent == True else os.rename(download_directory + '/' + original_file_name, download_directory + '/' + f'{formatted_file_name}_{random_number}')
+        if self.from_date is not None and self.format_file_in_parent == True:
+            formatted_file_name = file_name + f"{from_date}_{to_date}" + "." + extension
+        elif self.from_date is not None and self.format_file_in_parent == False:
+            random_number = self.generate_random_number()
+            formatted_file_name = file_name + f"{from_date}_{to_date}_{random_number}" + "." + extension
+        else:
+            formatted_file_name = file_name + "." + extension
+        os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name)
         return formatted_file_name
 
     def move_file(self, download_directory,formatted_file_name):
