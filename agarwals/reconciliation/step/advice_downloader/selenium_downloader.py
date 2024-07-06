@@ -417,6 +417,7 @@ class SeleniumDownloader:
         self.create_fileupload(file_url, self.file_name)
 
     def add_driver_argument(self):
+        self.options.add_argument('--log-level=3')
         if self.allow_insecure_file == True:
             self.options.add_argument('--disable-features=InsecureDownloadWarnings')
         if self.is_date_limit == 1:
@@ -444,6 +445,7 @@ class SeleniumDownloader:
             self._exit()
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
+            print(e)
             chunk.update_status(chunk_doc, "Error")
             self._exit(e)
 
