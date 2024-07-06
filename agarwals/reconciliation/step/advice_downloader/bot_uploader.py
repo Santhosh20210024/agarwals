@@ -18,6 +18,7 @@ class SABotUploader:
         self.mail_group = None
         self.delete_folders_with_zip = None
         self.delete_folders_without_zip = None
+        self.file_upload_failed = False
 
     def raise_exception(self,exception):
         raise Exception(exception)
@@ -67,39 +68,46 @@ class SABotUploader:
         if response.status_code != 200:
             self.raise_exception(f"Login Failed : Error = {response.text} , Status Code = {response.status_code}")
 
-
+    def change_status(self):
+        if self.file_upload_failed == False:
+            self.file_upload_failed = True
     def upload_zip_files(self):
         zip_files = os.listdir(self.zip_folder_path)
         if zip_files:
             for zip_file in zip_files:
-                file_upload_url = f'{self.url}api/method/upload_file'
-                file_path = self.zip_folder_path+"/"+zip_file
-                file_name = zip_file
-
-                with open(file_path, 'rb') as file_obj:
-                    files = {
-                        'file': (file_name, file_obj)
-                    }
-                    data = {
-                        'is_private': 1,
-                        'folder': 'Home/Attachments'
-                    }
-
-                    upload_response = self.session.post(file_upload_url, files=files, data=data)
-                    if upload_response.status_code == 200:
-                        create_file_upload = f'{self.url}api/resource/File upload'
-                        payload = {
-                            'file_format': 'ZIP',
-                            'document_type': 'Settlement Advice',
-                            'is_bot': '1',
-                            "payer_type": file_name.split("[")[0],
-                            "upload": f"/private/files/{file_name}"
+                try:
+                    file_upload_url = f'{self.url}api/method/upload_file'
+                    file_path = self.zip_folder_path+"/"+zip_file
+                    file_name = zip_file
+                    with open(file_path, 'rb') as file_obj:
+                        files = {
+                            'file': (file_name, file_obj)
                         }
-                        response = self.session.post(create_file_upload, json=payload)
-                        if response.status_code != 200:
-                            self.raise_exception(f"file created but file upload filed ")
-                    else:
-                        self.raise_exception(f"Upload Failed : Error ")
+                        data = {
+                            'is_private': 1,
+                            'folder': 'Home/Attachments'
+                        }
+                        upload_response = self.session.post(file_upload_url, files=files, data=data)
+                        if upload_response.status_code == 200:
+                            create_file_upload = f'{self.url}api/resource/File upload'
+                            payload = {
+                                'file_format': 'ZIP',
+                                'document_type': 'Settlement Advice',
+                                'is_bot': '1',
+                                "payer_type": file_name.split("[")[0],
+                                "upload": f"/private/files/{file_name}"
+                            }
+                            response = self.session.post(create_file_upload, json=payload)
+                            if response.status_code != 200:
+                                self.change_status()
+                                log_error(error=f"{file_name}file created but file upload filed ",doc_name="SA Bot Uploader")
+                        else:
+                            self.change_status()
+                            log_error(error = f"file creation failed for {file_name}",doc_name="SA Bot Uploader")
+
+                except Exception as e:
+                    self.change_status()
+                    log_error(error=f"Failed to Upload  {file_name}  error = {e}",doc_name="SA Bot Uploader")
         else:
             self.raise_exception("No Zip Files Found")
 
@@ -172,8 +180,7 @@ class SABotUploader:
                         shutil.rmtree(path)
                 else:
                     log_error("Path Dose not Exits While removing the folder ")
-
-        if self.delete_folders_with_zip == 1:
+        if self.delete_folders_with_zip == 1 and self.file_upload_failed == False:
             if os.path.exists(self.zip_folder_path):
                 shutil.rmtree(self.zip_folder_path)
 

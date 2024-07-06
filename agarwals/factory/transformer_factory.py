@@ -1,4 +1,5 @@
 from agarwals.reconciliation.step.transform.transformer import BillTransformer, ClaimbookTransformer, BankTransformer, AdjustmentTransformer, WritebackTransformer, WriteoffTransformer,BankBulkTransformer
+from agarwals.reconciliation.step.transform.advice_transformer import AdviceTransformer
 from agarwals.reconciliation.step.transform import settlement_advice
 
 def get_transformer(type):
@@ -8,7 +9,7 @@ def get_transformer(type):
         elif type == "claimbook":
             return ClaimbookTransformer()
         elif type == "Settlement":
-            return settlement_advice
+            return AdviceTransformer()
         elif type == "transaction":
             return BankTransformer()
         elif type == "adjustment":

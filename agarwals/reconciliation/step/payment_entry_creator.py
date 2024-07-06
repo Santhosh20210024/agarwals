@@ -23,7 +23,12 @@ class PaymentEntryCreator:
         bt_doc.append('payment_entries',
                       {'payment_document': 'Payment Entry'
                       ,'payment_entry': pe_doc.name
-                      ,'allocated_amount': pe_doc.paid_amount})
+                      ,'allocated_amount': pe_doc.paid_amount
+                      ,'custom_bill_date':pe_doc.custom_due_date
+                      ,'custom_bill_region':pe_doc.region
+                      ,'custom_bill_branch':pe_doc.branch
+                      ,'custom_bill_branch_type':pe_doc.branch_type
+                      ,'custom_bill_entity':pe_doc.entity})
         bt_doc.submit()
 
     def process_rounding_off(self, pe_doc, si_doc):
@@ -88,6 +93,8 @@ class PaymentEntryCreator:
             closing_date = max(closing_date_list)
             if bt_doc.date < closing_date:
                 return utils.today()
+            else:
+                return bt_doc.date
         else:
             return bt_doc.date
 
@@ -130,6 +137,7 @@ class PaymentEntryCreator:
             pe_doc.set('custom_file_upload', ref_doc.file_upload)
             pe_doc.set('custom_transform', ref_doc.transform)
             pe_doc.set('custom_index', ref_doc.index)
+            pe_doc.set('custom_parent_doc',ref_doc.name)
             pe_doc.save()
             pe_doc.submit()
             frappe.db.commit()
@@ -180,8 +188,8 @@ class PaymentEntryCreator:
         if record.settlement_advice:
             si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'settlement_advice': record.settlement_advice})
         else:
-            if record.claim_book:
-                si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'claim_book': record.claim_book})
+            if record.claimbook:
+                si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'claim_book': record.claimbook})
 
         frappe.db.set_value('Matcher', record.name, 'status', 'Processed')
         si_doc.save()

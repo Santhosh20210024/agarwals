@@ -25,12 +25,17 @@ from agarwals.reconciliation.step.advice_downloader.reliance_general_downloader 
 from agarwals.reconciliation.step.advice_downloader.niva_bupa_downloader import NivaBupaDownloader
 from agarwals.reconciliation.step.advice_downloader.provider_ihx_downoader import ProviderIhxDownloader
 from agarwals.reconciliation.step.advice_downloader.eriscon_downloader import EricsonDownloader
+from agarwals.reconciliation.step.advice_downloader.cmc_nethaji_downloader import CMCNethajiEyeFoundationDownloader
 from agarwals.reconciliation.step.advice_downloader.cholas_downloader import CholasDownloader
+from agarwals.reconciliation.step.advice_downloader.cmc_eyefoundation_downloader import CMCEyeFoundationDownloader
+from agarwals.reconciliation.step.advice_downloader.heritage_downloder import HeritageDownloader
+
 
 
 def download_advice(tpa_doc, chunk_doc, args):
     class_name=eval(tpa_doc.executing_method)
     frappe.enqueue(class_name().download,queue = args["queue"], is_async = True, job_name = f"TPA_downloader_{str(tpa_doc.name)}", timeout = 3600, tpa_doc = tpa_doc, chunk_doc = chunk_doc)
+
 
 @frappe.whitelist()
 def process(args):

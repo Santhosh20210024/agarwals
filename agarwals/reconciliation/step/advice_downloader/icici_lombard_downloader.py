@@ -4,6 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 import time
+from twocaptcha import TwoCaptcha
+import os
 
 class ICICLombardDownloader(SeleniumDownloader):
     def __init__(self):
@@ -17,15 +19,34 @@ class ICICLombardDownloader(SeleniumDownloader):
         captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
         if captcha:
             self.get_captcha_image(captcha)
-            captcha_value = self.get_captcha_value()
-            if captcha_value != None:
-                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_value)
+            captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
+            captcha_code = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
+            if captcha_code != None:
+                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_code)
                 self.driver.find_element(By.ID, 'btnLogin').click()
+                try:
+                    modal = self.wait.until(
+                        EC.presence_of_element_located((By.ID, 'simplemodal-container'))
+                    )
+                    undefined_link = modal.find_element(By.XPATH, "//a[@href='/undefined']//span[text()='undefined']")
+                    if undefined_link.text == "undefined":
+                        if self.enable_captcha_api == 1:
+                            solver = TwoCaptcha(captcha_api[1])
+                            solver.report(captcha_api[0]['captchaId'], False)
+                            self.update_retry()
+                        else:
+                            self.update_tpa_reference("Retry")
+                        self.raise_exception("Invalid Captcha")
+                except Exception as e:
+                    pass
             else:
-                self.update_tpa_reference("Retry")
-                self.raise_exception("No Captcha Value Found")
+                self.update_retry()
+                if self.enable_captcha_api == 0:
+                    self.update_tpa_reference("Retry")
+                self.raise_exception("Invalid Captcha")
         else:
             self.raise_exception(" No Captcha Image Found ")
+
 
     def navigate(self):
         try:
