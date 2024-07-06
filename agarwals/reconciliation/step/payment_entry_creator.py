@@ -188,8 +188,8 @@ class PaymentEntryCreator:
         if record.settlement_advice:
             si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'settlement_advice': record.settlement_advice})
         else:
-            if record.claim_book:
-                si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'claim_book': record.claim_book})
+            if record.claimbook:
+                si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'claim_book': record.claimbook})
 
         frappe.db.set_value('Matcher', record.name, 'status', 'Processed')
         si_doc.save()

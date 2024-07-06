@@ -13,6 +13,7 @@
   "captcha_entry_duration",
   "is_date_limit",
   "date_limit_period",
+  "allow_insecure_file",
   "column_break_wdivc",
   "website_url",
   "from_date",
@@ -66,7 +67,7 @@
    "fieldname": "class_name",
    "fieldtype": "Autocomplete",
    "label": "Class",
-   "options": "\nProviderIhx\nTnnhisMdIndia\nHeritageDownloader\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nVidalHealthDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader\nProviderIhxDownloader\nCMCEyeFoundationDownloader\nCMCNethajiEyeFoundationDownloader\nCholasPdfDownloader"
+   "options": "\nProviderIhx\nTnnhisMdIndia\nHeritageDownloader\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nVidalHealthDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader\nProviderIhxDownloader\nCMCEyeFoundationDownloader\nCMCNethajiEyeFoundationDownloader\nHeritageDownloader\nCholasPdfDownloader"
   },
   {
    "default": "60",
@@ -108,6 +109,12 @@
    "fieldname": "date_limit_period",
    "fieldtype": "Int",
    "label": "Enter the Period Limit in Days"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_insecure_file",
+   "fieldtype": "Check",
+   "label": "Allow Insecure File"
   }
  ],
  "index_web_pages_for_search": 1,
