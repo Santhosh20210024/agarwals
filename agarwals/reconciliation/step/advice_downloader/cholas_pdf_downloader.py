@@ -38,22 +38,22 @@ class CholasPdfDownloader(SeleniumDownloader):
     
     def download_from_web(self):
         td_elements = self.driver.find_elements(By.XPATH, "//td[@class='mat-cell cdk-column-memberID mat-column-memberID ng-star-inserted']")
-        c = 0
+        next = 0
         for i  in range(int(self.settled_claims)):
             try:
                 self.previous_files_count = len(os.listdir(self.download_directory))
-                a_tag = td_elements[c].find_element(By.XPATH, ".//a")
+                a_tag = td_elements[next].find_element(By.XPATH, ".//a")
                 a_tag.click()
                 time.sleep(10)
                 self.format_downloaded_file()
-                c=c+1
-                if c == 100:
-                    c=0
+                next=next+1
+                if next == 100:
+                    next=0
                     td_elements = self.driver.find_elements(By.XPATH, "//td[@class='mat-cell cdk-column-memberID mat-column-memberID ng-star-inserted']")
                     next_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Next page']"))).click()
                 time.sleep(2)   
             except Exception as e:
-                print(f"Failed to click on member ID link: {e}")  
+               self.log_error('TPA Login Credentials', self.user_name, e)
                 
                  
             
