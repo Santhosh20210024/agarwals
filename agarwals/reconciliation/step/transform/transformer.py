@@ -573,7 +573,7 @@ class BankTransformer(StagingTransformer):
 
         return None
 
-    def extract_utr(self, narration, reference, delimiters):
+    def extract_utr(self, narration, reference, bank_account, delimiters):
         numeric = '^[0-9]+$'
         alphanumeric_pattern = '^[a-zA-Z]*[0-9]+[a-zA-Z0-9]*$'
         if "IMPS" in narration:
@@ -600,12 +600,17 @@ class BankTransformer(StagingTransformer):
             length = 12
             pattern = numeric
         else:
-            return reference
+             if bank_account == 'BELGAUM - 32628850028 - STATE BANK OF INDIA' :
+                pattern = alphanumeric_pattern
+                utr_20 = self.extract_utr_by_length(reference, 20, delimiters, pattern )
+                return utr_20
+            else:
+                return reference
 
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
-    def extract_utr_from_narration(self, configuration):
-        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),eval(configuration.delimiters)), axis = 1)
+    def extract_utr_from_narration(self, configuration,bank_account):
+        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),bank_account,eval(configuration.delimiters)), axis = 1)
 
     def add_source_and_bank_account_column(self, source, bank_account):
         self.source_df['source'] = source
@@ -639,7 +644,7 @@ class BankTransformer(StagingTransformer):
         self.source_df = self.convert_into_common_format(self.source_df,columns_to_select)
         self.add_search_column()
         self.convert_column_to_numeric()
-        self.extract_utr_from_narration(configuration)
+        self.extract_utr_from_narration(configuration,file['bank_account'])
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
         self.source_df = self.fill_na_as_0(self.source_df)
@@ -754,7 +759,7 @@ class BankBulkTransformer(BankTransformer):
         configuration = frappe.get_single('Bank Configuration')
         if "date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df, eval(configuration.date_formats), 'date')
-        self.extract_utr_from_narration(configuration)
+        self.extract_utr_from_narration(configuration,self.source_df['bank_account'])
         self.source_df['credit'] = self.source_df['deposit']
         self.source_df['debit'] = self.source_df['withdrawal']
         self.add_search_column()
