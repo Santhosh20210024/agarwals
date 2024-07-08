@@ -28,7 +28,9 @@ class PaymentEntryCreator:
                       ,'custom_bill_region':pe_doc.region
                       ,'custom_bill_branch':pe_doc.branch
                       ,'custom_bill_branch_type':pe_doc.branch_type
-                      ,'custom_bill_entity':pe_doc.entity})
+                      ,'custom_bill_entity':pe_doc.entity
+                      ,'custom_posting_date':pe_doc.posting_date
+                      ,'custom_creation_date':pe_doc.creation})
         bt_doc.submit()
 
     def process_rounding_off(self, pe_doc, si_doc):
@@ -183,7 +185,8 @@ class PaymentEntryCreator:
                                            'disallowance_amount': payment_entry.custom_disallowed_amount,'allocated_amount': payment_entry.total_allocated_amount,
                                            'utr_number': payment_entry.reference_no, 'utr_date': payment_entry.reference_date,
                                            'created_date': created_date, 'bank_region': bt_doc[0].custom_region,
-                                           'bank_entity': bt_doc[0].custom_entity, 'bank_account_number': payment_entry.bank_account })
+                                           'bank_entity': bt_doc[0].custom_entity, 'bank_account_number': payment_entry.bank_account,
+                                           'posting_date':payment_entry.posting_date})
 
         if record.settlement_advice:
             si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'settlement_advice': record.settlement_advice})
