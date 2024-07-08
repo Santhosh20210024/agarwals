@@ -261,92 +261,92 @@ def split_and_move_to_transform(df,file):
 
 @frappe.whitelist()
 def process(args):
-        try:
-            file_list_details = frappe.get_all("File upload",{"status":"Open", "document_type": "Settlement Advice"},"*")
-            if not file_list_details:
-                chunk_doc = chunk.create_chunk(args["step_id"])
-                chunk.update_status(chunk_doc, "Processed")
-                return "Success"
-            for file in file_list_details:
-                try:
-                    chunk_doc = chunk.create_chunk(args["step_id"])
-                    chunk.update_status(chunk_doc, "InProgress")
-                    update_status('File upload', file.name, 'In Process')
-                    file_link = file.upload
-                    file_url_to_read =  SITE_PATH+file_link
-                    config = frappe.get_doc("Settlement Advice Configuration")
-                    header_row_patterns = eval(config.header_row_patterns)
-                    list_of_char_to_repalce = eval(config.char_to_replace_in_header)
-                    header_row_patterns = clean_header(header_row_patterns,list_of_char_to_repalce)
-                    target_columns = eval(config.target_columns)
+    try:
+        file_list_details = frappe.get_all("File upload", {"status": "Open", "document_type": "Settlement Advice",
+                                                           "file_format": "EXCEL"}, "*")
+        chunk_doc = chunk.create_chunk(args["step_id"])
+        if not file_list_details:
+            chunk.update_status(chunk_doc, "Processed")
+            return "Success"
+        chunk.update_status(chunk_doc, "InProgress")
+        status = "Processed"
+        for file in file_list_details:
+            try:
+                file_link = file.upload
+                file_url_to_read = SITE_PATH + file_link
+                config = frappe.get_doc("Settlement Advice Configuration")
+                header_row_patterns = eval(config.header_row_patterns)
+                list_of_char_to_repalce = eval(config.char_to_replace_in_header)
+                header_row_patterns = clean_header(header_row_patterns, list_of_char_to_repalce)
+                target_columns = eval(config.target_columns)
 
-                    if ".csv" in file_link.lower():
-                        df = pd.read_csv(file_url_to_read)
-                        file_link=file_link.lower().replace(".csv",".xlsx")
+                if ".csv" in file_link.lower():
+                    df = pd.read_csv(file_url_to_read)
+                    file_link = file_link.lower().replace(".csv", ".xlsx")
+                else:
+                    df = pd.read_excel(file_url_to_read, header=None, )
+                    break_loop = False
+
+                    for keys in header_row_patterns:  # header skip
+                        if break_loop:
+                            break
+                        header_row_index = None
+                        for index, row in df.iterrows():
+                            if keys in clean_header(row.values, list_of_char_to_repalce):
+                                header_row_index = index
+                                break_loop = True
+                                break
+
+                    df = pd.read_excel(file_url_to_read, header=header_row_index)
+                df.columns = clean_header(df.columns.values, list_of_char_to_repalce)
+                column_list = df.columns.values
+                rename_value = {}
+                for key, value in target_columns.items():
+                    if isinstance(value[0], list):
+                        p1_list = clean_header(value[0], list_of_char_to_repalce)
+                        p2_list = clean_header(value[1], list_of_char_to_repalce)
                     else:
-                        df = pd.read_excel(file_url_to_read,header=None,)
-                        break_loop=False
-
-                        for keys in header_row_patterns:  # header skip
-                            if break_loop:
-                                break
-                            header_row_index = None
-                            for index, row in df.iterrows():
-                                if keys in clean_header(row.values,list_of_char_to_repalce):
-                                    header_row_index = index
-                                    break_loop=True
-                                    break
-
-                        df = pd.read_excel(file_url_to_read , header = header_row_index)
-                    df.columns = clean_header(df.columns.values,list_of_char_to_repalce)
-                    column_list = df.columns.values
-                    rename_value={}
-                    for key,value in target_columns.items():
-                        if isinstance(value[0],list):
-                            p1_list=clean_header(value[0],list_of_char_to_repalce)
-                            p2_list=clean_header(value[1],list_of_char_to_repalce)
-                        else:
-                            p1_list=clean_header(value,list_of_char_to_repalce)
-                            p2_list=[]
-                        i=0
-                        for columns in p1_list:
+                        p1_list = clean_header(value, list_of_char_to_repalce)
+                        p2_list = []
+                    i = 0
+                    for columns in p1_list:
+                        if columns in column_list:
+                            rename_value[columns] = key
+                            i += 1
+                            break
+                    if i == 0 and p2_list is not None:
+                        for columns in p2_list:
                             if columns in column_list:
-                                rename_value[columns]=key
-                                i+=1
+                                rename_value[columns] = key
                                 break
-                        if i==0 and p2_list is not None:
-                            for columns in p2_list:
-                                if columns in column_list:
-                                    rename_value[columns]=key
-                                    break
-                    df = df.rename(columns = rename_value)
-                    if "claim_id" not in df.columns:
-                        log_error('Settlement Advice Staging',file.name,"No Valid data header or file is empty")
-                        update_status('File upload', file.name, 'Error')
-                        frappe.db.commit()
-                        continue
-                    all_columns = list(target_columns.keys())
-                    all_columns.append("final_utr_number")
-                    for every_column in all_columns:
-                        if every_column not in df.columns:
-                            df[every_column] = ""
-                    df = df[all_columns]
-                    df = clean_data(df)
-                    # Amount checking
-                    df = check_advice_amount(df)
-                    split_and_move_to_transform(df,file)
-                    loader = Loader("Settlement Advice Staging")
-                    loader.process()
-                    update_parent_status(file)
-                    chunk.update_status(chunk_doc, "Processed")
-                except Exception as e:
-                    chunk_doc = chunk.create_chunk(args["step_id"])
-                    chunk.update_status(chunk_doc, "Error")
+                df = df.rename(columns=rename_value)
+                if "claim_id" not in df.columns:
+                    log_error('Settlement Advice Staging', file.name, "No Valid data header or file is empty")
                     update_status('File upload', file.name, 'Error')
-                    log_error('Settlement Advice Staging',file.name,e)
+                    status = "Error"
                     frappe.db.commit()
                     continue
-            return "Success"
-        except Exception as e:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Error")
+                all_columns = list(target_columns.keys())
+                all_columns.append("final_utr_number")
+                for every_column in all_columns:
+                    if every_column not in df.columns:
+                        df[every_column] = ""
+                df = df[all_columns]
+                df = clean_data(df)
+                # Amount checking
+                df = check_advice_amount(df)
+                split_and_move_to_transform(df, file)
+                loader = Loader("Settlement Advice Staging")
+                loader.process()
+                update_parent_status(file)
+            except Exception as e:
+                status = "Error"
+                update_status('File upload', file.name, 'Error')
+                log_error('Settlement Advice Staging', file.name, e)
+                frappe.db.commit()
+                continue
+        chunk.update_status(chunk_doc, status)
+        return "Success"
+    except Exception as e:
+        chunk_doc = chunk.create_chunk(args["step_id"])
+        chunk.update_status(chunk_doc, "Error")

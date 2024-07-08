@@ -319,29 +319,30 @@ class Transformer:
                 chunk_doc = chunk.create_chunk(args["step_id"])
                 chunk.update_status(chunk_doc, "Processed")
                 return None
+            chunk_doc = chunk.create_chunk(args["step_id"])
+            chunk.update_status(chunk_doc, "InProgress")
+            status = "Processed"
             for file in files:
-                chunk_doc = chunk.create_chunk(args["step_id"])
-                chunk.update_status(chunk_doc, "InProgress")
                 self.update_status('File upload', file['name'], 'In Process')
                 self.load_source_df(file, self.header)
                 try:
                     if self.source_df.empty:
                         self.log_error(self.document_type, file['name'], 'The File is Empty')
                         self.update_status('File upload', file['name'], 'Error')
-                        chunk.update_status(chunk_doc, "Error")
+                        status = "Error"
                         continue
-                    transformed =self.transform(file)
+                    transformed = self.transform(file)
                     if not transformed:
                         continue
                 except Exception as e:
                     self.log_error(self.document_type, file['name'], e)
                     self.update_status('File upload', file['name'], 'Error')
-                    chunk.update_status(chunk_doc, "Error")
+                    status = "Error"
                     continue
                 loader = Loader(self.document_type)
                 loader.process()
                 self.update_parent(file)
-                chunk.update_status(chunk_doc, "Processed")
+            chunk.update_status(chunk_doc, status)
         except Exception as e:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Error")
