@@ -227,5 +227,8 @@ override_doctype_class = {
 # ]
 
 fixtures = [
-    "Custom Field"
+    "Custom Field",
+    "SA Downloader Configuration",
+    "Data Import Mapping",
+    "Settlement Advice Configuration"
 ]
