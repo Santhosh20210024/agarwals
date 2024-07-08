@@ -27,6 +27,7 @@ from agarwals.reconciliation.step.advice_downloader.provider_ihx_downoader impor
 from agarwals.reconciliation.step.advice_downloader.cmc_nethaji_downloader import CMCNethajiEyeFoundationDownloader
 from agarwals.reconciliation.step.advice_downloader.cholas_downloader import CholasDownloader
 from agarwals.reconciliation.step.advice_downloader.cmc_eyefoundation_downloader import CMCEyeFoundationDownloader
+from agarwals.reconciliation.step.advice_downloader.heritage_downloder import HeritageDownloader
 
 
 def download_advice(tpa_doc, chunk_doc, args):

@@ -58,6 +58,7 @@ class SeleniumDownloader:
         self.date_limit_period = 0
         self.enable_captcha_api = None
         self.folder_path = None
+        self.allow_insecure_file = False
 
 
     def construct_file_url(*args):
@@ -91,6 +92,7 @@ class SeleniumDownloader:
                 self.to_date = configuration_values.to_date if configuration_values.to_date else frappe.utils.now_datetime().date()
                 self.is_date_limit = configuration_values.is_date_limit
                 self.date_limit_period = configuration_values.date_limit_period
+                self.allow_insecure_file = True if configuration_values.allow_insecure_file == 1 else False
             control_panel = frappe.get_doc('Control Panel')
             if control_panel:
                 self.enable_captcha_api = control_panel.enable_captcha_api
@@ -414,6 +416,9 @@ class SeleniumDownloader:
         self.create_fileupload(file_url, self.file_name)
 
     def add_driver_argument(self):
+        self.options.add_argument('--log-level=3')
+        if self.allow_insecure_file == True:
+            self.options.add_argument('--disable-features=InsecureDownloadWarnings')
         if self.is_date_limit == 1:
             self.options.add_experimental_option('detach', True)
         if self.sandbox_mode == False:
@@ -439,6 +444,7 @@ class SeleniumDownloader:
             self._exit()
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
+            print(e)
             chunk.update_status(chunk_doc, "Error")
             self._exit(e)
 
