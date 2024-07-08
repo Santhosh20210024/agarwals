@@ -222,6 +222,7 @@ class SeleniumDownloader:
          except Exception as E:
              self.log_error('Settlement Advice Downloader UI',self.tpa," Status Update Failed ")
 
+
     def update_tpa_reference(self,status):
         try:
             status_query = frappe.db.sql(f"SELECT status FROM `tabSettlement Advice Downloader UI Logins` WHERE name = '{self.child_reference_name}' ",as_dict = True)

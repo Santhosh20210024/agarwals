@@ -91,6 +91,7 @@ class CMCNethajiEyeFoundationDownloader(SeleniumDownloader):
         excel_button.click()
         time.sleep(10)
 
+
     def logout(self):
         self.driver.switch_to.default_content()
         home_tab = self.wait.until(EC.element_to_be_clickable((By.ID, 'a_ppnhome')))

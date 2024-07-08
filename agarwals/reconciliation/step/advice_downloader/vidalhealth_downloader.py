@@ -8,7 +8,8 @@ import time
 class VidalHealthDownloader(SeleniumDownloader):
     def __init__(self):
         SeleniumDownloader.__init__(self)
-        
+
+
     def login(self):
         username =  self.wait.until(EC.visibility_of_element_located((By.ID,'hosUserID')))
         username.send_keys(self.user_name)
