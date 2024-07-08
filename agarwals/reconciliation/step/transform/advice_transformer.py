@@ -73,8 +73,13 @@ class AdviceTransformer(StagingTransformer):
     def get_column_name_to_convert_to_numeric(self):
         return ['settled_amount', 'tds_amount', 'disallowed_amount']
 
+    def convert_to_numeric(self, row):
+        columns = self.get_column_name_to_convert_to_numeric()
+        for column in columns:
+            row[column] = pd.to_numeric(row[column])
+
     def swap_advice_amount(self, row):
-        self.convert_column_to_numeric()
+        self.convert_to_numeric(row)
         if row['settled_amount'] < row['tds_amount']:
             temp = row['settled_amount']
             row['settled_amount'] = row['tds_amount']
@@ -125,6 +130,7 @@ class AdviceTransformer(StagingTransformer):
             self.log_error(self.document_type, file['name'], '"No Valid data header or file is empty')
             self.update_status('File upload', file['name'], 'Error')
             return False
+        self.convert_column_to_numeric()
         self.source_df = self.clean_data(self.source_df)
         self.hashing_job()
         self.load_target_df()
