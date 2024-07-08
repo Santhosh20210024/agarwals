@@ -600,7 +600,7 @@ class BankTransformer(StagingTransformer):
             length = 12
             pattern = numeric
         else:
-             if bank_account == 'BELGAUM - 32628850028 - STATE BANK OF INDIA' :
+            if bank_account == 'BELGAUM - 32628850028 - STATE BANK OF INDIA' :
                 pattern = alphanumeric_pattern
                 utr_20 = self.extract_utr_by_length(reference, 20, delimiters, pattern )
                 return utr_20
