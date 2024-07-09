@@ -57,13 +57,13 @@ class SalesInvoiceCreator:
                                             'custom_index': bill_record.index}
                     for key, value in sales_invoice_params.items():
                         sales_invoice_record.set(key, value)
-                    update_fiscal_year(sales_invoice_record,'Sales Invoice')
                     sales_invoice_record.save()
                     sales_invoice_record.submit()
                     if bill_record.status == 'CANCELLED':
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
+                    update_fiscal_year(sales_invoice_record,'Sales Invoice')
                     
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                         transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
