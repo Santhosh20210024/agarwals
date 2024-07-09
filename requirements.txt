@@ -3,6 +3,7 @@ selenium
 webdriver-manager
 2captcha-python
 openpyxl
-
+beautifulsoup4
+pdfplumber
 
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'
