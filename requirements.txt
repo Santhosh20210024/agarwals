@@ -1,2 +1,8 @@
 pandas
+selenium
+webdriver-manager
+2captcha-python
+openpyxl
+
+
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'
