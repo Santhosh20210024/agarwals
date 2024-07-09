@@ -30,7 +30,10 @@
   "hash",
   "error_code",
   "transform",
-  "index"
+  "index",
+  "is_bot",
+  "file_upload_date",
+  "tpa_user_id"
  ],
  "fields": [
   {
@@ -186,11 +189,31 @@
    "fieldtype": "Int",
    "label": "File Index",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "file_upload.is_bot",
+   "fieldname": "is_bot",
+   "fieldtype": "Check",
+   "label": "Is Bot"
+  },
+  {
+   "fetch_from": "file_upload.date",
+   "fieldname": "file_upload_date",
+   "fieldtype": "Date",
+   "label": "File Upload Date"
+  },
+  {
+   "depends_on": "eval:doc.is_bot == 1",
+   "fetch_from": "file_upload.tpa_login_id",
+   "fieldname": "tpa_user_id",
+   "fieldtype": "Data",
+   "label": "TPA User ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-29 18:18:19.508224",
+ "modified": "2024-07-09 11:25:06.163269",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
