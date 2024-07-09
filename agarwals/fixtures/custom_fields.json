@@ -28,6 +28,95 @@
     "label": "Yearly Due",
     "insert_after": "custom_fiscal_year"
   },
+    {
+    "doctype": "Custom Field",
+    "dt": "Payment Entry",
+    "name": "Payment Entry-custom_file_upload",
+    "fieldname": "custom_file_upload",
+    "fieldtype": "Link",
+    "options": "File upload",
+    "label": "File upload",
+    "insert_after": "custom_disallowed_amount"
+  },
+      {
+    "doctype": "Custom Field",
+    "dt": "Payment Entry",
+    "name": "Payment Entry-custom_transform",
+    "fieldname": "custom_transform",
+    "fieldtype": "Link",
+    "options": "Transform",
+    "label": "Transform",
+    "insert_after": "custom_file_upload"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Payment Entry",
+    "name": "Payment Entry-custom_index",
+    "fieldname": "custom_index",
+    "fieldtype": "Int",
+    "label": "Index",
+    "insert_after": "custom_transform"
+  },
+
+      {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_file_upload",
+    "fieldname": "custom_file_upload",
+    "fieldtype": "Link",
+    "options": "File upload",
+    "label": "File upload",
+    "insert_after": "repost_required"
+  },
+      {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_transform",
+    "fieldname": "custom_transform",
+    "fieldtype": "Link",
+    "options": "Transform",
+    "label": "Transform",
+    "insert_after": "custom_file_upload"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_index",
+    "fieldname": "custom_index",
+    "fieldtype": "Int",
+    "label": "Index",
+    "insert_after": "custom_transform"
+  },
+
+        {
+    "doctype": "Custom Field",
+    "dt": "Bank Transaction",
+    "name": "Bank Transaction-custom_file_upload",
+    "fieldname": "custom_file_upload",
+    "fieldtype": "Link",
+    "options": "File upload",
+    "label": "File upload",
+    "insert_after": "bank_party_iban"
+  },
+      {
+    "doctype": "Custom Field",
+    "dt": "Bank Transaction",
+    "name": "Bank Transaction-custom_transform",
+    "fieldname": "custom_transform",
+    "fieldtype": "Link",
+    "options": "Transform",
+    "label": "Transform",
+    "insert_after": "custom_file_upload"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Bank Transaction",
+    "name": "Bank Transaction-custom_index",
+    "fieldname": "custom_index",
+    "fieldtype": "Int",
+    "label": "Index",
+    "insert_after": "custom_transform"
+  },
 
 
   {
