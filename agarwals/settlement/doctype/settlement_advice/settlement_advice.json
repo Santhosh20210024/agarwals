@@ -46,7 +46,9 @@
   "transform",
   "index",
   "utr_key",
-  "is_bot"
+  "is_bot",
+  "file_upload_date",
+  "tpa_user_id"
  ],
  "fields": [
   {
@@ -283,10 +285,23 @@
    "fieldname": "is_bot",
    "fieldtype": "Check",
    "label": "Is Bot"
+  },
+  {
+   "fetch_from": "file_upload.date",
+   "fieldname": "file_upload_date",
+   "fieldtype": "Date",
+   "label": "File Upload Date"
+  },
+  {
+   "depends_on": "eval:doc.is_bot == 1",
+   "fetch_from": "file_upload.tpa_login_id",
+   "fieldname": "tpa_user_id",
+   "fieldtype": "Data",
+   "label": "TPA User ID"
   }
  ],
  "links": [],
- "modified": "2024-06-28 14:27:43.386724",
+ "modified": "2024-07-09 11:23:38.395246",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
