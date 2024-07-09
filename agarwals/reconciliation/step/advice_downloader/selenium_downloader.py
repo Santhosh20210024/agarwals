@@ -17,9 +17,11 @@ import pandas as pd
 import openpyxl
 import glob
 from io import StringIO
+import random
 
 class SeleniumDownloader:
     def __init__(self):
+        self.format_file_in_parent = True
         self.file_name = ''
         self.user_name = None
         self.password = None
@@ -269,7 +271,15 @@ class SeleniumDownloader:
         self.download_directory = file_path
         self.previous_files_count = len(os.listdir(self.download_directory))
 
-
+    def generate_random_number(self):
+        numbers = []
+        run = True
+        while run == True:
+            random_number = random.randint(1000, 9999)
+            if not random_number in numbers:
+                numbers.append(random_number)
+                run = False
+        return random_number
     def rename_downloaded_file(self, download_directory, file_name,temp_from_date=None,temp_to_date=None):
         from_date = self.from_date if temp_from_date is None else temp_from_date
         to_date = self.to_date if temp_to_date is None else temp_to_date
@@ -280,9 +290,15 @@ class SeleniumDownloader:
             self.convert_file_format(f"{self.download_directory}/{recent_downloaded_file.split('/')[-1]}",
                                      f"{self.download_directory}/{self.tpa}_formated_file.xlsx")
 
-        original_file_name = recent_downloaded_file.split('/')[-1] if self.incoming_file_type == 'Excel' else f"{self.tpa}_formated_file.xlsx"
+        original_file_name = recent_downloaded_file.split('/')[-1] if self.incoming_file_type != 'HTML' else f"{self.tpa}_formated_file.xlsx"
         extension = original_file_name.split(".")[-1]
-        formatted_file_name = file_name + f"{from_date}_{to_date}" + "." + extension if self.from_date is not None else file_name + "." + extension
+        if self.from_date is not None and self.format_file_in_parent == True:
+            formatted_file_name = file_name + f"{from_date}_{to_date}" + "." + extension
+        elif self.from_date is not None and self.format_file_in_parent == False:
+            random_number = self.generate_random_number()
+            formatted_file_name = file_name + f"{from_date}_{to_date}_{random_number}" + "." + extension
+        else:
+            formatted_file_name = file_name + "." + extension
         os.rename(download_directory + '/' + original_file_name, download_directory + '/' + formatted_file_name)
         return formatted_file_name
 
@@ -401,7 +417,8 @@ class SeleniumDownloader:
             self.download_with_date_range()
         else:
             self.download_from_web()
-            self.format_downloaded_file()
+            if self.format_file_in_parent == True:
+                self.format_downloaded_file()
     def format_downloaded_file(self,temp_from_date=None,temp_to_date=None):
         downloaded_files_count = len(os.listdir(self.download_directory))
         if self.previous_files_count == downloaded_files_count:
