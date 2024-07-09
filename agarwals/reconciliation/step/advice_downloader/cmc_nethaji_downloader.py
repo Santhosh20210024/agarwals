@@ -15,6 +15,7 @@ from twocaptcha import TwoCaptcha
 class CMCNethajiEyeFoundationDownloader(SeleniumDownloader):
     def __init__(self):
         SeleniumDownloader.__init__(self)
+        self.extract_first_table = True
 
     def login(self):
         username = self.wait.until(EC.visibility_of_element_located((By.ID, 'txtusername')))
@@ -71,21 +72,33 @@ class CMCNethajiEyeFoundationDownloader(SeleniumDownloader):
         satus_dropdown = self.wait.until(EC.visibility_of_element_located((By.ID, 'statusDDL')))
         select_status = Select(satus_dropdown)
         select_status.select_by_value('8')
+
+
+    def download_from_web(self,temp_from_date=None,temp_to_date=None):
+        formated_from_date = self.from_date.strftime("%d/%m/%Y") if temp_from_date is None else temp_from_date.strftime("%d/%m/%Y")
+        formated_to_date = self.to_date.strftime("%d/%m/%Y") if temp_to_date is None else temp_to_date.strftime("%d/%m/%Y")
         txt_from_date = self.wait.until(EC.visibility_of_element_located((By.ID, 'txtFromDate')))
-        formated_from_date = self.from_date.strftime("%d/%m/%Y")
+        txt_from_date.click()
+        txt_from_date.clear()
         txt_from_date.send_keys(formated_from_date)
         txt_to_date = self.wait.until(EC.visibility_of_element_located((By.ID, 'txtToDate')))
-        formated_to_date = self.to_date.strftime("%d/%m/%Y")
+        txt_to_date.click()
+        txt_to_date.clear()
         txt_to_date.send_keys(formated_to_date)
         generate_mis_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'BTNGenerateMIS')))
         generate_mis_button.click()
-
-    def download_from_web(self):
         excel_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'ExcelImageBtn')))
         excel_button.click()
+        time.sleep(10)
+
+
+    def logout(self):
         self.driver.switch_to.default_content()
         home_tab = self.wait.until(EC.element_to_be_clickable((By.ID, 'a_ppnhome')))
         home_tab.click()
         logout_link = self.wait.until(EC.element_to_be_clickable((By.LINK_TEXT, 'Log-Out')))
         logout_link.click()
-
+    def download_from_web_with_date_range(self,temp_from_date,temp_to_date,logout):
+        self.download_from_web(temp_from_date,temp_to_date)
+        if logout == 1:
+            self.logout()

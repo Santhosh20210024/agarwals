@@ -34,5 +34,5 @@ class StarVitrayaDownloader(SeleniumDownloader):
         time.sleep(10)
         dropdown.find_element(By.XPATH, "//option[. = 'Download Reports']").click()
 
-    def download_from_web_with_date_range(self,temp_from_date,temp_to_date):
+    def download_from_web_with_date_range(self,temp_from_date,temp_to_date,logout):
         self.download_from_web(temp_from_date,temp_to_date)

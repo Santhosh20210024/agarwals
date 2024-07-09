@@ -21,6 +21,7 @@ import random
 
 class SeleniumDownloader:
     def __init__(self):
+        self.extract_first_table = False
         self.format_file_in_parent = True
         self.file_name = ''
         self.user_name = None
@@ -225,6 +226,7 @@ class SeleniumDownloader:
          except Exception as E:
              self.log_error('Settlement Advice Downloader UI',self.tpa," Status Update Failed ")
 
+
     def update_tpa_reference(self,status):
         try:
             status_query = frappe.db.sql(f"SELECT status FROM `tabSettlement Advice Downloader UI Logins` WHERE name = '{self.child_reference_name}' ",as_dict = True)
@@ -255,7 +257,7 @@ class SeleniumDownloader:
     def download_from_web(self):
         return None
 
-    def download_from_web_with_date_range(self,temp_from_date, temp_to_date):
+    def download_from_web_with_date_range(self,temp_from_date, temp_to_date,logout):
         pass
 
     def insert_run_log(self, data):
@@ -384,13 +386,12 @@ class SeleniumDownloader:
         except Exception as e:
             # self.delete_backend_files(original_file)
             self.raise_exception(f"An error occurred while reading the file: {e}")
-        if len(data) == 1:
+        if len(data) == 0 or self.extract_first_table == True:
             data[0].to_excel(formated_file, index=False)
             self.delete_backend_files(original_file)
         else:
             # self.delete_backend_files(original_file)
             self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
-
 
     def download_with_date_range(self):
         run = True
@@ -402,15 +403,13 @@ class SeleniumDownloader:
             if temp_to_date >= self.to_date:
                 if temp_to_date > self.to_date:
                     temp_to_date = self.to_date
-                self.download_from_web_with_date_range(temp_from_date,temp_to_date)
+                self.download_from_web_with_date_range(temp_from_date,temp_to_date,logout=1)
                 self.format_downloaded_file(temp_from_date,temp_to_date)
                 run = False
             else:
-                self.download_from_web_with_date_range(temp_from_date, temp_to_date)
+                self.download_from_web_with_date_range(temp_from_date, temp_to_date,logout=0)
                 self.format_downloaded_file(temp_from_date, temp_to_date)
                 temp_from_date = temp_to_date + timedelta(days=1)
-
-
 
     def _download(self):
         if self.is_date_limit == 1 and self.date_limit_period != 0:
