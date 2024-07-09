@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import frappe
 from agarwals.reconciliation.step.transform.transformer import StagingTransformer
@@ -73,13 +75,11 @@ class AdviceTransformer(StagingTransformer):
     def get_column_name_to_convert_to_numeric(self):
         return ['settled_amount', 'tds_amount', 'disallowed_amount']
 
-    def swap_advice_amount(self, row):
-        self.convert_column_to_numeric()
-        if row['settled_amount'] < row['tds_amount']:
-            temp = row['settled_amount']
-            row['settled_amount'] = row['tds_amount']
-            row['tds_amount'] = temp
-        return row
+    def format_numbers(self, df):
+        columns = self.get_column_name_to_convert_to_numeric()
+        for column in columns:
+            df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.]", "", regex=True)).round(2)
+        return df
 
     def get_columns_to_fill_na_as_0(self):
         return ['settled_amount', 'tds_amount', 'disallowed_amount']
@@ -91,7 +91,7 @@ class AdviceTransformer(StagingTransformer):
         df["claim_id"] = df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '', regex=True).replace(
             "", "0")
         df = self.format_date(df, eval(frappe.get_single('Bank Configuration').date_formats), 'paid_date')
-        df = df.apply(self.swap_advice_amount, axis=1)
+        df = self.format_numbers(df)
         return df
 
     def get_columns_to_hash(self):
@@ -125,6 +125,7 @@ class AdviceTransformer(StagingTransformer):
             self.log_error(self.document_type, file['name'], '"No Valid data header or file is empty')
             self.update_status('File upload', file['name'], 'Error')
             return False
+        self.convert_column_to_numeric()
         self.source_df = self.clean_data(self.source_df)
         self.hashing_job()
         self.load_target_df()
