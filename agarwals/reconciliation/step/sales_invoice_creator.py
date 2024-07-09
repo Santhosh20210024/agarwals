@@ -6,6 +6,7 @@ from agarwals.utils.Matcher_Reference_Cancellator import MatcherReferenceCancell
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.fiscal_year_update import update_fiscal_year
 
 class SalesInvoiceCreator:
     def cancel_sales_invoice(self, cancelled_bills):
@@ -39,7 +40,7 @@ class SalesInvoiceCreator:
     def delete_sales_invoice_reference(self, bill):
         frappe.db.sql(f"DELETE FROM `tabSales Invoice Reference` WHERE parent = '{bill}'")
         
-        
+
     def process(self, bill_numbers, chunk_doc):
         chunk.update_status(chunk_doc, "InProgress")
         try:
@@ -65,12 +66,14 @@ class SalesInvoiceCreator:
                                             'custom_index': bill_record.index}
                     for key, value in sales_invoice_params.items():
                         sales_invoice_record.set(key, value)
+                    update_fiscal_year(sales_invoice_record,'Sales Invoice')
                     sales_invoice_record.save()
                     sales_invoice_record.submit()
                     if bill_record.status == 'CANCELLED':
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
+                    
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                         transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
                                         record=bill_number, index=sales_invoice_record.custom_index)
@@ -94,27 +97,27 @@ class SalesInvoiceCreator:
 @frappe.whitelist()
 def process(args):
     try:
-        args=cast_to_dic(args)
+        args = cast_to_dic(args)
         cancelled_bills = frappe.get_list('Bill', filters={'status': 'CANCELLED', 'invoice_status': 'RAISED'},
                                           pluck='name')
+        cancellation_chunk_doc = chunk.create_chunk(args["step_id"])
         if cancelled_bills:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "InProgress")
+            chunk.update_status(cancellation_chunk_doc, "InProgress")
             try:
                 SalesInvoiceCreator().cancel_sales_invoice(cancelled_bills)
-                chunk.update_status(chunk_doc, "Processed")
+                cancellation_chunk_doc_status = "Processed"
             except Exception as e:
-                chunk.update_status(chunk_doc, "Error")
+                cancellation_chunk_doc_status = "Error"
         else:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
+            cancellation_chunk_doc_status = "Processed"
         new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=','CANCELLED AND DELETED']},pluck = 'name')
         if new_bills:
-            SalesInvoiceCreator().enqueue_jobs(new_bills,args)
+            SalesInvoiceCreator().enqueue_jobs(new_bills, args)
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
+        chunk.update_status(cancellation_chunk_doc, cancellation_chunk_doc_status)
     except Exception as e:
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')
+        log_error(e, 'Step')
