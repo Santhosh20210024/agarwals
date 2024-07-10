@@ -15,8 +15,15 @@ def update_fiscal_year(doc,type):
         yearly_due_doc.parentfield = 'custom_yearly_due'
         yearly_due_doc.idx = 1
         yearly_due_doc.docstatus = 1
-        yearly_due_doc.save()
-        frappe.db.commit()
+        try:
+           yearly_due_doc.save()
+           frappe.db.commit()
+        except Exception as e:
+           error_log = frappe.new_doc('Error Log Record')
+           error_log.doctype_name = type
+           error_log.error_message = str(e)
+           error_log.save()
+           frappe.db.commit()
     
     
     
