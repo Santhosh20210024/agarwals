@@ -51,7 +51,7 @@ class StepProcessor(Processor):
             param = self.replace_placeholders(steps[i])
             frappe.call(steps[i].method + ".process", args = param)
             if steps[i].number_of_workers != 0:
-                worker.add(steps[i].number_of_workers, steps[i].queue)
+                worker.add(steps[i].number_of_workers, param["queue"])
 
     def start(self, name):
         step_doc = frappe.get_doc("Step", name)
