@@ -1,4 +1,5 @@
 import frappe
+from agarwals.agarwals.utils.error_handler import log_error
 
 def update_fiscal_year(doc,type):
         date = None
@@ -19,10 +20,7 @@ def update_fiscal_year(doc,type):
            yearly_due_doc.save()
            frappe.db.commit()
         except Exception as e:
-           error_log = frappe.new_doc('Error Log Record')
-           error_log.doctype_name = type
-           error_log.error_message = str(e)
-           error_log.save()
+           log_error(str(e),type,doc.name)
            frappe.db.commit()
     
     
