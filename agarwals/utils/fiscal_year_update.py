@@ -1,4 +1,5 @@
 import frappe
+from agarwals.agarwals.utils.error_handler import log_error
 
 def update_fiscal_year(doc,type):
         date = None
@@ -15,8 +16,12 @@ def update_fiscal_year(doc,type):
         yearly_due_doc.parentfield = 'custom_yearly_due'
         yearly_due_doc.idx = 1
         yearly_due_doc.docstatus = 1
-        yearly_due_doc.save()
-        frappe.db.commit()
+        try:
+           yearly_due_doc.save()
+           frappe.db.commit()
+        except Exception as e:
+           log_error(str(e),type,doc.name)
+           frappe.db.commit()
     
     
     
