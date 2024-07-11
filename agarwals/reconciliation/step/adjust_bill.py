@@ -1,6 +1,7 @@
 import frappe
 from agarwals.agarwals.doctype import file_records
 from agarwals.reconciliation import chunk
+from datetime import date
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 
@@ -69,12 +70,14 @@ class BillAdjustmentProcess(JournalUtils):
 
         sales_doc = self.fetch_invoice_details(sales_invoice)
         allocated_amount = tds_amount if tds_amount else disallowance_amount
+        created_date = date.today().strftime("%Y-%m-%d")
         sales_doc.append('custom_reference', {'entry_type': 'Journal Entry'
                                               ,'entry_name': je_name
                                               ,'tds_amount': tds_amount
                                               ,'disallowance_amount': disallowance_amount
                                               ,'allocated_amount': allocated_amount
-                                              ,'utr_date': date })
+                                              ,'posting_date': date
+                                              ,'created_date': created_date})
         sales_doc.save()
         frappe.db.commit()
 
@@ -98,8 +101,7 @@ class BillAdjustmentProcess(JournalUtils):
                         je.custom_party = invoice.customer
                         je = self.add_account_entries(je, invoice, 'Debtors - A', 'TDS - A', bill_adjt.tds)
                         self.save_je(je, bill_adjt)
-                        self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name,
-                                                      tds_amount=bill_adjt.tds)
+                        self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name, tds_amount = bill_adjt.tds)
                         valid_tds = True
                 except Exception as e:
                     error_log = frappe.new_doc('Error Record Log')
@@ -122,7 +124,7 @@ class BillAdjustmentProcess(JournalUtils):
                         je = self.add_account_entries(je, invoice, 'Debtors - A', 'Disallowance - A', bill_adjt.disallowance)
                         self.save_je(je, bill_adjt)
                         self.update_invoice_reference(bill_adjt.bill, bill_adjt.posting_date, je.name,
-                                                      disallowance_amount=bill_adjt.disallowance)
+                                                      disallowance_amount = bill_adjt.disallowance)
                         valid_dis = True
                 except Exception as e:
                     error_log = frappe.new_doc('Error Record Log')
