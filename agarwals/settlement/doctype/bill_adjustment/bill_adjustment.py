@@ -3,6 +3,7 @@
 import frappe.utils
 import frappe
 from agarwals.agarwals.doctype import file_records
+from agarwals.utils.accounting_utils import is_accounting_period_exist
 from frappe.model.document import Document
 import datetime
 from datetime import date
@@ -31,7 +32,7 @@ class BillAdjustment(Document):
 			# Posting Date Operation
 			if sales_doc:
 				if sales_doc.status == 'Unpaid':
-					if sales_doc.posting_date < datetime.date(2024,4,1):
+					if is_accounting_period_exist(sales_doc.posting_date.strftime("%Y-%m-%d")):
 						self.posting_date = date.today().strftime("%Y-%m-%d")
 						return
 					else:
@@ -40,7 +41,7 @@ class BillAdjustment(Document):
 
 				if sales_doc.status == 'Partly Paid':
 					payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation desc")
-					if payment_reference[0].posting_date < datetime.date(2024,4,1):
+					if is_accounting_period_exist(payment_reference[0].posting_date.strftime("%Y-%m-%d")):
 						self.posting_date = date.today().strftime("%Y-%m-%d")
 						return
 					else:
