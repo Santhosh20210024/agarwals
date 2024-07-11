@@ -18,7 +18,8 @@
   "created_date",
   "bank_region",
   "bank_entity",
-  "bank_account_number"
+  "bank_account_number",
+  "posting_date"
  ],
  "fields": [
   {
@@ -94,7 +95,12 @@
    "fieldtype": "Link",
    "label": "Bank Account Number",
    "options": "Bank Account"
-  }
+  },
+  {
+    "fieldname": "posting_date",
+    "fieldtype": "Date",
+    "label": "Posting Date"
+   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
