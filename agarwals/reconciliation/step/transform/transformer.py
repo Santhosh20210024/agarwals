@@ -612,7 +612,7 @@ class BankTransformer(StagingTransformer):
     def extract_utr_from_narration(self, configuration,bank_account):
         self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),bank_account,eval(configuration.delimiters)), axis = 1)
 
-    def reference_utrnumber_change(self,source_ref):
+    def validate_reference(self,source_ref):# chnage the unvalid reference number as 0
         source_ref['reference_number'] = source_ref.apply(lambda row: 0 if str(row['reference_number']).isalpha() else row['reference_number'], axis=1)
         return source_ref
 
@@ -652,7 +652,7 @@ class BankTransformer(StagingTransformer):
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
         self.source_df = self.fill_na_as_0(self.source_df)
-        self.source_df = self.reference_utrnumber_change(self.source_df)
+        self.source_df = self.validate_reference(self.source_df)
         self.new_records = self.source_df
         self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
