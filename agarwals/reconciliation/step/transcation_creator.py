@@ -75,7 +75,6 @@ def create_bank_transaction(transaction_list):
     for transaction in transaction_list:
         trans_doc = frappe.get_doc('Bank Transaction Staging', transaction.name)
         try:
-            # Layer level date (throws)
             if transaction.get('date') == None:
                 trans_doc.staging_status = 'Error'
                 trans_doc.error = ERROR_LOG['E101']
@@ -138,6 +137,7 @@ def create_bank_transaction(transaction_list):
                 check_warning(trans_doc, transaction, bnk_trans_ref)
                 trans_doc.save()
                 frappe.db.commit()
+
         except Exception as e:
             trans_doc = frappe.get_doc('Bank Transaction Staging', transaction['name'] )
             trace_info = str(traceback.format_exc()).split(':')[-1]
@@ -182,6 +182,7 @@ def bank_transaction_process(tag, args):
         # also Check if there is any change in the processed entrys retry
         for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'staging_status' : ['=', 'Processed'], 'update_reference_number' : ['!=', None], 'retry': 1}):
             pending_transaction.append(transaction)
+        
         if pending_transaction:
             for i in range(0, len(pending_transaction), int(args["chunk_size"])):
                 chunk_doc = chunk.create_chunk(args["step_id"])
@@ -195,7 +196,6 @@ def bank_transaction_process(tag, args):
         log_error(e,'Step')
         
 def change_matched_items(ref_no):
-    # Payment Entry # Need to check
     for item in frappe.get_list('Payment Entry', filters = {'reference_no':ref_no, 'status':['!=', 'Cancelled']}):
         pe_doc = frappe.get_doc('Payment Entry', item['name'])
         frappe.db.sql("""

@@ -3,30 +3,50 @@
 import frappe.utils
 import frappe
 from agarwals.agarwals.doctype import file_records
+from agarwals.utils.accounting_utils import is_accounting_period_exist
 from frappe.model.document import Document
 import datetime
+from datetime import date
 
 class BillAdjustment(Document):
 	def before_save(self):
-		if not self.posting_date:
-			if self.name:
-				sales_doc = frappe.get_doc('Sales Invoice', self.name)
-				if sales_doc.posting_date < datetime.date(2023,4,1):
-					if sales_doc.status == 'Paid' or sales_doc.status == 'Partly Paid':
-						payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation asc")
-						self.posting_date = payment_reference[0]['posting_date'].strftime("%Y/%m/%d")
+		if self.name:
+			sales_doc = frappe.get_doc("Sales Invoice", self.name)
+
+			# Invoice Status Operation
+			if sales_doc.status == 'Paid':
+				self.status = 'Error'
+				self.error_remark = 'Paid Bill'
+				return
+
+			if self.tds > sales_doc.total:
+				self.status = 'Error'
+				self.error_remark = 'TDS amount is greater than the claim amount'
+				return
+
+			if self.disallowance > sales_doc.total:
+				self.status = 'Error'
+				self.error_remark = 'Disallowance amount is greater than the claim amount'
+				return
+
+			# Posting Date Operation
+			if sales_doc:
+				if sales_doc.status == 'Unpaid':
+					if is_accounting_period_exist(sales_doc.posting_date.strftime("%Y-%m-%d")):
+						self.posting_date = date.today().strftime("%Y-%m-%d")
+						return
 					else:
-						self.posting_date = sales_doc.posting_date #else bill date
-				else:
-					if sales_doc.status == 'Unpaid':
-						self.status = 'Error'
-						self.error_remark = 'Unpaid Bill'
-					elif sales_doc.status == 'Paid':
-						self.status = 'Error'
-						self.error_remark = 'Paid Bill'
-					if sales_doc.status == 'Partly Paid':
-						payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation asc")
-						self.posting_date = payment_reference[0]['posting_date'].strftime("%Y/%m/%d")
+						self.posting_date = sales_doc.posting_date.strftime("%Y/%m/%d")
+						return
+
+				if sales_doc.status == 'Partly Paid':
+					payment_reference = frappe.db.get_list('Payment Entry',filters={'custom_sales_invoice': self.name},fields=['posting_date'], order_by="creation desc")
+					if is_accounting_period_exist(payment_reference[0].posting_date.strftime("%Y-%m-%d")):
+						self.posting_date = date.today().strftime("%Y-%m-%d")
+						return
+					else:
+						self.posting_date = payment_reference[0].posting_date.strftime("%Y/%m/%d")
+						return
 
 	def on_update(self):
 		file_records.create(file_upload=self.file_upload, transform=self.transform, reference_doc="Bill Adjustment",
