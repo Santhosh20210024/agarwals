@@ -1,5 +1,5 @@
 import frappe
-from agarwals.agarwals.utils.error_handler import log_error
+from agarwals.utils.error_handler import log_error
 
 def update_fiscal_year(doc,type):
         date = None
