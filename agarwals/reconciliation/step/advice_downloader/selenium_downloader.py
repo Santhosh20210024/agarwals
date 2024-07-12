@@ -109,8 +109,6 @@ class SeleniumDownloader:
 
     def get_captcha_value(self,captcha_type=None,sitekey=None):
         try:
-
-
             if self.enable_captcha_api == 0:
                 captcha = ''
                 end_time = time.time() + self.max_wait_time
@@ -124,7 +122,6 @@ class SeleniumDownloader:
                 return captcha if captcha !='' else None
 
             elif self.enable_captcha_api == 1:
-
                 #api method
                 control_panel = frappe.get_doc('Control Panel')
                 api_key =control_panel.captcha_api_key
@@ -261,12 +258,13 @@ class SeleniumDownloader:
         pass
 
     def insert_run_log(self, data):
-        doc=frappe.get_doc(data).insert(ignore_permissions=True)
+        frappe.get_doc(data).insert(ignore_permissions=True)
         frappe.db.commit()
         return None
 
     def create_download_directory(self):
-        self.file_name = f"{self.credential_doc.name}"
+        suffix =  f"{self.credential_doc.tpa}-{self.credential_doc.branch_code if self.credential_doc.branch_code else ''}-".replace(' ','').lower()
+        self.file_name = f"{self.credential_doc.user_name}-{suffix}"
         self.folder_path = self.files_path + "Settlement Advice/" + f"{self.credential_doc.tpa}/"
         file_path =self.folder_path + self.file_name
         os.mkdir(file_path)
@@ -314,17 +312,6 @@ class SeleniumDownloader:
         if os.path.exists(file_path):
             os.remove(file_path)
 
-    def create_file_record(self, file_name):
-        file = frappe.new_doc("File")
-        file.folder = self.construct_file_url(self.HOME_PATH,self.SUB_DIR[0])
-        file.is_private = 1
-        file.file_url = "/" + self.construct_file_url(self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name)
-        file.save(ignore_permissions=True)
-        self.delete_backend_files(
-            file_path=self.construct_file_url(self.SITE_PATH, self.SHELL_PATH, self.PROJECT_FOLDER, self.SUB_DIR[0], file_name))
-        file_url = "/" + self.construct_file_url(self.SHELL_PATH, file_name)
-        frappe.db.commit()
-        return file_url
 
     def log_error(self,doctype_name, reference_name, error_message):
         error_log = frappe.new_doc('Error Record Log')
@@ -336,17 +323,6 @@ class SeleniumDownloader:
             self.insert_run_log({"doctype": "SA Downloader Run Log","last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
             frappe.db.commit()
 
-    # May Needed in future
-    # def create_fileupload(self,file_url,file_name):
-    #     file_upload_doc=frappe.new_doc("File upload")
-    #     file_upload_doc.document_type="Settlement Advice"
-    #     file_upload_doc.payer_type=self.credential_doc.tpa
-    #     file_upload_doc.upload=file_url
-    #     file_upload_doc.is_bot = 1
-    #     file_upload_doc.file_format = 'EXCEL'
-    #     file_upload_doc.save(ignore_permissions=True)
-    #     self.insert_run_log({"last_executed_time":self.last_executed_time,"document_reference":"File upload","reference_name":file_upload_doc.name,"status":"Processed"})
-    #     frappe.db.commit()
 
     def raise_exception(self,exception):
         raise Exception(exception)
@@ -355,26 +331,24 @@ class SeleniumDownloader:
         if self.download_directory:
             self.delete_folder(self.download_directory)
             self.download_directory = None
-
         if self.driver:
             self.driver.quit()
         if e:
             self.log_error('TPA Login Credentials', self.user_name, e)
+            self.update_doc_status('Error')
         else:
+            self.update_doc_status('Valid')
             self.insert_run_log(
                 {"doctype": "SA Downloader Run Log","last_executed_time": self.last_executed_time, "document_reference": "TPA Login Credentials",
                  "reference_name": self.credential_doc.name, "status": "Processed","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
         if self.is_captcha == True:
             if e:
                 self.update_tpa_reference('Error')
+                self.update_doc_status('Error')
             else:
                 self.update_tpa_reference('Completed')
             self.delete_captcha_images()
             self.update_settlement_advice_downloader_status()
-        self.exit()
-
-    def exit(self):
-        pass
 
     def convert_file_format(self,original_file,formated_file):
         #HTML
@@ -386,7 +360,7 @@ class SeleniumDownloader:
         except Exception as e:
             # self.delete_backend_files(original_file)
             self.raise_exception(f"An error occurred while reading the file: {e}")
-        if len(data) == 0 or self.extract_first_table == True:
+        if len(data) == 1 or self.extract_first_table == True:
             data[0].to_excel(formated_file, index=False)
             self.delete_backend_files(original_file)
         else:
@@ -425,12 +399,6 @@ class SeleniumDownloader:
         else:
             self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,temp_from_date,temp_to_date)
             self.move_file(self.download_directory,self.formatted_file_name)
-    def _move_to_extract(self):
-        self.move_file_to_extract(self.download_directory,formatted_file_name=self.formatted_file_name)
-        self.delete_folder(self.download_directory)
-        self.download_directory = None
-        file_url = self.create_file_record(self.formatted_file_name)
-        self.create_fileupload(file_url, self.file_name)
 
     def add_driver_argument(self):
         self.options.add_argument('--log-level=3')
@@ -450,6 +418,11 @@ class SeleniumDownloader:
             for path in extension_path:
                 self.options.add_argument(f'--load-extension={path}')
 
+    def update_doc_status(self,status):
+        doc = frappe.get_doc("TPA Login Credentials", self.credential_doc.name)
+        doc.status = status
+        doc.save()
+
     def download(self, tpa_doc, chunk_doc=None, child=None, parent=None):
         try:
             chunk.update_status(chunk_doc, "InProgress")
@@ -461,7 +434,6 @@ class SeleniumDownloader:
             self._exit()
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
-            print(e)
             chunk.update_status(chunk_doc, "Error")
             self._exit(e)
 
@@ -476,7 +448,5 @@ class SeleniumDownloader:
         self.driver = webdriver.Chrome(options=self.options)
         self.wait = WebDriverWait(self.driver,  45)
 
-    def init(self):
-        pass
 
 
