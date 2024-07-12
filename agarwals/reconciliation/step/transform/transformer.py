@@ -147,7 +147,7 @@ class Transformer:
         if prune:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
-            self.format_utr(self.utr_column_name)
+           df = self.format_utr(df ,self.utr_column_name)
         transform = self.create_transform_record(file['name'])
         df["file_upload"] = file['name']
         df["transform"] = transform.name
@@ -219,8 +219,8 @@ class Transformer:
             return item.replace("XX", '')
         return item
 
-    def format_utr(self, utr_column):
-        utr_list = self.source_df[utr_column].fillna(0).to_list()
+    def format_utr(self,df,utr_column):
+        utr_list = df[utr_column].fillna(0).to_list()
         new_utr_list = []
         for item in utr_list:
             item = str(item).replace('UIIC_', 'CITIN')
@@ -243,7 +243,8 @@ class Transformer:
                 new_utr_list.append(self.remove_x_in_UTR(item[-1]))
             else:
                 new_utr_list.append(self.remove_x_in_UTR(item))
-        self.source_df['final_utr_number'] = new_utr_list
+        df['final_utr_number'] = new_utr_list
+        return df
 
     def transform(self, file):
         return None
