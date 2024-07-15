@@ -147,7 +147,7 @@ class Transformer:
         if prune:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
-            self.format_utr(self.utr_column_name)
+           df = self.format_utr(df ,self.utr_column_name)
         transform = self.create_transform_record(file['name'])
         df["file_upload"] = file['name']
         df["transform"] = transform.name
@@ -219,8 +219,8 @@ class Transformer:
             return item.replace("XX", '')
         return item
 
-    def format_utr(self, utr_column):
-        utr_list = self.source_df[utr_column].fillna(0).to_list()
+    def format_utr(self,df,utr_column):
+        utr_list = df[utr_column].fillna(0).to_list()
         new_utr_list = []
         for item in utr_list:
             item = str(item).replace('UIIC_', 'CITIN')
@@ -243,7 +243,8 @@ class Transformer:
                 new_utr_list.append(self.remove_x_in_UTR(item[-1]))
             else:
                 new_utr_list.append(self.remove_x_in_UTR(item))
-        self.source_df['final_utr_number'] = new_utr_list
+        df['final_utr_number'] = new_utr_list
+        return df
 
     def transform(self, file):
         return None
@@ -612,6 +613,10 @@ class BankTransformer(StagingTransformer):
     def extract_utr_from_narration(self, configuration,bank_account):
         self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),bank_account,eval(configuration.delimiters)), axis = 1)
 
+    def validate_reference(self,source_ref):# chnage the unvalid reference number as 0
+        source_ref['reference_number'] = source_ref.apply(lambda row: 0 if str(row['reference_number']).isalpha() else row['reference_number'], axis=1)
+        return source_ref
+
     def add_source_and_bank_account_column(self, source, bank_account):
         self.source_df['source'] = source
         self.source_df['bank_account'] = bank_account
@@ -648,6 +653,7 @@ class BankTransformer(StagingTransformer):
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
         self.source_df = self.fill_na_as_0(self.source_df)
+        self.source_df = self.validate_reference(self.source_df)
         self.new_records = self.source_df
         self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True

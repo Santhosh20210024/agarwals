@@ -2,6 +2,7 @@ import frappe
 from agarwals.agarwals.doctype import file_records
 from agarwals.utils.payment_entry_cancellator import PaymentEntryCancellator
 from agarwals.utils.journal_entry_cancellator import JournalEntryCancellator
+from agarwals.utils.Matcher_Reference_Cancellator import MatcherReferenceCancellator
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
@@ -17,20 +18,28 @@ class SalesInvoiceCreator:
                 sales_invoice_record.custom_transform = bill_record.transform
                 sales_invoice_record.custom_index = bill_record.index
                 sales_invoice_record.save(ignore_permissions=True)
+                journal_entry_doc = frappe.get_all('Journal Entry Account', filters={'reference_name': bill, 'reference_type':'Sales Invoice'}, pluck = 'parent')
                 sales_invoice_record.cancel()
                 PaymentEntryCancellator().cancel_payment_entry(bill)
-                JournalEntryCancellator().cancel_journal_entry(bill)
+                if journal_entry_doc:
+                    JournalEntryCancellator().cancel_journal_entry(journal_entry_doc)
+                MatcherReferenceCancellator().delete_matcher_reference(bill)
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
+                self.delete_sales_invoice_reference(bill)
                 frappe.db.commit()
-                file_records.create(file_upload=sales_invoice_record.file_upload,
-                                    transform=sales_invoice_record.transform, reference_doc=sales_invoice_record.doctype,
-                                    record=bill, index=sales_invoice_record.index)
+                file_records.create(file_upload=sales_invoice_record.custom_file_upload,
+                                    transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
+                                    record=bill, index=sales_invoice_record.custom_index)
             except Exception as e:
                 error_log = frappe.new_doc('Error Record Log')
                 error_log.set('doctype_name', 'Bill')
                 error_log.set('reference_name', bill)
                 error_log.set('error_message', e)
                 error_log.save()
+
+    def delete_sales_invoice_reference(self, bill):
+        frappe.db.sql(f"DELETE FROM `tabSales Invoice Reference` WHERE parent = '{bill}'")
+        
 
     def process(self, bill_numbers, chunk_doc):
         chunk.update_status(chunk_doc, "InProgress")

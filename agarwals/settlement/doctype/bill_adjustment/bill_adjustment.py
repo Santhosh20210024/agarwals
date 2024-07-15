@@ -27,9 +27,17 @@ class BillAdjustment(Document):
 			self._set_posting_date(sales_doc)
 
 	def _handle_invoice_status(self, sales_doc):
+		"""
+		Method to handle the invoice status
+		"""
 		if sales_doc.status == 'Paid':
 			self.status = 'Error'
 			self.error_remark = 'Paid Bill'
+			return
+
+		if sales_doc.status == 'Cancelled':
+			self.status = 'Error'
+			self.error_remark = 'Cancelled Bill'
 			return
 
 	def _validate_amount(self, sales_doc):
@@ -79,3 +87,4 @@ class BillAdjustment(Document):
 			record=self.name,
 			index=self.index
 		)
+
