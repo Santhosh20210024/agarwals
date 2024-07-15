@@ -11,6 +11,7 @@ class FHPLDownloader(SeleniumDownloader):
     def __init__(self):
         SeleniumDownloader.__init__(self)
 
+
     def login(self):
         self.wait.until(EC.presence_of_element_located((By.ID, 'ContentPlaceHolder1_txtUserName'))).send_keys(
             self.user_name)
@@ -20,13 +21,24 @@ class FHPLDownloader(SeleniumDownloader):
         time.sleep(5)
 
     def navigate(self):
-        self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_txtDateFrom'))).send_keys(
-            self.from_date.strftime("%m/%d/%Y"))
-        self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_txtDateTo'))).send_keys(
-            self.to_date.strftime("%m/%d/%Y"))
-        self.wait.until(EC.visibility_of_element_located((By.NAME, 'ctl00$ContentPlaceHolder1$btnSearch'))).click()
-        time.sleep(2)
+        return
 
-    def download_from_web(self):
+
+    def download_from_web(self,temp_from_date=None,temp_to_date=None):
+        from_date = self.from_date if temp_from_date is None else temp_from_date
+        to_date = self.to_date if temp_to_date is None else temp_to_date
+        from_date_element = self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_txtDateFrom')))
+        from_date_element.click()
+        from_date_element.clear()
+        from_date_element.send_keys(from_date.strftime("%m/%d/%Y"))
+        to_date_element = self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_txtDateTo')))
+        to_date_element.click()
+        to_date_element.clear()
+        to_date_element.send_keys(to_date.strftime("%m/%d/%Y"))
+        self.wait.until(EC.visibility_of_element_located((By.NAME, 'ctl00$ContentPlaceHolder1$btnSearch'))).click()
+        time.sleep(5)
         self.wait.until(EC.visibility_of_element_located((By.ID, 'ContentPlaceHolder1_btnPortToExcel'))).click()
         time.sleep(10)
+
+    def download_from_web_with_date_range(self,temp_from_date,temp_to_date,logout):
+        self.download_from_web(temp_from_date,temp_to_date)
