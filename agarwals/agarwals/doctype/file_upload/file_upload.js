@@ -1,4 +1,6 @@
 var set_css = function () {
+  document.querySelectorAll("[data-fieldname='download_template']")[1].style.backgroundColor = "#2490EF";
+  document.querySelectorAll("[data-fieldname='download_template']")[1].style.color = "white";
   document.querySelectorAll("[data-fieldname='upload']")[1].style.backgroundColor = "#2490EF";
   document.querySelectorAll("[data-fieldname='upload']")[1].style.color = "white";
   document.querySelectorAll("[data-action='delete_rows']")[0].style.display = "None";
@@ -196,3 +198,60 @@ function update_payer(frm) {
     }
   }
 }
+
+frappe.ui.form.on('File upload', {
+    download_template: function(frm) {
+      let template_name = null;
+      let template_doctype = null;
+
+      switch (frm.doc.document_type) {
+        case 'Debtors Report':
+          template_name = 'Bill';
+          break;
+        case 'Claim Book':
+          template_name = 'ClaimBook';
+          break;
+        case 'Settlement Advice':
+          template_doctype = 'Customer';
+          template_name = frm.doc.payer_type;
+          break;
+        case 'Bank Statement':
+          template_name = 'Bank Transaction'
+          break;
+        case 'Bill Adjustment':
+          template_name = 'Bill Adjustment';
+          break;
+        case 'Write Back':
+          template_name = 'Write Back';
+          break;
+        case 'Write Off':
+          template_name = 'Write Off';
+          break;
+        case 'Bank Statement Bulk':
+          template_name = 'Bank Transaction';
+          break;
+        default:
+          template_name = null;
+          template_doctype = null
+          break;
+      }
+      if(template_name === null){
+        frappe.msgprint('Template Not Available')
+      }
+      else{
+      frappe.call({
+          method: 'agarwals.utils.file_util.is_template_exist',
+          args: {
+            attached_to_name: template_name,
+            attached_to_doctype: template_doctype
+          },
+          callback: function (r) {
+            if(r.message === 'Not Found' || r.message === 'System Error'){
+              frappe.msgprint('Message: Template Not Available')
+            }
+            else{
+              window.open(r.message)
+            }
+      }})
+    }}}
+)

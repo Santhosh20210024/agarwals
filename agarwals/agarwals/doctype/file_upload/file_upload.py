@@ -4,13 +4,14 @@ import zipfile
 import os
 from frappe.model.document import Document
 import re
-from agarwals.utils.file_util import construct_file_url, HOME_PATH, SITE_PATH, SHELL_PATH, SUB_DIR, PROJECT_FOLDER
-
+from agarwals.utils.file_util import construct_file_url, HOME_PATH, SITE_PATH, SHELL_PATH, SUB_DIR, PROJECT_FOLDER, is_template_exist
+import pandas as pd
 
 class Fileupload(Document):
 
 	extract_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]) 
-	zip_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[-1]) 
+	zip_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[-1])
+	field_pattern = r'-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.\w+'
 
 	def add_log_error(self, doctype, error):  # To add error log 
 		error_log = frappe.new_doc('Error Record Log')
@@ -18,10 +19,26 @@ class Fileupload(Document):
 		error_log.set('error', error)
 		error_log.save()
 
-	def extract_tpalogin_id(self, input_string, replacement):
-		pattern = r'-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.\w+'
-		result = re.sub(pattern, replacement, input_string)
-		return result
+	def extract_tpa_id(self, input_string):
+		# Remove the pattern from the input string
+		result = re.sub(self.field_pattern, '', input_string)
+		if result:
+			# Split by '-' and append payer_type to the first part
+			result = result.split('-')[0] + '-' + self.payer_type
+			return result
+		return None
+
+	def extract_tpa_branch(self, input_string):
+		# Remove the pattern from the input string
+		result = re.sub(self.field_pattern, '', input_string)
+		if result:
+			# Split by '-' and take the last part, then strip whitespace
+			result = result.split('-')[-1].strip()
+			if result:
+				return result.upper()
+			else:
+				return None
+		return None
 
 	def get_fpath_fdir(self): # Used while Zip Processing
 		fname = self.upload.split('/')[-1]
@@ -113,7 +130,9 @@ class Fileupload(Document):
 		fname, fid = self.get_fdoc_meta()
 		
 		if fid:
-			self.validate_file_format(fname, fid) 
+			self.validate_file_format(fname, fid)
+			self.validate_file_content()
+			self.validate_file_header()
 			self.validate_file_hash(fname, fid)
 
 	def update_fdoc_upload(self, fid, furl, fname): 
@@ -123,7 +142,8 @@ class Fileupload(Document):
 			self.set("file", fname)
 			self.set("is_uploaded", 1)
 			if self.is_bot == 1 and self.file_format == 'EXCEL' and self.document_type == 'Settlement Advice':
-				self.tpa_login_id = self.extract_tpalogin_id(fname,'')
+				self.tpa_login_id = self.extract_tpa_id(fname)
+				self.tpa_branch = self.extract_tpa_branch(fname)
 
 		except Exception as e:
 			self.add_log_error('File upload', str(e))
@@ -186,7 +206,70 @@ class Fileupload(Document):
 			self.del_file_record(fid, fname, str(e))
 
 		self.update_fdoc_upload(fid, fdoc.file_url, fname)
-							
+
+	def validate_file_content(self):
+		try:
+			df = None
+			if self.upload.endswith('.xls') or self.upload.endswith('.xlsx'):
+				df = pd.read_excel(SITE_PATH + self.upload)
+			elif self.upload.endswith('.csv'):
+				df = pd.read_csv(SITE_PATH + self.upload)
+			if df.shape[0] == 0:
+				self.add_log_error('File upload', 'The file contains only the header or is empty')
+				frappe.throw('File contains only header or is empty')
+				return
+
+		except Exception as e:
+			self.add_log_error('File upload', f"An error occurred while checking the file: {e}")
+
+	def read_file(self, file):
+		if os.path.exists(file):
+			if file.endswith('.xls') or file.endswith('.xlsx'):
+				return pd.read_excel(SITE_PATH + file)
+			elif file.endswith('.csv'):
+				return pd.read_csv(SITE_PATH + file)
+			else:
+				return None
+		else:
+			return None
+
+	def get_template_details(self):
+		attached_name = None
+		attached_doctype = None
+
+		match self.document_type:
+			case 'Debtors Report':
+				attached_name = 'Bill'
+			case 'Claim Book':
+				attached_name = 'ClaimBook'
+			case 'Settlement Advice':
+				attached_doctype = 'Customer'
+				attached_name = self.payer_type
+			case 'Bank Statement Bulk':
+				attached_name = 'Bank Transaction'
+			case 'Bill Adjustment':
+				attached_name = 'Bill Adjustment'
+			case 'Write Back':
+				attached_name = 'Write Back'
+			case 'Write Off':
+				attached_name = 'Write Off'
+			case _:
+				attached_name = None
+
+		return attached_name, attached_doctype
+
+	def compare_header(self, template_data, upload_data):
+		pass
+
+	def validate_file_header(self):
+		if self.upload:
+			attached_name, attached_doctype = self.get_template_details()
+			template_data = self.read_file(SITE_PATH + is_template_exist(attached_name, attached_doctype))
+			if template_data:
+				upload_data = self.read_file(self.upload)
+				if upload_data:
+					self.compare_header(template_data, upload_data)
+
 	def validate(self): 
 
 		# God Level Validation
@@ -289,7 +372,6 @@ class Fileupload(Document):
 	def unzip_files(self):
 		try:
 			fpath, fdir = self.get_fpath_fdir()
-
 			if os.path.exists(fpath):
 				with zipfile.ZipFile(fpath) as _zip:
 					zip_list = _zip.namelist()
@@ -319,9 +401,7 @@ class Fileupload(Document):
 
 # ----------------- RQ JOB : (Utils) -------------------
 def extract_zip_files(fid, ffield = None):
-
 	frappe.set_value('File upload', fid, 'zip_status', 'Extracting')
-
 	fdoc = frappe.get_doc('File upload', fid)
 	fdoc.load_files(ffield)
 	frappe.db.commit()
@@ -337,10 +417,8 @@ def run_extractor(fid, ffield):
 
 	if not ffield.strip(): ffield = None
 	frappe.enqueue(extract_zip_files, job_name="ZipFileExtracting",  queue='long', is_async=True, timeout=18000, fid = fid, ffield = ffield)
-	# extract_zip_files(fid = fid,ffield = ffield)
 
 def zip_operation(fid):
-
 	def get_child_entries(cdoc, fid):
 		return frappe.get_list(cdoc, filters={'parent': fid}, pluck = 'name')
 	
@@ -400,8 +478,7 @@ def process_zip_entires(fid):
 	if fdoc.zip_status == 'Processed':
 		frappe.throw('Already Processed !')
 		return
-	
-	# Validation for avoiding the missing payer name and bank account while mapping
+
 	if fdoc.document_type == 'Settlement Advice':
 		if len(frappe.get_list('Settlement Advice Mapping', filters= {'parent': fid, 'payer_name':['=', '']})) > 0:
 			frappe.throw("Please select payer for all the mapping records")
