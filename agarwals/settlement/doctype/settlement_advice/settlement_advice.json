@@ -48,7 +48,8 @@
   "utr_key",
   "is_bot",
   "file_upload_date",
-  "tpa_user_id"
+  "tpa_user_id",
+  "tpa_branch"
  ],
  "fields": [
   {
@@ -298,10 +299,17 @@
    "fieldname": "tpa_user_id",
    "fieldtype": "Data",
    "label": "TPA User ID"
+  },
+  {
+   "fetch_from": "file_upload.tpa_branch",
+   "fieldname": "tpa_branch",
+   "fieldtype": "Data",
+   "label": "TPA Branch",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2024-07-09 11:23:38.395246",
+ "modified": "2024-07-15 11:19:01.900088",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
