@@ -147,7 +147,7 @@
   {
     "doctype": "SA Downloader Configuration",
     "name": "CarehealthDownloader",
-    "website_url": "https://cashless.cholainsurance.com",
+    "website_url": "https://healthconnect.careinsurance.com",
     "class_name": "CarehealthDownloader",
     "incoming_file_type": "Excel",
     "is_headless":1
@@ -163,7 +163,7 @@
   {
     "doctype": "SA Downloader Configuration",
     "name": "MDIndiaDownloader",
-    "website_url": "https://provider.ihx.in/#/",
+    "website_url": "https://eclaim.mdindia.com:94/",
     "class_name": "MDIndiaDownloader",
     "incoming_file_type": "HTML",
     "is_headless":1
@@ -237,7 +237,7 @@
     "name": "ProviderIhxDownloader",
     "website_url": "https://provider.ihx.in/",
     "class_name": "ProviderIhxDownloader",
-    "incoming_file_type": "HTML",
+    "incoming_file_type": "Excel",
     "is_headless":1
   },
   {
