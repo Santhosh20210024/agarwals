@@ -49,9 +49,10 @@ def create_bank_trans_doc(transaction, update_reference_number = None):
     bank_trans_doc.custom_file_upload = transaction.get('file_upload')
     bank_trans_doc.custom_transform = transaction.get('transform')
     bank_trans_doc.custom_index = transaction.get('index')
+    update_fiscal_year(bank_trans_doc,'Bank Transaction')
     bank_trans_doc.submit()
     frappe.db.commit()
-    update_fiscal_year(bank_trans_doc,'Bank Transaction')
+    
     file_records.create(file_upload=bank_trans_doc.custom_file_upload,
                         transform=bank_trans_doc.custom_transform, reference_doc=bank_trans_doc.doctype,
                         record=bank_trans_doc.name, index=bank_trans_doc.custom_index)
