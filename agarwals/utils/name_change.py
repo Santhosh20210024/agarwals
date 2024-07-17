@@ -1,8 +1,7 @@
 import frappe
 
-def test():
+def test(all_jv):
     try:
-        all_jv = frappe.get_all("Journal Entry", {"name": ["like", "%JV%"]}, "*")
         for jv in all_jv:
             jv_account_list = frappe.get_all("Journal Entry Account", filters={"parent": jv.name}, fields="*")
             for jv_account in jv_account_list:
@@ -31,6 +30,7 @@ def test():
 
 @frappe.whitelist()
 def check_doc():
+    # frappe.rename_doc("Journal Entry", "KKBK220974774271-WB", "Test-WB")
     all_jv = frappe.get_all("Journal Entry", {"name": ["like", "%JV%"]}, "*")
     for i in range(0, len(all_jv), 100):
-        frappe.enqueue("test", queue="long", all_jv=all_jv[i:i + 100])
+        frappe.enqueue(test, queue="long", all_jv=all_jv[i:i + 100])
