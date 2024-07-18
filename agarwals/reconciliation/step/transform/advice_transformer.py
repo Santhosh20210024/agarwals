@@ -87,6 +87,7 @@ class AdviceTransformer(StagingTransformer):
         df = self.format_date(df, eval(frappe.get_single('Bank Configuration').date_formats), 'paid_date')
         return df
 
+
     def get_columns_to_hash(self):
         return ["claim_id", "bill_number", "utr_number", "claim_status", "claim_amount", "disallowed_amount",
                 "payers_remark", "settled_amount", "tds_amount"]

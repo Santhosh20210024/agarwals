@@ -454,7 +454,7 @@ class ClaimbookTransformer(DirectTransformer):
         return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size','final_utr_number','hash', 'file_upload', 'transform', 'index']
 
     def get_column_name_to_convert_to_numeric(self):
-        return ['final_bill_amount','claim_amount','requested_amount','approved_amount','provisional_bill_amount','settled_amount','tds_amount','tpa_shortfall_amount','patient_paid']
+        return ['final_bill_amount','claim_amount','requested_amount','approved_amount','provisional_bill_amount','settled_amount','tds_amount','tpa_shortfall_amount','patient_paid','patientpayable']
 
 class StagingTransformer(Transformer):
     def __init__(self):
