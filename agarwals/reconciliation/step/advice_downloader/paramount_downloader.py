@@ -22,19 +22,24 @@ class ParamountDownloader(SeleniumDownloader):
         login_btn.click()
 
     def navigate(self):
-        time.sleep(5)
         self.driver.get("https://provider.paramounttpa.com/PaidClaims.aspx")
-        time.sleep(5)
-        formated_from_date=self.from_date.strftime("%d/%m/%Y")
-        formated_to_date = self.to_date.strftime("%d/%m/%Y")
+
+    def download_from_web(self,temp_from_date = None, temp_to_date=None):
+        formated_from_date=self.from_date.strftime("%d/%m/%Y") if temp_from_date is None else temp_from_date.strftime("%d/%m/%Y")
+        formated_to_date = self.to_date.strftime("%d/%m/%Y") if temp_to_date is None else temp_to_date.strftime("%d/%m/%Y")
         from_date = self.wait.until(EC.visibility_of_element_located((By.ID,"dateFrom")))
+        from_date.click()
+        from_date.clear()
         from_date.send_keys(formated_from_date)
         to_date = self.wait.until(EC.visibility_of_element_located((By.ID,"dateTo")))
+        to_date.click()
+        to_date.clear()
         to_date.send_keys(formated_to_date)
         self.driver.find_element(By.ID,"ContentPlaceHolder1_btnSubmit").click()
-
-    def download_from_web(self):
         time.sleep(5)
         export_button = self.wait.until(EC.visibility_of_element_located((By.ID,"ContentPlaceHolder1_btnExport")))
         export_button.click()
         time.sleep(10)
+
+    def download_from_web_with_date_range(self,temp_from_date, temp_to_date,logout):
+        self.download_from_web(temp_from_date,temp_to_date)
