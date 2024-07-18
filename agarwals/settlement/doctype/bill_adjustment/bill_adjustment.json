@@ -23,26 +23,30 @@
   {
    "fieldname": "bill",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Bill",
    "unique": 1
   },
   {
    "fieldname": "tds",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "TDS"
   },
   {
    "fieldname": "disallowance",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Disallowance"
   },
   {
    "fieldname": "posting_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Posting Date"
   },
   {
-   "fetch_from": "file_upload.file_name",
+   "fetch_from": "file_upload.file",
    "fieldname": "source_file",
    "fieldtype": "Data",
    "label": "Source File"
@@ -57,6 +61,7 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
    "options": "Open\nProcessed\nPartially Processed\nError"
   },
@@ -81,7 +86,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-30 11:48:36.012638",
+ "modified": "2024-07-16 17:06:45.824650",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Bill Adjustment",
