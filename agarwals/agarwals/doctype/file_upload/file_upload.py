@@ -7,9 +7,12 @@ import re
 from agarwals.utils.file_util import construct_file_url, HOME_PATH, SITE_PATH, SHELL_PATH, SUB_DIR, PROJECT_FOLDER, is_template_exist
 import pandas as pd
 
+
+
 class Fileupload(Document):
 
-	extract_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0]) 
+	extract_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0])
+	file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
 	zip_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[-1])
 	field_pattern = r'-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.\w+'
 
@@ -104,12 +107,11 @@ class Fileupload(Document):
 				err = 'Duplicate File Error: The file being uploaded already exists. Please check.'
 				self.del_file_record(fid, fname, err)
 	
-	def validate_file_format(self, fname, fid):
-		file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
+	def validate_file_extension(self, fname, fid):
 		extension = fname.split('.')[-1].upper().strip()
 
-		if extension not in file_extensions: # Extention Checking
-			err = f"Please upload files in the following format: {','.join(file_extensions)}"
+		if extension not in self.file_extensions: # Extention Checking
+			err = f"Please upload files in the following format: {','.join(self.file_extensions)}"
 			self.del_file_record(fid, fname, err)
 
 		if self.file_format == 'EXCEL':
@@ -130,9 +132,9 @@ class Fileupload(Document):
 		fname, fid = self.get_fdoc_meta()
 		
 		if fid:
-			self.validate_file_format(fname, fid)
-			self.validate_file_content()
-			self.validate_file_header()
+			self.validate_file_extension(fname, fid)
+			self.validate_file_header(fname, fid)
+			self.validate_file_content(fname, fid)
 			self.validate_file_hash(fname, fid)
 
 	def update_fdoc_upload(self, fid, furl, fname): 
@@ -207,13 +209,9 @@ class Fileupload(Document):
 
 		self.update_fdoc_upload(fid, fdoc.file_url, fname)
 
-	def validate_file_content(self):
+	def validate_file_content(self, fname, fid):
 		try:
-			df = None
-			if self.upload.endswith('.xls') or self.upload.endswith('.xlsx'):
-				df = pd.read_excel(SITE_PATH + self.upload)
-			elif self.upload.endswith('.csv'):
-				df = pd.read_csv(SITE_PATH + self.upload)
+			df = self.read_file(SITE_PATH + self.upload)
 			if df.shape[0] == 0:
 				self.add_log_error('File upload', 'The file contains only the header or is empty')
 				frappe.throw('File contains only header or is empty')
@@ -221,17 +219,28 @@ class Fileupload(Document):
 
 		except Exception as e:
 			self.add_log_error('File upload', f"An error occurred while checking the file: {e}")
+			self.del_file_record(fid, fname, str(e))
 
-	def read_file(self, file):
+	def read_file(self, file, columns = False):
 		if os.path.exists(file):
 			if file.endswith('.xls') or file.endswith('.xlsx'):
-				return pd.read_excel(SITE_PATH + file)
+				file_data = pd.read_excel(file)
+				if columns:
+					return list(file_data.columns)
+				return file_data
 			elif file.endswith('.csv'):
-				return pd.read_csv(SITE_PATH + file)
+				file_data = pd.read_csv(file)
+				if columns:
+					return list(file_data.columns)
+				return file_data
 			else:
-				return None
+				if columns:
+					return []
+				return pd.DataFrame()
 		else:
-			return None
+			if columns:
+				return []
+			return pd.DataFrame()
 
 	def get_template_details(self):
 		attached_name = None
@@ -257,18 +266,44 @@ class Fileupload(Document):
 				attached_name = None
 
 		return attached_name, attached_doctype
+	
+	def compress(self, column_list):
+		compressed_list = []
+		for value in column_list:
+			stripped_value = value.strip()
+			compressed_string = re.sub(r'\s+','', stripped_value)
+			lowercased_string = compressed_string.lower()
+			compressed_list.append(lowercased_string)
+		return compressed_list
 
-	def compare_header(self, template_data, upload_data):
-		pass
+	def compare_header(self, template_columns, upload_columns):
+		template_columns = set(self.compress(template_columns))
+		upload_columns = set(self.compress(upload_columns))
 
-	def validate_file_header(self):
-		if self.upload:
-			attached_name, attached_doctype = self.get_template_details()
-			template_data = self.read_file(SITE_PATH + is_template_exist(attached_name, attached_doctype))
-			if template_data:
-				upload_data = self.read_file(self.upload)
-				if upload_data:
-					self.compare_header(template_data, upload_data)
+		missing_in_upload = template_columns - upload_columns
+		# extra_in_upload = upload_columns - template_columns
+
+		if missing_in_upload:
+			return f'Templates are missing in the uploaded file: {missing_in_upload}'
+		# elif extra_in_upload:
+		# 	return f'Uploaded file has extra fields: {extra_in_upload}'
+		else:
+			return None
+
+	def validate_file_header(self, fname, fid):
+		try:
+			if self.upload:
+				attached_name, attached_doctype = self.get_template_details()
+				template_columns = self.read_file(SITE_PATH + is_template_exist(attached_name, attached_doctype), columns=True)
+
+				if template_columns:
+					upload_columns = self.read_file(SITE_PATH + self.upload, columns=True)
+					if upload_columns:
+						is_different = self.compare_header(template_columns, upload_columns)
+						if is_different:
+							frappe.throw(is_different)
+		except Exception as e:
+			self.del_file_record(fid, fname, str(e))
 
 	def validate(self): 
 
