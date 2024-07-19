@@ -25,7 +25,6 @@ class Transformer:
         self.clean_utr = 0
         self.utr_column_name = ''
         self.header = 0
-        self.max_value_len = 140
         self.is_truncate_excess_char = False
         self.max_trim_length = 140
 
