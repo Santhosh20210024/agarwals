@@ -25,6 +25,9 @@ class Transformer:
         self.clean_utr = 0
         self.utr_column_name = ''
         self.header = 0
+        self.max_value_len = 140
+        self.is_truncate_excess_char = False
+        self.max_trim_length = 140
 
     def get_files_to_transform(self):
         file_query = f"""SELECT 
@@ -144,6 +147,10 @@ class Transformer:
     def move_to_transform(self, file, df, type, folder, prune = True, status = 'Open'):
         if df.empty:
             return None
+
+        if self.is_truncate_excess_char == True:
+            df = df.applymap(lambda x:str(x)[:self.max_trim_length] if len(str(x)) > self.max_trim_length else x)
+
         if prune:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
@@ -344,7 +351,7 @@ class Transformer:
                         self.update_status('File upload', file['name'], 'Error')
                         status = "Error"
                         continue
-                    self.source_df = self.truncate_excess_char(self.source_df)
+                    # self.source_df = self.truncate_excess_char(self.source_df)
                     transformed = self.transform(file)
                     if not transformed:
                         continue
@@ -429,6 +436,7 @@ class ClaimbookTransformer(DirectTransformer):
         self.hashing = 1
         self.clean_utr = 1
         self.utr_column_name = 'utr_number'
+        self.is_truncate_excess_char = True
 
     def get_columns_to_hash(self):
         return ['unique_id', 'settled_amount']
