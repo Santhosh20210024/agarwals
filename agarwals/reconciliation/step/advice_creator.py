@@ -76,7 +76,7 @@ def insert_record_in_settlement_advice(doc_to_insert):
         else:
             log_error('Settlement Advice Staging', doc_to_insert, e)
 
-def settlement_advice_staging(advices, chunk_doc=None):
+def settlement_advice_staging(advices,chunk_doc):
     chunk.update_status(chunk_doc, "InProgress")
     try:
         for advice in advices:
