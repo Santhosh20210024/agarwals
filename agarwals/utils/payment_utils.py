@@ -21,7 +21,7 @@ def update_error(matcher_record, message):
     return None
 
 @redis_cache
-def get_company_account(self, bank_account_name):
+def get_company_account(bank_account_name):
     get_company_timer = Timer().start(f"get_company_account {bank_account_name}")
     bank_account = frappe.get_doc('Bank Account', bank_account_name)
     if not bank_account.account:

@@ -94,16 +94,19 @@
    "search_index": 1
   },
   {
+   "default": "0",
    "fieldname": "tds_amount",
    "fieldtype": "Data",
    "label": "TDS Amount"
   },
   {
+   "default": "0",
    "fieldname": "disallowance_amount",
    "fieldtype": "Data",
    "label": "Disallowance Amount"
   },
   {
+   "default": "0",
    "fieldname": "settled_amount",
    "fieldtype": "Data",
    "label": "Settled Amount"
@@ -262,7 +265,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-17 14:08:33.494549",
+ "modified": "2024-07-19 14:56:44.710674",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",
