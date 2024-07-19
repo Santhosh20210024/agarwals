@@ -155,6 +155,18 @@ class Transformer:
         self.create_file_record(file_path,folder)
         self.insert_in_file_upload(file_path, file['name'], type, status, transform)
 
+    def truncate_excess_char(self,df,max_len=None):
+        if self.file_type == 'Claim Book':
+            max_len = max_len if max_len is not None else 140
+            for column in df.columns:
+                for index in range(len(df)):
+                    value = df.at[index, column]
+                    value_str = str(value)
+                    if len(value_str) > max_len:
+                        trimmed_value = value_str[:max_len]
+                        df.at[index, column] = trimmed_value
+            return df
+
     def load_source_df(self, file, header):
         try:
             if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
@@ -332,6 +344,7 @@ class Transformer:
                         self.update_status('File upload', file['name'], 'Error')
                         status = "Error"
                         continue
+                    self.source_df = self.truncate_excess_char(self.source_df)
                     transformed = self.transform(file)
                     if not transformed:
                         continue
