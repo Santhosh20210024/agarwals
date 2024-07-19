@@ -148,6 +148,7 @@ class Transformer:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
            df = self.format_utr(df ,self.utr_column_name)
+        df = self.format_numbers(df)
         transform = self.create_transform_record(file['name'])
         df["file_upload"] = file['name']
         df["transform"] = transform.name
@@ -313,6 +314,12 @@ class Transformer:
             df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
         return df
 
+    def format_numbers(self, df):
+        columns = self.get_column_name_to_convert_to_numeric()
+        for column in columns:
+            df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.]", "", regex=True)).round(2)
+        return df
+
     def process(self, args):
         try:
             files = self.get_files_to_transform()
@@ -355,7 +362,6 @@ class DirectTransformer(Transformer):
     def transform(self, file):
         if self.hashing == 1:
             self.hashing_job()
-
         self.load_target_df()
         if self.target_df.empty: 
             self.new_records = self.source_df 
@@ -408,6 +414,9 @@ class BillTransformer(DirectTransformer):
     def get_column_needed(self):
         return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash', 'file_upload', 'transform', 'index']
 
+    def get_column_name_to_convert_to_numeric(self):
+        return ['Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due']
+
 class ClaimbookTransformer(DirectTransformer):
     def __init__(self):
         super().__init__()
@@ -443,6 +452,9 @@ class ClaimbookTransformer(DirectTransformer):
 
     def get_column_needed(self):
         return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size','final_utr_number','hash', 'file_upload', 'transform', 'index']
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ['final_bill_amount','claim_amount','requested_amount','approved_amount','provisional_bill_amount','settled_amount','tds_amount','tpa_shortfall_amount','patient_paid','patientpayable']
 
 class StagingTransformer(Transformer):
     def __init__(self):
@@ -667,6 +679,9 @@ class AdjustmentTransformer(Transformer):
     def get_column_needed(self):
         return ["bill","tds","disallowance","posting_date","source_file", 'file_upload', 'transform', 'index']
 
+    def get_column_name_to_convert_to_numeric(self):
+        return ["tds","disallowance"]
+
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
         rename_value = {}
@@ -697,6 +712,9 @@ class WritebackTransformer(Transformer):
         return ["reference_number","date","region","entity","branch_type","deposit","withdrawal","bank_account","description","custom_cg_utr_number",
                 "transaction_id","transaction_type","allocated_amount","unallocated_amount","party_type","party", 'file_upload', 'transform', 'index']
 
+    def get_column_name_to_convert_to_numeric(self):
+        return ["allocated_amount","unallocated_amount","withdrawal","deposit"]
+
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
         rename_value = {}
@@ -723,6 +741,9 @@ class WriteoffTransformer(Transformer):
     def get_column_needed(self):
         return ["bill_no","bill_date","customer","customer_group","claim_amount","outstanding_amount","branch","entity","region","mrn",
                 "patient_name","claim_id","ma_claim_id","payer_name", 'file_upload', 'transform', 'index']
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ["claim_amount","outstanding_amount"]
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -757,6 +778,9 @@ class BankBulkTransformer(BankTransformer):
             else:
                 raise Exception(f"Header is invalid {head}")
         return df.rename(columns=rename_value)
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ['deposit','withdrawal','credit','debit']
 
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
