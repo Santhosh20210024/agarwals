@@ -71,6 +71,7 @@
   "cg_utr_number",
   "cg_formatted_utr_number",
   "final_utr_number",
+  "utr_key",
   "cg_formatted_bill_number",
   "custom_raw_bill_number",
   "file_upload",
@@ -447,14 +448,14 @@
   },
   {
    "fieldname": "file_upload",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "File upload",
    "options": "File upload",
    "read_only": 1
   },
   {
    "fieldname": "transform",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Transform",
    "options": "Transform",
    "read_only": 1
@@ -464,11 +465,16 @@
    "fieldtype": "Int",
    "label": "File Index",
    "read_only": 1
+  },
+  {
+   "fieldname": "utr_key",
+   "fieldtype": "Data",
+   "label": "UTR Key"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-29 18:11:51.866177",
+ "modified": "2024-07-17 11:56:07.441617",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",

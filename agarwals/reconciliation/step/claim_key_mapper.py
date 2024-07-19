@@ -40,17 +40,23 @@ class BillClaimKeyMapper(ClaimKeyMapper):
         doctype = self.get_doctype()
         if record.claim_id != '0' and record.claim_id is not None:
             if str(record.claim_id).strip() != '':
-                claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.claim_id.lower().strip()}, pluck='claim_key')
+                claim_variant = ClaimKeyCreator(record.claim_id, doctype, record.name).get_variant_claim_numbers()
+                claim_variant = list(claim_variant)
+                claim_key = frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')
                 if not claim_key:
                     claim_key = self.create_claim_key(record.claim_id,doctype,record.name)
+                    insert_claim_keys(record.name,claim_key[0],'Bill Claim Key')
                 record.set('claim_key', claim_key[0])
         if record.ma_claim_id:
             if record.ma_claim_id != '0' and record.ma_claim_id is not None:
                 if str(record.ma_claim_id).strip() != '':
-                    ma_claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.ma_claim_id.lower().strip()}, pluck='claim_key')
+                    claim_variant = ClaimKeyCreator(record.ma_claim_id, doctype, record.name).get_variant_claim_numbers()
+                    claim_variant = list(claim_variant)
+                    ma_claim_key = frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')
 
                     if not ma_claim_key:
                         ma_claim_key = self.create_claim_key(record.ma_claim_id, doctype, record.name)
+                        insert_claim_keys(record.name,claim_key[0],'Bill Claim Key')
                     record.set('ma_claim_key', ma_claim_key[0])
 
 class ClaimBookClaimKeyMapper(ClaimKeyMapper):
@@ -64,15 +70,21 @@ class ClaimBookClaimKeyMapper(ClaimKeyMapper):
         doctype = self.get_doctype()
         if record.al_number != '0' and record.al_number is not None:
             if str(record.al_number).strip() != '':
-                claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.al_number.lower().strip()}, pluck='claim_key')
+                claim_variant = ClaimKeyCreator(record.al_number, doctype, record.name).get_variant_claim_numbers()
+                claim_variant = list(claim_variant)
+                claim_key = frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')
                 if not claim_key:
                     claim_key = self.create_claim_key(record.al_number,doctype,record.name)
+                    insert_claim_keys(record.name,claim_key[0],'ClaimBook Claim Key')
                 record.set('al_key', claim_key[0])
         if record.cl_number != '0' and record.cl_number is not None:
             if str(record.cl_number).strip() != '':
-                claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.cl_number.lower().strip()}, pluck='claim_key')
+                claim_variant = ClaimKeyCreator(record.cl_number, doctype, record.name).get_variant_claim_numbers()
+                claim_variant = list(claim_variant)
+                claim_key = frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')
                 if not claim_key:
                     claim_key = self.create_claim_key(record.cl_number,doctype,record.name)
+                    insert_claim_keys(record.name,claim_key[0],'ClaimBook Claim Key')
                 record.set('cl_key', claim_key[0])
 
 class SAClaimKeyMapper(BillClaimKeyMapper):
@@ -86,7 +98,9 @@ class SAClaimKeyMapper(BillClaimKeyMapper):
         doctype = self.get_doctype()
         if record.claim_id != '0' and record.claim_id is not None:
             if str(record.claim_id).strip() != '':
-                claim_key = frappe.get_list("Claim Key", filters={'claim_variant': record.claim_id.lower().strip()}, pluck='claim_key')
+                claim_variant = ClaimKeyCreator(record.claim_id, doctype, record.name).get_variant_claim_numbers()
+                claim_variant = list(claim_variant)
+                claim_key = frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')
                 if not claim_key:
                     claim_key = self.create_claim_key(record.claim_id,doctype,record.name)
             
@@ -132,3 +146,13 @@ def process(args):
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")
         log_error(e,'Step')
+        
+def insert_claim_keys(name,claim_key,doctype):
+	key_doc =frappe.new_doc(doctype)
+	if doctype == 'Bill Claim Key':
+		key_doc.bill = name
+	else:
+		key_doc.claimbook = name
+	key_doc.claim_key = claim_key	
+	key_doc.save()		
+	frappe.db.commit()

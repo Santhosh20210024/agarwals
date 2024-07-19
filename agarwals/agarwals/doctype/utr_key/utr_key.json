@@ -1,0 +1,69 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-07-16 10:38:43.508951",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "utr_key",
+  "utr_variant",
+  "utr_number",
+  "reference_name",
+  "reference_doctype"
+ ],
+ "fields": [
+  {
+   "fieldname": "utr_key",
+   "fieldtype": "Data",
+   "label": "UTR Key"
+  },
+  {
+   "fieldname": "utr_variant",
+   "fieldtype": "Data",
+   "label": "UTR Variant"
+  },
+  {
+   "fieldname": "utr_number",
+   "fieldtype": "Data",
+   "label": "UTR Number"
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Reference name",
+   "options": "reference_doctype"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Reference Doctype",
+   "options": "DocType"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-16 10:38:43.508951",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "UTR Key",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

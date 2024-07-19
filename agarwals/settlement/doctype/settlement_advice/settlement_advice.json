@@ -19,6 +19,7 @@
   "utr_number",
   "cg_utr_number",
   "final_utr_number",
+  "utr_key",
   "cg_formatted_utr_number",
   "claim_amount",
   "disallowed_amount",
@@ -45,7 +46,6 @@
   "cg_formatted_bill_number",
   "transform",
   "index",
-  "utr_key",
   "is_bot",
   "file_upload_date",
   "tpa_user_id",
@@ -199,9 +199,8 @@
   },
   {
    "fieldname": "matched_bank_transaction",
-   "fieldtype": "Link",
-   "label": "Matched Bank Transaction",
-   "options": "Bank Transaction"
+   "fieldtype": "Data",
+   "label": "Matched Bank Transaction"
   },
   {
    "fieldname": "matched_claimbook_record",
@@ -309,7 +308,7 @@
   }
  ],
  "links": [],
- "modified": "2024-07-15 11:19:01.900088",
+ "modified": "2024-07-17 15:37:24.924886",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

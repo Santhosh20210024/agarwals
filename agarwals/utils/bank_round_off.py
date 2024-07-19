@@ -8,7 +8,11 @@ def create_journal_entry(ype, date):
 def fetch_bank_details(bank):
     return frappe.get_doc('Bank Transaction', bank)
 
-def add_account_entries(je, bank, from_account, to_account, amount):
+def add_account_entries(je, bank,  to_account, amount):
+    print(bank.bank_account)
+    account = frappe.get_doc('Bank Account',bank.bank_account)
+    print(account.account)
+    from_account = account.account
     je.append('accounts', {
         'account': from_account,
         'party_type': 'Customer',
@@ -32,7 +36,7 @@ def save_je(je, parent_doc=None):
         je.custom_file_upload = parent_doc.transform
         je.custom_transform = parent_doc.transform
         je.custom_index = parent_doc.index
-    log(je)
+    print(je)
     je.save()
     je.submit()
     frappe.db.commit()
@@ -46,11 +50,11 @@ def process_round_off(rnd_unallocated):
         try:
             je = create_journal_entry('Credit Note', bank_.date)
             je.name = "".join([bank_.name, '-', 'RND'])
-            je = add_account_entries(je, bank_, 'Debtors - A', 'Rounded Off - A', bank_.unallocated_amount)
-            update_trans_reference(bank, je)
+            je = add_account_entries(je, bank_, 'Rounded Off - A', bank_.unallocated_amount)
             save_je(je)
+            update_trans_reference(bank, je)
         except Exception as e:
-            log(str(e))
+            print(str(e))
 
 def get_round_off_bills():
     bank = frappe.qb.DocType('Bank Transaction')
@@ -65,9 +69,14 @@ def update_trans_reference(bt_doc, pe_doc):
         bt_doc = frappe.get_doc('Bank Transaction', bt_doc.name)
         bt_doc.append('payment_entries',
                       {'payment_document': 'Journal Entry'
+                      ,'payment_entry':pe_doc.name
                        ,'allocated_amount':pe_doc.total_credit
                       ,'custom_posting_date':pe_doc.posting_date
                       ,'custom_creation_date':pe_doc.creation})
         bt_doc.submit()
-rnd_unallocated = get_round_off_bills()
-process_round_off(rnd_unallocated)
+        frappe.db.commit()
+        
+@frappe.whitelist()        
+def process():
+	rnd_unallocated = get_round_off_bills()
+	process_round_off(rnd_unallocated)
