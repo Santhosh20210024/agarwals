@@ -30,43 +30,53 @@ def log_error(doctype_name, error_doc, error_message):
     error_doc.save(ignore_permissions=True)
     frappe.db.commit()
 
-def insert_record_in_settlement_advice(doc_to_insert):
-    try:
-        settlement_advices = frappe.get_list("Settlement Advice", filters={
-            'utr_number': doc_to_insert.utr_number, 'claim_id':doc_to_insert.claim_id, 'status': "Error"})
-        if len(settlement_advices) > 0 and doc_to_insert.retry == 1:
-            name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id + "-" + str(len(settlement_advices))
-        else:
-            name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id
-        sa_doc = frappe.get_doc({
-            "doctype": "Settlement Advice",
-            "name": name,
-            "claim_id": doc_to_insert.claim_id,
-            "bill_no":doc_to_insert.bill_number,
-            "utr_number": doc_to_insert.utr_number,
-            "final_utr_number":doc_to_insert.final_utr_number,
-            "claim_amount": doc_to_insert.claim_amount,
-            "disallowed_amount":doc_to_insert.disallowed_amount,
-            "payers_remark":doc_to_insert.payers_remark,
-            "tds_amount": doc_to_insert.tds_amount,
-            "settled_amount": doc_to_insert.settled_amount,
-            "paid_date": doc_to_insert.paid_date,
-            "file_upload": doc_to_insert.file_upload,
-            "transform": doc_to_insert.transform,
-            "index": doc_to_insert.index,
-            "source": "TPA",
-            "status": "Open",   
-        }).insert(ignore_permissions=True)
-        doc_to_insert.status = "Processed"
-        doc_to_insert.save(ignore_permissions=True)
-        frappe.db.commit()
-        file_records.create(file_upload = sa_doc.file_upload,
-                            transform = sa_doc.transform, reference_doc = sa_doc.doctype,
-                            record = sa_doc.name, index = sa_doc.index)
-    except Exception as e:
-        log_error('Settlement Advice Staging', doc_to_insert, e)
+def update_sa_status(doctype,doc_name,status):
+    doc = frappe.get_doc(doctype,doc_name)
+    doc.status = status
+    doc.save()
 
-def settlement_advice_staging(advices, chunk_doc):
+def insert_record_in_settlement_advice(doc_to_insert):
+    settlement_advices = frappe.get_list("Settlement Advice", filters={
+        'utr_number': doc_to_insert.utr_number, 'claim_id': doc_to_insert.claim_id, 'status': "Error"})
+    if len(settlement_advices) > 0 and doc_to_insert.retry == 1:
+        name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id + "-" + str(len(settlement_advices))
+    else:
+        name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id
+    data = {
+        "doctype": "Settlement Advice",
+        "name": name,
+        "claim_id": doc_to_insert.claim_id,
+        "bill_no":doc_to_insert.bill_number,
+        "utr_number": doc_to_insert.utr_number,
+        "final_utr_number":doc_to_insert.final_utr_number,
+        "claim_amount": doc_to_insert.claim_amount,
+        "disallowed_amount":doc_to_insert.disallowed_amount,
+        "payers_remark":doc_to_insert.payers_remark,
+        "tds_amount": doc_to_insert.tds_amount,
+        "settled_amount": doc_to_insert.settled_amount,
+        "paid_date": doc_to_insert.paid_date,
+        "file_upload": doc_to_insert.file_upload,
+        "transform": doc_to_insert.transform,
+        "index": doc_to_insert.index,
+        "source": "TPA",
+        "status": "Open",
+    }
+    try:
+        sa_doc = frappe.get_doc(data).insert(ignore_permissions=True)
+        update_sa_status('Settlement Advice Staging',doc_to_insert.name,'Processed')
+    except Exception as e:
+        if "Duplicate entry" in str(e):
+            sa_doc = frappe.get_doc('Settlement Advice',name)
+            if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount==doc_to_insert.disallowed_amount:
+                log_error('Settlement Advice Staging', doc_to_insert, e)
+                return
+            sa_doc.update(data)
+            sa_doc.save()
+            update_sa_status('Settlement Advice Staging', doc_to_insert.name, 'Processed')
+        else:
+            log_error('Settlement Advice Staging', doc_to_insert, e)
+
+def settlement_advice_staging(advices, chunk_doc=None):
     chunk.update_status(chunk_doc, "InProgress")
     try:
         for advice in advices:
@@ -108,8 +118,8 @@ def settlement_advice_staging(advices, chunk_doc):
                     advice_staging_doc.final_utr_number = advice_staging_doc.final_utr_number.replace(".0","")
                     advice_staging_doc.utr_number = advice_staging_doc.utr_number.replace(".0","")
                     advice_staging_doc.save(ignore_permissions=True)
-                    frappe.db.commit()
                     insert_record_in_settlement_advice(advice_staging_doc)
+                    frappe.db.commit()
                 except Exception as e:
                     log_error('Settlement Advice Staging',advice_staging_doc,e)
                     continue
@@ -117,6 +127,7 @@ def settlement_advice_staging(advices, chunk_doc):
     except Exception as e:
         log_error('Settlement Advice Staging', None, e)
         chunk.update_status(chunk_doc, "Error")
+
 
 @frappe.whitelist()
 def process(args):
