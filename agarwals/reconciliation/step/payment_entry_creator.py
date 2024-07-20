@@ -17,7 +17,7 @@ class PaymentEntryCreator:
         return doc
 
     def __init__(self, matcher_record, match_logic, closing_date, chunk_doc):
-        class_init_timer = Timer().start(f"Payment Entry class init {matcher_record.name}")
+        class_init_timer = Timer().start(f"Payment_Entry_class_init {matcher_record.name}")
         self.matcher_record = matcher_record
         self.match_logic = match_logic
         self.chunk_doc = chunk_doc
@@ -25,8 +25,6 @@ class PaymentEntryCreator:
         self.tds_amount = round(float(matcher_record.tds_amount), 2) if matcher_record.tds_amount else 0
         self.disallowance_amount = round(float(matcher_record.disallowance_amount), 2) if matcher_record.disallowance_amount else 0
         self.bank_account = self.matcher_record.company_bank_account
-        self.bt_doc = self.get_document_record('Bank Transaction', self.matcher_record.bank_transaction)
-        self.si_doc = self.get_document_record('Sales Invoice', self.matcher_record.sales_invoice)
         self.sa_status = 'Fully Processed'
         self.sa_remark = ''
         self.closing_date = closing_date
@@ -35,6 +33,8 @@ class PaymentEntryCreator:
 
     def validate(self):
         validate_timer = Timer().start(f"validate {self.matcher_record.name}")
+        self.bt_doc = self.get_document_record('Bank Transaction', self.matcher_record.bank_transaction)
+        self.si_doc = self.get_document_record('Sales Invoice', self.matcher_record.sales_invoice)
         error = None
         if not self.bank_account:
             error = "No Company Account Found for the Bank"
@@ -56,24 +56,27 @@ class PaymentEntryCreator:
         return True
 
     def set_amount(self):
-        set_amount_timer = Timer().start(f"set_amount_timer {self.matcher_record.name}")
+        set_amount_timer = Timer().start(f"set_amount {self.matcher_record.name}")
         unallocated_amount = self.bt_doc.unallocated_amount
-        self.sa_status = 'Partially Processed'
         if self.settled_amount > unallocated_amount:
             self.settled_amount = unallocated_amount
+            self.sa_status = 'Partially Processed'
         if self.si_doc.outstanding_amount < self.settled_amount:
             self.settled_amount = self.si_doc.outstanding_amount
-        self.sa_status = 'Fully Processed'
+            self.sa_status = 'Partially Processed'
         if self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount and self.si_doc.outstanding_amount >= self.settled_amount + self.tds_amount:
             self.disallowance_amount = 0
             self.sa_remark = 'Disallowance amount is greater than Outstanding Amount'
+            self.sa_status = 'Fully Processed'
         elif self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount and self.si_doc.outstanding_amount >= self.settled_amount + self.disallowance_amount:
             self.tds_amount = 0
             self.sa_remark = 'TDS amount is greater than Outstanding Amount'
+            self.sa_status = 'Fully Processed'
         elif self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount:
             self.tds_amount = 0
             self.disallowance_amount = 0
             self.sa_remark = 'Both Disallowed and TDS amount is greater than Outstanding Amount'
+            self.sa_status = 'Fully Processed'
         set_amount_timer.end()
 
     def get_entry_name(self):
@@ -117,18 +120,18 @@ class PaymentEntryCreator:
     def create_payment_entry(self, pe_dict):
         create_payment_timer = Timer().start(f"create_payment_entry {pe_dict['name']}")
         pe_doc = frappe.get_doc(pe_dict)
-        process_payment_entry_insert_timer = Timer().start(f"process_payment_entry Insert {pe_dict['name']}")
+        process_payment_entry_insert_timer = Timer().start(f"payment_entry Insert {pe_dict['name']}")
         pe_doc.insert()
         process_payment_entry_insert_timer.end()
-        process_payment_entry_submit_timer = Timer().start(f"process_payment_entry Submit {pe_dict['name']}")
+        process_payment_entry_submit_timer = Timer().start(f"payment_entry_Submit {pe_dict['name']}")
         pe_doc.submit()
         process_payment_entry_submit_timer.end()
         create_payment_timer.end()
         return pe_doc
 
     def process_payment_entry(self):
+        process_payment_entry_timer = Timer().start(f"process_payment_entry {self.si_doc.name}")
         try:
-            process_payment_entry_timer = Timer().start(f"process_payment_entry {self.si_doc.name}")
             name = self.get_entry_name()
             pe_dict = {
                 "doctype": "Payment Entry",
@@ -156,7 +159,7 @@ class PaymentEntryCreator:
                     {
                         'reference_doctype': 'Sales Invoice',
                         'reference_name': self.si_doc.name,
-                        'allocated_amount': self.settled_amount + self.tds_amount + self.disallowed_amount
+                        'allocated_amount': self.settled_amount + self.tds_amount + self.disallowance_amount
                     }
                 ]
             }
@@ -164,9 +167,9 @@ class PaymentEntryCreator:
             if self.tds_amount > 0:
                 deductions.append(self.add_deduction('TDS - A', 'TDS', self.tds_amount))
                 pe_dict["custom_tds_amount"] = self.tds_amount
-            if self.disallowed_amount > 0:
-                deductions.append(self.add_deduction('Disallowance - A', 'Disallowance', self.disallowed_amount))
-                pe_dict["custom_disallowed_amount"] = self.disallowed_amount
+            if self.disallowance_amount > 0:
+                deductions.append(self.add_deduction('Disallowance - A', 'Disallowance', self.disallowance_amount))
+                pe_dict["custom_disallowed_amount"] = self.disallowance_amount
             if deductions:
                 pe_dict["deductions"] = deductions
             pe_dict = self.process_write_off(pe_dict)
@@ -180,11 +183,11 @@ class PaymentEntryCreator:
             file_records.create(file_upload=pe_doc.custom_file_upload,
                                 transform=pe_doc.custom_transform, reference_doc=pe_doc.doctype,
                                 record=pe_doc.name, index=pe_doc.custom_index)
-            process_payment_entry_timer.end()
             self.pe_doc = pe_doc
+            process_payment_entry_timer.end()
         except Exception as e:
-            self.sa_status = 'Warning'
             self.sa_remark = 'Unable to Create Payment Entry'
+            process_payment_entry_timer.end()
             raise Exception(e)
 
     def update_invoice_reference(self):
@@ -201,10 +204,11 @@ class PaymentEntryCreator:
                                            'created_date': created_date, 'bank_region': self.bt_doc.custom_region,
                                            'bank_entity': self.bt_doc.custom_entity,
                                            'bank_account_number': self.pe_doc.bank_account})
-        ref_key, ref_value = 'settlement_advice', self.matcher_record.settlement_advice
         if not self.matcher_record.settlement_advice:
             ref_key, ref_value = 'claim_book', self.matcher_record.claim_book
             self.si_doc.custom_insurance_name = self.matcher_record.insurance_company_name
+        else:
+            ref_key, ref_value = 'settlement_advice', self.matcher_record.settlement_advice
         self.si_doc.append('custom_matcher_reference',
                               {'id': self.matcher_record.name, 'match_logic': self.matcher_record.match_logic, ref_key: ref_value})
         update_invoice_reference_save_timer = Timer().start(f"update_invoice_reference_save {self.si_doc.name}")
@@ -246,6 +250,7 @@ class PaymentEntryCreator:
         if self.matcher_record.claimbook:
             sa_dict['matched_claimbook_record'], sa_dict['insurance_company_name'] = self.matcher_record.claimbook, self.matcher_record.insurance_company_name
         settlement_advice.update(sa_dict)
+        settlement_advice.save()
         update_advice_reference_timer.end()
 
     def update_claim_reference(self):
@@ -254,7 +259,7 @@ class PaymentEntryCreator:
         update_claim_referece.end()
 
     def update_references(self):
-        update_reference_timer = Timer().start(f"update_reference_timer {self.matcher_record.name}")
+        update_reference_timer = Timer().start(f"update_reference {self.matcher_record.name}")
         self.update_invoice_reference()
         self.update_trans_reference()
         self.update_advice_reference()
@@ -262,18 +267,22 @@ class PaymentEntryCreator:
         update_reference_timer.end()
 
     def process(self):
-        matcher_status = 'Processed'
+        Payment_creation_process_timer = Timer().start(f"Payment_creation_process {self.matcher_record.name}")
         try:
             if not self.validate():
+                Payment_creation_process_timer.end()
                 return None
             self.set_amount()
             self.process_payment_entry()
             self.update_references()
+            frappe.db.set_value('Matcher', self.matcher_record.name, 'status', 'Processed')
+            Payment_creation_process_timer.end()
         except Exception as e:
+            frappe.db.rollback()
             log_error(e,'Payment Entry', self.si_doc.name)
-            matcher_status = 'Error'
-        frappe.db.set_value('Matcher', self.matcher_record.name, 'status', matcher_status)
-        frappe.db.commit()
+            update_error(self.matcher_record, self.sa_remark)
+            frappe.db.commit()
+            Payment_creation_process_timer.end()
 
 @redis_cache
 def get_posting_date(entity):
@@ -286,7 +295,7 @@ def get_posting_date(entity):
     get_posting_date_timer.end()
     return closing_date
 
-def create_payment_entry(matcher_doc_records, match_logic, chunk_doc):
+def create_payment_entries(matcher_doc_records, match_logic, chunk_doc):
         t1 = Timer().start("create_payment_entry")
         chunk.update_status(chunk_doc, "InProgress")
         try:
@@ -296,7 +305,9 @@ def create_payment_entry(matcher_doc_records, match_logic, chunk_doc):
                 return
             for matcher_record in matcher_doc_records:
                 closing_date = get_posting_date(matcher_record.si_entity)
+                t2 = Timer().start(f"Payment_class {matcher_record.name}")
                 PaymentEntryCreator(matcher_record, match_logic, closing_date, chunk_doc).process()
+                t2.end()
             chunk.update_status(chunk_doc, "Processed")
             t1.end()
         except Exception as e:
@@ -317,11 +328,11 @@ def process(args):
                                        , as_dict=True)
         if matcher_doc_records:
             chunk_doc = chunk.create_chunk(args["step_id"])
-            create_payment_entry(matcher_doc_records=matcher_doc_records, match_logic=m_logic, chunk_doc=chunk_doc)
+            create_payment_entries(matcher_doc_records=matcher_doc_records, match_logic=m_logic, chunk_doc=chunk_doc)
             # for record in range(0, len(matcher_doc_records), chunk_size):
             #     chunk_doc = chunk.create_chunk(args["step_id"])
             #     seq_no = seq_no + 1
-            #     frappe.enqueue(create_payment_entry
+            #     frappe.enqueue(create_payment_entries
             #                    , queue = 'long'
             #                    , is_async = True
             #                    , job_name = "Batch" + str(seq_no)
@@ -332,9 +343,9 @@ def process(args):
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
         process_timer.end()
-        process_timer.print("payment_process_output_7")
+        process_timer.print("payment_process_output_11")
     except Exception:
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")
         process_timer.end()
-        process_timer.print("payment_process_output_7")
+        process_timer.print("payment_process_output_11")
