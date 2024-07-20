@@ -72,7 +72,8 @@ class SalesInvoiceCreator:
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
-                    update_fiscal_year(sales_invoice_record,'Sales Invoice')
+                    if sales_invoice_record.status != 'Cancelled':
+                       update_fiscal_year(sales_invoice_record,'Sales Invoice')
                     
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                         transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
