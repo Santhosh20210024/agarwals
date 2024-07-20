@@ -36,7 +36,7 @@ def log_error(doctype_name, error_doc, error_message):
         update_error(error_doc,'S106')
     else:
         update_error(error_doc,'S104')
-    frappe.db.commit()
+
 
 def update_sa_status(doctype,doc_name,status):
     doc = frappe.get_doc(doctype,doc_name)
