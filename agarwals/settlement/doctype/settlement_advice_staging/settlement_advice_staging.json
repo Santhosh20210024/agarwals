@@ -167,9 +167,9 @@
   },
   {
    "fieldname": "error_code",
-   "fieldtype": "Select",
+   "fieldtype": "Autocomplete",
    "label": "Error Code",
-   "options": "\nS100\nS101\nS102\nS103\nS104\nS105"
+   "options": "\nS100\nS101\nS102\nS103\nS104\nS105\nS106"
   },
   {
    "fieldname": "transform",
@@ -221,7 +221,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-15 11:22:08.881230",
+ "modified": "2024-07-20 15:21:47.538095",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
