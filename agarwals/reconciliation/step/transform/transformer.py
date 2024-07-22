@@ -168,7 +168,7 @@ class Transformer:
             if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
                 self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             elif file['upload'].endswith('.csv'):
-                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
+                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header,on_bad_lines="skip")
             else:
                 self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
                 self.update_status('File upload', file['name'], 'Error')
