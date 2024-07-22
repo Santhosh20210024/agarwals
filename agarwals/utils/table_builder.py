@@ -16,22 +16,19 @@ def get_sales_invoice_data(doc_name,jv_ac_name):
                   })
 
     if jv:
-        for i in range(len(jv)):
-            print(jv[i])
-            ent = jv[i]
-            entry_type = ent.parent.split('-')[1]
+        for entry in range(len(jv)):
+            jv_entry = jv[entry]
+            entry_type = jv_entry.parent.split('-')[1]
             tds,dis,wo=0,0,0
             if entry_type == "RND":
                 continue
             elif entry_type == "TDS":
-                tds=jv[i]['credit']
+                tds=jv[entry]['credit']
             elif entry_type == 'DIS':
-                dis=jv[i]['credit']
+                dis=jv[entry]['credit']
             elif entry_type == 'WO':
-                wo=jv[i]['credit']
-
-            jv_doc=frappe.get_doc('Journal Entry',jv[i]['parent'])
-
+                wo=jv[entry]['credit']
+            jv_doc=frappe.get_doc('Journal Entry',jv[entry]['parent'])
             child_table.append({'entry_type': 'Journal Entry', 'entry_name': jv_doc.name,
                                 'settled_amount': 0,
                                 'tds_amount': tds, 'disallowance_amount':dis,'writeoff_amount':wo,
@@ -44,14 +41,12 @@ def get_sales_invoice_data(doc_name,jv_ac_name):
     matcher = frappe.db.sql(f"SELECT * FROM `tabMatcher` where sales_invoice ='{doc_name}' AND status = 'Processed' ", as_dict=True)
     if matcher:
         for matcher_doc in matcher:
-
             if matcher_doc.settlement_advice:
                 matcher_link_value_sa = matcher_doc.settlement_advice
                 matcher_link_value_cb = "No Match"
             elif matcher_doc.claimbook:
                 matcher_link_value_cb = matcher_doc.claimbook
                 matcher_link_value_sa = "No Match"
-
 
             matcher_list.append({'matcher_id': matcher_doc.name,
                                  'matcher_logic': matcher_doc.match_logic,
