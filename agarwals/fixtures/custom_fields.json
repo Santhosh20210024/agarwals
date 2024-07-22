@@ -936,7 +936,7 @@
     "fieldname": "custom_reference_matcher",
     "fieldtype": "HTML",
     "label": "Matcher Reference",
-    "insert_after": "custom_reference"
+    "insert_after": "custom_referencetable"
   },
   {
     "doctype": "Custom Field",
@@ -980,7 +980,9 @@
     "name": "Sales Invoice-custom_total_settled_amount",
     "fieldname": "custom_total_settled_amount",
     "fieldtype": "Currency",
-    "Hidden": "1"
+    "options": "currency",
+    "label" : "Total Settled Amount",
+    "hidden": "1"
   },
   {
     "doctype": "Custom Field",
@@ -988,7 +990,9 @@
     "name": "Sales Invoice-custom_total_tds_amount",
     "fieldname": "custom_total_tds_amount",
     "fieldtype": "Currency",
-    "Hidden": "1"
+    "options": "currency",
+    "label" : "Total TDS Amount",
+    "hidden": "1"
   },
   {
     "doctype": "Custom Field",
@@ -996,7 +1000,9 @@
     "name": "Sales Invoice-custom_total_disallowance_amount",
     "fieldname": "custom_total_disallowance_amount",
     "fieldtype": "Currency",
-    "Hidden": "1"
+    "options": "currency",
+    "label" : "Total Disallowance Amount",
+    "hidden": "1"
   },
   {
     "doctype": "Custom Field",
@@ -1004,7 +1010,9 @@
     "name": "Sales Invoice-custom_total_writeoff_amount",
     "fieldname": "custom_total_writeoff_amount",
     "fieldtype": "Currency",
-    "Hidden": "1"
+    "options": "currency",
+    "label" : "Total WriteOff Amount",
+    "hidden": "1"
   },
   {
     "doctype": "Custom Field",
@@ -1012,7 +1020,9 @@
     "name": "Sales Invoice-custom_matcher_reference",
     "fieldname": "custom_matcher_reference",
     "fieldtype": "Table",
-    "Hidden": "1"
+    "options": "Matcher Reference",
+    "label" : "Matcher Reference",
+    "hidden": "1"
   },
   {
     "doctype": "Custom Field",
@@ -1020,7 +1030,9 @@
     "name": "Sales Invoice-custom_reference",
     "fieldname": "custom_reference",
     "fieldtype": "Table",
-    "Hidden": "1"
+    "label" : "Reference",
+    "options": "Sales Invoice Reference",
+    "hidden": "1"
   },
   {
     "doctype": "Client Script",
