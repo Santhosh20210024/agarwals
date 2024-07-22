@@ -79,8 +79,6 @@ class Processor:
             parent_doc.end_time = frappe.utils.now_datetime()
             parent_doc.save()
             frappe.db.commit()
-            if self.doc_name == "Step":
-                worker.kill()
         except Exception as e:
             self.raise_exception(
                 {"doctype": self.doc_name, "message": f"Failed To Change the step status and end time of due to {e}"})
