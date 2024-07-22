@@ -979,6 +979,7 @@
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_total_settled_amount",
     "fieldname": "custom_total_settled_amount",
+    "fieldtype": "Currency",
     "Hidden": "1"
   },
   {
@@ -986,6 +987,7 @@
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_total_tds_amount",
     "fieldname": "custom_total_tds_amount",
+    "fieldtype": "Currency",
     "Hidden": "1"
   },
   {
@@ -993,6 +995,7 @@
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_total_disallowance_amount",
     "fieldname": "custom_total_disallowance_amount",
+    "fieldtype": "Currency",
     "Hidden": "1"
   },
   {
@@ -1000,6 +1003,7 @@
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_total_writeoff_amount",
     "fieldname": "custom_total_writeoff_amount",
+    "fieldtype": "Currency",
     "Hidden": "1"
   },
   {
@@ -1007,6 +1011,7 @@
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_matcher_reference",
     "fieldname": "custom_matcher_reference",
+    "fieldtype": "Table",
     "Hidden": "1"
   },
   {
@@ -1014,6 +1019,7 @@
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_reference",
     "fieldname": "custom_reference",
+    "fieldtype": "Table",
     "Hidden": "1"
   },
   {
