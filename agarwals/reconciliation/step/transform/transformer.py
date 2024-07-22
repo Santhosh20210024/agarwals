@@ -165,13 +165,10 @@ class Transformer:
 
     def load_source_df(self, file, header):
         try:
-            if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
-                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
-            elif file['upload'].endswith('.csv'):
+            if file['upload'].lower().endswith('.csv'):
                 self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
             else:
-                self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
-                self.update_status('File upload', file['name'], 'Error')
+                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
             self.log_error(self.document_type, file['name'], e)
