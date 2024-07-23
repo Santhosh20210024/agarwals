@@ -1,11 +1,10 @@
 import frappe
 
 @frappe.whitelist()
-def get_sales_invoice_data(doc_name,jv_ac_name):
+def get_sales_invoice_references(doc_name,jv_ac_name):
     child_table = []
     parent_payment_entry = frappe.db.sql(f"SELECT parent FROM `tabPayment Entry Reference` WHERE reference_name ='{doc_name}' ",pluck ='parent')
     jv= frappe.db.sql(f"SELECT * FROM `tabJournal Entry Account` where account='{jv_ac_name}' AND reference_name = '{doc_name}' ", as_dict=True)
-
 
     if parent_payment_entry:
         for each_parent in parent_payment_entry:
