@@ -7,6 +7,7 @@ from datetime import datetime as dt
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.fiscal_year_update import update_fiscal_year
+from agarwals.reconciliation.step.closing_balance_check import validate_balance
 
 TAG = 'Credit Payment'
 ERROR_LOG = { 
@@ -256,6 +257,7 @@ def is_document_naming_rule(doctype):
 def process(args):
     try:
         args = cast_to_dic(args)
+        validate_balance()
         tag = 'Credit Payment'
         if not is_document_naming_rule('Bank Transaction'):
             frappe.msgprint("Document Naming Rule is not set for the Bank Transaction")
