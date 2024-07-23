@@ -73,7 +73,7 @@ def insert_record_in_settlement_advice(doc_to_insert):
             if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount==doc_to_insert.disallowed_amount:
                 update_error(doc_to_insert,'S100')
                 return
-            if sa_doc.status in ['Partially Processed','Fully Processed']:
+            if sa_doc.status != 'Warning':
                 update_error(doc_to_insert,'S106')
                 return
             sa_doc.update(data)
