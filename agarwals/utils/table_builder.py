@@ -1,4 +1,5 @@
 import frappe
+
 @frappe.whitelist()
 def get_sales_invoice_data(doc_name,jv_ac_name):
     child_table = []
