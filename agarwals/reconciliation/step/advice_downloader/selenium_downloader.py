@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime,timedelta
+from agarwals.utils.error_handler import log_error as error_handler
 import os
 import shutil
 from twocaptcha import TwoCaptcha
@@ -312,15 +313,10 @@ class SeleniumDownloader:
         if os.path.exists(file_path):
             os.remove(file_path)
 
-
     def log_error(self,doctype_name, reference_name, error_message):
-        error_log = frappe.new_doc('Error Record Log')
-        error_log.set('doctype_name', doctype_name)
-        error_log.set('reference_name', reference_name)
-        error_log.set('error_message', error_message)
-        error_log.save()
+        log = error_handler(error=error_message, doc=doctype_name,doc_name=reference_name)
         if reference_name:
-            self.insert_run_log({"doctype": "SA Downloader Run Log","last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":error_log.name,"status":"Error","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
+            self.insert_run_log({"doctype": "SA Downloader Run Log","last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":log.name,"status":"Error","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
             frappe.db.commit()
 
 
