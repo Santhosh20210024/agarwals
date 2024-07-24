@@ -45,7 +45,7 @@ class BankTransactionUTRKeyMapper(UTRKeyMapper):
 
         if(record.reference_number != '0' and record.status != 'Cancelled'):
                 utr_variant = list(self.get_variants(record.reference_number.lower().strip(), doctype, record.name))
-                utr_key = frappe.get_list("UTR Key", filters={'utr_variant':['in', utr_variant]}, pluck='utr_key')
+                utr_key = list(set(frappe.get_list("UTR Key", filters={'utr_variant':['in', utr_variant]}, pluck='utr_key')))
                 
                 if len(utr_key) > 1: # Check if any case it happening 
                     log_error(str(utr_key),'UTR Key', 'UTR Key - Bank Transaction') 
@@ -68,7 +68,7 @@ class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
         if record.utr_number != '0' and record.utr_number is not None:
             if str(record.utr_number).strip():
                 utr_variant = list(self.get_variants(record.utr_number.lower().strip(), doctype, record.name))
-                utr_key = frappe.get_list("UTR Key", filters={'utr_variant':['in',utr_variant]}, pluck='utr_key')
+                utr_key = list(set(frappe.get_list("UTR Key", filters={'utr_variant':['in',utr_variant]}, pluck='utr_key')))
                 
                 if len(utr_key) > 1: # Check if any case it happening 
                     log_error(str(utr_key),'UTR Key', 'UTR Key - Settlement Advice') 
@@ -93,7 +93,7 @@ class ClaimBookUTRKeyMapper(UTRKeyMapper):
         if record.utr_number != '0' and record.utr_number is not None:
             if str(record.utr_number).strip():
                 utr_variant = list(self.get_variants(record.utr_number.lower().strip(), doctype, record.name))
-                utr_key = frappe.get_list("UTR Key", filters={'utr_variant':['in',utr_variant]}, pluck='utr_key')
+                utr_key = list(set(frappe.get_list("UTR Key", filters={'utr_variant':['in',utr_variant]}, pluck='utr_key')))
                 
                 if len(utr_key) > 1: # Check if any case it happening 
                     log_error(str(utr_key),'UTR Key', 'UTR Key - ClaimBook') 
@@ -114,7 +114,7 @@ def process(args):
         process_records(
             """SELECT name FROM `tabBank Transaction`
                WHERE ( reference_number != '0' and reference_number IS NOT NULL and custom_utr_key IS NULL 
-               and status != 'Cancelled' and status != 'Reconciled' )""",
+               and status != 'Cancelled' )""",
             BankTransactionUTRKeyMapper,
             chunk_size,
             args,
@@ -132,8 +132,7 @@ def process(args):
         # Process Settlement Advice records
         process_records(
             """SELECT name FROM `tabSettlement Advice` 
-               WHERE status not in ('Fully Processed','Partially Processed') 
-               and utr_number !='0' and utr_number IS NOT NULL and utr_key IS NULL""",
+               WHERE utr_number !='0' and utr_number IS NOT NULL and utr_key IS NULL""",
             SettlementAdviceUTRKeyMapper,
             chunk_size,
             args,
