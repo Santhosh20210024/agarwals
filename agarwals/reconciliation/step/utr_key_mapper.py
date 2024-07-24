@@ -100,7 +100,7 @@ class ClaimBookUTRKeyMapper(UTRKeyMapper):
                     return
                 
                 if not utr_key:
-                    utr_key = self.create_utr_key(record.utr_number.lower(),doctype,record.name)
+                    utr_key = self.create_utr_key(record.utr_number.lower(),doctype,record.name,utr_variant)
                     
                 record.set('utr_key', utr_key[0])
             
@@ -111,14 +111,14 @@ def process(args):
         chunk_size = int(args["chunk_size"])
 
         # Process Bank Transactions
-        process_records(
-            """SELECT name FROM `tabBank Transaction`
-               WHERE ( reference_number != '0' and reference_number IS NOT NULL and custom_utr_key IS NULL 
-               and status != 'Cancelled' )""",
-            BankTransactionUTRKeyMapper,
-            chunk_size,
-            args,
-        )
+        # process_records(
+        #     """SELECT name FROM `tabBank Transaction`
+        #        WHERE ( reference_number != '0' and reference_number IS NOT NULL and custom_utr_key IS NULL 
+        #        and status != 'Cancelled' )""",
+        #     BankTransactionUTRKeyMapper,
+        #     chunk_size,
+        #     args,
+        # )
 
         # Process Claim Book records
         process_records(
@@ -128,15 +128,16 @@ def process(args):
             chunk_size,
             args,
         )
+        
 
         # Process Settlement Advice records
-        process_records(
-            """SELECT name FROM `tabSettlement Advice` 
-               WHERE utr_number !='0' and utr_number IS NOT NULL and utr_key IS NULL""",
-            SettlementAdviceUTRKeyMapper,
-            chunk_size,
-            args,
-        )
+        # process_records(
+        #     """SELECT name FROM `tabSettlement Advice` 
+        #        WHERE utr_number !='0' and utr_number IS NOT NULL and utr_key IS NULL""",
+        #     SettlementAdviceUTRKeyMapper,
+        #     chunk_size,
+        #     args,
+        # )
 
     except Exception as e:
         handle_exception(args["step_id"], e)
@@ -146,14 +147,15 @@ def process_records(query, mapper_class, chunk_size, args):
     if records:
         for index in range(0, len(records), chunk_size):
             chunk_doc = chunk.create_chunk(args["step_id"])
-            frappe.enqueue(
-                mapper_class().process,
-                queue = args['queue'],
-                is_async = True,
-                timeout = 50000,
-                records = records[index : index + chunk_size],
-                chunk_doc = chunk_doc,
-            )
+            # frappe.enqueue(
+            #     mapper_class().process,
+            #     queue = args['queue'],
+            #     is_async = True,
+            #     timeout = 50000,
+            #     records = records[index : index + chunk_size],
+            #     chunk_doc = chunk_doc,
+            # )
+            mapper_class().process(records,chunk_doc)
     else:
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Processed")
