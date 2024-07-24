@@ -6,7 +6,7 @@ from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from tfs.profiler.timer import Timer
-from agarwals.utils.payment_utils import update_error
+from agarwals.utils.reconciliation_utils import update_error
 from frappe.utils.caching import redis_cache
 
 class PaymentEntryCreator:
@@ -36,9 +36,7 @@ class PaymentEntryCreator:
         self.bt_doc = self.get_document_record('Bank Transaction', self.matcher_record.bank_transaction)
         self.si_doc = self.get_document_record('Sales Invoice', self.matcher_record.sales_invoice)
         error = None
-        if not self.bank_account:
-            error = "No Company Account Found for the Bank"
-        elif self.bt_doc.status == 'Reconciled':  # Already Reconciled
+        if self.bt_doc.status == 'Reconciled':  # Already Reconciled
              error = 'Already Reconciled'
         elif self.bt_doc.status not in ['Pending', 'Unreconciled']:
             error = 'Status Should be other then Pending, Unreconciled'
@@ -55,28 +53,29 @@ class PaymentEntryCreator:
         validate_timer.end()
         return True
 
+    def set_sa_vars(self, status = 'Fully Processed', remark = ''):
+        self.sa_status = status
+        self.sa_remark = remark
+
     def set_amount(self):
         set_amount_timer = Timer().start(f"set_amount {self.matcher_record.name}")
         unallocated_amount = self.bt_doc.unallocated_amount
-        if self.settled_amount > unallocated_amount:
-            self.settled_amount = unallocated_amount
-            self.sa_status = 'Partially Processed'
-        if self.si_doc.outstanding_amount < self.settled_amount:
-            self.settled_amount = self.si_doc.outstanding_amount
-            self.sa_status = 'Partially Processed'
         if self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount and self.si_doc.outstanding_amount >= self.settled_amount + self.tds_amount:
             self.disallowance_amount = 0
-            self.sa_remark = 'Disallowance amount is greater than Outstanding Amount'
-            self.sa_status = 'Fully Processed'
+            self.set_sa_vars(remark = 'Disallowance amount is greater than Outstanding Amount')
         elif self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount and self.si_doc.outstanding_amount >= self.settled_amount + self.disallowance_amount:
             self.tds_amount = 0
-            self.sa_remark = 'TDS amount is greater than Outstanding Amount'
-            self.sa_status = 'Fully Processed'
+            self.set_sa_vars(remark = 'TDS amount is greater than Outstanding Amount')
         elif self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount:
             self.tds_amount = 0
             self.disallowance_amount = 0
-            self.sa_remark = 'Both Disallowed and TDS amount is greater than Outstanding Amount'
-            self.sa_status = 'Fully Processed'
+            self.set_sa_vars(remark = 'Both Disallowed and TDS amount is greater than Outstanding Amount')
+        if self.settled_amount > unallocated_amount:
+            self.settled_amount = unallocated_amount
+            self.set_sa_vars('Partially Processed', "Bank Transcation unalllocated is less than settled amount")
+        if self.si_doc.outstanding_amount < self.settled_amount:
+            self.settled_amount = self.si_doc.outstanding_amount
+            self.set_sa_vars('Partially Processed', "Sales Invoice Outstanding is less than settled amount")
         set_amount_timer.end()
 
     def get_entry_name(self):
@@ -186,7 +185,7 @@ class PaymentEntryCreator:
             self.pe_doc = pe_doc
             process_payment_entry_timer.end()
         except Exception as e:
-            self.sa_remark = 'Unable to Create Payment Entry'
+            self.set_sa_vars("Warning", 'Unable to Create Payment Entry')
             process_payment_entry_timer.end()
             raise Exception(e)
 
@@ -266,6 +265,9 @@ class PaymentEntryCreator:
         self.update_claim_reference()
         update_reference_timer.end()
 
+    def clear_payment_doc(self):
+        self.pe_doc.delete()
+
     def process(self):
         Payment_creation_process_timer = Timer().start(f"Payment_creation_process {self.matcher_record.name}")
         try:
@@ -276,16 +278,17 @@ class PaymentEntryCreator:
             self.process_payment_entry()
             self.update_references()
             frappe.db.set_value('Matcher', self.matcher_record.name, 'status', 'Processed')
-            Payment_creation_process_timer.end()
         except Exception as e:
-            frappe.db.rollback()
+            self.clear_payment_doc()
             log_error(e,'Payment Entry', self.si_doc.name)
             update_error(self.matcher_record, self.sa_remark)
+        finally:
             frappe.db.commit()
             Payment_creation_process_timer.end()
 
+
 @redis_cache
-def get_posting_date(entity):
+def get_entity_closing_date(entity):
     get_posting_date_timer = Timer().start(f"get_posting_date {entity}")
     closing_date_list = frappe.get_list('Period Closure by Entity',
                                         filters={'entity': entity}
@@ -295,8 +298,8 @@ def get_posting_date(entity):
     get_posting_date_timer.end()
     return closing_date
 
-def create_payment_entries(matcher_doc_records, match_logic, chunk_doc):
-        t1 = Timer().start("create_payment_entry")
+def create_payment_entries(matcher_doc_records, match_logic, chunk_doc, batch):
+        t1 = Timer().start(f"create_payment_entry {batch}")
         chunk.update_status(chunk_doc, "InProgress")
         try:
             if not len(matcher_doc_records):
@@ -304,21 +307,22 @@ def create_payment_entries(matcher_doc_records, match_logic, chunk_doc):
                 t1.end()
                 return
             for matcher_record in matcher_doc_records:
-                closing_date = get_posting_date(matcher_record.si_entity)
+                closing_date = get_entity_closing_date(matcher_record.si_entity)
                 t2 = Timer().start(f"Payment_class {matcher_record.name}")
                 PaymentEntryCreator(matcher_record, match_logic, closing_date, chunk_doc).process()
                 t2.end()
             chunk.update_status(chunk_doc, "Processed")
             t1.end()
+            t1.print(batch)
         except Exception as e:
             log_error(e, 'Matcher')
             chunk.update_status(chunk_doc, "Error")
             t1.end()
+            t1.print(batch)
 
 @frappe.whitelist()
 def process(args):
     try:
-        process_timer = Timer().start("Payment Intial Process")
         args = cast_to_dic(args)
         seq_no = 0
         chunk_size = int(args["chunk_size"])
@@ -327,25 +331,20 @@ def process(args):
                                        , values={"m_logic": m_logic}
                                        , as_dict=True)
         if matcher_doc_records:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            create_payment_entries(matcher_doc_records=matcher_doc_records, match_logic=m_logic, chunk_doc=chunk_doc)
-            # for record in range(0, len(matcher_doc_records), chunk_size):
-            #     chunk_doc = chunk.create_chunk(args["step_id"])
-            #     seq_no = seq_no + 1
-            #     frappe.enqueue(create_payment_entries
-            #                    , queue = 'long'
-            #                    , is_async = True
-            #                    , job_name = "Batch" + str(seq_no)
-            #                    , timeout = 25000
-            #                    , matcher_doc_records = matcher_doc_records[record:record + chunk_size]
-            #                    , match_logic = m_logic, chunk_doc = chunk_doc)
+            for record in range(0, len(matcher_doc_records), chunk_size):
+                # create_payment_entries(matcher_doc_records=matcher_doc_records, match_logic=m_logic, chunk_doc=chunk_doc)
+                chunk_doc = chunk.create_chunk(args["step_id"])
+                seq_no = seq_no + 1
+                frappe.enqueue(create_payment_entries
+                               , queue = 'long'
+                               , is_async = True
+                               , job_name = "Batch" + str(seq_no)
+                               , timeout = 25000
+                               , matcher_doc_records = matcher_doc_records[record:record + chunk_size]
+                               , match_logic = m_logic, chunk_doc = chunk_doc, batch = "Batch" + str(seq_no))
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
-        process_timer.end()
-        process_timer.print("payment_process_output_11")
     except Exception:
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")
-        process_timer.end()
-        process_timer.print("payment_process_output_11")

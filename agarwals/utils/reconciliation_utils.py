@@ -4,14 +4,12 @@ from frappe.utils.caching import redis_cache
 
 def update_advice_log(advice, status, msg):
     advice_log_timer = Timer().start(f"update_advice_log {advice}")
-    frappe.db.set_value('Settlement Advice', advice, 'status', status)
-    frappe.db.set_value('Settlement Advice', advice, 'remark', msg)
+    frappe.db.sql(f"""UPDATE `tabSettlement Advice` SET 'status' = {status}, 'remark' = {msg} WHERE name = {advice}""")
     advice_log_timer.end()
 
 def update_matcher_log(name, status, msg):
     macher_log_timer = Timer().start(f"update_matcher_log {name}")
-    frappe.db.set_value('Matcher', name, 'status', status)
-    frappe.db.set_value('Matcher', name, 'remarks', msg)
+    frappe.db.sql(f"""UPDATE `tabMatcher` SET 'status' = {status}, 'remarks' = {msg} WHERE name = {name}""")
     macher_log_timer.end()
 
 def update_error(matcher_record, message):
