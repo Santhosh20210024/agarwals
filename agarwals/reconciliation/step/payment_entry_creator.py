@@ -272,20 +272,18 @@ class PaymentEntryCreator:
         Payment_creation_process_timer = Timer().start(f"Payment_creation_process {self.matcher_record.name}")
         try:
             if not self.validate():
-                Payment_creation_process_timer.end()
                 return None
             self.set_amount()
             self.process_payment_entry()
             self.update_references()
             frappe.db.set_value('Matcher', self.matcher_record.name, 'status', 'Processed')
         except Exception as e:
-            self.clear_payment_doc()
-            log_error(e,'Payment Entry', self.si_doc.name)
+            frappe.db.rollback()
             update_error(self.matcher_record, self.sa_remark)
+            log_error(e,'Payment Entry', self.si_doc.name)
         finally:
             frappe.db.commit()
             Payment_creation_process_timer.end()
-
 
 @redis_cache
 def get_entity_closing_date(entity):
@@ -301,22 +299,20 @@ def get_entity_closing_date(entity):
 def create_payment_entries(matcher_doc_records, match_logic, chunk_doc, batch):
         t1 = Timer().start(f"create_payment_entry {batch}")
         chunk.update_status(chunk_doc, "InProgress")
+        chunk_status = "Processed"
         try:
             if not len(matcher_doc_records):
-                chunk.update_status(chunk_doc, "Processed")
-                t1.end()
                 return
             for matcher_record in matcher_doc_records:
                 closing_date = get_entity_closing_date(matcher_record.si_entity)
                 t2 = Timer().start(f"Payment_class {matcher_record.name}")
                 PaymentEntryCreator(matcher_record, match_logic, closing_date, chunk_doc).process()
                 t2.end()
-            chunk.update_status(chunk_doc, "Processed")
-            t1.end()
-            t1.print(batch)
         except Exception as e:
+            chunk_status = "Error"
             log_error(e, 'Matcher')
-            chunk.update_status(chunk_doc, "Error")
+        finally:
+            chunk.update_status(chunk_doc, chunk_status)
             t1.end()
             t1.print(batch)
 
