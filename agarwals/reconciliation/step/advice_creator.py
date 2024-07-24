@@ -20,24 +20,23 @@ def update_error(error_doc,error_code):
     error_doc.status = 'Error'
     error_doc.remarks = ERROR_LOG[error_code]
     error_doc.error_code = error_code
-    error_doc.save(ignore_permissions=True)
-    frappe.db.commit()
+    return error_doc
 
 def log_error(doctype_name, error_doc, error_message):
     error_log = frappe.new_doc('Error Record Log')
     error_log.set('doctype_name', doctype_name)
-    if error_doc:
-        error_log.set('reference_name', error_doc.name)
     error_log.set('error_message', error_message)
     error_log.save()
-    update_error(error_doc,'S104')
+    if error_doc:
+        error_log.set('reference_name', error_doc.name)
+        return update_error(error_doc,'S104')
 
-def update_sa_status(doctype,doc_name,status):
-    doc = frappe.get_doc(doctype,doc_name)
-    doc.status = status
-    doc.save()
+def update_processed_status(doc_to_update, sa_name):
+    doc_to_update.settlement_advice = sa_name
+    doc_to_update.status = 'Processed'
+    return doc_to_update
 
-def insert_record_in_settlement_advice(doc_to_insert):
+def create_settlement_advice_doc(doc_to_insert):
     settlement_advices = frappe.get_list("Settlement Advice", filters={
         'utr_number': doc_to_insert.utr_number, 'claim_id': doc_to_insert.claim_id, 'status': "Error"})
     if len(settlement_advices) > 0 and doc_to_insert.retry == 1:
@@ -54,6 +53,15 @@ def insert_record_in_settlement_advice(doc_to_insert):
             "utr_number": doc_to_insert.utr_number,
             "final_utr_number":doc_to_insert.final_utr_number,
             "paid_date": doc_to_insert.paid_date,
+            "insurance_company": doc_to_insert.insurance_company,
+            "patient_name": doc_to_insert.patient_name,
+            "insurance_policy_number": doc_to_insert.insurance_policy_number,
+            "date_of_admission": doc_to_insert.date_of_admission,
+            "date_of_discharge": doc_to_insert.date_of_discharge,
+            "hospital_name": doc_to_insert.hospital_name,
+            "bank_account_number": doc_to_insert.bank_account_number,
+            "bank_name": doc_to_insert.bank_name,
+            "bank_branch": doc_to_insert.bank_branch,
             "claim_amount": doc_to_insert.claim_amount,
             "settled_amount": doc_to_insert.settled_amount,
             "tds_amount": doc_to_insert.tds_amount,
@@ -66,21 +74,21 @@ def insert_record_in_settlement_advice(doc_to_insert):
         }
     try:
         sa_doc = frappe.get_doc(data).insert(ignore_permissions=True)
-        update_sa_status(staging_doc,doc_to_insert.name,'Processed')
+        return update_processed_status(doc_to_insert, sa_doc.name)
     except Exception as e:
         if "Duplicate entry" in str(e):
             sa_doc = frappe.get_doc('Settlement Advice',name)
             if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount==doc_to_insert.disallowed_amount:
-                update_error(doc_to_insert,'S100')
-                return
+                doc_to_insert = update_error(doc_to_insert,'S100')
+                return doc_to_insert
             if sa_doc.status != 'Warning':
-                update_error(doc_to_insert,'S106')
-                return
+                doc_to_insert = update_error(doc_to_insert,'S106')
+                return doc_to_insert
             sa_doc.update(data)
             sa_doc.save()
-            update_sa_status(staging_doc, doc_to_insert.name, 'Processed')
+            return update_processed_status(doc_to_insert, sa_doc.name)
         else:
-            log_error(staging_doc, doc_to_insert, e)
+            raise Exception(e)
 
 def validate_advice(advice_staging_doc):
     if advice_staging_doc.status == "Error" and advice_staging_doc.retry == 0:
@@ -88,41 +96,41 @@ def validate_advice(advice_staging_doc):
     advice_staging_doc.retry = 0
     if advice_staging_doc.status == "Open" and (
             advice_staging_doc.final_utr_number == "0" or advice_staging_doc.final_utr_number is None or advice_staging_doc.claim_id == "0" or advice_staging_doc.utr_number is None):
-        update_error(advice_staging_doc, "S101")
-        return False
+        return update_error(advice_staging_doc, "S101"), False
     if advice_staging_doc.settled_amount is None or advice_staging_doc.settled_amount == 0:
-        update_error(advice_staging_doc, "S102")
-        return False
+        return update_error(advice_staging_doc, "S102"), False
     if advice_staging_doc.settled_amount < 0 or advice_staging_doc.tds_amount < 0 or advice_staging_doc.disallowed_amount < 0:
-        update_error(advice_staging_doc, "S105")
-        return False
+        return update_error(advice_staging_doc, "S105"), False
     if "e+" in advice_staging_doc.final_utr_number.lower() or "e+" in advice_staging_doc.utr_number.lower():
-        update_error(advice_staging_doc, "S103")
-        return False
-    return True
+        return update_error(advice_staging_doc, "S103"), False
+    return advice_staging_doc, True
 
-def settlement_advice_staging(advices, chunk_doc):
+def create_settlement_advices(advices, chunk_doc):
     chunk.update_status(chunk_doc, "InProgress")
+    chunk_status = "Processed"
     try:
         for advice in advices:
-                try:
-                    advice_staging_doc=frappe.get_doc(staging_doc,advice[0])
-                    advice_staging_doc.date = date.today(),
-                    if not validate_advice(advice_staging_doc):
-                        continue
-                    advice_staging_doc.claim_id=advice_staging_doc.claim_id.replace(".0","")
-                    advice_staging_doc.final_utr_number = advice_staging_doc.final_utr_number.replace(".0","")
-                    advice_staging_doc.utr_number = advice_staging_doc.utr_number.replace(".0","")
-                    advice_staging_doc.save(ignore_permissions=True)
-                    insert_record_in_settlement_advice(advice_staging_doc)
-                    frappe.db.commit()
-                except Exception as e:
-                    log_error(staging_doc, advice_staging_doc,e)
+            try:
+                advice_staging_doc=frappe.get_doc(staging_doc,advice[0])
+                advice_staging_doc, flag = validate_advice(advice_staging_doc)
+                if not flag:
                     continue
-        chunk.update_status(chunk_doc, "Processed")
+                advice_staging_doc.date = date.today(),
+                advice_staging_doc.claim_id=advice_staging_doc.claim_id.replace(".0","")
+                advice_staging_doc.final_utr_number = advice_staging_doc.final_utr_number.replace(".0","")
+                advice_staging_doc.utr_number = advice_staging_doc.utr_number.replace(".0","")
+                advice_staging_doc = create_settlement_advice_doc(advice_staging_doc)
+            except Exception as e:
+                advice_staging_doc = log_error(staging_doc, advice_staging_doc,e)
+                continue
+            finally:
+                advice_staging_doc.save(ignore_permissions=True)
+                frappe.db.commit()
     except Exception as e:
+        chunk_status = "Error"
         log_error(staging_doc, None, e)
-        chunk.update_status(chunk_doc, "Error")
+    finally:
+        chunk.update_status(chunk_doc, chunk_status)
 
 @frappe.whitelist()
 def process(args):
@@ -133,8 +141,8 @@ def process(args):
         if advices_list:
             for i in range(0, len(advices_list), n):
                 chunk_doc=chunk.create_chunk(args["step_id"])
-                frappe.enqueue(settlement_advice_staging, queue=args["queue"], is_async=True, job_name="Advice Creation", timeout=25000,
-                           advices = advices_list[i:i + n],chunk_doc=chunk_doc)
+                frappe.enqueue(create_settlement_advices, queue=args["queue"], is_async=True, job_name="Advice Creation", timeout=25000,
+                               advices = advices_list[i:i + n], chunk_doc=chunk_doc)
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
