@@ -36,8 +36,9 @@ class ClaimKeyCreator:
         variant_claim_numbers = None
         if claim_variant == None:
             variant_claim_numbers = list(self.get_variant_claim_numbers())
+        else:
+            variant_claim_numbers = claim_variant
         
-       
         for claim_number in variant_claim_numbers:
             claim_key = frappe.new_doc('Claim Key')
             claim_key.set('claim_key',key)
