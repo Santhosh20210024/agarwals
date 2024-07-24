@@ -18,7 +18,7 @@ ERROR_LOG = {
 
 def update_error(error_doc,error_code):
     error_doc.status = 'Error'
-    error_doc.remark = ERROR_LOG[error_code]
+    error_doc.remarks = ERROR_LOG[error_code]
     error_doc.error_code = error_code
     error_doc.save(ignore_permissions=True)
     frappe.db.commit()
@@ -30,12 +30,7 @@ def log_error(doctype_name, error_doc, error_message):
         error_log.set('reference_name', error_doc.name)
     error_log.set('error_message', error_message)
     error_log.save()
-    if "Duplicate entry" in str(error_message):
-        update_error(error_doc,'S100')
-    elif ERROR_LOG['S106'] == error_message:
-        update_error(error_doc,'S106')
-    else:
-        update_error(error_doc,'S104')
+    update_error(error_doc,'S104')
 
 
 def update_sa_status(doctype,doc_name,status):
@@ -76,10 +71,10 @@ def insert_record_in_settlement_advice(doc_to_insert):
         if "Duplicate entry" in str(e):
             sa_doc = frappe.get_doc('Settlement Advice',name)
             if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount==doc_to_insert.disallowed_amount:
-                log_error('Settlement Advice Staging', doc_to_insert, e)
+                update_error(doc_to_insert,'S100')
                 return
-            if sa_doc.status not in ['Partially Processed','Processed']:
-                log_error('Settlement Advice Staging', doc_to_insert,ERROR_LOG['S106'])
+            if sa_doc.status != 'Warning':
+                update_error(doc_to_insert,'S106')
                 return
             sa_doc.update(data)
             sa_doc.save()
