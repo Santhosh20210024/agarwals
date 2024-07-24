@@ -1,7 +1,7 @@
 import frappe
 
 def execute(filters=None):
-    query = """``
+    query = """
     SELECT
         COALESCE(table2.BRANCH, "TOTAL") AS "BRANCH",
         table2.branch_entity AS "BRANCH ENTITY",
@@ -53,15 +53,16 @@ def execute(filters=None):
                     tpa.reference_no AS utr_number,
                     SUM(tpa.paid_amount) AS settled_amount,
                     tpa.party_name AS party_name,
-                    tpa.custom_sales_invoice As bill_no,
+                    tpa.custom_sales_invoice AS bill_no,
                     tpa.posting_date AS posting_date
-                    FROM `tabPayment Entry` tpa
-                    Where tpa.status != 'Cancelled' GROUP BY tpa.branch, tpa.reference_no
+                FROM `tabPayment Entry` tpa
+                WHERE tpa.status != 'Cancelled'
+                GROUP BY tpa.branch, tpa.reference_no
             ) t ON t.utr_number = tbt.reference_number
         ) table1
     ) table2
     JOIN `tabBranch` tbr ON tbr.name = table2.BRANCH
-    GROUP BY table2.branch,table2.bank_account,table2.party_name, table2.utr_number;
+    GROUP BY table2.branch, table2.bank_account, table2.party_name, table2.utr_number;
     """
 
     data = frappe.db.sql(query, as_dict=True)
