@@ -33,6 +33,7 @@ class ClaimKeyCreator:
 
     def process(self,claim_variant = None):
         key = hashlib.sha1(self.claim_id.encode('utf-8')).hexdigest()
+        variant_claim_numbers = None
         if claim_variant == None:
             variant_claim_numbers = list(self.get_variant_claim_numbers())
         
