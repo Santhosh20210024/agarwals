@@ -56,6 +56,8 @@ class UTRKeyCreator:
         utr_variant_list = None
         if utr_variant == None:
             utr_variant_list = list(self.get_variants())
+        else:
+            utr_variant_list = utr_variant
             
         for _utr in utr_variant_list:
             utr_key = frappe.new_doc('UTR Key')
