@@ -53,6 +53,7 @@ class UTRKeyCreator:
 
     def process(self, utr_variant = None):
         key = hashlib.sha1(self.utr_number.encode('utf-8')).hexdigest()
+        utr_variant_list = None
         if utr_variant == None:
             utr_variant_list = list(self.get_variants())
             
