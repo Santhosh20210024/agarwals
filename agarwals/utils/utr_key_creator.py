@@ -14,9 +14,9 @@ class UTRKeyCreator:
         variants = [
             utr,
             re.sub(self.pattern, '', utr),
-            re.sub(r'uiic_', 'citin', utr),
-            re.sub(r'uic_', 'citin', utr),
-            self.remove_x_in_UTR(utr),
+            re.sub(r'.*uiic_', 'citin', utr),
+            re.sub(r'.*uic_', 'citin', utr),
+            re.sub(r'x+', '', utr),
             re.sub(r'^0+', '', utr)
         ]
        
@@ -24,7 +24,7 @@ class UTRKeyCreator:
             variants.append("citin" + utr)
        
         if len(utr) == 9:
-            variants.append('axiscn0' + utr)
+            variants.append('aiscn0' + utr)
            
         if utr.startswith("s") and len(utr) == 13:
             variants.append(utr[1:])
@@ -40,19 +40,19 @@ class UTRKeyCreator:
             if '-' in extracted_utr:
                 variants.extend(self.format_utr(extracted_utr.split('-')[-1]))
             else:
-                variants.extend(self.format_utr(self.remove_x_in_UTR(extracted_utr)))
+                variants.extend(self.format_utr(extracted_utr))
  
         if '-' in utr:
-            variants.extend(self.format_utr(self.remove_x_in_UTR(utr.split('-')[-1])))
+            variants.extend(self.format_utr(utr.split('-')[-1]))
         else:
-            variants.extend(self.format_utr(self.remove_x_in_UTR(utr)))
+            variants.extend(self.format_utr(utr))
  
         if utr.startswith('neft') and '-' in utr:
-            variants.extend(self.format_utr(self.remove_x_in_UTR(utr.split('-')[1])))
+            variants.extend(self.format_utr(utr.split('-')[1]))
  
         elif utr.startswith('rtgs') and '-' in utr:
-            variants.extend(self.format_utr(self.remove_x_in_UTR(utr.split('-')[1])))
- 
+            variants.extend(self.format_utr(utr.split('-')[1]))
+        variants = [variant for variant in variants if (variant.isnumeric() or variant.isalnum()) and len(variant) > 4 ]
         return set(variants)
  
     def process(self, utr_variants=None):
@@ -75,10 +75,10 @@ class UTRKeyCreator:
         frappe.db.commit()
         return [key]
  
-    def remove_x_in_UTR(self, utr):
-        if "xxxxxxx" in utr:
-            return utr.replace("xxxxxxx", '')
-        elif "xx" in utr and len(utr) > 16:
-            return utr.replace("xx", '')
-        return utr
+    # def remove_x_in_UTR(self, utr):
+    #     if "xxxxxxx" in utr:
+    #         return utr.replace("xxxxxxx", '')
+    #     elif "xx" in utr and len(utr) > 16:
+    #         return utr.replace("xx", '')
+    #     return utr
  
