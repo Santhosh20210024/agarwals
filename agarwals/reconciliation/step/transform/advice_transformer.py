@@ -20,6 +20,17 @@ class AdviceTransformer(StagingTransformer):
         self.rename_value = None
         self.list_of_char_to_replace = None
 
+    def get_files_to_transform(self):
+        file_query = f"""SELECT 
+                            upload,name,payer_type
+                        FROM 
+                            `tabFile upload` 
+                        WHERE 
+                            status = 'Open' AND document_type = '{self.file_type}'
+                            ORDER BY creation"""
+        files = frappe.db.sql(file_query, as_dict=True)
+        return files
+
     def clean_header(self, list_to_clean):
         cleaned_list = []
         for header in list_to_clean:
@@ -67,7 +78,12 @@ class AdviceTransformer(StagingTransformer):
         return None, header_row_index, identified_header_row
 
     def verify_file(self, file, header_index):
-        return True
+        configured_customers = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration';""", as_list=True)
+        if [file["payer_type"]] in configured_customers:
+            return True
+        self.log_error(self.document_type, file['name'], f'No Configuration For the Payer: {file["payer_type"]}')
+        self.update_status('File upload', file['name'], 'Error')
+        return False
 
     def get_columns_to_prune(self):
         return ['name', '_merge', 'hash_x', 'hash_column']

@@ -9,6 +9,7 @@
  "field_order": [
   "header_row_patterns",
   "target_columns",
+  "tpa",
   "char_to_replace_in_header"
  ],
  "fields": [
@@ -26,12 +27,18 @@
    "fieldname": "char_to_replace_in_header",
    "fieldtype": "Code",
    "label": "Char to replace in header"
+  },
+  {
+   "fieldname": "tpa",
+   "fieldtype": "Table MultiSelect",
+   "label": "TPA's",
+   "options": "SA Configured Customers"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-02-15 19:41:54.472376",
+ "modified": "2024-07-25 14:59:52.617440",
  "modified_by": "Administrator",
  "module": "Configuration",
  "name": "Settlement Advice Configuration",
