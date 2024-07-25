@@ -324,7 +324,7 @@ class Transformer:
     def format_numbers(self, df):
         columns = self.get_column_name_to_convert_to_numeric()
         for column in columns:
-            df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.]", "", regex=True)).round(2)
+            df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
         return df
 
     def process(self, args):
