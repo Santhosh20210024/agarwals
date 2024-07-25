@@ -630,7 +630,7 @@ class BankTransformer(StagingTransformer):
 
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
-    def extract_utr_from_narration(self, configuration,bank_account):
+    def extract_utr_from_narration(self, configuration):
         self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),str(row['bank_account']),eval(configuration.delimiters)), axis = 1)
 
     def validate_reference(self,source_ref):# chnage the unvalid reference number as 0
