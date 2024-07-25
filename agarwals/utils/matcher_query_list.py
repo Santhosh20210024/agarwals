@@ -36,7 +36,7 @@ def get_matcher_query(matcher_pattern):
                 ON CONCAT(bi.name, "-", bt.name) = mt.name
             WHERE
                 mt.name IS NULL
-                AND sa.status = 'Open'
+                AND sa.status = 'Open' and bt.custom_utr_key != 'Full String Value'
         """,
         "MA1-BN": """
             SELECT
@@ -70,7 +70,7 @@ def get_matcher_query(matcher_pattern):
                 ON CONCAT(bi.name, "-", bt.name) = mt.name
             WHERE
                 mt.name IS NULL
-                AND sa.status = 'Open'
+                AND sa.status = 'Open' and bt.custom_utr_key != 'Full String Value'
         """,
         "MA2-CN": """
             SELECT
@@ -105,7 +105,7 @@ def get_matcher_query(matcher_pattern):
                 ON bi.name = mt.sales_invoice 
             WHERE
                 mt.name is null
-                AND sa.status = 'Open'
+                AND sa.status = 'Open' and sa.utr_key != 'Full String Value'
         """,
         "MA2-BN": """
              SELECT
@@ -136,7 +136,7 @@ def get_matcher_query(matcher_pattern):
                 ON bi.name = mt.sales_invoice 
             WHERE
                 mt.name is null
-                AND sa.status = 'Open'
+                AND sa.status = 'Open' and sa.utr_key != 'Full String Value'
         """,
         "MA3-CN": """
             SELECT
@@ -170,7 +170,7 @@ def get_matcher_query(matcher_pattern):
                 `tabMatcher` mt
                 ON CONCAT(bi.name, "-", bt.name) = mt.name
             WHERE
-                mt.name IS NULL
+                mt.name IS NULL and bt.custom_utr_key != 'Full String Value'
         """,
         "MA3-BN": """
             SELECT
@@ -196,7 +196,7 @@ def get_matcher_query(matcher_pattern):
                 `tabMatcher` mt
                 ON CONCAT(bi.name, '-', bt.name) = mt.name
             WHERE
-                mt.name IS NULL
+                mt.name IS NULL and bt.custom_utr_key != 'Full String Value'
         """,
         "MA4-CN": """
             SELECT
@@ -225,7 +225,7 @@ def get_matcher_query(matcher_pattern):
             LEFT JOIN
             `tabMatcher` mt
             ON bi.name = mt.sales_invoice
-            WHERE mt.name is null
+            WHERE mt.name is null and cb.utr_key != 'Full String Value'
         """,
         "MA4-BN": """
             SELECT
@@ -247,7 +247,7 @@ def get_matcher_query(matcher_pattern):
             LEFT JOIN
             `tabMatcher` mt 
             ON bi.name = mt.sales_invoice
-            WHERE mt.name is null
+            WHERE mt.name is null and cb.utr_key != 'Full String Value'
         """,
         "MA5-CN": """
             SELECT
@@ -277,7 +277,7 @@ def get_matcher_query(matcher_pattern):
 	            ON CONCAT(bi.name, "-", bt.name) = mt.name
             WHERE
              	mt.name is null and
-                sa.status = 'Open'
+                sa.status = 'Open' and bt.custom_utr_key != 'Full String Value'
         """,
         "MA5-BN": """
             SELECT
@@ -306,7 +306,7 @@ def get_matcher_query(matcher_pattern):
                 ON CONCAT(bi.name, "-", bt.name) = mt.name
             WHERE
                 mt.name IS NULL
-                AND sa.status = 'Open'
+                AND sa.status = 'Open' and bt.custom_utr_key != 'Full String Value'
         """,
         "MA6-CN": """
             SELECT
@@ -333,7 +333,7 @@ def get_matcher_query(matcher_pattern):
                 ON bi.name = mt.sales_invoice
             WHERE
                 mt.name is null
-                AND sa.status = 'Open'
+                AND sa.status = 'Open' and and sa.utr_key != 'Full String Value'
         """,
         "MA6-BN": """
             SELECT
@@ -357,7 +357,7 @@ def get_matcher_query(matcher_pattern):
 		        ON bi.name = mt.sales_invoice
 		    WHERE
 		        mt.name is null
-		        AND sa.status = 'Open'
+		        AND sa.status = 'Open' and and sa.utr_key != 'Full String Value'
         """
     }
 
