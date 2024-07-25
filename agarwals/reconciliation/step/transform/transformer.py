@@ -494,7 +494,6 @@ class StagingTransformer(Transformer):
         self.source_df = self.source_df.loc[:null_index - 1]
         return True
 
-
     def transform(self,file):
         configuration = self.get_configuration()
         header_identification_keys = self.get_header_identification_keys(configuration)

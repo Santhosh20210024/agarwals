@@ -78,7 +78,12 @@ class AdviceTransformer(StagingTransformer):
         return None, header_row_index, identified_header_row
 
     def verify_file(self, file, header_index):
-        return True
+        configured_customers = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration';""", as_list=True)
+        if [file["payer_type"]] in configured_customers:
+            return True
+        self.log_error(self.document_type, file['name'], f'No Configuration For the Payer: {file["payer_type"]}')
+        self.update_status('File upload', file['name'], 'Error')
+        return False
 
     def get_columns_to_prune(self):
         return ['name', '_merge', 'hash_x', 'hash_column']
