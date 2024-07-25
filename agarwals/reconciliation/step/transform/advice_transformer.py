@@ -20,6 +20,17 @@ class AdviceTransformer(StagingTransformer):
         self.rename_value = None
         self.list_of_char_to_replace = None
 
+    def get_files_to_transform(self):
+        file_query = f"""SELECT 
+                            upload,name,payer_type
+                        FROM 
+                            `tabFile upload` 
+                        WHERE 
+                            status = 'Open' AND document_type = '{self.file_type}'
+                            ORDER BY creation"""
+        files = frappe.db.sql(file_query, as_dict=True)
+        return files
+
     def clean_header(self, list_to_clean):
         cleaned_list = []
         for header in list_to_clean:
@@ -78,15 +89,27 @@ class AdviceTransformer(StagingTransformer):
     def get_columns_to_fill_na_as_0(self):
         return ['settled_amount', 'tds_amount', 'disallowed_amount']
 
-    def clean_data(self, df):
+    def calculate_settled_amount(self, file, df):
+        if file["payer_type"].lower().replace(" ", "") not in ["carehealthinsurancelimited"]:
+            return df
+        df["tdsdeduction"] = pd.to_numeric(df["tdsdeduction"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
+            r"[\"\'?%,]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0"), errors='coerce')
+        df["tds_amount"] = df["tds_amount"].round(2)
+        df["calculate_tds"] = ((df["settled_amount"].astype(float).round(2) * df["tdsdeduction"].astype(float).round(2))/100).round(2)
+        if any(df["calculate_tds"] == df["tds_amount"]):
+            df.columns = ['claim_amount' if x == 'settled_amount' else x for x in df.columns]
+            df['settled_amount'] = df['claim_amount'] - df['tds_amount']
+        return df.drop(columns = ["calculate_tds"])
+
+    def clean_data(self, file, df):
         df = self.fill_na_as_0(df)
+        df = self.calculate_settled_amount(file, df)
         df["final_utr_number"] = df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
             r"[\"\'?]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0")
         df["claim_id"] = df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '', regex=True).replace(
             "", "0")
         df = self.format_date(df, eval(frappe.get_single('Bank Configuration').date_formats), 'paid_date')
         return df
-
 
     def get_columns_to_hash(self):
         return ["claim_id", "bill_number", "utr_number", "claim_status", "claim_amount", "disallowed_amount",
@@ -120,7 +143,7 @@ class AdviceTransformer(StagingTransformer):
             self.update_status('File upload', file['name'], 'Error')
             return False
         self.convert_column_to_numeric()
-        self.source_df = self.clean_data(self.source_df)
+        self.source_df = self.clean_data(file, self.source_df)
         self.hashing_job()
         self.load_target_df()
         if self.target_df.empty:
