@@ -47,12 +47,12 @@ class BillClaimKeyMapper(ClaimKeyMapper):
                 claim_key = list(set(frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')))
                 
                 if len(claim_key) > 1:
-                    log_error(str(claim_key),'Claim Key','Claim Key - Settlement Advice')
+                    log_error(str(claim_key),'Claim Key','Claim Key - Bill')
                     return
                 
                 if not claim_key:
                     claim_key = self.create_claim_key(record.claim_id,doctype,record.name,claim_variant)
-                    insert_claim_keys(record.name,claim_key[0],'Bill Claim Key')
+                insert_claim_keys(record.name,claim_key[0],'Bill Claim Key')
                 record.set('claim_key', claim_key[0])
         if record.ma_claim_id:
             if record.ma_claim_id != '0' and record.ma_claim_id is not None:
@@ -60,11 +60,11 @@ class BillClaimKeyMapper(ClaimKeyMapper):
                     claim_variant = list(claim_variant = list(self.get_variants(record.ma_claim_id, doctype, record.name)))
                     ma_claim_key = list(set(frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')))
                     if len(ma_claim_key) > 1:
-                       log_error(str(ma_claim_key),'Claim Key','Claim Key - Settlement Advice')
+                       log_error(str(ma_claim_key),'Claim Key','Claim Key - Bill')
                        return
                     if not ma_claim_key:
                         ma_claim_key = self.create_claim_key(record.ma_claim_id, doctype, record.name,claim_variant)
-                        insert_claim_keys(record.name,claim_key[0],'Bill Claim Key')
+                    insert_claim_keys(record.name,claim_key[0],'Bill Claim Key')
                     record.set('ma_claim_key', ma_claim_key[0])
 
 class ClaimBookClaimKeyMapper(ClaimKeyMapper):
@@ -82,12 +82,12 @@ class ClaimBookClaimKeyMapper(ClaimKeyMapper):
                 claim_key = list(set(frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')))
                 
                 if len(claim_key) > 1:
-                    log_error(str(claim_key),'Claim Key','Claim Key - Settlement Advice')
+                    log_error(str(claim_key),'Claim Key','Claim Key - ClaimBook')
                     return
                 
                 if not claim_key:
                     claim_key = self.create_claim_key(record.al_number,doctype,record.name,claim_variant)
-                    insert_claim_keys(record.name,claim_key[0],'ClaimBook Claim Key')
+                insert_claim_keys(record.name,claim_key[0],'ClaimBook Claim Key')
                 record.set('al_key', claim_key[0])
         if record.cl_number != '0' and record.cl_number is not None:
             if str(record.cl_number).strip() != '':
@@ -96,15 +96,15 @@ class ClaimBookClaimKeyMapper(ClaimKeyMapper):
                 claim_key = list(set(frappe.get_list("Claim Key", filters={'claim_variant':['in',claim_variant]}, pluck='claim_key')))
                 
                 if len(claim_key) > 1:
-                    log_error(str(claim_key),'Claim Key','Claim Key - Settlement Advice')
+                    log_error(str(claim_key),'Claim Key','Claim Key - ClaimBook')
                     return
                 
                 if not claim_key:
                     claim_key = self.create_claim_key(record.cl_number,doctype,record.name,claim_variant)
-                    insert_claim_keys(record.name,claim_key[0],'ClaimBook Claim Key')
+                insert_claim_keys(record.name,claim_key[0],'ClaimBook Claim Key')
                 record.set('cl_key', claim_key[0])
 
-class SAClaimKeyMapper(BillClaimKeyMapper):
+class SAClaimKeyMapper(ClaimKeyMapper):
     def get_doctype(self):
         return 'Settlement Advice'
 
