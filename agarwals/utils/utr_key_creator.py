@@ -52,22 +52,19 @@ class UTRKeyCreator:
  
         match = self.utr_format_pattern.match(utr)
         if match:
-            _,utr_number, _ = match.groups()
+            _, utr_number, _ = match.groups()
             print(utr_number)
             variants.extend(self.format_utr(utr_number))
  
         return set(variants)
     
-    def process(self, utr_variants=None):
+    def process(self, utr_variants = None):
         key = hashlib.sha1(self.utr_number.encode('utf-8')).hexdigest()
-       
-        utr_variant_list = None
-        if utr_variants == None:
-            utr_variant_list = list(self.get_variants())
-        else:
-            utr_variant_list = utr_variants
-           
-        for variant in utr_variant_list:
+        
+        if not utr_variants:
+            return ["Full String Value"]
+
+        for variant in utr_variants:
             utr_key = frappe.new_doc('UTR Key')
             utr_key.update({
                 'utr_key': key,
@@ -80,11 +77,3 @@ class UTRKeyCreator:
  
         frappe.db.commit()
         return [key]
- 
-    # def remove_x_in_UTR(self, utr):
-    #     if "xxxxxxx" in utr:
-    #         return utr.replace("xxxxxxx", '')
-    #     elif "xx" in utr and len(utr) > 16:
-    #         return utr.replace("xx", '')
-    #     return utr
- 
