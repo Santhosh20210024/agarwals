@@ -31,15 +31,12 @@ class ClaimKeyCreator:
         variant_claim_number.append(possible_claim_id)
         return set(variant_claim_number)
 
-    def process(self,claim_variant = None):
+    def process(self,claim_variants = None):
         key = hashlib.sha1(self.claim_id.encode('utf-8')).hexdigest()
-        variant_claim_numbers = None
-        if claim_variant == None:
-            variant_claim_numbers = list(self.get_variant_claim_numbers())
-        else:
-            variant_claim_numbers = claim_variant
-        
-        for claim_number in variant_claim_numbers:
+        if not claim_variants :
+            return [None]
+            
+        for claim_number in claim_variants:
             claim_key = frappe.new_doc('Claim Key')
             claim_key.set('claim_key',key)
             claim_key.set('claim_variant',claim_number)
