@@ -48,7 +48,6 @@ class UTRKeyCreator:
         match = self.utr_format_pattern.match(utr)
         if match:
             _,utr_number, _ = match.groups()
-            print(utr_number)
             variants.extend(self.format_utr(utr_number))
 
         return set(variants)
