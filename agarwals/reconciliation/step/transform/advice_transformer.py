@@ -93,13 +93,13 @@ class AdviceTransformer(StagingTransformer):
         if file["payer_type"].lower().replace(" ", "") not in ["carehealthinsurancelimited"]:
             return df
         df["tdsdeduction"] = pd.to_numeric(df["tdsdeduction"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
-            r"[\"\'?%,]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0"), errors='coerce')
-        df["tds_amount"] = df["tds_amount"].round(2)
-        df["calculate_tds"] = ((df["settled_amount"].astype(float).round(2) * df["tdsdeduction"].astype(float).round(2))/100).round(2)
-        if any(df["calculate_tds"] == df["tds_amount"]):
-            df.columns = ['claim_amount' if x == 'settled_amount' else x for x in df.columns]
-            df['settled_amount'] = df['claim_amount'] - df['tds_amount']
-        return df.drop(columns = ["calculate_tds"])
+                    r"[\"\'?%,]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0"), errors='coerce')
+        df["calculate_tds"] = ((df["settled_amount"].astype(float) * df["tdsdeduction"].astype(float))/100)
+        if any(df["calculate_tds"].astype(float) == df["tds_amount"].astype(float)):
+            df['claim_amount'] = df['settled_amount']
+            df['settled_amount'] = df['claim_amount'].astype(float) - df['tds_amount'].astype(float)
+        df = df.drop(columns = ["calculate_tds"])
+        return df
 
     def clean_data(self, file, df):
         df = self.fill_na_as_0(df)
