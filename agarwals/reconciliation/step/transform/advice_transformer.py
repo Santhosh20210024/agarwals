@@ -92,13 +92,25 @@ class AdviceTransformer(StagingTransformer):
     def calculate_settled_amount(self, file, df):
         if file["payer_type"].lower().replace(" ", "") not in ["carehealthinsurancelimited"]:
             return df
-        df["tdsdeduction"] = pd.to_numeric(df["tdsdeduction"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
-                    r"[\"\'?%,]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0"), errors='coerce')
-        df["calculate_tds"] = ((df["settled_amount"].astype(float) * df["tdsdeduction"].astype(float))/100)
-        if any(df["calculate_tds"].astype(float) == df["tds_amount"].astype(float)):
-            df['claim_amount'] = df['settled_amount']
-            df['settled_amount'] = df['claim_amount'].astype(float) - df['tds_amount'].astype(float)
-        df = df.drop(columns = ["calculate_tds"])
+
+        def set_settled_amount(df):
+            df['settled_amount'] = df['settled_amount'].astype(float) - df['tds_amount'].astype(float)
+            return df
+
+        def care_health_insurance_limited(df):
+            df["tdsdeduction"] = pd.to_numeric(df["tdsdeduction"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
+                        r"[\"\'?%,]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0"), errors='coerce')
+            df["calculate_tds"] = ((df["settled_amount"].astype(float) * df["tdsdeduction"].astype(float))/100)
+            if any(df["calculate_tds"].astype(float) == df["tds_amount"].astype(float)):
+                df['claim_amount'] = df['settled_amount']
+                df = set_settled_amount(df)
+            return df.drop(columns = ["calculate_tds"])
+
+        try:
+            func=eval(file["payer_type"].lower().replace(" ", "_"))
+        except Exception:
+            func = set_settled_amount
+        df = func(df)
         return df
 
     def clean_data(self, file, df):
