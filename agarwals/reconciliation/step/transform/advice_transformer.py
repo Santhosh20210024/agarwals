@@ -78,7 +78,7 @@ class AdviceTransformer(StagingTransformer):
         return None, header_row_index, identified_header_row
 
     def verify_file(self, file, header_index):
-        configured_customers = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration';""", as_list=True)
+        configured_customers = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'tpa';""", as_list=True)
         if [file["payer_type"]] in configured_customers:
             return True
         self.log_error(self.document_type, file['name'], f'No Configuration For the Payer: {file["payer_type"]}')
@@ -95,11 +95,12 @@ class AdviceTransformer(StagingTransformer):
         return ['settled_amount', 'tds_amount', 'disallowed_amount']
 
     def calculate_settled_amount(self, file, df):
-        if file["payer_type"].lower().replace(" ", "") not in ["carehealthinsurancelimited"]:
+        tpa_to_calculate_settled_amount = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount';""", as_list=True)
+        if [file["payer_type"]] not in tpa_to_calculate_settled_amount or 'linkedclaimnumber' in df.columns:
             return df
 
         def set_settled_amount(df):
-            df['settled_amount'] = df['settled_amount'].astype(float) - df['tds_amount'].astype(float)
+            df['settled_amount'] = df['claim_amount'].astype(float) - df['tds_amount'].astype(float)
             return df
 
         def care_health_insurance_limited(df):
@@ -110,9 +111,8 @@ class AdviceTransformer(StagingTransformer):
                 df['claim_amount'] = df['settled_amount']
                 df = set_settled_amount(df)
             return df.drop(columns = ["calculate_tds"])
-
         try:
-            func=eval(file["payer_type"].lower().replace(" ", "_"))
+            func=eval(file["payer_type"].lower().strip().replace(" ", "_"))
         except Exception:
             func = set_settled_amount
         df = func(df)
