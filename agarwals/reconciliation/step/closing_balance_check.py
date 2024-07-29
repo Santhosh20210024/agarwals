@@ -39,15 +39,15 @@ class ClosingBalance:
     def validate_balance(self):
         self.load_data()
         self.validate()
-        balance_list = frappe.get_all('Closing Balance', fields=['name', 'closing_balance', 'ag_closing_balance', 'difference'])
-        mail = frappe.db.get_single_value('Control Panel', 'mail_id')
-        balance = frappe.get_list('Closing Balance', filters={'difference': ['!=', 0]}, fields=['difference'])
-        mail_ids = mail.split(',')
+        balance_list = frappe.get_all('Closing Balance', fields=['name', 'closing_balance', 'ag_closing_balance', 'difference'],filters={'difference': ['!=', 0]}, fields=['difference'])
+        mail_group = frappe.get_doc('Control Panel').check_list_email_group
+        recipients = frappe.get_list('Email Group Member', {'email_group': mail_group}, pluck='email')
+        if recipients:
         
-        if balance:
-            html_table = ClosingBalance().format_table(balance_list)
-            frappe.sendmail(
-                recipients=mail_ids,
+            if balance_list:
+              html_table = ClosingBalance().format_table(balance_list)
+              frappe.sendmail(
+                recipients=recipients,
                 subject="Closing Balance Check",
                 message=f"""
                     <p>Dear User,</p>
@@ -56,7 +56,7 @@ class ClosingBalance:
                     <p>Regards,<br>Your Company</p>
                 """
             )
-            frappe.throw('Check the closing balance')
+              frappe.throw('Check the closing balance')
     
     def format_table(self,balance_list):
         if not balance_list:
