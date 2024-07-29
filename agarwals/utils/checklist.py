@@ -21,7 +21,11 @@ class checker:
             'M01': 'Evaluation of matcher records with status equal to "Open" after the matching process',
             'U01': 'Evaluation of the UTR key in bank transactions',
             'U02': 'Evaluation of the UTR key in settlement advice',
-            'U03': 'Evaluation of the UTR key in the claim book'
+            'U03': 'Evaluation of the UTR key in the claim book',
+            'C01': 'Evaluation of presence of claim key in Bill',
+            'C02' : 'Evaluation of the presence of claim key in settlement advice',
+            'C03' : 'Evaluation of the presence of claim key in Claim Book',
+            'B01' : 'Evaluation of all processed bill adjustments has been recorded with a journal entry'
         }
 
         self.report = []
@@ -49,7 +53,9 @@ class checker:
                 "3": "BankTransactionChecker",
                 "4": "SettlementAdviceChecker",
                 "5": "MatcherChecker",
-                "6": "UTRKeyChecker"
+                "6": "UTRKeyChecker",
+                "7": 'ClaimKeyChecker',
+                "8": 'BillAdjustmentChecker'
             }
             new_order = trigger_order.split(",")
             for order in new_order:
@@ -79,7 +85,7 @@ class checker:
             <br>Claimgenie  
         """
         if self.mail_group:
-            recipients = frappe.get_list('Email Group Member', {'email_group': self.mail_group}, 'email', pluck='email')
+            recipients = frappe.get_list('Email Group Member', {'email_group': self.mail_group} , pluck='email')
             if recipients:
                 frappe.sendmail(recipients=recipients, message=message, subject=subject)
         else:
@@ -223,13 +229,35 @@ class UTRKeyChecker(checker):
     def process(self):
         self.check_utr_key()
 
+class ClaimKeyChecker(checker):
+    def check_claim_key(self):
+        settlement_advice = self.get_value(self.get_count('Settlement Advice', {'claim_key': None}))
+        claimbook = self.get_value(frappe.db.sql("SELECT count(1) total FROM `tabClaimBook` WHERE (al_number is NOT NULL AND al_key is NULL) OR (cl_number is NOT null and cl_key IS NULL)",pluck= 'total')[0])
+        bill = self.get_value(frappe.db.sql("SELECT count(1) total FROM `tabBill` WHERE (ma_claim_id IS NOT NULL AND ma_claim_key is NULL ) OR (claim_id IS NOT NULL AND (claim_key is NULL AND claim_key <> 0)) "))
+        self.add_to_report('C01',True ) if bill == 0 else self.add_to_report('C01', False,f'{bill} Records Found "Claim KEY = NONE " in Bill')
+        self.add_to_report('C02',True) if settlement_advice == 0 else self.add_to_report('C02',False,f'{settlement_advice} Records Found "Claim KEY = NONE " in Settlement Advice')
+        self.add_to_report('C03',True) if claimbook == 0 else self.add_to_report('C03',False,f'{claimbook} Records Found "Claim KEY = NONE " in Claim Book')
+
+    def process(self):
+        self.check_claim_key()
+
+class BillAdjustmentChecker(checker):
+
+    def eval_bill_adjustment_with_jv(self):
+        bill_adjustment = self.get_value(self.get_count('Bill Adjustment', {'status': ['in', ['Processed', 'Partially Processed']]}))
+        jv_count = self.get_value(frappe.db.sql("""SELECT COUNT(DISTINCT(jv.reference_name)) as total FROM `tabJournal Entry Account` jv JOIN `tabBill Adjustment` ba ON ba.name = jv.reference_name ;""",pluck = 'total')[0])
+        self.add_to_report('B01',True ) if bill_adjustment == jv_count else self.add_to_report('B01', False,f'bill adjustment {bill_adjustment} Not Equals to {jv_count} Journal Entry "')
+
+    def process(self):
+        self.eval_bill_adjustment_with_jv()
+
 @frappe.whitelist()
 def process():
     try:
         control_panel = frappe.get_single("Control Panel")
         if control_panel.site_path is None:
             raise Exception("Site Path Not Found")
-        trigger_order = control_panel.order if control_panel.order else "1,2,3,4,5,6"
+        trigger_order = control_panel.order if control_panel.order else "1,2,3,4,5,6,7,8"
         checklist_instance = checker()
         frappe.enqueue(checklist_instance.process, queue='long', job_name=f"checklist - {frappe.utils.now_datetime()}",
                        trigger_order=trigger_order, mail_group=control_panel.check_list_email_group,
