@@ -5,7 +5,7 @@ frappe.listview_settings['Closing Balance'] = {
                  'Are you sure you want to perform this action ?',
                  function (frm) {
                    frappe.call({
-                   method: 'agarwals.reconciliation.step.closing_balance_check.validate',
+                   method: 'agarwals.reconciliation.step.closing_balance_check.check',
                    freeze: true,
                    freeze_message: "Validating...",
                    callback: function (r) {
@@ -20,7 +20,7 @@ frappe.listview_settings['Closing Balance'] = {
                  'Are you sure you want to perform this action ?',
                  function (frm) {
                    frappe.call({
-                   method: 'agarwals.reconciliation.step.closing_balance_check.load_data',
+                   method: 'agarwals.reconciliation.step.closing_balance_check.load',
                    freeze: true,
                    freeze_message: "Loading...",
                    callback: function (r) {
