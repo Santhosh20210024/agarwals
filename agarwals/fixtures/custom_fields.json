@@ -117,15 +117,13 @@
     "label": "Index",
     "insert_after": "custom_transform"
   },
-
-
   {
     "doctype": "SA Downloader Configuration",
     "name": "VidalHealthDownloader",
     "website_url": "https://tips.vidalhealthtpa.com/hospitallogin/hospital/login/",
     "class_name": "VidalHealthDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -133,16 +131,15 @@
     "website_url": "https://cashless.cholainsurance.com/login",
     "class_name": "CholasPdfDownloader",
     "incoming_file_type": "PDF",
-    "is_headless":1
+    "is_headless": 1
   },
-
   {
     "doctype": "SA Downloader Configuration",
     "name": "EricsonDownloader",
     "website_url": "https://www.ericsontpa.com/",
     "class_name": "EricsonDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -150,7 +147,7 @@
     "website_url": "https://healthconnect.careinsurance.com",
     "class_name": "CarehealthDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -158,7 +155,7 @@
     "website_url": "https://provider.reliancegeneral.co.in//",
     "class_name": "RelianceGeneralDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -166,7 +163,7 @@
     "website_url": "https://eclaim.mdindia.com:94/",
     "class_name": "MDIndiaDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -174,7 +171,7 @@
     "website_url": "https://webace.goodhealthtpa.in/Provider/ProviderLogin.aspx",
     "class_name": "GoodHealthDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -182,7 +179,7 @@
     "website_url": "https://shpv.starhealth.in/",
     "class_name": "StarVitrayaDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -190,7 +187,7 @@
     "website_url": "https://provider.paramounttpa.com/Login.aspx",
     "class_name": "ParamountDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -198,7 +195,7 @@
     "website_url": "https://fhpl.net/FhplLogins/NetworkHospitals/ProviderLogin.aspx",
     "class_name": "FHPLDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -206,7 +203,7 @@
     "website_url": "https://healthindiatpa.com/Logins/LoginProvider.aspx",
     "class_name": "HealthIndiaDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -214,7 +211,7 @@
     "website_url": "https://www.safewaytpa.in/Hospitallogin.aspx",
     "class_name": "SafewayDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -222,7 +219,7 @@
     "website_url": "https://www.safewaytpa.in/Hospitallogin.aspx",
     "class_name": "NivaBupaDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -230,7 +227,7 @@
     "website_url": "https://ecare.bajajallianz.com",
     "class_name": "BajajAllianzDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -238,7 +235,7 @@
     "website_url": "https://provider.ihx.in/",
     "class_name": "ProviderIhxDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -246,7 +243,7 @@
     "website_url": "https://ilhc.icicilombard.com/",
     "class_name": "ICICLombardDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -254,7 +251,7 @@
     "website_url": "https://cashless.cholainsurance.com",
     "class_name": "CholasDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -262,25 +259,25 @@
     "website_url": "https://spp.starhealth.in/#/",
     "class_name": "StarHealthDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
-    {
+  {
     "doctype": "SA Downloader Configuration",
     "name": "HeritageDownloader",
     "website_url": "http://www.heritagehealthtpa.in/HospitalPortal/LogIn.aspx",
     "class_name": "HeritageDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
-      {
+  {
     "doctype": "SA Downloader Configuration",
     "name": "HeritageDownloader",
     "website_url": "http://www.heritagehealthtpa.in/HospitalPortal/LogIn.aspx",
     "class_name": "HeritageDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
-{
+  {
     "doctype": "Data Import Mapping",
     "name": "Bill",
     "mapping_columns": [
@@ -381,7 +378,7 @@
         }
 
     ]
-},
+  },
   {
     "doctype": "Data Import Mapping",
     "name": "Write Off",
@@ -454,8 +451,8 @@
 
 
     ]
-},
-    {
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "Write Back",
     "mapping_columns": [
@@ -531,8 +528,8 @@
             "column_in_doctype": "index"
         }
     ]
-},
-      {
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "Settlement Advice Staging",
     "mapping_columns": [
@@ -596,8 +593,8 @@
         }
 
     ]
-},
-        {
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "ClaimBook",
     "mapping_columns": [
@@ -812,8 +809,8 @@
         }
 
     ]
-},
-{
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "Bank Transaction Staging",
     "mapping_columns": [
@@ -870,7 +867,7 @@
         }
 
     ]
-},
+  },
   {
     "doctype": "Data Import Mapping",
     "name": "Bill Adjustment",
@@ -901,13 +898,141 @@
         }
 
     ]
-},
+  },
   {
     "doctype": "Settlement Advice Configuration",
     "name": "Settlement Advice Configuration",
     "header_row_patterns": "[\"CLAIM NO\",\"Claim Number\",\"Claimno\",\"ClaimId\",\"CCNNumber\",\"al_number\",\"AL-Number\",\"AL Number\",\"Insurer Claim Number\",\"Insurance Claim No\",\"PreAuth Number\",\"PA No\",\"preauthid\",\"FIR\",\"Case Id\",\"CCN\",\"File No\",\"INTIMATION_NUM\",\"INSURER_CLAIM_NO\", \"Ref Id\",\"Ref No.\",\"Case Number\"]",
     "target_columns": "{\n    \"claim_id\":[[\"PreAuth Number\",\"PA No\",\"preauthid\",\"al_number\",\"AL-Number\",\"AL Number\",\"Insurer Claim Number\",\"InsurerClaimID\",\"Insurance Claim No\",\"INSURER_CLAIM_NO\",\"AL/ Cashless Authorisation No\"],[ \"FIR\",\"Case Id\",\"CCN\",\"File No\",\"CLAIM NO\", \"CCNNumber\",\"Claim Number\",\"Claimno\",\"ClaimId\", \"INTIMATION_NUM\", \"Ref Id\", \"Ref No.\",\"Case Number\"]],\n    \"claim_amount\":[\"Amount Intim\",\"AL_AMOUNT\",\"GROSS AMOUNT\",\"Claim-Amount Claimed\", \"Lodge_Amount\",\"Request Amount\",\"Request_Amount\",\"claim_amount\", \"Claimed Amount\",\"Claim Amt\",\"Claimed Amt\",\"Claim Initiation Amount\",\"Sum of Claimed Amount\",\"Claim Amt\",\"Request_Amount\",\"Claimed amount (A)\",\"Claim Amount\",\"Approved Amount\",\"claimamount\",\"claimedamount\",\"CLAIMED_AMOUNT\",\"ClaimedAmt\",\"Bill Amt.\",\"App. Amt.\",\"App Amt(INR)\"],\n    \"utr_number\":[\"Claim UTR Number\", \"Fund Transfer No.\",\"utr_number\",\"UTR Number\",\"UTR NO\",\"Cheque/ NEFT/ UTR No.\", \"UTR_NO\",\"UTR\",\"Cheque/NEFT No\",\"UTR No\", \"UTR/Chq No.\",\"NEFT Transaction Number\",\"Payment_Reference_Number\",\"UTR/Chq No.\",\"Cheque/NEFT Number\",\"Claim-Cheque Number\", \"Cheque_No\",\"Cheque Number\",\"Chq No\",\"CHEQUE_NUM\",\"Instrument/NEFT No\",\"E-Transaction No./ChequeNo\",\"Map Cheque/NEFT Number\",\"Chequeno\",\"TRASACTION_NO\",\"Bank EFT Ref Id.\"],\n    \"disallowed_amount\":[\"total_disallowance\",\"Claim-Disallowed Amount\", \"Deductable Amount\",\"Deduction\",\"Disallowed Amount\",\"Shortfall Amount\",\"Disallowance\",\"Deduction_Amount (B)\",\"totaldisallowances\",\"FinalDisallowedAmt\",\"DISC_AMT\",\"AMOUNT_DEDUCTED\"],\n    \"payers_remark\":[\"Claim-Disallowed Reasons\", \"Deductable Reason\",\"Dis Allowence Reason1\",\"Deduction Details\",\"Payers Remark\",\"Deduction Reason\",\"Reason For Disallowance\",\"DEDUCTED_REMARKS\",\"Claim-Disallowed Reasons\",\"REASONS\",\"Remarks_of_TPA\"],\n    \"settled_amount\":[[\"Cheque Amount\",\"Paid_Amount\",\"Net Amount Paid\",\"Net Approved Amt\",\"ECS_Amount\"],[\"Amount Paid\",\"Claim-Transferred Amt\",\"AMOUNT_PAID\",\"Claim Net Pay Amount\",\"Final Payment\",\"ClaimNetPayAmount\",\"Total_amount_Claim_Paid\",\"Total Amount Paid\",\"Passed Amount\", \"NetPaybleAmount (J)=(G-I)\",\"paidamount\",\"Net Payable\",\"NETPAYBLE\",\"settled_amount\",\"Settled Amount\",\"Settled Amt\",\"Sum of Settled Amount\",\"settledamt\",\"NET AMOUNT\",\"PassedAmt\",\"Net Approved Amt\",\"Approved_Amount\",\"ApprovedAmt\",\"Claim Amount\",\"Claim Approved Amount\"]],\n    \"tds_amount\":[\"tds_amount\",\"TDS AMOUNT\",\"Claim-TDS Amt\", \"TDS_Amount\",\"TDS Amount\",\"TDS_AMT\",\"TDS Amount\",\"T.D.S.\",\"TDS Amount\",\"Sum of TDS Amount\",\"TDS Amt\", \"Tds\",\"TDS_Rs\",\"TDS_Amount (I) = (G*H)\",\"TDS\",\"Tax Deducted\",\"DeductionAmt\"],\n    \"claim_status\":[\"Claim Status\",\"portal_status\",\"NEW_STATUS\",\"CLAIMStatusNM\",\"Claim-Status\", \"Claim-Status\",\"Claim Status\", \"Status\",\"Status Name\",\"Status\",\"Claim Status\"],\n    \"paid_date\":[\"Claim Paid Date\",\"paid_on_date\",\"TRANSFER DATE\",\"paid_date\",\"Cheque/ NEFT/ UTR Date\",\"DT_OF_PAYMENT\",\"Cheque Date\",\"Settlement Date\",\"Cheque/NEFT Date\",\"Claim Paid Date\",\"UTR Date\",\"UTR Date/Chq Date\",\"Chq Date\",\"NEFT/RTGS Date\",\"Chequedate\",\"UTR_Dt\",\"CHEQUE_DT\",\"Cheque/NEFT Date\",\"CHEQUE_DT\",\"Instrument/NEFT Date\",\"E- Transaction Date/Cheque Date\",\"Paid Date\",\"Map Cheque/NEFT Date\",\"PAYMENT_TRANSACTION_DATE\",\"Date of Transaction\",\"Claim-Cheque Date\",\"Date_Of_Payment\",\"Payment Confirmation Time\",\"EFT Creation Time\"],\n    \"bill_number\":[\"bill no.\",\"bill number\",\"bill\",\"final_bill_number\",\"Billno\",\"Bill No\"]\n}",
     "char_to_replace_in_header": "[\" \",\"-\",\"/\",\"_\",\"\\'\",\"\\\"\",\".\",\"(\",\")\",\"₹\",\"`\",\"<\",\">\",\"?\",\":\",\";\",\"[\",\"]\",\"{\",\"}\",\"|\",\"+\",\"=\",\"*\",\"&\",\"^\",\"%\",\"$\",\"#\",\"@\",\"!\",\"~\"]"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_referencetable",
+    "fieldname": "custom_referencetable",
+    "fieldtype": "HTML",
+    "label": "ReferenceTable",
+    "insert_after": "custom_section_break_xyfew"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_reference_matcher",
+    "fieldname": "custom_reference_matcher",
+    "fieldtype": "HTML",
+    "label": "Matcher Reference",
+    "insert_after": "custom_referencetable"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_settled_amount",
+    "fieldname": "custom_settled_amount",
+    "fieldtype": "HTML",
+    "label": "Settled Amount",
+    "insert_after": "customer"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_tds_amount",
+    "fieldname": "custom_tds_amount",
+    "fieldtype": "HTML",
+    "label": "Total TDS Amount",
+    "insert_after": "posting_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_disallowance_amount",
+    "fieldname": "custom_disallowance_amount",
+    "fieldtype": "HTML",
+    "label": "Total Disallowance Amount",
+    "insert_after": "total"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_writeoff_amount",
+    "fieldname": "custom_writeoff_amount",
+    "fieldtype": "HTML",
+    "label": "Total WriteOff Amount",
+    "insert_after": "outstanding_amount"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_settled_amount",
+    "fieldname": "custom_total_settled_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label" : "Total Settled Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_tds_amount",
+    "fieldname": "custom_total_tds_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label" : "Total TDS Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_disallowance_amount",
+    "fieldname": "custom_total_disallowance_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label" : "Total Disallowance Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_writeoff_amount",
+    "fieldname": "custom_total_writeoff_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label" : "Total WriteOff Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_matcher_reference",
+    "fieldname": "custom_matcher_reference",
+    "fieldtype": "Table",
+    "options": "Matcher Reference",
+    "label" : "Matcher Reference",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_reference",
+    "fieldname": "custom_reference",
+    "fieldtype": "Table",
+    "label" : "Reference",
+    "options": "Sales Invoice Reference",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Client Script",
+    "name": "Sales Invoice custom table",
+    "owner": "Administrator",
+    "creation": "2024-07-14 10:43:03.166280",
+    "modified": "2024-07-19 18:21:39.394337",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "dt": "Sales Invoice",
+    "view": "Form",
+    "script": "frappe.ui.form.on('Sales Invoice', {\r\n    refresh: function (frm) {\r\n        // Fetch default currency\r\n        let currency = frappe.defaults.get_default(\"currency\");\r\n\r\n        frappe.call({\r\n            method: 'agarwals.utils.invoice_reference.get_sales_invoice_references',\r\n            args: {\r\n                doc_name: frm.doc.name,\r\n                jv_ac_name: 'Debtors - A'\r\n            },\r\n            callback: function (r) {\r\n                // Function to format amounts as currency\r\n                function formatCurrency(amount) {\r\n                    return amount.toLocaleString(currency, { style: 'currency', currency: currency });\r\n                }\r\n                \r\n                // Cal  culate the totals for each amount\r\n                    let total_settled_amount = 0;\r\n                    let total_disallowance_amount = 0;\r\n                    let total_tds_amount = 0;\r\n                    let total_writeoff_amount = 0;\r\n                    \r\n                    let sales_invoice_reference = r.message[0];\r\n    \r\n                    sales_invoice_reference.forEach(row => {\r\n                        total_settled_amount += row.settled_amount || 0;\r\n                        total_disallowance_amount += row.disallowance_amount || 0;\r\n                        total_tds_amount += row.tds_amount || 0;\r\n                        total_writeoff_amount += row.writeoff_amount || 0;\r\n                    });\r\n                    \r\n                    let settled_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Settled Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_settled_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let disallowance_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Disallowance Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_disallowance_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let tds_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total TDS Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_tds_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let writeoff_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total WriteOff Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_writeoff_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    \r\n                frm.get_field('custom_settled_amount').html(settled_amount);\r\n                frm.get_field('custom_disallowance_amount').html(disallowance_amount);\r\n                frm.get_field('custom_tds_amount').html(tds_amount);\r\n                frm.get_field('custom_writeoff_amount').html(writeoff_amount);\r\n                    \r\n                    // Generate HTML table using provided Bootstrap structure\r\n                    let sales_invoice_table_html = `\r\n                    <label class=\"control-label\">Sales Invoice Reference</label>\r\n                        <div class=\"form-grid form-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\" title=\"Entry Type\">\r\n                                            <div class=\"static-area ellipsis\">Entry Type</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\" title=\"Entry Name\">\r\n                                            <div class=\"static-area ellipsis\">Entry Name</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"utr_date\" title=\"Utr Date\">\r\n                                            <div class=\"static-area ellipsis\">UTR Date</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\" title=\"UTR Number\">\r\n                                            <div class=\"static-area ellipsis\">UTR Number</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\" title=\"Settled Amount\">\r\n                                            <div class=\"static-area ellipsis\">Settled Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\" title=\"TDS Amount\">\r\n                                            <div class=\"static-area ellipsis\">TDS Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\" title=\"Disallowance Amount\">\r\n                                            <div class=\"static-area ellipsis\">Disallowance Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"allocated_amount\" title=\"Allocated Amount\">\r\n                                            <div class=\"static-area ellipsis\">Allocated Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\" title=\"WriteOff Amount\">\r\n                                            <div class=\"static-area ellipsis\">Write Off</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\" title=\"Created Date\">\r\n                                            <div class=\"static-area ellipsis\">Created Date</div>\r\n                                        </div>\r\n                                       \r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n\r\n                    sales_invoice_reference.forEach((row) => {\r\n                        sales_invoice_table_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/doctype/${row.entry_type}\" data-doctype=\"DocType\" data-name=\"${row.entry_type}\" data-value=\"${row.entry_type}\">${row.entry_type}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/${row.entry_type.toLowerCase().replace(/ /g, \"-\")}/${row.entry_name}\" data-doctype=\"${row.entry_type}\" data-name=\"${row.entry_name}\" data-value=\"${row.entry_name}\">${row.entry_name}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"utr_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_number}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.settled_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.tds_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.disallowance_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"allocated_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.allocated_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.writeoff_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        ${row.created_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    \r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    sales_invoice_table_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_referencetable').html(sales_invoice_table_html);\r\n                \r\n                    // Create Matcher Reference HTML table\r\n                    let matcher_reference = r.message[1];\r\n                    let matcher_reference_html = `\r\n                    <label class=\"control-label\">Matcher Reference</label>\r\n                        <div class=\"form-grid from-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                            <span>No.</span>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"matcher_id\" title=\"ID\">\r\n                                            <div class=\"static-area ellipsis\">ID</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcher_logic\" title=\"Match Logic\">\r\n                                            <div class=\"static-area ellipsis\">Matcher Logic</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Settlement Advice</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Claimbook</div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n    \r\n                    matcher_reference.forEach((row, index) => {\r\n                        matcher_reference_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                        <span>${index + 1}</span>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/matcher/${row.matcher_id.replace('/', \"%2F\")}\" >${row.matcher_id}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcer_logic\">\r\n                                        <div class=\"static-area ellipsis\">${row.matcher_logic}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advise\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/settlement-advice/${row.settlement_advice}\">${row.settlement_advice}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"claimbook\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        <a href=\"/app/claimbook/${row.claimbook}\">${row.claimbook}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    matcher_reference_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_reference_matcher').html(matcher_reference_html);\r\n                    \r\n            }\r\n        });\r\n    }\r\n});\r\n",
+    "enabled": 1
   }
 ]
 
