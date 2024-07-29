@@ -122,6 +122,8 @@
     "name": "VidalHealthDownloader",
     "website_url": "https://tips.vidalhealthtpa.com/hospitallogin/hospital/login/",
     "class_name": "VidalHealthDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "Excel",
     "is_headless": 1
   },
@@ -146,7 +148,7 @@
     "name": "CarehealthDownloader",
     "website_url": "https://healthconnect.careinsurance.com",
     "class_name": "CarehealthDownloader",
-    "incoming_file_type": "Excel",
+    "incoming_file_type": "HTML",
     "is_headless": 1
   },
   {
@@ -170,7 +172,7 @@
     "name": "GoodHealthDownloader",
     "website_url": "https://webace.goodhealthtpa.in/Provider/ProviderLogin.aspx",
     "class_name": "GoodHealthDownloader",
-    "incoming_file_type": "Excel",
+    "incoming_file_type": "HTML",
     "is_headless": 1
   },
   {
@@ -178,6 +180,8 @@
     "name": "StarVitrayaDownloader",
     "website_url": "https://shpv.starhealth.in/",
     "class_name": "StarVitrayaDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "Excel",
     "is_headless": 1
   },
@@ -194,6 +198,8 @@
     "name": "FHPLDownloader",
     "website_url": "https://fhpl.net/FhplLogins/NetworkHospitals/ProviderLogin.aspx",
     "class_name": "FHPLDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "HTML",
     "is_headless": 1
   },
@@ -216,8 +222,10 @@
   {
     "doctype": "SA Downloader Configuration",
     "name": "NivaBupaDownloader",
-    "website_url": "https://www.safewaytpa.in/Hospitallogin.aspx",
+    "website_url": "https://nbhiclaims.vitrayatech.com/",
     "class_name": "NivaBupaDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "Excel",
     "is_headless": 1
   },
@@ -226,6 +234,8 @@
     "name": "BajajAllianzDownloader",
     "website_url": "https://ecare.bajajallianz.com",
     "class_name": "BajajAllianzDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 85,
     "incoming_file_type": "Excel",
     "is_headless": 1
   },
@@ -266,14 +276,7 @@
     "name": "HeritageDownloader",
     "website_url": "http://www.heritagehealthtpa.in/HospitalPortal/LogIn.aspx",
     "class_name": "HeritageDownloader",
-    "incoming_file_type": "Excel",
-    "is_headless": 1
-  },
-  {
-    "doctype": "SA Downloader Configuration",
-    "name": "HeritageDownloader",
-    "website_url": "http://www.heritagehealthtpa.in/HospitalPortal/LogIn.aspx",
-    "class_name": "HeritageDownloader",
+    "is_date_limit": 1,
     "incoming_file_type": "Excel",
     "is_headless": 1
   },
