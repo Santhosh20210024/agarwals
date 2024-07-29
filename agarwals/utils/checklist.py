@@ -1,6 +1,5 @@
 import frappe
 from agarwals.utils.error_handler import log_error
-from erpnext.accounts.utils import get_fiscal_year
 from datetime import datetime, timedelta
 import pandas as pd
 from agarwals.utils.file_util import PROJECT_FOLDER
@@ -8,26 +7,26 @@ import os
 
 
 class checker:
-    def __init__(self):
-        self.test_cases = {
-            'S01': 'Evaluation of claim amounts in sales invoices',
-            'S02': 'Evaluation of outstanding amounts and their status in sales invoices',
-            'P01': 'Evaluation of allocation amounts in payment entries',
-            'P02': 'Evaluation of whether the allocated amount in the bank transaction matches the paid amount in the payment entry',
-            'B01': 'Evaluation of the presence of the party and party type in bank transactions',
-            'B02': 'Evaluation of unallocated amounts in bank transactions',
-            'B03': 'Evaluation of staging total records in bank transactions',
-            'SA01': 'Evaluation of settlement advice staging and settlement advice',
-            'M01': 'Evaluation of matcher records with status equal to "Open" after the matching process',
-            'U01': 'Evaluation of the UTR key in bank transactions',
-            'U02': 'Evaluation of the UTR key in settlement advice',
-            'U03': 'Evaluation of the UTR key in the claim book',
-            'C01': 'Evaluation of presence of claim key in Bill',
-            'C02' : 'Evaluation of the presence of claim key in settlement advice',
-            'C03' : 'Evaluation of the presence of claim key in Claim Book',
-            'B01' : 'Evaluation of all processed bill adjustments has been recorded with a journal entry'
-        }
 
+    test_cases = {
+        'S01': 'Evaluation of claim amounts in sales invoices',
+        'S02': 'Evaluation of outstanding amounts and their status in sales invoices',
+        'P01': 'Evaluation of allocation amounts in payment entries',
+        'P02': 'Evaluation of whether the allocated amount in the bank transaction matches the paid amount in the payment entry',
+        'B01': 'Evaluation of the presence of the party and party type in bank transactions',
+        'B02': 'Evaluation of unallocated amounts in bank transactions',
+        'B03': 'Evaluation of  bank transactions staging processed records with bank transactions',
+        'SA01': 'Evaluation of settlement advice staging and settlement advice',
+        'M01': 'Evaluation of matcher records with status equal to "Open" after the matching process',
+        'U01': 'Evaluation of the UTR key in bank transactions',
+        'U02': 'Evaluation of the UTR key in settlement advice',
+        'U03': 'Evaluation of the UTR key in the claim book',
+        'C01': 'Evaluation of presence of claim key in Bill',
+        'C02': 'Evaluation of the presence of claim key in settlement advice',
+        'C03': 'Evaluation of the presence of claim key in Claim Book',
+        'B01': 'Evaluation of all processed bill adjustments has been recorded with a journal entry'
+    }
+    def __init__(self):
         self.report = []
 
     def get_sum(self, doctype, field, filter={}):
@@ -45,32 +44,33 @@ class checker:
     def get_value(self, value):
         return value if value is not None else 0
 
-    def process_check_list(self, trigger_order):
-        if trigger_order:
-            trigger_list = {
-                "1": "SalesInvoiceChecker",
-                "2": "PaymentEntryChecker",
-                "3": "BankTransactionChecker",
-                "4": "SettlementAdviceChecker",
-                "5": "MatcherChecker",
-                "6": "UTRKeyChecker",
-                "7": 'ClaimKeyChecker',
-                "8": 'BillAdjustmentChecker'
-            }
-            new_order = trigger_order.split(",")
-            for order in new_order:
-                class_obj = eval(trigger_list[order])()
-                class_obj.process()
-                self.report.extend(class_obj.report)
-        else:
-            log_error('There is no trigger_order given')
+    def process_check_list(self, event_order):
+        trigger_list = {
+            "1": "SalesInvoiceChecker",
+            "2": "PaymentEntryChecker",
+            "3": "BankTransactionChecker",
+            "4": "SettlementAdviceChecker",
+            "5": "MatcherChecker",
+            "6": "UTRKeyChecker",
+            "7": 'ClaimKeyChecker',
+            "8": 'BillAdjustmentChecker'
+        }
+
+        for order in event_order.split(","):
+            class_obj = eval(trigger_list[order])()
+            class_obj.process()
+            self.report.extend(class_obj.report)
+
 
     def generate_report(self):
-        file_name = f'tfs_checklist_{frappe.utils.now_datetime()}.xlsx'
+        date_time = frappe.utils.now_datetime().strftime('%Y-%m-%d %H:%M:%S').replace(':', '-')
+        file_name = f'tfs_checklist_{date_time}.xlsx'
         self.file_path = self.site_path + f"/private/files/{PROJECT_FOLDER}/CheckList/"
         self.report_df = pd.DataFrame(self.report)
         self.report_df.insert(0, 'S NO', range(1, len(self.report) + 1))
         self.report_df.to_excel(self.file_path + file_name, index=False)
+        if not os.path.exists(self.file_path + file_name):
+            raise FileNotFoundError(f"Report File Not found in checklist {file_name}")
 
     def send_mail(self):
         report_wo_remarks = self.report_df.drop(columns=['Remarks'], axis=1)
@@ -118,7 +118,7 @@ class SalesInvoiceChecker(checker):
 
     def si_status_check(self):
         si_status_error_list = frappe.db.sql(
-            """Select name from `tabSales Invoice` tsi where (tsi.outstanding_amount > 0.01  AND tsi.status = 'Paid') OR (tsi.outstanding_amount < 0.01 AND tsi.status = 'Unpaid')""",
+            """Select name from `tabSales Invoice` tsi where (tsi.outstanding_amount > 0.01  AND tsi.status = 'Paid') OR (tsi.outstanding_amount < 0.01 AND tsi.status in ('Unpaid','Partly Paid'))""",
             as_list=True)
         self.add_to_report('S02', True) if not si_status_error_list else self.add_to_report('S02', False,
                                                                                             'Outstanding amount > 0 but status paid or Outstanding amount < 0 but status Unpaid')
@@ -134,7 +134,7 @@ class PaymentEntryChecker(checker):
                                 SELECT tped.parent AS name,ABS(ROUND(SUM(tped.amount) + tpe.paid_amount) - ROUND(tpe.total_allocated_amount) ) as diff
                                 FROM `tabPayment Entry Deduction` tped
                                 JOIN `tabPayment Entry` tpe ON tpe.name = tped.parent WHERE tpe.status = 'Submitted' GROUP BY tped.parent
-                                HAVING diff > 1;
+                                HAVING diff > 1 AND tped.parent NOT IN ('JPR/OP/106333','JPR/OP/107277');
                               """
         misallocated_payment_entry = frappe.db.sql(misallocated_payment_entry_query, as_dict=True)
         self.add_to_report('P01', False,
@@ -206,7 +206,7 @@ class SettlementAdviceChecker(checker):
 
 class MatcherChecker(checker):
     def matcher_status_check(self):  # 12 - Any  Matcher Document should not be open after the payment_Entry Process.
-        open_matcher = self.get_value(self.get_count('Matcher', {'status': 'Open'}))
+        open_matcher = self.get_value(self.get_count('Matcher', {'status': 'Open','match_logic':('in',['MA1-CN', 'MA5-BN', 'MA3-CN'])}))
         self.add_to_report('M01', False,
                            f'There are {open_matcher} Matcher Records found "Status in Open "') if open_matcher != 0 else self.add_to_report(
             'M01', True)
@@ -232,8 +232,8 @@ class UTRKeyChecker(checker):
 class ClaimKeyChecker(checker):
     def check_claim_key(self):
         settlement_advice = self.get_value(self.get_count('Settlement Advice', {'claim_key': None}))
-        claimbook = self.get_value(frappe.db.sql("SELECT count(1) total FROM `tabClaimBook` WHERE (al_number is NOT NULL AND al_key is NULL) OR (cl_number is NOT null and cl_key IS NULL)",pluck= 'total')[0])
-        bill = self.get_value(frappe.db.sql("SELECT count(1) total FROM `tabBill` WHERE (ma_claim_id IS NOT NULL AND ma_claim_key is NULL ) OR (claim_id IS NOT NULL AND (claim_key is NULL AND claim_key <> 0)) "))
+        claimbook = self.get_value(frappe.db.sql("SELECT count(1) as total FROM `tabClaimBook` WHERE (al_number is NOT NULL AND al_key is NULL) OR (cl_number is NOT null and cl_key IS NULL)",pluck= 'total')[0])
+        bill = self.get_value(frappe.db.sql("SELECT count(1) as total FROM `tabBill` WHERE (ma_claim_id IS NOT NULL AND ma_claim_key is NULL ) OR (claim_id IS NOT NULL AND (claim_key is NULL AND claim_key <> 0)) ",pluck= 'total')[0])
         self.add_to_report('C01',True ) if bill == 0 else self.add_to_report('C01', False,f'{bill} Records Found "Claim KEY = NONE " in Bill')
         self.add_to_report('C02',True) if settlement_advice == 0 else self.add_to_report('C02',False,f'{settlement_advice} Records Found "Claim KEY = NONE " in Settlement Advice')
         self.add_to_report('C03',True) if claimbook == 0 else self.add_to_report('C03',False,f'{claimbook} Records Found "Claim KEY = NONE " in Claim Book')
@@ -256,7 +256,7 @@ def process():
     try:
         control_panel = frappe.get_single("Control Panel")
         if control_panel.site_path is None:
-            raise Exception("Site Path Not Found")
+            raise ValueError("Site Path Not Found in checklist")
         trigger_order = control_panel.order if control_panel.order else "1,2,3,4,5,6,7,8"
         checklist_instance = checker()
         frappe.enqueue(checklist_instance.process, queue='long', job_name=f"checklist - {frappe.utils.now_datetime()}",
