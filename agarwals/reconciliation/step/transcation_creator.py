@@ -258,7 +258,7 @@ def process(args):
     try:
         args = cast_to_dic(args)
         panel = frappe.get_doc('Control Panel')
-        if panel.closing_balance_check == 1:
+        if panel.check_closing_balance == 1:
             ClosingBalance().validate_balance()
         tag = 'Credit Payment'
         if not is_document_naming_rule('Bank Transaction'):
