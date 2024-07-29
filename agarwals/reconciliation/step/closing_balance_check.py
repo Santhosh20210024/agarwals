@@ -39,7 +39,7 @@ class ClosingBalance:
     def validate_balance(self):
         self.load_data()
         self.validate()
-        balance_list = frappe.get_all('Closing Balance', fields=['name', 'closing_balance', 'ag_closing_balance', 'difference'],filters={'difference': ['!=', 0]}, fields=['difference'])
+        balance_list = frappe.get_all('Closing Balance', fields=['name', 'closing_balance', 'ag_closing_balance', 'difference'],filters={'difference': ['!=', 0]})
         mail_group = frappe.get_doc('Control Panel').check_list_email_group
         recipients = frappe.get_list('Email Group Member', {'email_group': mail_group}, pluck='email')
         if recipients:
