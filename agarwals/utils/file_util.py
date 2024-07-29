@@ -2,7 +2,7 @@ import frappe
 PROJECT_FOLDER = "DrAgarwals"
 HOME_PATH = "Home/DrAgarwals"
 SHELL_PATH = "private/files"
-SUB_DIR = ["Extract", "Transform", "Load", "Bin", "Zip","Settlement Advice"]
+SUB_DIR = ["Extract", "Transform", "Load", "Bin","CheckList","Settlement Advice","Zip"]
 INNER_SUB_DIR = ["Error"]
 SITE_PATH = "/home/frappe/frappe-bench/sites/agarwals.claimgenie.ai"
 
