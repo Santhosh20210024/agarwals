@@ -7,7 +7,7 @@ from agarwals.utils.file_util import PROJECT_FOLDER
 import os
 
 
-class CheckList:
+class checker:
     def __init__(self):
         self.test_cases = {
             'S01': 'Evaluation of claim amounts in sales invoices',
@@ -94,7 +94,7 @@ class CheckList:
         except Exception as E:
             log_error(E)
 
-class SalesInvoiceChecker(CheckList):
+class SalesInvoiceChecker(checker):
     def evaluate_si_claim_amount(
             self):  # 2 - Total_Claim_Amount = total_outstanding-amount+ total_allocated_amount + total_credit_amount
         sales_invoice = self.get_sum(doctype='Sales Invoice', filter={'status': ('!=', 'Cancelled')},
@@ -122,7 +122,7 @@ class SalesInvoiceChecker(CheckList):
         self.si_status_check()
 
 
-class PaymentEntryChecker(CheckList):
+class PaymentEntryChecker(checker):
     def allocated_amount_check(self):  # 4 - Paid_amount +TDS + Disallowance = Total_allocated_amount
         misallocated_payment_entry_query = """
                                 SELECT tped.parent AS name,ABS(ROUND(SUM(tped.amount) + tpe.paid_amount) - ROUND(tpe.total_allocated_amount) ) as diff
@@ -152,7 +152,7 @@ class PaymentEntryChecker(CheckList):
         self.pe_bt_allocated_amount_check()
 
 
-class BankTransactionChecker(CheckList):
+class BankTransactionChecker(checker):
     def party_check(self):  # 7 -  Party & party type in Bank Transaction Should Exist
         bank_transaction_list = frappe.db.sql(
             "Select tbt.name from `tabBank Transaction`tbt where (tbt.party = NULL or tbt.party = '' ) Or (tbt.party_type = NULL or tbt.party_type) = ''",
@@ -185,7 +185,7 @@ class BankTransactionChecker(CheckList):
         self.bt_total_staging_check()
 
 
-class SettlementAdviceChecker(CheckList):
+class SettlementAdviceChecker(checker):
     def sa_total_staging_check(
             self):  # 10 - Settlement Advice Staging (Count) Should be Equal To that of the Settlement Advice (Count)
         sa_count = self.get_value(self.get_count('Settlement Advice', {}))
@@ -198,7 +198,7 @@ class SettlementAdviceChecker(CheckList):
         self.sa_total_staging_check()
 
 
-class MatcherChecker(CheckList):
+class MatcherChecker(checker):
     def matcher_status_check(self):  # 12 - Any  Matcher Document should not be open after the payment_Entry Process.
         open_matcher = self.get_value(self.get_count('Matcher', {'status': 'Open'}))
         self.add_to_report('M01', False,
@@ -209,7 +209,7 @@ class MatcherChecker(CheckList):
         self.matcher_status_check()
 
 
-class UTRKeyChecker(CheckList):
+class UTRKeyChecker(checker):
     def check_utr_key(self):
         bank_transaction = self.get_value(self.get_count('Bank Transaction', {'custom_utr_key': None}))
         settlement_advice = self.get_value(self.get_count('Settlement Advice', {'utr_key': None}))
@@ -230,7 +230,7 @@ def process():
         if control_panel.site_path is None:
             raise Exception("Site Path Not Found")
         trigger_order = control_panel.order if control_panel.order else "1,2,3,4,5,6"
-        checklist_instance = CheckList()
+        checklist_instance = checker()
         frappe.enqueue(checklist_instance.process, queue='long', job_name=f"checklist - {frappe.utils.now_datetime()}",
                        trigger_order=trigger_order, mail_group=control_panel.check_list_email_group,
                        site_path=control_panel.site_path)
