@@ -6,7 +6,7 @@ from agarwals.utils.file_util import PROJECT_FOLDER
 import os
 
 
-class checker:
+class Checker:
 
     test_cases = {
         'S01': 'Evaluation of claim amounts in sales invoices',
@@ -100,7 +100,7 @@ class checker:
         except Exception as E:
             log_error(E)
 
-class SalesInvoiceChecker(checker):
+class SalesInvoiceChecker(Checker):
     def evaluate_si_claim_amount(
             self):  # 2 - Total_Claim_Amount = total_outstanding-amount+ total_allocated_amount + total_credit_amount
         sales_invoice = self.get_sum(doctype='Sales Invoice', filter={'status': ('!=', 'Cancelled')},
@@ -128,7 +128,7 @@ class SalesInvoiceChecker(checker):
         self.si_status_check()
 
 
-class PaymentEntryChecker(checker):
+class PaymentEntryChecker(Checker):
     def allocated_amount_check(self):  # 4 - Paid_amount +TDS + Disallowance = Total_allocated_amount
         misallocated_payment_entry_query = """
                                 SELECT tped.parent AS name,ABS(ROUND(SUM(tped.amount) + tpe.paid_amount) - ROUND(tpe.total_allocated_amount) ) as diff
@@ -158,7 +158,7 @@ class PaymentEntryChecker(checker):
         self.pe_bt_allocated_amount_check()
 
 
-class BankTransactionChecker(checker):
+class BankTransactionChecker(Checker):
     def party_check(self):  # 7 -  Party & party type in Bank Transaction Should Exist
         bank_transaction_list = frappe.db.sql(
             "Select tbt.name from `tabBank Transaction`tbt where (tbt.party = NULL or tbt.party = '' ) Or (tbt.party_type = NULL or tbt.party_type) = ''",
@@ -191,7 +191,7 @@ class BankTransactionChecker(checker):
         self.bt_total_staging_check()
 
 
-class SettlementAdviceChecker(checker):
+class SettlementAdviceChecker(Checker):
     def sa_total_staging_check(
             self):  # 10 - Settlement Advice Staging (Count) Should be Equal To that of the Settlement Advice (Count)
         sa_count = self.get_value(self.get_count('Settlement Advice', {}))
@@ -204,7 +204,7 @@ class SettlementAdviceChecker(checker):
         self.sa_total_staging_check()
 
 
-class MatcherChecker(checker):
+class MatcherChecker(Checker):
     def matcher_status_check(self):  # 12 - Any  Matcher Document should not be open after the payment_Entry Process.
         open_matcher = self.get_value(self.get_count('Matcher', {'status': 'Open','match_logic':('in',['MA1-CN', 'MA5-BN', 'MA3-CN'])}))
         self.add_to_report('M01', False,
@@ -215,7 +215,7 @@ class MatcherChecker(checker):
         self.matcher_status_check()
 
 
-class UTRKeyChecker(checker):
+class UTRKeyChecker(Checker):
     def check_utr_key(self):
         bank_transaction = self.get_value(self.get_count('Bank Transaction', {'custom_utr_key': None}))
         settlement_advice = self.get_value(self.get_count('Settlement Advice', {'utr_key': None}))
@@ -229,7 +229,7 @@ class UTRKeyChecker(checker):
     def process(self):
         self.check_utr_key()
 
-class ClaimKeyChecker(checker):
+class ClaimKeyChecker(Checker):
     def check_claim_key(self):
         settlement_advice = self.get_value(self.get_count('Settlement Advice', {'claim_key': None}))
         claimbook = self.get_value(frappe.db.sql("SELECT count(1) as total FROM `tabClaimBook` WHERE (al_number is NOT NULL AND al_key is NULL) OR (cl_number is NOT null and cl_key IS NULL)",pluck= 'total')[0])
@@ -241,7 +241,7 @@ class ClaimKeyChecker(checker):
     def process(self):
         self.check_claim_key()
 
-class BillAdjustmentChecker(checker):
+class BillAdjustmentChecker(Checker):
 
     def eval_bill_adjustment_with_jv(self):
         bill_adjustment = self.get_value(self.get_count('Bill Adjustment', {'status': ['in', ['Processed', 'Partially Processed']]}))
@@ -258,7 +258,7 @@ def process():
         if control_panel.site_path is None:
             raise ValueError("Site Path Not Found in checklist")
         trigger_order = control_panel.order if control_panel.order else "1,2,3,4,5,6,7,8"
-        checklist_instance = checker()
+        checklist_instance = Checker()
         frappe.enqueue(checklist_instance.process, queue='long', job_name=f"checklist - {frappe.utils.now_datetime()}",
                        trigger_order=trigger_order, mail_group=control_panel.check_list_email_group,
                        site_path=control_panel.site_path)
