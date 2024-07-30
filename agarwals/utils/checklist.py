@@ -24,7 +24,7 @@ class Checker:
         'C01': 'Evaluation of presence of claim key in Bill',
         'C02': 'Evaluation of the presence of claim key in settlement advice',
         'C03': 'Evaluation of the presence of claim key in Claim Book',
-        'B01': 'Evaluation of all processed bill adjustments has been recorded with a journal entry'
+        'BA01': 'Evaluation of all processed bill adjustments has been recorded with a journal entry'
     }
     def __init__(self):
         self.report = []
@@ -246,7 +246,7 @@ class BillAdjustmentChecker(Checker):
     def eval_bill_adjustment_with_jv(self):
         bill_adjustment = self.get_value(self.get_count('Bill Adjustment', {'status': ['in', ['Processed', 'Partially Processed']]}))
         jv_count = self.get_value(frappe.db.sql("""SELECT COUNT(DISTINCT(jv.reference_name)) as total FROM `tabJournal Entry Account` jv JOIN `tabBill Adjustment` ba ON ba.name = jv.reference_name ;""",pluck = 'total')[0])
-        self.add_to_report('B01',True ) if bill_adjustment == jv_count else self.add_to_report('B01', False,f'bill adjustment {bill_adjustment} Not Equals to {jv_count} Journal Entry "')
+        self.add_to_report('BA01',True ) if bill_adjustment == jv_count else self.add_to_report('BA01', False,f'bill adjustment {bill_adjustment} Not Equals to {jv_count} Journal Entry "')
 
     def process(self):
         self.eval_bill_adjustment_with_jv()
