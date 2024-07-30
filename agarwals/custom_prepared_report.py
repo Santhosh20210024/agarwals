@@ -4,7 +4,6 @@ from agarwals.utils.error_handler import log_error
 @frappe.whitelist()
 def custom_prepared_report():
     try:
-        print("its working dude")
         control_panel = frappe.get_single("Control Panel")
         report_list = control_panel.prepared_report_list
         if isinstance(report_list, str):
