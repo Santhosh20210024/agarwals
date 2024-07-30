@@ -95,27 +95,28 @@ class AdviceTransformer(StagingTransformer):
         return ['settled_amount', 'tds_amount', 'disallowed_amount']
 
     def calculate_settled_amount(self, file, df):
-        tpa_to_calculate_settled_amount = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount';""", as_list=True)
+        tpa_to_calculate_settled_amount = frappe.db.sql("""SELECT tpa FROM `tabSettled Amount Calculation Configuration` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount';""", as_list=True)
         if [file["payer_type"]] not in tpa_to_calculate_settled_amount or 'linkedclaimnumber' in df.columns:
             return df
+        has_tds_percentage = frappe.db.sql(f"""SELECT has_tds_percentage FROM `tabSettled Amount Calculation Configuration` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount' AND tpa = '{file['payer_type']}';""", as_list=True)[0][0]
 
         def set_settled_amount(df):
             df['settled_amount'] = df['claim_amount'].astype(float) - df['tds_amount'].astype(float)
             return df
 
-        def care_health_insurance_limited(df):
-            df["tdsdeduction"] = pd.to_numeric(df["tdsdeduction"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
+        def set_settled_amount_using_tds_percentage(df):
+            df["tds_percentage"] = pd.to_numeric(df["tds_percentage"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
                         r"[\"\'?%,]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0"), errors='coerce')
-            df["calculate_tds"] = ((df["settled_amount"].astype(float) * df["tdsdeduction"].astype(float))/100)
-            if any(df["calculate_tds"].astype(float) == df["tds_amount"].astype(float)):
+            df["calculated_tds"] = ((df["settled_amount"].astype(float) * df["tds_percentage"].astype(float))/100)
+            if any(df["calculated_tds"].astype(float) == df["tds_amount"].astype(float)):
                 df['claim_amount'] = df['settled_amount']
                 df = set_settled_amount(df)
-            return df.drop(columns = ["calculate_tds"])
-        try:
-            func=eval(file["payer_type"].lower().strip().replace(" ", "_"))
-        except Exception:
-            func = set_settled_amount
-        df = func(df)
+            return df.drop(columns = ["calculated_tds"])
+
+        if has_tds_percentage == 0:
+            df = set_settled_amount(df)
+        else:
+            df = set_settled_amount_using_tds_percentage(df)
         return df
 
     def clean_data(self, file, df):
