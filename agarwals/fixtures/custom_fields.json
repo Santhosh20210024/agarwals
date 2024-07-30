@@ -941,7 +941,8 @@
       {"customer":"VIDAL HEALTH TPA PVT LTD"},
       {"customer":"Manual"},
       {"customer":"National Insurance Company Limited"},
-      {"customer":"Liberty General Insurance Limited"}
+      {"customer":"Liberty General Insurance Limited"},
+      {"customer":"Future Generali General Insurance"}
     ],
     "calculate_settled_amount": [
     {"has_tds_percentage":0,"tpa":"IFFCO TOKIO GENERAL INSURANCE COMPANY"},
