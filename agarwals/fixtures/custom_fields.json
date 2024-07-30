@@ -123,7 +123,7 @@
     "website_url": "https://tips.vidalhealthtpa.com/hospitallogin/hospital/login/",
     "class_name": "VidalHealthDownloader",
     "incoming_file_type": "Excel",
-    "is_headless": 1
+    "is_headless":1
   },
   {
     "doctype": "SA Downloader Configuration",
