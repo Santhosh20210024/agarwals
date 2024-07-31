@@ -35,6 +35,7 @@
   "section_break_orox7",
   "payers_remark",
   "cg_section",
+  "staging",
   "matcher_id",
   "matched_bill_record",
   "matched_claimbook_record",
@@ -437,10 +438,17 @@
    "fieldname": "insurance_policy_number",
    "fieldtype": "Data",
    "label": "Insurance Policy Number"
+  },
+  {
+   "fieldname": "staging",
+   "fieldtype": "Link",
+   "label": "Staging",
+   "options": "Settlement Advice Staging",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2024-07-03 17:14:54.006918",
+ "modified": "2024-07-31 16:13:28.224375",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

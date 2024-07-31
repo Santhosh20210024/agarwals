@@ -42,7 +42,6 @@
   "column_break_nrpjk",
   "remarks",
   "error_code",
-  "settlement_advice",
   "file_upload_section",
   "file_upload",
   "transform",
@@ -133,6 +132,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "hidden": 1,
+   "in_standard_filter": 1,
    "label": "Status",
    "options": "Open\nError\nProcessed",
    "read_only": 1
@@ -346,18 +346,11 @@
    "fieldname": "insurance_policy_number",
    "fieldtype": "Data",
    "label": "Insurance Policy Number"
-  },
-  {
-   "fieldname": "settlement_advice",
-   "fieldtype": "Link",
-   "label": "Settlement Advice",
-   "options": "Settlement Advice",
-   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-24 20:56:21.914322",
+ "modified": "2024-07-31 16:24:53.233504",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
