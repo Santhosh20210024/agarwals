@@ -930,7 +930,7 @@
   {
     "doctype": "Data Import Mapping",
     "name": "Bill Adjustment",
-    u"mapping_columns": [
+    "mapping_columns": [
       {
         "column_index_in_import_file": "0",
         "column_in_doctype": "bill"
