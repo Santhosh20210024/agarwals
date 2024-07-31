@@ -1,7 +1,5 @@
 import frappe
 from datetime import date
-
-from agarwals.agarwals.doctype import file_records
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 
@@ -31,8 +29,7 @@ def log_error(doctype_name, error_doc, error_message):
         error_log.set('reference_name', error_doc.name)
         return update_error(error_doc,'S104')
 
-def update_processed_status(doc_to_update, sa_name):
-    doc_to_update.settlement_advice = sa_name
+def update_processed_status(doc_to_update):
     doc_to_update.status = 'Processed'
     return doc_to_update
 
@@ -70,11 +67,12 @@ def create_settlement_advice_doc(doc_to_insert):
             "file_upload": doc_to_insert.file_upload,
             "transform": doc_to_insert.transform,
             "index": doc_to_insert.index,
+            "staging": doc_to_insert.name,
             "status": "Open",
         }
     try:
         sa_doc = frappe.get_doc(data).insert(ignore_permissions=True)
-        return update_processed_status(doc_to_insert, sa_doc.name)
+        return update_processed_status(doc_to_insert)
     except Exception as e:
         if "Duplicate entry" in str(e):
             sa_doc = frappe.get_doc('Settlement Advice',name)
@@ -86,7 +84,7 @@ def create_settlement_advice_doc(doc_to_insert):
                 return doc_to_insert
             sa_doc.update(data)
             sa_doc.save()
-            return update_processed_status(doc_to_insert, sa_doc.name)
+            return update_processed_status(doc_to_insert)
         else:
             raise Exception(e)
 
