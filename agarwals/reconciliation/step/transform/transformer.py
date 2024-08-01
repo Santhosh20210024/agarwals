@@ -146,10 +146,8 @@ class Transformer:
     def move_to_transform(self, file, df, type, folder, prune = True, status = 'Open'):
         if df.empty:
             return None
-
         if self.is_truncate_excess_char == True:
             df = df.applymap(lambda x:str(x)[:self.max_trim_length] if len(str(x)) > self.max_trim_length else x)
-
         if prune:
             df = self.prune_columns(df)
         if self.clean_utr == 1:

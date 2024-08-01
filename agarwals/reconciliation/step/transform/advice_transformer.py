@@ -1,5 +1,3 @@
-import re
-
 import pandas as pd
 import frappe
 from agarwals.reconciliation.step.transform.transformer import StagingTransformer
@@ -89,10 +87,10 @@ class AdviceTransformer(StagingTransformer):
         return ['name', '_merge', 'hash_x', 'hash_column']
 
     def get_column_name_to_convert_to_numeric(self):
-        return ['settled_amount', 'tds_amount', 'disallowed_amount']
+        return ['claim_amount', 'settled_amount', 'tds_amount', 'disallowed_amount']
 
     def get_columns_to_fill_na_as_0(self):
-        return ['settled_amount', 'tds_amount', 'disallowed_amount']
+        return ['claim_amount', 'settled_amount', 'tds_amount', 'disallowed_amount']
 
     def calculate_settled_amount(self, file, df):
         tpa_to_calculate_settled_amount = frappe.db.sql("""SELECT tpa FROM `tabSettled Amount Calculation Configuration` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount';""", as_list=True)
@@ -119,7 +117,8 @@ class AdviceTransformer(StagingTransformer):
             df = set_settled_amount_using_tds_percentage(df)
         return df
 
-    def clean_data(self, file, df):
+    def clean_data(self, df):
+        df = df.T.drop_duplicates().T
         df = self.fill_na_as_0(df)
         df = self.calculate_settled_amount(file, df)
         df["final_utr_number"] = df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
@@ -149,12 +148,10 @@ class AdviceTransformer(StagingTransformer):
         return left_df_column, right_df_column
 
     def get_column_needed(self):
-        return ["claim_id", "claim_amount", "utr_number", "disallowed_amount", "payers_remark", "settled_amount",
-                "tds_amount", "claim_status", "paid_date", "bill_number", "final_utr_number", "hash", "file_upload",
-                "transform", "index"]
+        return ["claim_id", "cl_number", "bill_number", "mrn", "utr_number", "final_utr_number", "claim_status", "paid_date", "insurance_company", "patient_name", "insurance_policy_number", "doa", "dod", "hospital_name", "bank_account_no", "bank_name", "bank_branch", "claim_amount", "settled_amount", "tds_amount", "disallowed_amount", "payers_remark", "hash", "file_upload", "transform", "index"]
 
     def extract(self, configuration, key, file):
-        self.source_df = self.source_df.rename(columns=self.rename_value)
+        self.source_df.rename(columns=self.rename_value, inplace=True)
         self.source_df = self.convert_into_common_format(self.source_df, self.get_column_needed())
         if "claim_id" not in self.source_df.columns:
             self.log_error(self.document_type, file['name'], '"No Valid data header or file is empty')
