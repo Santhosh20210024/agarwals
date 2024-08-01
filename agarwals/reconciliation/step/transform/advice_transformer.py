@@ -18,16 +18,8 @@ class AdviceTransformer(StagingTransformer):
         self.rename_value = None
         self.list_of_char_to_replace = None
 
-    def get_files_to_transform(self):
-        file_query = f"""SELECT 
-                            upload,name,payer_type
-                        FROM 
-                            `tabFile upload` 
-                        WHERE 
-                            status = 'Open' AND document_type = '{self.file_type}'
-                            ORDER BY creation"""
-        files = frappe.db.sql(file_query, as_dict=True)
-        return files
+    def get_file_columns(self):
+        return "upload,name,payer_type,is_mail"
 
     def clean_header(self, list_to_clean):
         cleaned_list = []
@@ -77,7 +69,7 @@ class AdviceTransformer(StagingTransformer):
 
     def verify_file(self, file, header_index):
         configured_customers = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'tpa';""", as_list=True)
-        if [file["payer_type"]] in configured_customers:
+        if file["is_mail"] == 1 or [file["payer_type"]] in configured_customers:
             return True
         self.log_error(self.document_type, file['name'], f'No Configuration For the Payer: {file["payer_type"]}')
         self.update_status('File upload', file['name'], 'Error')
@@ -117,7 +109,7 @@ class AdviceTransformer(StagingTransformer):
             df = set_settled_amount_using_tds_percentage(df)
         return df
 
-    def clean_data(self, df):
+    def clean_data(self, file, df):
         df = df.T.drop_duplicates().T
         df = self.fill_na_as_0(df)
         df = self.calculate_settled_amount(file, df)
@@ -126,6 +118,7 @@ class AdviceTransformer(StagingTransformer):
         df["claim_id"] = df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '', regex=True).replace(
             "", "0")
         df = self.format_date(df, eval(frappe.get_single('Bank Configuration').date_formats), 'paid_date')
+        df = self.convert_into_common_format(df,self.get_column_needed())
         return df
 
     def get_columns_to_hash(self):

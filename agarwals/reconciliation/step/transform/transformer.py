@@ -28,9 +28,13 @@ class Transformer:
         self.is_truncate_excess_char = False
         self.max_trim_length = 140
 
+    def get_file_columns(self):
+        return "upload,name"
+
     def get_files_to_transform(self):
+        fields = self.get_file_columns()
         file_query = f"""SELECT 
-                            upload,name 
+                            {fields} 
                         FROM 
                             `tabFile upload` 
                         WHERE 
@@ -524,16 +528,8 @@ class BankTransformer(StagingTransformer):
         self.document_type = 'Bank Transaction Staging'
         self.header = None
 
-    def get_files_to_transform(self):
-        file_query = f"""SELECT 
-                            upload,name,date,bank_account 
-                        FROM 
-                            `tabFile upload` 
-                        WHERE 
-                            status = 'Open' AND document_type = '{self.file_type}'
-                            ORDER BY creation"""
-        files = frappe.db.sql(file_query, as_dict=True)
-        return files
+    def get_file_columns(self):
+        return "upload,name,date,bank_account"
 
     def clean_header(self, list_to_clean):
         return [self.trim_and_lower(value) for value in list_to_clean]
