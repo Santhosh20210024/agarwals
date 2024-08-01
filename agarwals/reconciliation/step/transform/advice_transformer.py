@@ -18,16 +18,8 @@ class AdviceTransformer(StagingTransformer):
         self.rename_value = None
         self.list_of_char_to_replace = None
 
-    def get_files_to_transform(self):
-        file_query = f"""SELECT 
-                            upload,name,payer_type
-                        FROM 
-                            `tabFile upload` 
-                        WHERE 
-                            status = 'Open' AND document_type = '{self.file_type}'
-                            ORDER BY creation"""
-        files = frappe.db.sql(file_query, as_dict=True)
-        return files
+    def get_file_columns(self):
+        return "upload,name,payer_type,is_mail"
 
     def clean_header(self, list_to_clean):
         cleaned_list = []
