@@ -18,6 +18,17 @@ class AdviceTransformer(StagingTransformer):
         self.rename_value = None
         self.list_of_char_to_replace = None
 
+    def get_files_to_transform(self):
+        file_query = f"""SELECT 
+                            upload,name,payer_type
+                        FROM 
+                            `tabFile upload` 
+                        WHERE 
+                            status = 'Open' AND document_type = '{self.file_type}'
+                            ORDER BY creation"""
+        files = frappe.db.sql(file_query, as_dict=True)
+        return files
+
     def clean_header(self, list_to_clean):
         cleaned_list = []
         for header in list_to_clean:
@@ -65,7 +76,12 @@ class AdviceTransformer(StagingTransformer):
         return None, header_row_index, identified_header_row
 
     def verify_file(self, file, header_index):
-        return True
+        configured_customers = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'tpa';""", as_list=True)
+        if [file["payer_type"]] in configured_customers:
+            return True
+        self.log_error(self.document_type, file['name'], f'No Configuration For the Payer: {file["payer_type"]}')
+        self.update_status('File upload', file['name'], 'Error')
+        return False
 
     def get_columns_to_prune(self):
         return ['name', '_merge', 'hash_x', 'hash_column']
@@ -76,16 +92,41 @@ class AdviceTransformer(StagingTransformer):
     def get_columns_to_fill_na_as_0(self):
         return ['claim_amount', 'settled_amount', 'tds_amount', 'disallowed_amount']
 
+    def calculate_settled_amount(self, file, df):
+        tpa_to_calculate_settled_amount = frappe.db.sql("""SELECT tpa FROM `tabSettled Amount Calculation Configuration` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount';""", as_list=True)
+        if [file["payer_type"]] not in tpa_to_calculate_settled_amount or 'linkedclaimnumber' in df.columns:
+            return df
+        has_tds_percentage = frappe.db.sql(f"""SELECT has_tds_percentage FROM `tabSettled Amount Calculation Configuration` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount' AND tpa = '{file['payer_type']}';""", as_list=True)[0][0]
+
+        def set_settled_amount(df):
+            df['settled_amount'] = df['claim_amount'].astype(float) - df['tds_amount'].astype(float)
+            return df
+
+        def set_settled_amount_using_tds_percentage(df):
+            df["tds_percentage"] = pd.to_numeric(df["tds_percentage"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
+                        r"[\"\'?%,]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0"), errors='coerce')
+            df["calculated_tds"] = ((df["settled_amount"].astype(float) * df["tds_percentage"].astype(float))/100)
+            if any(df["calculated_tds"].astype(float) == df["tds_amount"].astype(float)):
+                df['claim_amount'] = df['settled_amount']
+                df = set_settled_amount(df)
+            return df.drop(columns = ["calculated_tds"])
+
+        if has_tds_percentage == 0:
+            df = set_settled_amount(df)
+        else:
+            df = set_settled_amount_using_tds_percentage(df)
+        return df
+
     def clean_data(self, df):
         df = df.T.drop_duplicates().T
         df = self.fill_na_as_0(df)
+        df = self.calculate_settled_amount(file, df)
         df["final_utr_number"] = df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
             r"[\"\'?]", '', regex=True).replace("NOT AVAILABLE", "0").replace("", "0")
         df["claim_id"] = df["claim_id"].fillna("0").astype(str).str.strip().replace(r"[\"\'?]", '', regex=True).replace(
             "", "0")
         df = self.format_date(df, eval(frappe.get_single('Bank Configuration').date_formats), 'paid_date')
         return df
-
 
     def get_columns_to_hash(self):
         return ["claim_id", "bill_number", "utr_number", "claim_status", "claim_amount", "disallowed_amount",
@@ -117,7 +158,7 @@ class AdviceTransformer(StagingTransformer):
             self.update_status('File upload', file['name'], 'Error')
             return False
         self.convert_column_to_numeric()
-        self.source_df = self.clean_data(self.source_df)
+        self.source_df = self.clean_data(file, self.source_df)
         self.hashing_job()
         self.load_target_df()
         if self.target_df.empty:
