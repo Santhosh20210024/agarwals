@@ -69,7 +69,7 @@ class AdviceTransformer(StagingTransformer):
 
     def verify_file(self, file, header_index):
         configured_customers = frappe.db.sql("""SELECT customer FROM `tabSA Configured Customers` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'tpa';""", as_list=True)
-        if [file["payer_type"]] in configured_customers:
+        if file["is_mail"] == 1 or [file["payer_type"]] in configured_customers:
             return True
         self.log_error(self.document_type, file['name'], f'No Configuration For the Payer: {file["payer_type"]}')
         self.update_status('File upload', file['name'], 'Error')
