@@ -295,7 +295,8 @@ class Transformer:
     def convert_column_to_numeric(self):
         columns = self.get_column_name_to_convert_to_numeric()
         for column in columns:
-            self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
+            if column in self.source_df.columns:
+                self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
 
     def format_date(self,df,date_formats,date_column):
         df['original_date'] = df[date_column].astype(str).apply(lambda x: x.strip() if isinstance(x,str) else x)
@@ -314,14 +315,16 @@ class Transformer:
     def fill_na_as_0(self,df):
         columns = self.get_columns_to_fill_na_as_0()
         for column in columns:
-            df[column] = df[column].fillna(0)
-            df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
+            if column in df.columns:
+                df[column] = df[column].fillna(0)
+                df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
         return df
 
     def format_numbers(self, df):
         columns = self.get_column_name_to_convert_to_numeric()
         for column in columns:
-            df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
+            if column in df.columns:
+                df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
         return df
 
     def process(self, args):
@@ -490,7 +493,6 @@ class StagingTransformer(Transformer):
         null_index = self.source_df.index[self.source_df[column].isnull()].min()
         self.source_df = self.source_df.loc[:null_index - 1]
         return True
-
 
     def transform(self,file):
         configuration = self.get_configuration()
