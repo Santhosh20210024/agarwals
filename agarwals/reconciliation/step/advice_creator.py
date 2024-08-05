@@ -77,14 +77,12 @@ def create_settlement_advice_doc(doc_to_insert):
         if "Duplicate entry" in str(e):
             sa_doc = frappe.get_doc('Settlement Advice', name)
             if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount == doc_to_insert.disallowed_amount:
-                update_error(doc_to_insert, 'S100')
-                return
+                return update_error(doc_to_insert, 'S100')
             if sa_doc.status == 'Warning' and sa_doc.remark == "Claim amount lesser than the cumulative of other amounts":
                 sa_doc.update(data)
                 sa_doc.save()
-                update_processed_status(sa_doc)
-                return
-            update_error(doc_to_insert, 'S106')
+                return update_processed_status(sa_doc)
+            return update_error(doc_to_insert, 'S106')
         else:
             raise Exception(e)
 
@@ -113,7 +111,7 @@ def create_settlement_advices(advices, chunk_doc):
                 advice_staging_doc, flag = validate_advice(advice_staging_doc)
                 if not flag:
                     continue
-                advice_staging_doc.date = date.today(),
+                advice_staging_doc.date = date.today()
                 advice_staging_doc.claim_id=advice_staging_doc.claim_id.replace(".0","")
                 advice_staging_doc.final_utr_number = advice_staging_doc.final_utr_number.replace(".0","")
                 advice_staging_doc.utr_number = advice_staging_doc.utr_number.replace(".0","")
@@ -139,6 +137,7 @@ def process(args):
         if advices_list:
             for i in range(0, len(advices_list), n):
                 chunk_doc=chunk.create_chunk(args["step_id"])
+                # create_settlement_advices(advices = advices_list[i:i + n], chunk_doc=chunk_doc)
                 frappe.enqueue(create_settlement_advices, queue=args["queue"], is_async=True, job_name="Advice Creation", timeout=25000,
                                advices = advices_list[i:i + n], chunk_doc=chunk_doc)
         else:
