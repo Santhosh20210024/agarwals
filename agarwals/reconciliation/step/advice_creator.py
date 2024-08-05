@@ -75,16 +75,16 @@ def create_settlement_advice_doc(doc_to_insert):
         return update_processed_status(doc_to_insert)
     except Exception as e:
         if "Duplicate entry" in str(e):
-            sa_doc = frappe.get_doc('Settlement Advice',name)
-            if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount==doc_to_insert.disallowed_amount:
-                doc_to_insert = update_error(doc_to_insert,'S100')
-                return doc_to_insert
-            if sa_doc.status != 'Warning':
-                doc_to_insert = update_error(doc_to_insert,'S106')
-                return doc_to_insert
-            sa_doc.update(data)
-            sa_doc.save()
-            return update_processed_status(doc_to_insert)
+            sa_doc = frappe.get_doc('Settlement Advice', name)
+            if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount == doc_to_insert.disallowed_amount:
+                update_error(doc_to_insert, 'S100')
+                return
+            if sa_doc.status == 'Warning' and sa_doc.remark == "Claim amount lesser than the cumulative of other amounts":
+                sa_doc.update(data)
+                sa_doc.save()
+                update_processed_status(sa_doc)
+                return
+            update_error(doc_to_insert, 'S106')
         else:
             raise Exception(e)
 

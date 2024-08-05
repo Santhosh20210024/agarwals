@@ -133,8 +133,8 @@ class Fileupload(Document):
 		
 		if fid:
 			self.validate_file_extension(fname, fid)
-			self.validate_file_header(fname, fid)
-			self.validate_file_content(fname, fid)
+			# self.validate_file_header(fname, fid)
+			# self.validate_file_content(fname, fid)
 			self.validate_file_hash(fname, fid)
 
 	def update_fdoc_upload(self, fid, furl, fname): 
