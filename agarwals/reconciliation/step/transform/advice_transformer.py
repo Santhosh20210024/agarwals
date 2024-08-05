@@ -111,6 +111,7 @@ class AdviceTransformer(StagingTransformer):
 
     def clean_data(self, file, df):
         df = df.T.drop_duplicates().T
+        self.source_df = self.convert_into_common_format(self.source_df, self.get_column_needed())
         df = self.fill_na_as_0(df)
         df = self.calculate_settled_amount(file, df)
         df["final_utr_number"] = df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
