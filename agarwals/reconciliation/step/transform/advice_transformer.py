@@ -111,6 +111,7 @@ class AdviceTransformer(StagingTransformer):
 
     def clean_data(self, file, df):
         df = df.T.drop_duplicates().T
+        df = self.convert_into_common_format(df, self.get_column_needed())
         df = self.fill_na_as_0(df)
         df = self.calculate_settled_amount(file, df)
         df["final_utr_number"] = df["utr_number"].fillna("0").astype(str).str.lstrip("0").str.strip().replace(
@@ -145,11 +146,11 @@ class AdviceTransformer(StagingTransformer):
 
     def extract(self, configuration, key, file):
         self.source_df.rename(columns=self.rename_value, inplace=True)
-        self.source_df = self.convert_into_common_format(self.source_df, self.get_column_needed())
         if "claim_id" not in self.source_df.columns:
             self.log_error(self.document_type, file['name'], '"No Valid data header or file is empty')
             self.update_status('File upload', file['name'], 'Error')
             return False
+        self.source_df = self.convert_into_common_format(self.source_df, self.get_column_needed())
         self.convert_column_to_numeric()
         self.source_df = self.clean_data(file, self.source_df)
         self.hashing_job()
