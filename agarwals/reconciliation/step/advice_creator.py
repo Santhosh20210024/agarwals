@@ -108,8 +108,8 @@ def create_settlement_advices(advices, chunk_doc):
     chunk_status = "Processed"
     try:
         for advice in advices:
+            advice_staging_doc=frappe.get_doc(staging_doc,advice[0])
             try:
-                advice_staging_doc=frappe.get_doc(staging_doc,advice[0])
                 advice_staging_doc, flag = validate_advice(advice_staging_doc)
                 if not flag:
                     continue
