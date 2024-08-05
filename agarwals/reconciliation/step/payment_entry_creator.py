@@ -1,5 +1,6 @@
 import frappe
 from agarwals.agarwals.doctype import file_records
+from erpnext.patches.v14_0.delete_agriculture_doctypes import execute
 from frappe import utils
 from datetime import date
 from agarwals.reconciliation import chunk
@@ -8,33 +9,49 @@ from agarwals.utils.error_handler import log_error
 from tfs.profiler.timer import Timer
 from agarwals.utils.reconciliation_utils import update_error
 from frappe.utils.caching import redis_cache
+chunk_status = "Processed"
+
+def get_document_record(doctype, name):
+    document_timer = Timer().start(f"get_document_record {doctype} - {name}")
+    doc = frappe.get_doc(doctype, name)
+    document_timer.end()
+    return doc
+
+class BankReconciliation:
+    def process(self, bt):
+        try:
+            t1 = Timer().start(f"Reconciliation process {bt.bank_transaction}")
+            self.bt_doc = get_document_record("Bank Transaction", bt.bank_transaction)
+            matcher_name_list = eval(bt.matcher_names)
+            for matcher_name in matcher_name_list:
+                t2 = Timer().start(f"Reconciliation Matcher Loop {matcher_name}")
+                matcher_doc = get_document_record("Matcher", matcher_name)
+                PaymentEntryCreator(matcher_doc, self.bt_doc).process()
+                self.bt_doc.reload()
+                t2.end()
+            t1.end()
+        except Exception as e:
+            global chunk_status
+            chunk_status = "Error"
+            log_error(e, 'Matcher')
 
 class PaymentEntryCreator:
-    def get_document_record(self, doctype, name):
-        document_timer = Timer().start(f"get_document_record {doctype} - {name}")
-        doc = frappe.get_doc(doctype, name)
-        document_timer.end()
-        return doc
-
-    def __init__(self, matcher_record, match_logic, closing_date, chunk_doc):
+    def __init__(self, matcher_record, bt_doc):
         class_init_timer = Timer().start(f"Payment_Entry_class_init {matcher_record.name}")
         self.matcher_record = matcher_record
-        self.match_logic = match_logic
-        self.chunk_doc = chunk_doc
         self.settled_amount = round(float(matcher_record.settled_amount), 2) if matcher_record.settled_amount else 0
         self.tds_amount = round(float(matcher_record.tds_amount), 2) if matcher_record.tds_amount else 0
         self.disallowance_amount = round(float(matcher_record.disallowance_amount), 2) if matcher_record.disallowance_amount else 0
         self.bank_account = self.matcher_record.company_bank_account
         self.sa_status = 'Fully Processed'
         self.sa_remark = ''
-        self.closing_date = closing_date
         self.pe_doc = None
+        self.bt_doc=bt_doc
         class_init_timer.end()
 
     def validate(self):
         validate_timer = Timer().start(f"validate {self.matcher_record.name}")
-        self.bt_doc = self.get_document_record('Bank Transaction', self.matcher_record.bank_transaction)
-        self.si_doc = self.get_document_record('Sales Invoice', self.matcher_record.sales_invoice)
+        self.si_doc = get_document_record('Sales Invoice', self.matcher_record.sales_invoice)
         error = None
         if self.bt_doc.status == 'Reconciled':  # Already Reconciled
              error = 'Already Reconciled'
@@ -86,9 +103,21 @@ class PaymentEntryCreator:
         get_entry_name_timer.end()
         return name
 
+    @redis_cache
+    def get_entity_closing_date(self, entity):
+        get_posting_date_timer = Timer().start(f"get_posting_date {entity}")
+        closing_date_list = frappe.get_list('Period Closure by Entity',
+                                            filters={'entity': entity}
+                                            , order_by='creation desc'
+                                            , pluck='posting_date')
+        closing_date = max(closing_date_list) if closing_date_list else None
+        get_posting_date_timer.end()
+        return closing_date
+
     def get_posting_date(self):
         get_posting_date_timer = Timer().start(f"get_posting_date {self.matcher_record.name}")
-        if self.closing_date and self.bt_doc.date < self.closing_date:
+        closing_date = self.get_entity_closing_date(self.matcher_doc.si_entity)
+        if closing_date and self.bt_doc.date < closing_date:
             get_posting_date_timer.end()
             return utils.today()
         get_posting_date_timer.end()
@@ -236,7 +265,7 @@ class PaymentEntryCreator:
         update_advice_reference_timer = Timer().start(f"update_advice_reference {self.matcher_record.name}")
         if not self.matcher_record.settlement_advice:
             return None
-        settlement_advice = self.get_document_record('Settlement Advice', self.matcher_record.settlement_advice)
+        settlement_advice = get_document_record('Settlement Advice', self.matcher_record.settlement_advice)
         sa_dict = {'tpa': self.si_doc.customer,
                     'region': self.si_doc.region,
                     'entity': self.si_doc.entity,
@@ -281,40 +310,30 @@ class PaymentEntryCreator:
             frappe.db.rollback()
             update_error(self.matcher_record, self.sa_remark)
             log_error(e,'Payment Entry', self.si_doc.name)
+            global chunk_status
+            chunk_status = "Error"
         finally:
             frappe.db.commit()
             Payment_creation_process_timer.end()
 
-@redis_cache
-def get_entity_closing_date(entity):
-    get_posting_date_timer = Timer().start(f"get_posting_date {entity}")
-    closing_date_list = frappe.get_list('Period Closure by Entity',
-                                        filters={'entity': entity}
-                                        , order_by='creation desc'
-                                        , pluck='posting_date')
-    closing_date = max(closing_date_list) if closing_date_list else None
-    get_posting_date_timer.end()
-    return closing_date
-
-def create_payment_entries(matcher_doc_records, match_logic, chunk_doc, batch):
-        t1 = Timer().start(f"create_payment_entry {batch}")
-        chunk.update_status(chunk_doc, "InProgress")
-        chunk_status = "Processed"
-        try:
-            if not len(matcher_doc_records):
-                return
-            for matcher_record in matcher_doc_records:
-                closing_date = get_entity_closing_date(matcher_record.si_entity)
-                t2 = Timer().start(f"Payment_class {matcher_record.name}")
-                PaymentEntryCreator(matcher_record, match_logic, closing_date, chunk_doc).process()
-                t2.end()
-        except Exception as e:
-            chunk_status = "Error"
-            log_error(e, 'Matcher')
-        finally:
-            chunk.update_status(chunk_doc, chunk_status)
-            t1.end()
-            t1.print(batch)
+def reconcile_bank_transaction(bt_records, chunk_doc, batch):
+    t1 = Timer().start(f"reconcile_bank_transaction {batch}")
+    chunk.update_status(chunk_doc, "InProgress")
+    try:
+        if not len(bt_records):
+            return
+        for bt in bt_records:
+            t2 = Timer().start(f"Payment_class {bt.name}")
+            Reconciliation().process(bt)
+            t2.end()
+    except Exception as e:
+        global chunk_status
+        chunk_status = "Error"
+        log_error(e, 'Matcher')
+    finally:
+        chunk.update_status(chunk_doc, chunk_status)
+        t1.end()
+        t1.print(batch)
 
 @frappe.whitelist()
 def process(args):
@@ -323,20 +342,23 @@ def process(args):
         seq_no = 0
         chunk_size = int(args["chunk_size"])
         m_logic = tuple(frappe.get_single('Control Panel').match_logic.split(','))
-        matcher_doc_records = frappe.db.sql("""select * from `tabMatcher` where match_logic in %(m_logic)s and status = 'Open' ORDER BY unallocated DESC"""
-                                       , values={"m_logic": m_logic}
-                                       , as_dict=True)
-        if matcher_doc_records:
-            for record in range(0, len(matcher_doc_records), chunk_size):
+        bt_records = frappe.db.sql("""SELECT bank_transaction, JSON_ARRAYAGG(name) as matcher_names
+                                        FROM `tabMatcher`
+                                        where match_logic in  %(m_logic)s and status = 'Open'
+                                        GROUP BY bank_transaction ORDER BY sales_invoice,unallocated DESC;"""
+                                       ,values={"m_logic": m_logic}
+                                       ,as_dict=True)
+        if bt_records:
+            for record in range(0, len(bt_records), chunk_size):
                 # create_payment_entries(matcher_doc_records=matcher_doc_records, match_logic=m_logic, chunk_doc=chunk_doc)
                 chunk_doc = chunk.create_chunk(args["step_id"])
                 seq_no = seq_no + 1
-                frappe.enqueue(create_payment_entries
+                frappe.enqueue(reconcile_bank_transaction
                                , queue = 'long'
                                , is_async = True
                                , job_name = "Batch" + str(seq_no)
                                , timeout = 25000
-                               , matcher_doc_records = matcher_doc_records[record:record + chunk_size]
+                               , matcher_doc_records = bt_records[record:record + chunk_size]
                                , match_logic = m_logic, chunk_doc = chunk_doc, batch = "Batch" + str(seq_no))
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
