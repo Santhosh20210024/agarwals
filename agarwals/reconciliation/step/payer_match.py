@@ -24,7 +24,7 @@ def update_payer(customer_list):
             frappe.db.sql("""
                           UPDATE `tabBank Transaction Staging` tbt SET tbt.payer_type = 'Customer', tbt.payer_name = %(payer)s,
                           tbt.payer_group = %(payer_group)s where search REGEXP %(compressed_payer_match)s 
-                          AND ( tbt.payer_name is NULL or tbt.payer_name = 'TPA Receipt' )
+                          AND ( tbt.payer_name is NULL or tbt.payer_name = 'TPA Receipts' )
                           """, values = { 'payer' : customer_item.name , 'payer_group' : customer_item.customer_group 
                           ,'compressed_payer_match' :  compressed_payer_match})
             frappe.db.commit()
