@@ -58,9 +58,12 @@
   "file_upload",
   "transform",
   "index",
-  "column_break_fnp9x",
   "file_name",
-  "file_upload_payer"
+  "column_break_fnp9x",
+  "file_upload_payer",
+  "tpa_user_id",
+  "tpa_brach",
+  "is_bot"
  ],
  "fields": [
   {
@@ -445,10 +448,32 @@
    "label": "Staging",
    "options": "Settlement Advice Staging",
    "read_only": 1
+  },
+  {
+   "fetch_from": "file_upload.tpa_login_id",
+   "fieldname": "tpa_user_id",
+   "fieldtype": "Data",
+   "label": "TPA User ID",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "file_upload.tpa_branch",
+   "fieldname": "tpa_brach",
+   "fieldtype": "Data",
+   "label": "TPA Brach",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "file_upload.is_bot",
+   "fieldname": "is_bot",
+   "fieldtype": "Check",
+   "label": "Is Bot",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2024-07-31 16:13:28.224375",
+ "modified": "2024-08-06 15:27:40.027869",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

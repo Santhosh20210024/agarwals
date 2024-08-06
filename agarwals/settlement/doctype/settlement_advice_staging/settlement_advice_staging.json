@@ -46,10 +46,13 @@
   "file_upload",
   "transform",
   "index",
-  "column_break_8izxn",
   "file_name",
+  "column_break_8izxn",
   "file_upload_payer",
-  "hash"
+  "hash",
+  "tpa_login_id",
+  "tpa_branch",
+  "is_bot"
  ],
  "fields": [
   {
@@ -346,11 +349,33 @@
    "fieldname": "insurance_policy_number",
    "fieldtype": "Data",
    "label": "Insurance Policy Number"
+  },
+  {
+   "default": "0",
+   "fetch_from": "file_upload.is_bot",
+   "fieldname": "is_bot",
+   "fieldtype": "Check",
+   "label": "Is Bot",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "file_upload.tpa_login_id",
+   "fieldname": "tpa_login_id",
+   "fieldtype": "Data",
+   "label": "TPA Login ID",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "file_upload.tpa_branch",
+   "fieldname": "tpa_branch",
+   "fieldtype": "Data",
+   "label": "TPA Branch",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-06 10:40:27.721525",
+ "modified": "2024-08-06 15:28:13.202607",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
