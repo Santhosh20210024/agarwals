@@ -46,10 +46,14 @@
   "file_upload",
   "transform",
   "index",
-  "column_break_8izxn",
   "file_name",
+  "column_break_8izxn",
   "file_upload_payer",
-  "hash"
+  "hash",
+  "tpa_login_id",
+  "tpa_branch",
+  "is_bot",
+  "is_mail"
  ],
  "fields": [
   {
@@ -206,7 +210,7 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Error Code",
-   "options": "\nS100\nS101\nS102\nS103\nS104\nS105",
+   "options": "\nS100\nS101\nS102\nS103\nS104\nS105\nS106",
    "read_only": 1
   },
   {
@@ -346,11 +350,40 @@
    "fieldname": "insurance_policy_number",
    "fieldtype": "Data",
    "label": "Insurance Policy Number"
+  },
+  {
+   "default": "0",
+   "fetch_from": "file_upload.is_bot",
+   "fieldname": "is_bot",
+   "fieldtype": "Check",
+   "label": "Is Bot",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "file_upload.tpa_login_id",
+   "fieldname": "tpa_login_id",
+   "fieldtype": "Data",
+   "label": "TPA Login ID",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "file_upload.tpa_branch",
+   "fieldname": "tpa_branch",
+   "fieldtype": "Data",
+   "label": "TPA Branch",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_mail",
+   "fieldtype": "Check",
+   "label": "Is Mail",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-31 16:24:53.233504",
+ "modified": "2024-08-06 15:37:55.624411",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",
