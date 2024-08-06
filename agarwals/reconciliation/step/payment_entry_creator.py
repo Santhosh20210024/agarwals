@@ -324,7 +324,7 @@ def reconcile_bank_transaction(bt_records, chunk_doc, batch):
             return
         for bt in bt_records:
             t2 = Timer().start(f"Payment_class {bt.name}")
-            Reconciliation().process(bt)
+            BankReconciliation().process(bt)
             t2.end()
     except Exception as e:
         global chunk_status
