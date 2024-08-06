@@ -52,7 +52,8 @@
   "hash",
   "tpa_login_id",
   "tpa_branch",
-  "is_bot"
+  "is_bot",
+  "is_mail"
  ],
  "fields": [
   {
@@ -371,11 +372,18 @@
    "fieldtype": "Data",
    "label": "TPA Branch",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_mail",
+   "fieldtype": "Check",
+   "label": "Is Mail",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-06 15:28:13.202607",
+ "modified": "2024-08-06 15:37:55.624411",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice Staging",

@@ -63,7 +63,8 @@
   "file_upload_payer",
   "tpa_user_id",
   "tpa_brach",
-  "is_bot"
+  "is_bot",
+  "is_mail"
  ],
  "fields": [
   {
@@ -470,10 +471,17 @@
    "fieldtype": "Check",
    "label": "Is Bot",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_mail",
+   "fieldtype": "Check",
+   "label": "Is Mail",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2024-08-06 15:27:40.027869",
+ "modified": "2024-08-06 15:38:13.813171",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
