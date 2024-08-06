@@ -14,7 +14,7 @@ class Fileupload(Document):
 	zip_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[-1])
 	field_pattern = r'-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.\w+'
 
-	def add_log_error(self, doctype, error):  # To add error log 
+	def add_log_error(self, doctype, error):
 		error_log = frappe.new_doc('Error Record Log')
 		error_log.set('reference_doctype', doctype)
 		error_log.set('error', error)
@@ -41,13 +41,13 @@ class Fileupload(Document):
 				return None
 		return None
 
-	def get_fpath_fdir(self): # Used while Zip Processing
+	def get_fpath_fdir(self):
 		fname = self.upload.split('/')[-1]
 		fpath = "".join([self.zip_folder ,'/', fname])
 		fdir = "".join([self.zip_folder, '/', fname.split('.')[0]])
 		return fpath, fdir
 	
-	def get_fdoc_meta(self): # To get the info of the file uploaded
+	def get_fdoc_meta(self):
 		fname = self.upload.split("/")[-1]
 		fdoc_id = frappe.get_list("File"
 								  ,filters={'file_url': self.upload}
