@@ -81,7 +81,7 @@ def create_settlement_advice_doc(doc_to_insert):
             if sa_doc.status == 'Warning' and sa_doc.remark == "Claim amount lesser than the cumulative of other amounts":
                 sa_doc.update(data)
                 sa_doc.save()
-                return update_processed_status(sa_doc)
+                return update_processed_status(doc_to_insert)
             return update_error(doc_to_insert, 'S106')
         else:
             raise Exception(e)
