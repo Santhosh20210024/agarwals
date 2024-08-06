@@ -8,11 +8,9 @@ from agarwals.utils.file_util import construct_file_url, HOME_PATH, SITE_PATH, S
 import pandas as pd
 
 
-
 class Fileupload(Document):
 
 	extract_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[0])
-	file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
 	zip_folder = construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, SUB_DIR[-1])
 	field_pattern = r'-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.\w+'
 
@@ -109,9 +107,10 @@ class Fileupload(Document):
 	
 	def validate_file_extension(self, fname, fid):
 		extension = fname.split('.')[-1].upper().strip()
+		file_extensions = frappe.get_single('Control Panel').allowed_file_extensions.split(',')
 
-		if extension not in self.file_extensions: # Extention Checking
-			err = f"Please upload files in the following format: {','.join(self.file_extensions)}"
+		if extension not in file_extensions:
+			err = f"Please upload files in the following format: {','.join(file_extensions)}"
 			self.del_file_record(fid, fname, err)
 
 		if self.file_format == 'EXCEL':
@@ -133,8 +132,8 @@ class Fileupload(Document):
 		
 		if fid:
 			self.validate_file_extension(fname, fid)
-			# self.validate_file_header(fname, fid)
-			# self.validate_file_content(fname, fid)
+			self.validate_file_content(fname, fid)
+			self.validate_file_header(fname, fid)
 			self.validate_file_hash(fname, fid)
 
 	def update_fdoc_upload(self, fid, furl, fname): 
@@ -211,11 +210,12 @@ class Fileupload(Document):
 
 	def validate_file_content(self, fname, fid):
 		try:
-			df = self.read_file(SITE_PATH + self.upload)
-			if df.shape[0] == 0:
-				self.add_log_error('File upload', 'The file contains only the header or is empty')
-				frappe.throw('File contains only header or is empty')
-				return
+			if self.file_format != 'ZIP':
+				df = self.read_file(SITE_PATH + self.upload)
+				if df.shape[0] == 0:
+					self.add_log_error('File upload', 'The file contains only the header or is empty')
+					frappe.throw('File contains only header or is empty')
+					return
 
 		except Exception as e:
 			self.add_log_error('File upload', f"An error occurred while checking the file: {e}")
@@ -223,20 +223,21 @@ class Fileupload(Document):
 
 	def read_file(self, file, columns = False):
 		if os.path.exists(file):
-			if file.endswith('.xls') or file.endswith('.xlsx'):
-				file_data = pd.read_excel(file)
-				if columns:
-					return list(file_data.columns)
-				return file_data
-			elif file.endswith('.csv'):
+			if file.endswith('.csv'):
 				file_data = pd.read_csv(file)
 				if columns:
 					return list(file_data.columns)
 				return file_data
 			else:
-				if columns:
-					return []
-				return pd.DataFrame()
+				file_data = pd.read_excel(file)
+				if not file_data.empty:
+					if columns:
+						return list(file_data.columns)
+					return file_data
+				else:
+					if columns:
+						return []
+					return pd.DataFrame()
 		else:
 			if columns:
 				return []
@@ -279,23 +280,17 @@ class Fileupload(Document):
 	def compare_header(self, template_columns, upload_columns):
 		template_columns = set(self.compress(template_columns))
 		upload_columns = set(self.compress(upload_columns))
-
 		missing_in_upload = template_columns - upload_columns
-		# extra_in_upload = upload_columns - template_columns
-
 		if missing_in_upload:
 			return f'Templates are missing in the uploaded file: {missing_in_upload}'
-		# elif extra_in_upload:
-		# 	return f'Uploaded file has extra fields: {extra_in_upload}'
 		else:
 			return None
 
 	def validate_file_header(self, fname, fid):
 		try:
-			if self.upload:
+			if self.upload and self.file_format != 'ZIP':
 				attached_name, attached_doctype = self.get_template_details()
 				template_columns = self.read_file(SITE_PATH + is_template_exist(attached_name, attached_doctype), columns=True)
-
 				if template_columns:
 					upload_columns = self.read_file(SITE_PATH + self.upload, columns=True)
 					if upload_columns:
@@ -307,13 +302,12 @@ class Fileupload(Document):
 
 	def validate(self): 
 
-		# God Level Validation
 		if self.is_uploaded == 1:
 			return
 		
 		if self.upload == None or self.upload == '':
 			frappe.throw('Please upload file')
-
+			
 		self.validate_file()
 		self.process_file_attachment()
 
@@ -495,8 +489,9 @@ def zip_operation(fid):
 			if ndoc.document_type == 'Settlement Advice': set_child_entries_status('Settlement Advice Mapping', 'Created', ndoc.name)
 			elif ndoc.document_type == 'Bank Statement': set_child_entries_status('Bank Account Mapping', 'Created', ndoc.name)
 			else: set_child_entries_status('Other Mapping', 'Created', ndoc.name)
-		
 			processed_count += 1
+			frappe.db.commit()
+			
 		except Exception as e:
 			if ndoc.document_type == 'Settlement Advice': set_child_entries_status('Settlement Advice Mapping', 'Error', None, str(e))
 			elif ndoc.document_type == 'Bank Statement': set_child_entries_status('Bank Account Mapping', 'Error', None, str(e))
