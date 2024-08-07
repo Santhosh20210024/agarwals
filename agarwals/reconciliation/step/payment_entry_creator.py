@@ -294,7 +294,7 @@ class PaymentEntryCreator:
     def __update_claim_reference(self):
         update_claim_referece = Timer().start(f"update_claim_reference {self.matcher_record.name}")
         frappe.db.sql(
-            f"""UPDATE `tabClaimBook` SET matched_status = 'Matched' WHERE name = '{self.matcher_record.claimbook}'""")
+            f"""UPDATE `tabClaimBook` SET matched_status = 'Matched' WHERE name = \"{self.matcher_record.claimbook}\"""")
         update_claim_referece.end()
 
     def __update_references(self):
