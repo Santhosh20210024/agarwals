@@ -1,6 +1,6 @@
 frappe.listview_settings['Closing Balance'] = {
     refresh: function(listview) {
-         listview.page.add_inner_button("Validate", function() {
+         listview.page.add_inner_button("Validate Closing Balance", function() {
              frappe.confirm(
                  'Are you sure you want to perform this action ?',
                  function (frm) {
@@ -15,7 +15,7 @@ frappe.listview_settings['Closing Balance'] = {
                });
          });;
  
-         listview.page.add_inner_button("Load Data", function() {
+         listview.page.add_inner_button("Load Closing Balance", function() {
              frappe.confirm(
                  'Are you sure you want to perform this action ?',
                  function (frm) {

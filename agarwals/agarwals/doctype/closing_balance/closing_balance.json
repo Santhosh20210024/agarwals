@@ -12,7 +12,7 @@
   "opening_balance",
   "deposit",
   "withdrawal",
-  "closing_balance",
+  "cg_closing_balance",
   "ag_closing_balance",
   "difference",
   "skip",
@@ -44,12 +44,6 @@
    "label": "Withdrawal"
   },
   {
-   "depends_on": "eval:doc.bank_account != null",
-   "fieldname": "closing_balance",
-   "fieldtype": "Float",
-   "label": "Closing Balance"
-  },
-  {
    "fieldname": "ag_closing_balance",
    "fieldtype": "Float",
    "label": "AG Closing Balance"
@@ -67,8 +61,9 @@
   },
   {
    "fieldname": "file_upload",
-   "fieldtype": "Data",
-   "label": "File Upload"
+   "fieldtype": "Link",
+   "label": "File Upload",
+   "options": "File upload"
   },
   {
    "fieldname": "index",
@@ -79,11 +74,17 @@
    "fieldname": "transform",
    "fieldtype": "Data",
    "label": "Transform"
+  },
+  {
+   "depends_on": "eval:doc.bank_account != null",
+   "fieldname": "cg_closing_balance",
+   "fieldtype": "Float",
+   "label": "CG Closing Balance"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-22 18:40:12.186346",
+ "modified": "2024-08-07 11:35:33.331972",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Closing Balance",
