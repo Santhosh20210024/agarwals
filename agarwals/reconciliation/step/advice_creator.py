@@ -27,6 +27,7 @@ def log_error(doctype_name, error_doc, error_message):
     error_log.save()
     if error_doc:
         error_log.set('reference_name', error_doc.name)
+        error_log.save()
         return update_error(error_doc,'S104')
 
 def update_processed_status(doc_to_update):
@@ -40,6 +41,7 @@ def create_settlement_advice_doc(doc_to_insert):
         name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id + "-" + str(len(settlement_advices))
     else:
         name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id
+
     data = {
             "doctype": "Settlement Advice",
             "name": name,
@@ -100,6 +102,10 @@ def validate_advice(advice_staging_doc):
     if "e+" in advice_staging_doc.final_utr_number.lower() or "e+" in advice_staging_doc.utr_number.lower():
         return update_error(advice_staging_doc, "S103"), False
     return advice_staging_doc, True
+def clean_sa_data(data):
+    return data.replace(".0","").strip() if data else data
+
+
 
 def create_settlement_advices(advices, chunk_doc):
     chunk.update_status(chunk_doc, "InProgress")
@@ -112,9 +118,9 @@ def create_settlement_advices(advices, chunk_doc):
                 if not flag:
                     continue
                 advice_staging_doc.date = date.today()
-                advice_staging_doc.claim_id=advice_staging_doc.claim_id.replace(".0","")
-                advice_staging_doc.final_utr_number = advice_staging_doc.final_utr_number.replace(".0","")
-                advice_staging_doc.utr_number = advice_staging_doc.utr_number.replace(".0","")
+                advice_staging_doc.claim_id= clean_sa_data(advice_staging_doc.claim_id)
+                advice_staging_doc.final_utr_number = clean_sa_data(advice_staging_doc.final_utr_number)
+                advice_staging_doc.utr_number = clean_sa_data(advice_staging_doc.utr_number)
                 advice_staging_doc = create_settlement_advice_doc(advice_staging_doc)
             except Exception as e:
                 advice_staging_doc = log_error(staging_doc, advice_staging_doc,e)
