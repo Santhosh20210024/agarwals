@@ -10,11 +10,7 @@ class ClosingBalance:
             query = repo_doc.query
             accounts = frappe.db.sql(query, as_dict=True)
             for account in accounts:
-                close_docs = frappe.get_all('Closing Balance', filters={'name': account['Bank Account']})
-                if close_docs:
-                  doc = frappe.get_doc('Closing Balance', account['Bank Account'])
-                else:
-                  doc = frappe.new_doc('Closing Balance')
+                doc = frappe.get_doc('Closing Balance', account['Bank Account'])
                 doc.bank_account = account['Bank Account']
                 doc.opening_balance = account['Opening Balance']
                 doc.deposit = account['Deposit']
@@ -25,7 +21,7 @@ class ClosingBalance:
             
                 
         except Exception as e:
-            log_error(str(e), 'Closing Balance')
+            log_error(e, 'Closing Balance')
     
     def validate(self):
         close_docs = frappe.get_all('Closing Balance')
