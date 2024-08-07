@@ -24,7 +24,7 @@ def update_matcher_log(matcher_record, status, msg):
     macher_log_timer.end()
 
 def update_error(matcher_record, message, error=None):
-    update_matcher_log(matcher_record.name, 'Error', message)
+    update_matcher_log(matcher_record, 'Error', message)
     if matcher_record.settlement_advice:
         update_advice_log(matcher_record.settlement_advice, 'Warning', message)
     if error:

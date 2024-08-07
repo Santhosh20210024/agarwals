@@ -6,6 +6,8 @@ from agarwals.utils.reconciliation_utils import update_error, get_company_accoun
 
 class Matcher(Document):
 	def before_save(self):
+		if self.status != "Open":
+			return
 		if not self.settlement_advice:
 			ref_doc = frappe.get_doc("ClaimBook", self.claimbook)
 		else:
@@ -17,6 +19,8 @@ class Matcher(Document):
 			self.company_bank_account = get_company_account(self.bt_bank_account)
 
 	def on_update(self):
+		if self.status != "Open":
+			return
 		error = None
 		if not self.bank_transaction:
 			error = "No Bank Transaction"
