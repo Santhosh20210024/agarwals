@@ -78,7 +78,7 @@ class PaymentEntryCreator:
         validate_timer.end()
         return True
 
-    def __set_sa_vars(self, status = 'Fully Processed', remark = ''):
+    def __set_sa_vars(self, status = 'Partially Processed', remark = ''):
         self.sa_status = status
         self.sa_remark = remark
 
@@ -87,20 +87,20 @@ class PaymentEntryCreator:
         unallocated_amount = self.bt_doc.unallocated_amount
         if self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount and self.si_doc.outstanding_amount >= self.settled_amount + self.tds_amount:
             self.disallowance_amount = 0
-            self.__set_sa_vars('Partially Processed', 'Disallowance amount is greater than Outstanding Amount')
+            self.__set_sa_vars(remark='Disallowance amount is greater than Outstanding Amount')
         elif self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount and self.si_doc.outstanding_amount >= self.settled_amount + self.disallowance_amount:
             self.tds_amount = 0
-            self.__set_sa_vars('Partially Processed', 'TDS amount is greater than Outstanding Amount')
+            self.__set_sa_vars(remark='TDS amount is greater than Outstanding Amount')
         elif self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount:
             self.tds_amount = 0
             self.disallowance_amount = 0
-            self.__set_sa_vars('Partially Processed','Both Disallowed and TDS amount is greater than Outstanding Amount')
+            self.__set_sa_vars(remark='Both Disallowed and TDS amount is greater than Outstanding Amount')
         if self.settled_amount > unallocated_amount:
             self.settled_amount = unallocated_amount
-            self.__set_sa_vars('Partially Processed', "Bank Transcation unalllocated is less than settled amount")
+            self.__set_sa_vars(remark="Bank Transcation unalllocated is less than settled amount")
         if self.si_doc.outstanding_amount < self.settled_amount:
             self.settled_amount = self.si_doc.outstanding_amount
-            self.__set_sa_vars('Partially Processed', "Sales Invoice Outstanding is less than settled amount")
+            self.__set_sa_vars(remark="Sales Invoice Outstanding is less than settled amount")
         set_amount_timer.end()
 
     def __get_entry_name(self):
@@ -227,32 +227,32 @@ class PaymentEntryCreator:
             self.__set_sa_vars("Warning", 'Unable to Create Payment Entry')
             process_payment_entry_timer.end()
             raise Exception(e)
-
-    def __update_invoice_reference(self):
-        update_invoice_reference_timer = Timer().start(f"update_invoice_reference {self.si_doc.name}")
-        self.si_doc.reload()
-        created_date = date.today().strftime("%Y-%m-%d")
-        self.si_doc.append('custom_reference', {'entry_type': 'Payment Entry', 'entry_name': self.pe_doc.name,
-                                           'paid_amount': self.pe_doc.paid_amount,
-                                           'tds_amount': self.pe_doc.custom_tds_amount,
-                                           'disallowance_amount': self.pe_doc.custom_disallowed_amount,
-                                           'allocated_amount': self.pe_doc.total_allocated_amount,
-                                           'utr_number': self.pe_doc.reference_no,
-                                           'utr_date': self.pe_doc.reference_date,
-                                           'created_date': created_date, 'bank_region': self.bt_doc.custom_region,
-                                           'bank_entity': self.bt_doc.custom_entity,
-                                           'bank_account_number': self.pe_doc.bank_account})
-        if self.matcher_record.settlement_advice:
-            ref_key, ref_value = 'settlement_advice', self.matcher_record.settlement_advice
-        else:
-            ref_key, ref_value = 'claim_book', self.matcher_record.claim_book
-            self.si_doc.custom_insurance_name = self.matcher_record.insurance_company_name
-        self.si_doc.append('custom_matcher_reference',
-                              {'id': self.matcher_record.name, 'match_logic': self.matcher_record.match_logic, ref_key: ref_value})
-        update_invoice_reference_save_timer = Timer().start(f"update_invoice_reference_save {self.si_doc.name}")
-        self.si_doc.save()
-        update_invoice_reference_save_timer.end()
-        update_invoice_reference_timer.end()
+    #
+    # def __update_invoice_reference(self):
+    #     update_invoice_reference_timer = Timer().start(f"update_invoice_reference {self.si_doc.name}")
+    #     self.si_doc.reload()
+    #     created_date = date.today().strftime("%Y-%m-%d")
+    #     self.si_doc.append('custom_reference', {'entry_type': 'Payment Entry', 'entry_name': self.pe_doc.name,
+    #                                        'paid_amount': self.pe_doc.paid_amount,
+    #                                        'tds_amount': self.pe_doc.custom_tds_amount,
+    #                                        'disallowance_amount': self.pe_doc.custom_disallowed_amount,
+    #                                        'allocated_amount': self.pe_doc.total_allocated_amount,
+    #                                        'utr_number': self.pe_doc.reference_no,
+    #                                        'utr_date': self.pe_doc.reference_date,
+    #                                        'created_date': created_date, 'bank_region': self.bt_doc.custom_region,
+    #                                        'bank_entity': self.bt_doc.custom_entity,
+    #                                        'bank_account_number': self.pe_doc.bank_account})
+    #     if self.matcher_record.settlement_advice:
+    #         ref_key, ref_value = 'settlement_advice', self.matcher_record.settlement_advice
+    #     else:
+    #         ref_key, ref_value = 'claim_book', self.matcher_record.claim_book
+    #         self.si_doc.custom_insurance_name = self.matcher_record.insurance_company_name
+    #     self.si_doc.append('custom_matcher_reference',
+    #                           {'id': self.matcher_record.name, 'match_logic': self.matcher_record.match_logic, ref_key: ref_value})
+    #     update_invoice_reference_save_timer = Timer().start(f"update_invoice_reference_save {self.si_doc.name}")
+    #     self.si_doc.save()
+    #     update_invoice_reference_save_timer.end()
+    #     update_invoice_reference_timer.end()
 
     def __update_trans_reference(self):
         update_trans_timer = Timer().start(f"update_trans_reference {self.bt_doc.name}")
@@ -299,7 +299,7 @@ class PaymentEntryCreator:
 
     def __update_references(self):
         update_reference_timer = Timer().start(f"update_reference {self.matcher_record.name}")
-        self.__update_invoice_reference()
+        # self.__update_invoice_reference()
         self.__update_trans_reference()
         self.__update_advice_reference()
         self.__update_claim_reference()
