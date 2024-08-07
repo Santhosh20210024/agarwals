@@ -109,7 +109,7 @@ class SettlementAdviceClaimKeyMapper(ClaimKeyMapper):
         super().__init__(
             records,
             "Settlement Advice",
-            {'claim_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""}
+            {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""}
         )
 
 @frappe.whitelist()
@@ -125,14 +125,14 @@ def process(args=None):
             "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
                             WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
                             or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
-            "Settlement Advice": """SELECT name, claim_id as key_id FROM `tabSettlement Advice` 
+            "Settlement Advice": """SELECT name, claim_id as claim_key_id FROM `tabSettlement Advice` 
                                     WHERE claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')"""
         }
 
         mappers = {
             "Bill": BillClaimKeyMapper,
             "ClaimBook": ClaimBookClaimKeyMapper,
-            "Settlement Advice": SettlementAdviceClaimKeyMapper,
+            "Settlement Advice": SettlementAdviceClaimKeyMapper
         }
 
         for record_type, query in queries.items():

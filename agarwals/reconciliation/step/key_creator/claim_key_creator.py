@@ -32,8 +32,6 @@ class ClaimKeyCreator(KeyCreator):
             regex_patterns = regex_conf.get("regex_patterns", "")
             cls.compiled_replace_pattern = KeyCreator.get_compiled_pattern(replace_pattern, "Replace Pattern")
             cls.compiled_regex_patterns = KeyCreator.compile_regex_patterns(regex_patterns)
-            print(f"Compiled Replace Pattern: {cls.compiled_replace_pattern}")
-            print(f"Compiled Regex Patterns: {cls.compiled_regex_patterns}")
         except Exception as e:
             log_error(f"Error loading key configuration: {e}", doc="Claim Key")
 
