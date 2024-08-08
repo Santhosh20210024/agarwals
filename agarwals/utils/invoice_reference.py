@@ -14,7 +14,7 @@ def get_sales_invoice_references(doc_name,jv_ac_name):
                     if payment_entry.status =='Submitted':
                         child_table.append({'entry_type': 'Payment Entry', 'entry_name': payment_entry.name, 'settled_amount': payment_entry.paid_amount, 'tds_amount': payment_entry.custom_tds_amount, 'disallowance_amount':
                         payment_entry.custom_disallowed_amount,'writeoff_amount':0, 'allocated_amount':  payment_entry.total_allocated_amount, 'utr_number':  payment_entry.reference_no, 'utr_date':  payment_entry.reference_date,
-                        'created_date':payment_entry.posting_date
+                        'posting_date':payment_entry.posting_date
                           })
 
         if jv:
@@ -35,8 +35,9 @@ def get_sales_invoice_references(doc_name,jv_ac_name):
                                     'settled_amount': 0,
                                     'tds_amount': tds, 'disallowance_amount':dis,'writeoff_amount':wo,
                                     'allocated_amount': jv_doc.total_credit,
-                                    'utr_number': "", 'utr_date':jv_doc.posting_date,
-                                    'created_date': ""
+                                    'utr_number': "",
+                                    'utr_date':"",
+                                    'posting_date': jv_doc.posting_date
                                     })
 
         matcher_list = []

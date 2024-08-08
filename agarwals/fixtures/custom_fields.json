@@ -121,7 +121,7 @@
     "website_url": "https://tips.vidalhealthtpa.com/hospitallogin/hospital/login/",
     "class_name": "VidalHealthDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -963,49 +963,129 @@
     "header_row_patterns": "[\"alnumber\", \"preauthnumber\", \"pano\", \"preauthid\", \"alcashlessauthorisationno\", \"ccn\", \"ccnno\", \"fileno\", \"paclaimid\", \"incidentno\", \"refid\", \"uhid\", \"casenumber\", \"fir\", \"insurerclaimnumber\", \"ccnnumber\", \"insuranceclaimno\", \"caseid\", \"intimationnum\", \"refno\",\"claimnumber\", \"claimid\", \"claimno\", \"insurerclaimno\", \"tpaclaimno\", \"refccn\", \"insurerclaimid\", \"memberidtpa\"]",
     "target_columns": "{\r\n\"cl_number\": [\"claimnumber\", \"claimid\", \"claimno\", \"insurerclaimno\", \"refccn\", \"insurerclaimid\", \"memberidtpa\"],\r\n\r\n\"claim_id\": [[\"alnumber\", \"preauthnumber\", \"pano\", \"preauthid\", \"alcashlessauthorisationno\", \"ccn\", \"ccnno\", \"fileno\", \"paclaimid\", \"incidentno\", \"refid\", \"uhid\", \"casenumber\",\"fir\", \"insurerclaimnumber\", \"ccnnumber\", \"tpaclaimno\", \"insuranceclaimno\", \"caseid\"],[\"insuranceclaimno\", \"caseid\", \"claimnumber\", \"claimid\",\"claimno\", \"insurerclaimno\", \"insurerclaimid\", \"refccn\"]],\r\n\r\n\"bill_number\": [\"billno\", \"billnumber\", \"bill\", \"finalbillnumber\"],\r\n\r\n\"mrn\": [\"patientidnumber\", \"patientipnumber\", \"inpatientnumber\", \"branchmrnno\", \"ipnumber\"],\r\n\r\n\"utr_number\": [\"utr\", \"claimchequenumber\", \"instrumentneftno\", \"chequeneftutrno\", \"utrno\", \"chequeno\", \"chequenumber\", \"etransactionnochequeno\", \"mapchequeneftnumber\", \"utrnumber\", \"trasactionno\", \"paymentreferencenumber\", \"fundtransferno\", \"nefttransactionnumber\", \"utrchqno\", \"ddchequeecsrefno\", \"paymenttransactionidutr\", \"instrumentno\", \"bankeftrefid\", \"paymentutr\", \"claimutrnumber\", \"chequeneftno\", \"chequeneftnumber\", \"chqno\", \"chequenum\", \"chqutrno\", \"rumentno\", \"cdsdsa\", \"neftchqddrefno\"],\r\n\r\n\"claim_status\": [\"statusname\", \"status\", \"claimstatus\", \"finalstatus\", \"interimstatus\", \"portalstatus\", \"newstatus\", \"claimstatusnm\"],\r\n\r\n\"paid_date\": [\"settlementdate\", \"chequeneftutrdate\", \"dtofpayment\", \"utrdt\", \"chequedate\", \"transferdate\", \"chequeneftno\", \"claimchequedate\", \"etransactiondatechequedate\", \"mapchequeneftdate\", \"utrdate\", \"paymenttransactiondate\", \"dateofpayment\", \"dateoftransaction\", \"neftrtgsdate\", \"utrdatechqdate\", \"chequeddecsdate\", \"paiddate\", \"paymentdate\", \"paymentconfirmationtime\", \"claimpaiddate\", \"instrumentneftdate\", \"paidondate\", \"chequeneftdate\", \"chqdate\", \"chequedt\", \"eftcreationtime\",  \"chqutrdate\", \"utrnoupdatedate\", \"dateneftchqdd\"],\r\n\r\n\"insurance_company\": [\"insurancecompany\", \"insurancecompanyname\", \"nameofinsuranceco\", \"icname\", \"inscompname\", \"insurername\", \"insurancename\", \"insurer\", \"payorname\", \"tpaname\", \"tpabranchname\"],\r\n\r\n\"patient_name\": [\"patientname\", \"name\", \"claimantname\", \"nameoftheinsured\", \"insuredname\", \"nameofpatient\", \"patient\"],\r\n\r\n\"insurance_policy_number\": [\"policynumber\"],\r\n\r\n\"doa\": [\"dateofadmission\", \"doa\", \"claimdateofadmission\", \"dtofadmission\", \"cddoa\", \"admissiondate\", \"admdate\", \"doaopdtreatmentfrom\", \"hospfrom\"],\r\n\r\n\"dod\": [\"dateofdischarge\", \"dod\", \"dtofdischarge\", \"cddod\", \"disdate\", \"claimdateofdischarge\", \"dodopdtreatmentto\", \"hospto\", \"dischargedate\"],\r\n\r\n\"hospital_name\": [\"providername\", \"hospitalname\", \"hospname\", \"claimhospitalname\", \"nameofthehospital\", \"nameofthepayee\", \"payeename\"],\r\n\r\n\"bank_account_no\": [\"bankacno\", \"bankaccountno\", \"payeebankaccount\", \"accountno\", \"accountnumber\", \"accno\", \"payeeaccount\", \"payeebankaccno\"],\r\n\r\n\"bank_name\": [\"bankname\", \"bank\", \"payeebankname\"],\r\n\r\n\"bank_branch\": [\"bankbranchname\", \"payebankbranchname\", \"branch\", \"accountbranch\"],\r\n\r\n\"claim_amount\": [\"claimamount\", \"claimedamount\", \"sumofclaimedamount\", \"alamount\", \"lodgeamount\", \"grossamount\", \"claimamt\", \"claimedamt\", \"claimamountclaimed\", \"claimedamounta\", \"requestamount\", \"payeramount\", \"totalamountclaimed\", \"amountclaimed\", \"claimapprovalamount\", \"approvedamount\", \"appamt\", \"amountintim\", \"claiminitiationamount\", \"billamt\", \"appamtinr\", \"grossamt\"],\r\n\r\n\"settled_amount\": [[\"claimnetpayamount\", \"settledamount\", \"sumofsettledamount\", \"amountpaid\", \"ecsamount\", \"paidamount\", \"netamount\", \"chequeamount\", \"settledamt\", \"netamountpaid\", \"claimtransferredamt\", \"netpaybleamountjgi\", \"totalamountpaid\", \"totalamountclaimpaid\", \"netpayable\", \"passedamount\", \"netapprovedamt\", \"ecsamt\", \"finalpayableamount\", \"passedamt\", \"netamountpaidincludinggstaftertds\", \"netpayble\", \"paidamountaftertax\", \"amtcredited\", \"amountpaidtohospital\", \"finalpayment\", \"transferedamount\", \"netpaidamount\", \"netclaimpayableaftertds\"], [\"approvedamt\", \"approvedamount\", \"claimamount\", \"claimapprovedamount\"]],\r\n\r\n\"tds_amount\": [\"tds\", \"tdsamount\", \"sumoftdsamount\", \"tdsamt\", \"claimtdsamt\", \"tdsamountigh\", \"tdsrs\", \"taxdeducted\", \"tdstds\", \"tdsforcashlessclaim\"],\r\n\r\n\"disallowed_amount\": [\"shortfallamount\", \"deductableamount\", \"totaldeductions\", \"deduction\", \"totaldisallowances\", \"deductionamt\", \"disallowedamount\", \"claimdisallowedamount\", \"finaldisallowedamt\", \"deductionamountb\", \"amountdeducted\", \"totaldisallowance\", \"disallowance\", \"discamt\"],\r\n\r\n\"payers_remark\": [\"deductablereason\", \"deduction\", \"disallowencereason1\", \"claimdisallowedreasons\", \"deductionreason\", \"deductiondetails\", \"reasonfordisallowance\", \"deductedremarks\", \"payersremark\", \"reasons\", \"remarksoftpa\"],\r\n\r\n\"tds_percentage\": [\"tdsdeduction\"]\r\n}",
     "char_to_replace_in_header": "[\" \",\"-\",\"/\",\"_\",\"\\'\",\"\\\"\",\".\",\"(\",\")\",\"₹\",\"`\",\"<\",\">\",\"?\",\":\",\";\",\"[\",\"]\",\"{\",\"}\",\"|\",\"+\",\"=\",\"*\",\"&\",\"^\",\"%\",\"$\",\"#\",\"@\",\"!\",\"~\"]",
-    "tpa":[
-      {"customer":"Family Health Plan TPA Ltd"},
-      {"customer":"Ericson Insurance TPA Pvt Ltd"},
-      {"customer":"KASP-PMJAY"},
-      {"customer":"ECHS"},
-      {"customer":"Medisep"},
-      {"customer":"CHIEF MINISTERS COMPREHENSIVE HEALTH INS SCHEME"},
-      {"customer":"IFFCO TOKIO GENERAL INSURANCE COMPANY"},
-      {"customer":"SBI GENERAL INSURANCE CO LTD"},
-      {"customer":"Volo Health Insurance TPA Pvt Ltd"},
-      {"customer":"Medsave TPA Healthcare TPA Ltd"},
-      {"customer":"Genins India TPA Ltd"},
-      {"customer":"Raksha Health Insurance TPA Pvt Ltd"},
-      {"customer":"Heritage Health TPA P Ltd"},
-      {"customer":"Niva Bupa Health Insurance"},
-      {"customer":"Health India Insurance TPA Services Pvt Ltd"},
-      {"customer":"Health India Insurance TPA"},
-      {"customer":"Healthindia Insurance TPA Services Pvt Ltd"},
-      {"customer":"Star Health & Allied Insurance Co Ltd"},
-      {"customer":"Health Insurance TPA of India Ltd"},
-      {"customer":"GOOD HEALTH INSURANCE TPA LIMITED"},
-      {"customer":"Reliance General Insurance Co. Ltd"},
-      {"customer":"Reliance Industries Ltd"},
-      {"customer":"Care Health Insurance Limited"},
-      {"customer":"Paramount Health Services TPA Ltd"},
-      {"customer":"Bajaj Allianz General Insurance"},
-      {"customer":"MD India Healthcare TPA Service Ltd"},
-      {"customer":"Mediassist India TPA P Ltd"},
-      {"customer":"HDFC ERGO GENERAL INSURANCE CO LTD"},
-      {"customer":"Safeway Insurance TPA Pvt Ltd"},
-      {"customer":"Safeway TPA Services Ltd"},
-      {"customer":"ICICI Lombard General Insurance"},
-      {"customer":"ICICI Prudential General Insurance"},
-      {"customer":"VIDAL HEALTH TPA PVT LTD"},
-      {"customer":"Manual"},
-      {"customer":"National Insurance Company Limited"},
-      {"customer":"Liberty General Insurance Limited"},
-      {"customer":"Future Generali General Insurance"}
+    "tpa": [
+      {
+        "customer": "Family Health Plan TPA Ltd"
+      },
+      {
+        "customer": "Ericson Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "KASP-PMJAY"
+      },
+      {
+        "customer": "ECHS"
+      },
+      {
+        "customer": "Medisep"
+      },
+      {
+        "customer": "CHIEF MINISTERS COMPREHENSIVE HEALTH INS SCHEME"
+      },
+      {
+        "customer": "IFFCO TOKIO GENERAL INSURANCE COMPANY"
+      },
+      {
+        "customer": "SBI GENERAL INSURANCE CO LTD"
+      },
+      {
+        "customer": "Volo Health Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "Medsave TPA Healthcare TPA Ltd"
+      },
+      {
+        "customer": "Genins India TPA Ltd"
+      },
+      {
+        "customer": "Raksha Health Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "Heritage Health TPA P Ltd"
+      },
+      {
+        "customer": "Niva Bupa Health Insurance"
+      },
+      {
+        "customer": "Health India Insurance TPA Services Pvt Ltd"
+      },
+      {
+        "customer": "Health India Insurance TPA"
+      },
+      {
+        "customer": "Healthindia Insurance TPA Services Pvt Ltd"
+      },
+      {
+        "customer": "Star Health & Allied Insurance Co Ltd"
+      },
+      {
+        "customer": "Health Insurance TPA of India Ltd"
+      },
+      {
+        "customer": "GOOD HEALTH INSURANCE TPA LIMITED"
+      },
+      {
+        "customer": "Reliance General Insurance Co. Ltd"
+      },
+      {
+        "customer": "Reliance Industries Ltd"
+      },
+      {
+        "customer": "Care Health Insurance Limited"
+      },
+      {
+        "customer": "Paramount Health Services TPA Ltd"
+      },
+      {
+        "customer": "Bajaj Allianz General Insurance"
+      },
+      {
+        "customer": "MD India Healthcare TPA Service Ltd"
+      },
+      {
+        "customer": "Mediassist India TPA P Ltd"
+      },
+      {
+        "customer": "HDFC ERGO GENERAL INSURANCE CO LTD"
+      },
+      {
+        "customer": "Safeway Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "Safeway TPA Services Ltd"
+      },
+      {
+        "customer": "ICICI Lombard General Insurance"
+      },
+      {
+        "customer": "ICICI Prudential General Insurance"
+      },
+      {
+        "customer": "VIDAL HEALTH TPA PVT LTD"
+      },
+      {
+        "customer": "Manual"
+      },
+      {
+        "customer": "National Insurance Company Limited"
+      },
+      {
+        "customer": "Liberty General Insurance Limited"
+      },
+      {
+        "customer": "Future Generali General Insurance"
+      }
     ],
     "calculate_settled_amount": [
-    {"has_tds_percentage":0,"tpa":"IFFCO TOKIO GENERAL INSURANCE COMPANY"},
-    {"has_tds_percentage":1,"tpa":"Care Health Insurance Limited"}
-  ]
+      {
+        "has_tds_percentage": 0,
+        "tpa": "IFFCO TOKIO GENERAL INSURANCE COMPANY"
+      },
+      {
+        "has_tds_percentage": 1,
+        "tpa": "Care Health Insurance Limited"
+      }
+    ]
   },
   {
     "doctype": "Custom Field",
@@ -1068,7 +1148,7 @@
     "fieldname": "custom_total_settled_amount",
     "fieldtype": "Currency",
     "options": "currency",
-    "label" : "Total Settled Amount",
+    "label": "Total Settled Amount",
     "hidden": "1"
   },
   {
@@ -1078,7 +1158,7 @@
     "fieldname": "custom_total_tds_amount",
     "fieldtype": "Currency",
     "options": "currency",
-    "label" : "Total TDS Amount",
+    "label": "Total TDS Amount",
     "hidden": "1"
   },
   {
@@ -1088,7 +1168,7 @@
     "fieldname": "custom_total_disallowance_amount",
     "fieldtype": "Currency",
     "options": "currency",
-    "label" : "Total Disallowance Amount",
+    "label": "Total Disallowance Amount",
     "hidden": "1"
   },
   {
@@ -1098,7 +1178,7 @@
     "fieldname": "custom_total_writeoff_amount",
     "fieldtype": "Currency",
     "options": "currency",
-    "label" : "Total WriteOff Amount",
+    "label": "Total WriteOff Amount",
     "hidden": "1"
   },
   {
@@ -1108,7 +1188,7 @@
     "fieldname": "custom_matcher_reference",
     "fieldtype": "Table",
     "options": "Matcher Reference",
-    "label" : "Matcher Reference",
+    "label": "Matcher Reference",
     "hidden": "1"
   },
   {
@@ -1117,7 +1197,7 @@
     "name": "Sales Invoice-custom_reference",
     "fieldname": "custom_reference",
     "fieldtype": "Table",
-    "label" : "Reference",
+    "label": "Reference",
     "options": "Sales Invoice Reference",
     "hidden": "1"
   },
@@ -1126,13 +1206,13 @@
     "name": "Sales Invoice custom table",
     "owner": "Administrator",
     "creation": "2024-07-14 10:43:03.166280",
-    "modified": "2024-07-19 18:21:39.394337",
+    "modified": "2024-08-08 20:07:45.953431",
     "modified_by": "Administrator",
     "docstatus": 0,
     "idx": 0,
     "dt": "Sales Invoice",
     "view": "Form",
-    "script": "frappe.ui.form.on('Sales Invoice', {\r\n    refresh: function (frm) {\r\n        // Fetch default currency\r\n        let currency = frappe.defaults.get_default(\"currency\");\r\n\r\n        frappe.call({\r\n            method: 'agarwals.utils.invoice_reference.get_sales_invoice_references',\r\n            args: {\r\n                doc_name: frm.doc.name,\r\n                jv_ac_name: 'Debtors - A'\r\n            },\r\n            callback: function (r) {\r\n                // Function to format amounts as currency\r\n                function formatCurrency(amount) {\r\n                    return amount.toLocaleString(currency, { style: 'currency', currency: currency });\r\n                }\r\n                \r\n                // Cal  culate the totals for each amount\r\n                    let total_settled_amount = 0;\r\n                    let total_disallowance_amount = 0;\r\n                    let total_tds_amount = 0;\r\n                    let total_writeoff_amount = 0;\r\n                    \r\n                    let sales_invoice_reference = r.message[0];\r\n    \r\n                    sales_invoice_reference.forEach(row => {\r\n                        total_settled_amount += row.settled_amount || 0;\r\n                        total_disallowance_amount += row.disallowance_amount || 0;\r\n                        total_tds_amount += row.tds_amount || 0;\r\n                        total_writeoff_amount += row.writeoff_amount || 0;\r\n                    });\r\n                    \r\n                    let settled_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Settled Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_settled_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let disallowance_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Disallowance Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_disallowance_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let tds_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total TDS Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_tds_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let writeoff_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total WriteOff Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_writeoff_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    \r\n                frm.get_field('custom_settled_amount').html(settled_amount);\r\n                frm.get_field('custom_disallowance_amount').html(disallowance_amount);\r\n                frm.get_field('custom_tds_amount').html(tds_amount);\r\n                frm.get_field('custom_writeoff_amount').html(writeoff_amount);\r\n                    \r\n                    // Generate HTML table using provided Bootstrap structure\r\n                    let sales_invoice_table_html = `\r\n                    <label class=\"control-label\">Sales Invoice Reference</label>\r\n                        <div class=\"form-grid form-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\" title=\"Entry Type\">\r\n                                            <div class=\"static-area ellipsis\">Entry Type</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\" title=\"Entry Name\">\r\n                                            <div class=\"static-area ellipsis\">Entry Name</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"utr_date\" title=\"Utr Date\">\r\n                                            <div class=\"static-area ellipsis\">UTR Date</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\" title=\"UTR Number\">\r\n                                            <div class=\"static-area ellipsis\">UTR Number</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\" title=\"Settled Amount\">\r\n                                            <div class=\"static-area ellipsis\">Settled Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\" title=\"TDS Amount\">\r\n                                            <div class=\"static-area ellipsis\">TDS Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\" title=\"Disallowance Amount\">\r\n                                            <div class=\"static-area ellipsis\">Disallowance Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"allocated_amount\" title=\"Allocated Amount\">\r\n                                            <div class=\"static-area ellipsis\">Allocated Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\" title=\"WriteOff Amount\">\r\n                                            <div class=\"static-area ellipsis\">Write Off</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\" title=\"Created Date\">\r\n                                            <div class=\"static-area ellipsis\">Created Date</div>\r\n                                        </div>\r\n                                       \r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n\r\n                    sales_invoice_reference.forEach((row) => {\r\n                        sales_invoice_table_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/doctype/${row.entry_type}\" data-doctype=\"DocType\" data-name=\"${row.entry_type}\" data-value=\"${row.entry_type}\">${row.entry_type}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/${row.entry_type.toLowerCase().replace(/ /g, \"-\")}/${row.entry_name}\" data-doctype=\"${row.entry_type}\" data-name=\"${row.entry_name}\" data-value=\"${row.entry_name}\">${row.entry_name}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"utr_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_number}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.settled_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.tds_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.disallowance_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"allocated_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.allocated_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.writeoff_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        ${row.created_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    \r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    sales_invoice_table_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_referencetable').html(sales_invoice_table_html);\r\n                \r\n                    // Create Matcher Reference HTML table\r\n                    let matcher_reference = r.message[1];\r\n                    let matcher_reference_html = `\r\n                    <label class=\"control-label\">Matcher Reference</label>\r\n                        <div class=\"form-grid from-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                            <span>No.</span>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"matcher_id\" title=\"ID\">\r\n                                            <div class=\"static-area ellipsis\">ID</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcher_logic\" title=\"Match Logic\">\r\n                                            <div class=\"static-area ellipsis\">Matcher Logic</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Settlement Advice</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Claimbook</div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n    \r\n                    matcher_reference.forEach((row, index) => {\r\n                        matcher_reference_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                        <span>${index + 1}</span>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/matcher/${row.matcher_id.replace('/', \"%2F\")}\" >${row.matcher_id}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcer_logic\">\r\n                                        <div class=\"static-area ellipsis\">${row.matcher_logic}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advise\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/settlement-advice/${row.settlement_advice}\">${row.settlement_advice}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"claimbook\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        <a href=\"/app/claimbook/${row.claimbook}\">${row.claimbook}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    matcher_reference_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_reference_matcher').html(matcher_reference_html);\r\n                    \r\n            }\r\n        });\r\n    }\r\n});\r\n",
+    "script": "frappe.ui.form.on('Sales Invoice', {\r\n    refresh: function (frm) {\r\n        // Fetch default currency\r\n        let currency = frappe.defaults.get_default(\"currency\");\r\n\r\n        frappe.call({\r\n            method: 'agarwals.utils.invoice_reference.get_sales_invoice_references',\r\n            args: {\r\n                doc_name: frm.doc.name,\r\n                jv_ac_name: 'Debtors - A'\r\n            },\r\n            callback: function (r) {\r\n                // Function to format amounts as currency\r\n                function formatCurrency(amount) {\r\n                    return amount.toLocaleString(currency, { style: 'currency', currency: currency });\r\n                }\r\n                \r\n                // Cal  culate the totals for each amount\r\n                    let total_settled_amount = 0;\r\n                    let total_disallowance_amount = 0;\r\n                    let total_tds_amount = 0;\r\n                    let total_writeoff_amount = 0;\r\n                    \r\n                    let sales_invoice_reference = r.message[0];\r\n    \r\n                    sales_invoice_reference.forEach(row => {\r\n                        total_settled_amount += row.settled_amount || 0;\r\n                        total_disallowance_amount += row.disallowance_amount || 0;\r\n                        total_tds_amount += row.tds_amount || 0;\r\n                        total_writeoff_amount += row.writeoff_amount || 0;\r\n                    });\r\n                    \r\n                    let settled_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Settled Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_settled_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let disallowance_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Disallowance Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_disallowance_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let tds_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total TDS Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_tds_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let writeoff_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total WriteOff Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_writeoff_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    \r\n                frm.get_field('custom_settled_amount').html(settled_amount);\r\n                frm.get_field('custom_disallowance_amount').html(disallowance_amount);\r\n                frm.get_field('custom_tds_amount').html(tds_amount);\r\n                frm.get_field('custom_writeoff_amount').html(writeoff_amount);\r\n                    \r\n                    // Generate HTML table using provided Bootstrap structure\r\n                    let sales_invoice_table_html = `\r\n                    <label class=\"control-label\">Sales Invoice Reference</label>\r\n                        <div class=\"form-grid form-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\" title=\"Entry Type\">\r\n                                            <div class=\"static-area ellipsis\">Entry Type</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\" title=\"Entry Name\">\r\n                                            <div class=\"static-area ellipsis\">Entry Name</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"utr_date\" title=\"Utr Date\">\r\n                                            <div class=\"static-area ellipsis\">UTR Date</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\" title=\"UTR Number\">\r\n                                            <div class=\"static-area ellipsis\">UTR Number</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\" title=\"Settled Amount\">\r\n                                            <div class=\"static-area ellipsis\">Settled Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\" title=\"TDS Amount\">\r\n                                            <div class=\"static-area ellipsis\">TDS Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\" title=\"Disallowance Amount\">\r\n                                            <div class=\"static-area ellipsis\">Disallowance Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"allocated_amount\" title=\"Allocated Amount\">\r\n                                            <div class=\"static-area ellipsis\">Allocated Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\" title=\"WriteOff Amount\">\r\n                                            <div class=\"static-area ellipsis\">Write Off</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\" title=\"Created Date\">\r\n                                            <div class=\"static-area ellipsis\">Posting Date</div>\r\n                                        </div>\r\n                                       \r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n\r\n                    sales_invoice_reference.forEach((row) => {\r\n                        sales_invoice_table_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/doctype/${row.entry_type}\" data-doctype=\"DocType\" data-name=\"${row.entry_type}\" data-value=\"${row.entry_type}\">${row.entry_type}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/${row.entry_type.toLowerCase().replace(/ /g, \"-\")}/${row.entry_name}\" data-doctype=\"${row.entry_type}\" data-name=\"${row.entry_name}\" data-value=\"${row.entry_name}\">${row.entry_name}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"utr_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_number}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.settled_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.tds_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.disallowance_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"allocated_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.allocated_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.writeoff_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        ${row.posting_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    \r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    sales_invoice_table_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_referencetable').html(sales_invoice_table_html);\r\n                \r\n                    // Create Matcher Reference HTML table\r\n                    let matcher_reference = r.message[1];\r\n                    let matcher_reference_html = `\r\n                    <label class=\"control-label\">Matcher Reference</label>\r\n                        <div class=\"form-grid from-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                            <span>No.</span>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"matcher_id\" title=\"ID\">\r\n                                            <div class=\"static-area ellipsis\">ID</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcher_logic\" title=\"Match Logic\">\r\n                                            <div class=\"static-area ellipsis\">Matcher Logic</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Settlement Advice</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Claimbook</div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n    \r\n                    matcher_reference.forEach((row, index) => {\r\n                        matcher_reference_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                        <span>${index + 1}</span>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/matcher/${row.matcher_id.replace('/', \"%2F\")}\" >${row.matcher_id}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcer_logic\">\r\n                                        <div class=\"static-area ellipsis\">${row.matcher_logic}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advise\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/settlement-advice/${row.settlement_advice}\">${row.settlement_advice}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"claimbook\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        <a href=\"/app/claimbook/${row.claimbook}\">${row.claimbook}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    matcher_reference_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_reference_matcher').html(matcher_reference_html);\r\n                    \r\n            }\r\n        });\r\n    }\r\n});\r\n",
     "enabled": 1
   }
 ]
