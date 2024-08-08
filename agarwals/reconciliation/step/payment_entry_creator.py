@@ -85,6 +85,12 @@ class PaymentEntryCreator:
     def __set_amount(self):
         set_amount_timer = Timer().start(f"set_amount {self.matcher_record.name}")
         unallocated_amount = self.bt_doc.unallocated_amount
+        if self.settled_amount > unallocated_amount:
+            self.settled_amount = unallocated_amount
+            self.__set_sa_vars(remark="Bank Transcation unalllocated is less than settled amount")
+        if self.si_doc.outstanding_amount < self.settled_amount:
+            self.settled_amount = self.si_doc.outstanding_amount
+            self.__set_sa_vars(remark="Sales Invoice Outstanding is less than settled amount")
         if self.si_doc.outstanding_amount < self.settled_amount + self.tds_amount + self.disallowance_amount and self.si_doc.outstanding_amount >= self.settled_amount + self.tds_amount:
             self.disallowance_amount = 0
             self.__set_sa_vars(remark='Disallowance amount is greater than Outstanding Amount')
@@ -95,12 +101,6 @@ class PaymentEntryCreator:
             self.tds_amount = 0
             self.disallowance_amount = 0
             self.__set_sa_vars(remark='Both Disallowed and TDS amount is greater than Outstanding Amount')
-        if self.settled_amount > unallocated_amount:
-            self.settled_amount = unallocated_amount
-            self.__set_sa_vars(remark="Bank Transcation unalllocated is less than settled amount")
-        if self.si_doc.outstanding_amount < self.settled_amount:
-            self.settled_amount = self.si_doc.outstanding_amount
-            self.__set_sa_vars(remark="Sales Invoice Outstanding is less than settled amount")
         set_amount_timer.end()
 
     def __get_entry_name(self):
@@ -141,6 +141,7 @@ class PaymentEntryCreator:
     def __process_write_off(self, pe_dict):
         process_round_timer = Timer().start(f"process_write_off {pe_dict['name']} ")
         deductions = []
+        pe_dict["deductions"] = deductions
         si_outstanding_amount = self.si_doc.outstanding_amount
         si_allocated_amount = pe_dict["references"][0]["allocated_amount"]
         si_outstanding_amount = round(float(si_outstanding_amount - si_allocated_amount), 2)
