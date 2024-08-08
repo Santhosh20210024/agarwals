@@ -55,7 +55,6 @@ def get_sales_invoice_references(doc_name,jv_ac_name):
                                      'settlement_advice':matcher_link_value_sa,
                                      'claimbook': matcher_link_value_cb
                                      })
-
         return child_table, matcher_list
     except Exception as e:
         log_error(e,"No Matcher Records Found",matcher_doc)
