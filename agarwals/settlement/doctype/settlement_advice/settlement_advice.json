@@ -130,7 +130,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nError\nOpen\nNot Processed\nPartially Processed\nFully Processed\nWarning"
+   "options": "\nError\nOpen\nNot Processed\nPartially Processed\nFully Processed\nWarning\nUnmatched"
   },
   {
    "fieldname": "disallowed_amount",
@@ -308,7 +308,7 @@
   }
  ],
  "links": [],
- "modified": "2024-07-17 15:37:24.924886",
+ "modified": "2024-08-08 15:32:00.294895",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
