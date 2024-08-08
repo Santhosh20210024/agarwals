@@ -41,7 +41,6 @@ def create_settlement_advice_doc(doc_to_insert):
         name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id + "-" + str(len(settlement_advices))
     else:
         name = doc_to_insert.utr_number + "-" + doc_to_insert.claim_id
-
     data = {
             "doctype": "Settlement Advice",
             "name": name,
@@ -102,10 +101,9 @@ def validate_advice(advice_staging_doc):
     if "e+" in advice_staging_doc.final_utr_number.lower() or "e+" in advice_staging_doc.utr_number.lower():
         return update_error(advice_staging_doc, "S103"), False
     return advice_staging_doc, True
+
 def clean_sa_data(data):
     return data.replace(".0","").strip() if data else data
-
-
 
 def create_settlement_advices(advices, chunk_doc):
     chunk.update_status(chunk_doc, "InProgress")
