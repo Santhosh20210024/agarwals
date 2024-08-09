@@ -52,9 +52,7 @@ def is_template_exist(attached_to_name, attached_to_doctype):
             return "Not Found"
     except frappe.exceptions.DoesNotExistError as e:
         log_error(str(e), "File upload")
-        frappe.db.commit()
         return "Not Found"
     except Exception as e:
         log_error(str(e), "File upload")
-        frappe.db.commit()
         return "System Error"
