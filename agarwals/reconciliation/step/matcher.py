@@ -8,10 +8,6 @@ from agarwals.utils.error_handler import log_error as error_handler
 
 class Matcher:
     def add_log_error(self, doctype, name, error):
-        if len(name)>=140:
-            name = name[0:130]
-        if len(error)>=140:
-            error = error[0:139]
         error_handler(error=error, doc=doctype, doc_name=name)
 
     def update_payment_order(self, matcher_record, record):
