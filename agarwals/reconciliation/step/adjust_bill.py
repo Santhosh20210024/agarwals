@@ -124,12 +124,7 @@ class BillAdjustmentProcess(JournalUtils):
                         valid_dis = True
                 except Exception as e:
                     log_error(error=str(e), doc="Bill Adjustment", doc_name=bill_adjt.bill)
-                    # error_log = frappe.new_doc('Error Record Log')
-                    # error_log.set('doctype_name', 'Bill Adjustment')
-                    # error_log.set('reference_name', bill_adjt.bill)
-                    # error_log.set('error_message', '' + str(e))
                     bill_adjt.error_remark = str(e)
-                    # error_log.save()
                 # Need to refactor this part
                 if bill_adjt.tds and bill_adjt.disallowance:
                     if valid_dis and valid_tds:
