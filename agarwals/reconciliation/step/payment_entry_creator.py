@@ -141,7 +141,6 @@ class PaymentEntryCreator:
     def __process_write_off(self, pe_dict):
         process_round_timer = Timer().start(f"process_write_off {pe_dict['name']} ")
         deductions = []
-        pe_dict["deductions"] = deductions
         si_outstanding_amount = self.si_doc.outstanding_amount
         si_allocated_amount = pe_dict["references"][0]["allocated_amount"]
         si_outstanding_amount = round(float(si_outstanding_amount - si_allocated_amount), 2)
@@ -151,6 +150,8 @@ class PaymentEntryCreator:
         if deductions:
             pe_dict["references"][0]["allocated_amount"] = round(float(pe_dict["references"][0]["allocated_amount"]),
                                                              2) + round(float(si_outstanding_amount), 2)
+            if "deductions" not in pe_dict.keys():
+                pe_dict["deductions"] = []
             pe_dict["deductions"] = pe_dict["deductions"] + deductions
         process_round_timer.end()
         return pe_dict
@@ -359,14 +360,14 @@ def process(args):
             for record in range(0, len(bt_records), chunk_size):
                 chunk_doc = chunk.create_chunk(args["step_id"])
                 seq_no = seq_no + 1
-                # reconcile_bank_transaction(bt_records=bt_records, chunk_doc=chunk_doc, batch = "Batch" + str(seq_no))
-                frappe.enqueue(reconcile_bank_transaction
-                               , queue = 'long'
-                               , is_async = True
-                               , job_name = "Batch" + str(seq_no)
-                               , timeout = 25000
-                               , bt_records = bt_records[record:record + chunk_size]
-                               , chunk_doc = chunk_doc, batch = "Batch" + str(seq_no))
+                reconcile_bank_transaction(bt_records=bt_records, chunk_doc=chunk_doc, batch = "Batch" + str(seq_no))
+                # frappe.enqueue(reconcile_bank_transaction
+                #                , queue = 'long'
+                #                , is_async = True
+                #                , job_name = "Batch" + str(seq_no)
+                #                , timeout = 25000
+                #                , bt_records = bt_records[record:record + chunk_size]
+                #                , chunk_doc = chunk_doc, batch = "Batch" + str(seq_no))
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
