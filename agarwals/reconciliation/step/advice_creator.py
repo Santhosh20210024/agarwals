@@ -2,6 +2,7 @@ import frappe
 from datetime import date
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
+from agarwals.utils.error_handler import log_error as error_handler
 
 ERROR_LOG = { 
     'S100': 'Settlement Advice Already Exist',
@@ -21,10 +22,7 @@ def update_error(error_doc,error_code):
     return error_doc
 
 def log_error(doctype_name, error_doc, error_message):
-    error_log = frappe.new_doc('Error Record Log')
-    error_log.set('doctype_name', doctype_name)
-    error_log.set('error_message', error_message)
-    error_log.save()
+    error_log = error_handler(error=error_message, doc=doctype_name, doc_name=error_doc)
     if error_doc:
         error_log.set('reference_name', error_doc.name)
         error_log.save()

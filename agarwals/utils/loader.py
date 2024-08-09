@@ -3,17 +3,14 @@ import frappe
 from frappe.core.doctype.data_import.data_import import start_import
 from agarwals.utils.file_util import SITE_PATH
 import os
+from agarwals.utils.error_handler import log_error as error_handler
 
 class Loader():
     def __init__(self,document_type):
         self.document_type = document_type
 
     def log_error(self, doctype_name, reference_name, error_message):
-        error_log = frappe.new_doc('Error Record Log')
-        error_log.set('doctype_name', doctype_name)
-        error_log.set('reference_name', reference_name)
-        error_log.set('error_message', error_message)
-        error_log.save()
+        error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
 
     def get_files_to_load(self):
         file_query = f"""SELECT 
