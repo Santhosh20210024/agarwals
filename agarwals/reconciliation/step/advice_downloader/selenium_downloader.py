@@ -19,50 +19,59 @@ import openpyxl
 import glob
 from io import StringIO
 import random
+from agarwals.utils.file_util import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH
 
 class SeleniumDownloader:
+
     def __init__(self):
         self.extract_first_table = False
         self.format_file_in_parent = True
-        self.file_name = ''
-        self.user_name = None
-        self.password = None
-        self.url = None
-        self.options = webdriver.ChromeOptions()
-        self.credential_doc=None
-        self.PROJECT_FOLDER = "DrAgarwals"
-        self.HOME_PATH = "Home/DrAgarwals"
-        self.SHELL_PATH = "private/files"
-        self.SUB_DIR = ["Extract", "Transform", "Load", "Bin"]
-        self.SITE_PATH=frappe.get_single("Control Panel").site_path
-        self.files_path = self.SITE_PATH + "/private/files/DrAgarwals/"
-        self.driver = None
-        self.wait = None
-        self.from_date = None
-        self.to_date = None
-        self.download_directory = ''
+        self.credential_doc = None
+        self.SHELL_PATH = SHELL_PATH
+        self.SITE_PATH = SITE_PATH
         self.last_executed_time = frappe.utils.now_datetime()
         self.public_path = "public/files"
-        self.child_reference_name = ''
-        self.captcha_tpa_doc = ''
-        self.full_img_path = ''
-        self.crop_img_path = ''
-        self.captcha_img_name = ''
-        self.executing_child_class = ''
-        self.tpa = ''
-        self.is_captcha = False
-        self.is_headless = True
-        self.incoming_file_type = ''
-        self.max_wait_time = 0
-        self.formatted_file_name = None
-        self.sandbox_mode = True
-        self.previous_files_count = None
-        self.is_date_limit  = 0
-        self.date_limit_period = 0
-        self.enable_captcha_api = None
-        self.folder_path = None
-        self.allow_insecure_file = False
 
+    def web_driver_init(self):
+        self.options = webdriver.ChromeOptions()
+        prefs = {"download.default_directory": self.download_directory + "/"}
+        self.options.add_experimental_option("prefs", prefs)
+        self.add_driver_argument()
+        self.driver = webdriver.Chrome(options=self.options)
+        self.wait = WebDriverWait(self.driver, 45)
+
+    def load_credentials(self,tpa_doc,child,parent):
+        self.user_name = self.credential_doc.user_name
+        self.password = self.credential_doc.password
+        self.executing_child_class = self.credential_doc.executing_method
+        self.tpa = self.credential_doc.name
+        if child and parent is not None:
+            self.child_reference_name = child
+            self.captcha_tpa_doc = parent
+
+    def load_control_panel(self): #TODO
+        pass
+
+    def load_configuration(self):
+        if frappe.db.exists("SA Downloader Configuration", {"name": self.executing_child_class}):
+            configuration_values = frappe.db.sql(
+                f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",
+                as_dict=True
+            )[0]
+            self.is_captcha = configuration_values.is_captcha
+            self.is_headless = configuration_values.is_headless
+            self.incoming_file_type = configuration_values.incoming_file_type
+            self.max_wait_time = configuration_values.captcha_entry_duration
+            self.url = configuration_values.website_url or self.raise_exception("Website URL Not Found,Please Check SA Downloader Configuration")
+            self.to_date = configuration_values.to_date or frappe.utils.now_datetime().date()
+            self.from_date = configuration_values.from_date or self.to_date - timedelta(days=29)
+            self.sandbox_mode = configuration_values.sandbox_mode
+
+            self.is_date_limit = configuration_values.is_date_limit
+            self.date_limit_period = configuration_values.date_limit_period
+            self.allow_insecure_file = configuration_values.allow_insecure_file
+        else:
+            self.raise_exception(" SA Downloader Configuration not found ")
 
     def construct_file_url(*args):
         list_of_items = []
@@ -101,10 +110,8 @@ class SeleniumDownloader:
                 self.enable_captcha_api = control_panel.enable_captcha_api
             else:
                 self.raise_exception(" SA Downloader Configuration not found ")
-            if child and parent is not None:
-                self.child_reference_name = child
-                self.captcha_tpa_doc = parent
-                self.tpa = self.credential_doc.name
+
+
         else:
             self.log_error('TPA Login Credentials',None,"No Credential for the given input")
 
@@ -266,7 +273,7 @@ class SeleniumDownloader:
     def create_download_directory(self):
         suffix =  f"{self.credential_doc.tpa}-{self.credential_doc.branch_code if self.credential_doc.branch_code else ''}-".replace(' ','').lower()
         self.file_name = f"{self.credential_doc.user_name}-{suffix}"
-        self.folder_path = self.files_path + "Settlement Advice/" + f"{self.credential_doc.tpa}/"
+        self.folder_path = os.path.join(SITE_PATH,SHELL_PATH,PROJECT_FOLDER,'Settlement Advice',self.credential_doc.tpa) + "/"
         file_path =self.folder_path + self.file_name
         os.mkdir(file_path)
         self.download_directory = file_path
@@ -276,7 +283,7 @@ class SeleniumDownloader:
         numbers = []
         run = True
         while run == True:
-            random_number = random.randint(1000, 9999)
+            random_number = random.randint(1000, 99999)
             if not random_number in numbers:
                 numbers.append(random_number)
                 run = False
@@ -423,7 +430,8 @@ class SeleniumDownloader:
         try:
             chunk.update_status(chunk_doc, "InProgress")
             self.set_self_variables(tpa_doc,child,parent) if child and parent != None else self.set_self_variables(tpa_doc)
-            self._init()
+            self.create_download_directory()
+            self.web_driver_init()
             self._login()
             self.navigate()
             self._download()
@@ -433,16 +441,10 @@ class SeleniumDownloader:
             chunk.update_status(chunk_doc, "Error")
             self._exit(e)
 
-    def _init(self):
-        self.create_download_directory()
-        prefs = {"download.default_directory": self.download_directory + "/"}
-        self.options.add_experimental_option("prefs", prefs)
-        if frappe.db.exists("SA Downloader Configuration", {"name": self.executing_child_class}):
-            self.add_driver_argument()
-        else:
-            self.raise_exception(" SA Downloader Configuration not found ")
-        self.driver = webdriver.Chrome(options=self.options)
-        self.wait = WebDriverWait(self.driver,  45)
+
+
+
+
 
 
 
