@@ -19,12 +19,7 @@ class RoundOffCreation(JournalUtils):
 
             except Exception as e:
                 error_handler(error=str(e), doc='Journal Entry', doc_name=invoice_.name)
-                # error_log = frappe.new_doc('Error Record Log')
-                # error_log.set('doctype_name', 'Journal Entry')
-                # error_log.set('reference_name', invoice_.name)
-                # error_log.set('error_message', '' + str(e))
-                # error_log.save()
-            
+
 
 @frappe.whitelist()
 def run(_chunk_size):

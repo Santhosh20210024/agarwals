@@ -13,12 +13,7 @@ class Matcher:
         if len(error)>=140:
             error = error[0:139]
         error_handler(error=error, doc=doctype, doc_name=name)
-        # error_log = frappe.new_doc('Error Record Log')
-        # error_log.set('doctype_name',doctype)
-        # error_log.set('reference_name', name)
-        # error_log.set('error_message', error)
-        # error_log.save()
-       
+
     def update_payment_order(self, matcher_record, record):
         matcher_record.set("payment_order", record['payment_order'])
         return matcher_record

@@ -92,11 +92,6 @@ class Transformer:
 
     def log_error(self, doctype_name, reference_name, error_message):
         error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
-        # error_log = frappe.new_doc('Error Record Log')
-        # error_log.set('doctype_name', doctype_name)
-        # error_log.set('reference_name', reference_name)
-        # error_log.set('error_message', error_message)
-        # error_log.save()
 
     def get_column_needed(self):
         return []

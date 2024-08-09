@@ -35,10 +35,6 @@ def advices_rfn_match():
         print("Advice Process Completed")
     except Exception as e:
         log_error(error=str(e),doc="Bank Transaction Staging")
-        # error_log = frappe.new_doc('Error Record Log')
-        # error_log.set('doctype_name', 'Bank Transaction Staging')
-        # error_log.set('error_message', str(e))
-        # error_log.save()
 
 def claimbook_match():
         frappe.db.sql(""" 
@@ -130,11 +126,6 @@ def process(args):
                 rm_transactions()
             except Exception as e:
                 log_error(error=str(e), doc="Bank Transaction Staging")
-                # error_log = frappe.new_doc('Error Record Log')
-                # error_log.set('doctype_name', 'Bank Transaction Staging')
-                # error_log.set('error_message', str(e))
-                # error_log.save()
-                # frappe.db.commit()
             chunk.update_status(chunk_doc, "Processed")
             return "Done"
         except Exception as e:
