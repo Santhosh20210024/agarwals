@@ -31,20 +31,18 @@
   },
   {
    "fieldname": "reference_name",
-   "fieldtype": "Dynamic Link",
-   "label": "Reference name",
-   "options": "reference_doctype"
+   "fieldtype": "Data",
+   "label": "Reference name"
   },
   {
    "fieldname": "reference_doctype",
-   "fieldtype": "Link",
-   "label": "Reference Doctype",
-   "options": "DocType"
+   "fieldtype": "Data",
+   "label": "Reference Doctype"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-16 10:38:43.508951",
+ "modified": "2024-08-09 12:18:13.006935",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "UTR Key",

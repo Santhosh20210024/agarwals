@@ -1,8 +1,10 @@
 import frappe
 from agarwals.reconciliation.step.key_mapper.key_mapper import KeyMapper
 from agarwals.reconciliation.step.key_creator.utr_key_creator import UTRKeyCreator
-from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
+from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing, finalize_chunk_processing
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.str_to_dict import cast_to_dic
+from agarwals.reconciliation import chunk
 
 
 class UTRKeyMapper(KeyMapper):
@@ -13,8 +15,8 @@ class UTRKeyMapper(KeyMapper):
         map_key : return None
     """
 
-    def __init__(self, records, record_type, query):
-        super().__init__(records, record_type, "UTR Key")
+    def __init__(self, records, record_type, query, chunk_doc):
+        super().__init__(records, record_type, "UTR Key", chunk_doc)
         self.query = query
 
     def map_key(self, record):
@@ -73,37 +75,39 @@ class UTRKeyMapper(KeyMapper):
 
 
 class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "Settlement Advice",
             """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s""",
+            chunk_doc
         )
 
 
 class BankTransactionUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "Bank Transaction",
             """UPDATE `tabBank Transaction` SET custom_utr_key = %(key)s WHERE name = %(name)s""",
+            chunk_doc
         )
 
 
 class ClaimBookUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "ClaimBook",
             """UPDATE `tabClaimBook` SET utr_key = %(key)s WHERE name = %(name)s""",
+            chunk_doc
         )
 
-
 @frappe.whitelist()
-def process(args=None):  # Not Closed # Need to change according to the chunk
+def process(args = None):
     try:
-        # args = cast_to_dic(args)
-        # chunk_size = int(args.get("chunk_size", 100))
+        args = cast_to_dic(args)
+        chunk_size = int(args.get("chunk_size"))
 
         queries = {
             "Bank Transaction": """SELECT name, reference_number as key_id FROM `tabBank Transaction`
@@ -118,23 +122,20 @@ def process(args=None):  # Not Closed # Need to change according to the chunk
         mappers = {
             "Bank Transaction": BankTransactionUTRKeyMapper,
             "ClaimBook": ClaimBookUTRKeyMapper,
-            "Settlement Advice": SettlementAdviceUTRKeyMapper,
+            "Settlement Advice": SettlementAdviceUTRKeyMapper
         }
 
         for record_type, query in queries.items():
-            process_records(query, mappers[record_type], 1000, None)
+            process_records(query, mappers[record_type], chunk_size, args)
 
     except Exception as e:
-        log_error("Error While Processing: " + str(e), doc="UTR Key")
+        log_error("Error While Processing: " + str(e), doc = "UTR Key")
 
 
-def process_records(query, mapper_class, chunk_size, args):  # not closed
-    records = frappe.db.sql(query, as_dict=True)
+def process_records(query, mapper_class, chunk_size, args):
+    records = frappe.db.sql(query, as_dict = True)
     if records:
         for index in range(0, len(records), chunk_size):
-            # chunk_doc = chunk.create_chunk(args.get("step_id"))
+            chunk_doc = chunk.create_chunk(args.get("step_id"))
             records_chunk = records[index : index + chunk_size]
-            enqueue_record_processing(mapper_class, records_chunk)
-    else:
-        # finalize_chunk_processing(args.get("step_id"))
-        pass
+            enqueue_record_processing(mapper_class, records_chunk, chunk_doc, args)

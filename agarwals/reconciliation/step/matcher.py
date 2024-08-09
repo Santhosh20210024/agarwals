@@ -54,9 +54,11 @@ class MatcherValidation:
             return False
         
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount ):
-            if claim_amount < settled_amount + tds_amount + disallowed_amount:
-                Matcher.update_advice_status(self.record['advice'], 'Warning', "Claim Amount is greater than the sum of Settled Amount, TDS Amount and Disallowance Amount.")
-            return False
+            difference_amount = claim_amount - (settled_amount + tds_amount + disallowed_amount)
+            if difference_amount > 0:
+                if self.record['advice']:
+                    Matcher.update_advice_status(self.record['advice'], 'Warning', "Claim Amount is greater than the sum of Settled Amount, TDS Amount and Disallowance Amount.")
+                return False
         return True        
  
     def _validate_bill_status(self):
@@ -167,6 +169,7 @@ class Matcher:
                         WHERE name = %(name)s
                     """
                     frappe.db.sql(update_query, values={'status': 'Error', 'remark': str(e), 'name': matcher_record.settlement_advice})
+                frappe.db.commit()
                 self.add_log_error('Matcher', matcher_record.name, str(e))      
  
     def preprocess_entries(self):
@@ -187,27 +190,33 @@ class Matcher:
             self.create_matcher_record(records, payment_logic)
         self.postprocess_entries()
        
-    def process(self):
-        match_logic, payment_logic = frappe.get_single("Control Panel").match_logic.split(","), frappe.get_single("Control Panel").payment_logic.split(",")
-        update_index()
-        self.preprocess_entries()
-        self.execute_cursors(match_logic, payment_logic)
- 
+    def process(self, chunk_doc):
+        try:
+            chunk.update_status(chunk_doc, "InProgress")
+            match_logic, payment_logic = frappe.get_single("Control Panel").match_logic.split(","), frappe.get_single("Control Panel").payment_logic.split(",")
+            update_index()
+            self.preprocess_entries()
+            self.execute_cursors(match_logic, payment_logic)
+            chunk.update_status(chunk_doc, "Processed")
+        except Exception as e:
+            chunk.update_status(chunk_doc, "Error")
+            log_error(e, "Error")
+            
 @frappe.whitelist()
 def process(args):
     try:
         args = cast_to_dic(args)
         chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "InProgress")
         try:
             frappe.enqueue(Matcher().process
-                           ,queue = 'long'
+                           ,queue = args['queue']
                            ,is_async = True
                            ,job_name = "Matcher_Process"
-                           ,timeout = 25000)
-            chunk.update_status(chunk_doc, "Processed")
+                           ,timeout = 25000
+                           ,chunk_doc = chunk_doc)
         except Exception as e:
             chunk.update_status(chunk_doc, "Error")
+            log_error(e, 'Matcher')
     except Exception as e:
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")

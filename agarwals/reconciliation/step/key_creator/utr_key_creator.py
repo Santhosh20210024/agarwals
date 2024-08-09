@@ -1,5 +1,3 @@
-import math
-import random
 import re
 from agarwals.reconciliation.step.key_creator.key_creator import KeyCreator
 from agarwals.utils.error_handler import log_error
@@ -100,6 +98,10 @@ class UTRKeyCreator(KeyCreator):
             return key_variants
         
         key_variants.add(n_key_id)
+        
+        if n_key_id.isnumeric():
+            return key_variants
+        
         key_variants.update(self.format_utr(n_key_id))
 
         if "/" in n_key_id and len(n_key_id.split("/")) == 2:
