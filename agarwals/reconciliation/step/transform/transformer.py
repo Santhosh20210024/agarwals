@@ -29,9 +29,13 @@ class Transformer:
         self.is_truncate_excess_char = False
         self.max_trim_length = 140
 
+    def get_file_columns(self):
+        return "upload,name"
+
     def get_files_to_transform(self):
+        fields = self.get_file_columns()
         file_query = f"""SELECT 
-                            upload,name 
+                            {fields} 
                         FROM 
                             `tabFile upload` 
                         WHERE 
@@ -143,10 +147,8 @@ class Transformer:
     def move_to_transform(self, file, df, type, folder, prune = True, status = 'Open'):
         if df.empty:
             return None
-
         if self.is_truncate_excess_char == True:
             df = df.applymap(lambda x:str(x)[:self.max_trim_length] if len(str(x)) > self.max_trim_length else x)
-
         if prune:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
@@ -162,13 +164,10 @@ class Transformer:
 
     def load_source_df(self, file, header):
         try:
-            if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
-                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
-            elif file['upload'].endswith('.csv'):
+            if file['upload'].lower().endswith('.csv'):
                 self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
             else:
-                self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
-                self.update_status('File upload', file['name'], 'Error')
+                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
             self.log_error(self.document_type, file['name'], e)
@@ -295,7 +294,8 @@ class Transformer:
     def convert_column_to_numeric(self):
         columns = self.get_column_name_to_convert_to_numeric()
         for column in columns:
-            self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
+            if column in self.source_df.columns:
+                self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
 
     def format_date(self,df,date_formats,date_column):
         df['original_date'] = df[date_column].astype(str).apply(lambda x: x.strip() if isinstance(x,str) else x)
@@ -314,14 +314,16 @@ class Transformer:
     def fill_na_as_0(self,df):
         columns = self.get_columns_to_fill_na_as_0()
         for column in columns:
-            df[column] = df[column].fillna(0)
-            df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
+            if column in df.columns:
+                df[column] = df[column].fillna(0)
+                df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
         return df
 
     def format_numbers(self, df):
         columns = self.get_column_name_to_convert_to_numeric()
         for column in columns:
-            df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
+            if column in df.columns:
+                df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
         return df
 
     def process(self, args):
@@ -491,7 +493,6 @@ class StagingTransformer(Transformer):
         self.source_df = self.source_df.loc[:null_index - 1]
         return True
 
-
     def transform(self,file):
         configuration = self.get_configuration()
         header_identification_keys = self.get_header_identification_keys(configuration)
@@ -524,16 +525,8 @@ class BankTransformer(StagingTransformer):
         self.document_type = 'Bank Transaction Staging'
         self.header = None
 
-    def get_files_to_transform(self):
-        file_query = f"""SELECT 
-                            upload,name,date,bank_account 
-                        FROM 
-                            `tabFile upload` 
-                        WHERE 
-                            status = 'Open' AND document_type = '{self.file_type}'
-                            ORDER BY creation"""
-        files = frappe.db.sql(file_query, as_dict=True)
-        return files
+    def get_file_columns(self):
+        return "upload,name,date,bank_account"
 
     def clean_header(self, list_to_clean):
         return [self.trim_and_lower(value) for value in list_to_clean]
