@@ -2,10 +2,11 @@ import frappe
 import shutil
 import zipfile
 import os
-from frappe.model.document import Document
 import re
-from agarwals.utils.file_util import construct_file_url, HOME_PATH, SITE_PATH, SHELL_PATH, SUB_DIR, PROJECT_FOLDER, is_template_exist
 import pandas as pd
+from frappe.model.document import Document
+from agarwals.utils.file_util import construct_file_url, HOME_PATH, SITE_PATH, SHELL_PATH, SUB_DIR, PROJECT_FOLDER, is_template_exist
+from agarwals.utils.error_handler import log_error
 
 
 class Fileupload(Document):
@@ -15,10 +16,7 @@ class Fileupload(Document):
 	field_pattern = r'-\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}\.\w+'
 
 	def add_log_error(self, doctype, error):
-		error_log = frappe.new_doc('Error Record Log')
-		error_log.set('reference_doctype', doctype)
-		error_log.set('error', error)
-		error_log.save()
+		log_error(error, doc = doctype)
 
 	def extract_tpa_id(self, input_string):
 		# Remove the pattern from the input string
