@@ -22,7 +22,6 @@ import random
 from agarwals.utils.file_util import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH
 
 class SeleniumDownloader:
-
     def __init__(self):
         self.extract_first_table = False
         self.format_file_in_parent = True
@@ -327,10 +326,7 @@ class SeleniumDownloader:
         from_date = self.from_date if temp_from_date is None else temp_from_date
         to_date = self.to_date if temp_to_date is None else temp_to_date
         if self.previous_files_count == downloaded_files_count:
-            self.insert_run_log({"doctype": "SA Downloader Run Log", "last_executed_time": self.last_executed_time,
-                                 "document_reference": "Error Record Log", "reference_name": self.credential_doc.name,
-                                 "status": "Info", 'message':f'NO FILE FOUND FOR {from_date} to {to_date}',
-                                 "tpa_name": self.credential_doc.tpa})
+            self.insert_run_log({"doctype": "SA Downloader Run Log", "last_executed_time": self.last_executed_time,"document_reference": "Error Record Log", "reference_name": self.credential_doc.name,"status": "Info", 'message':f'NO FILE FOUND FOR {from_date} to {to_date}',"tpa_name": self.credential_doc.tpa})
         else:
             self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,from_date,to_date)
             self.move_file(self.download_directory,self.formatted_file_name)
@@ -355,6 +351,8 @@ class SeleniumDownloader:
     def update_doc_status(self,status):
         doc = frappe.get_doc("TPA Login Credentials", self.credential_doc.name)
         doc.status = status
+        if status == "Valid":
+            doc.retry = 0
         doc.save()
 
     def web_driver_init(self):
