@@ -3,11 +3,13 @@ from agarwals.reconciliation.step.key_mapper.key_mapper import KeyMapper
 from agarwals.reconciliation.step.key_creator.claim_key_creator import ClaimKeyCreator
 from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.str_to_dict import cast_to_dic
+from agarwals.reconciliation import chunk
 
 
 class ClaimKeyMapper(KeyMapper):
-    def __init__(self, records, record_type, query):
-        super().__init__(records, record_type, "Claim Key")
+    def __init__(self, records, record_type, query, chunk_doc):
+        super().__init__(records, record_type, "Claim Key", chunk_doc)
         self.query = query
     
     def insert_claim_keys(self, name, claim_key):
@@ -50,8 +52,6 @@ class ClaimKeyMapper(KeyMapper):
                         self.update(self.query[field], key[0], record["name"])
                         _temp[key_id] = key
                     else:
-                        # if self.record_type in ('Bill', 'ClaimBook'):
-                        #     self.insert_claim_keys(record["name"], _temp[key_id])
                         self.update(self.query[field], _temp[key_id], record["name"])
 
         except KeyError as e:
@@ -87,36 +87,39 @@ class ClaimKeyMapper(KeyMapper):
             frappe.throw(f"Unexpected error while processing Claim keys: {str(e)}")
 
 class BillClaimKeyMapper(ClaimKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "Bill",
             {'claim_key_id': """UPDATE `tabBill` SET claim_key = %(key)s WHERE name = %(name)s"""
-            ,'ma_key_id': """UPDATE `tabBill` SET ma_claim_key = %(key)s WHERE name = %(name)s"""}
+            ,'ma_key_id': """UPDATE `tabBill` SET ma_claim_key = %(key)s WHERE name = %(name)s"""},
+            chunk_doc
         )
 
 class ClaimBookClaimKeyMapper(ClaimKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "ClaimBook",
             {'al_key_id': """UPDATE `tabClaimBook` SET al_key = %(key)s WHERE name = %(name)s"""
-            ,'cl_key_id': """UPDATE `tabClaimBook` SET cl_key = %(key)s WHERE name = %(name)s"""}
+            ,'cl_key_id': """UPDATE `tabClaimBook` SET cl_key = %(key)s WHERE name = %(name)s"""},
+            chunk_doc
         )
 
 class SettlementAdviceClaimKeyMapper(ClaimKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "Settlement Advice",
-            {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""}
+            {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""},
+            chunk_doc
         )
 
 @frappe.whitelist()
-def process(args=None): 
+def process(args): 
     try:
-        # args = cast_to_dic(args)
-        # chunk_size = int(args.get("chunk_size", 100))
+        args = cast_to_dic(args)
+        chunk_size = int(args.get("chunk_size", 100))
 
         queries = {
             "Bill": """SELECT name, claim_id as claim_key_id, ma_claim_id as ma_key_id FROM tabBill 
@@ -136,19 +139,16 @@ def process(args=None):
         }
 
         for record_type, query in queries.items():
-            process_records(query, mappers[record_type], 1000, None)
+            process_records(query, mappers[record_type], chunk_size, args)
 
     except Exception as e:
         log_error("Error While Processing: " + str(e), doc="Claim Key")
 
 
-def process_records(query, mapper_class, chunk_size, args):  # not closed
+def process_records(query, mapper_class, chunk_size, args):
     records = frappe.db.sql(query, as_dict=True)
     if records:
         for index in range(0, len(records), chunk_size):
-            # chunk_doc = chunk.create_chunk(args.get("step_id"))
+            chunk_doc = chunk.create_chunk(args.get("step_id"))
             records_chunk = records[index : index + chunk_size]
-            enqueue_record_processing(mapper_class, records_chunk)
-    else:
-        # finalize_chunk_processing(args.get("step_id"))
-        pass
+            enqueue_record_processing(mapper_class, records_chunk, chunk_doc, args)

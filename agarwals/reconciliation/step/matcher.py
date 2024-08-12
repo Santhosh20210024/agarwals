@@ -7,12 +7,12 @@ from agarwals.utils.index_update import update_index
 from agarwals.utils.matcher_query_list import get_matcher_query
 
 """
-'Open' -> New Records
-'Warning' -> Validation Error
-'Fully Processed' -> Processed Records
-'Partially Processed' -> Partially Processed Records
-'Error' -> System Error
-'Unmatched' -> Unmatched Records For Other Queries
+'Open' -> New Records.
+'Warning' -> Validation Error.
+'Fully Processed' -> Processed Records.
+'Partially Processed' -> Partially Processed Records.
+'Error' -> System Error.
+'Unmatched' -> Unmatched Records For Other Queries.
 """
  
 class MatcherValidation:
