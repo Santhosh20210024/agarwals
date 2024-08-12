@@ -6,6 +6,7 @@ import re
 import json
 from agarwals.utils.loader import Loader
 from agarwals.reconciliation import chunk
+from agarwals.utils.error_handler import log_error as error_handler
 
 FOLDER = "Home/DrAgarwals/"
 IS_PRIVATE = 1
@@ -25,10 +26,16 @@ class Transformer:
         self.clean_utr = 0
         self.utr_column_name = ''
         self.header = 0
+        self.is_truncate_excess_char = False
+        self.max_trim_length = 140
+
+    def get_file_columns(self):
+        return "upload,name"
 
     def get_files_to_transform(self):
+        fields = self.get_file_columns()
         file_query = f"""SELECT 
-                            upload,name 
+                            {fields} 
                         FROM 
                             `tabFile upload` 
                         WHERE 
@@ -88,11 +95,7 @@ class Transformer:
         return modified_records, df
 
     def log_error(self, doctype_name, reference_name, error_message):
-        error_log = frappe.new_doc('Error Record Log')
-        error_log.set('doctype_name', doctype_name)
-        error_log.set('reference_name', reference_name)
-        error_log.set('error_message', error_message)
-        error_log.save()
+        error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
 
     def get_column_needed(self):
         return []
@@ -144,10 +147,13 @@ class Transformer:
     def move_to_transform(self, file, df, type, folder, prune = True, status = 'Open'):
         if df.empty:
             return None
+        if self.is_truncate_excess_char == True:
+            df = df.applymap(lambda x:str(x)[:self.max_trim_length] if len(str(x)) > self.max_trim_length else x)
         if prune:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
            df = self.format_utr(df ,self.utr_column_name)
+        df = self.format_numbers(df)
         transform = self.create_transform_record(file['name'])
         df["file_upload"] = file['name']
         df["transform"] = transform.name
@@ -155,15 +161,13 @@ class Transformer:
         self.create_file_record(file_path,folder)
         self.insert_in_file_upload(file_path, file['name'], type, status, transform)
 
+
     def load_source_df(self, file, header):
         try:
-            if file['upload'].endswith('.xls') or file['upload'].endswith('.xlsx'):
-                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
-            elif file['upload'].endswith('.csv'):
+            if file['upload'].lower().endswith('.csv'):
                 self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
             else:
-                self.log_error(self.document_type, file['name'], 'The File should be XLSX or CSV')
-                self.update_status('File upload', file['name'], 'Error')
+                 self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
             self.log_error(self.document_type, file['name'], e)
@@ -290,7 +294,8 @@ class Transformer:
     def convert_column_to_numeric(self):
         columns = self.get_column_name_to_convert_to_numeric()
         for column in columns:
-            self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
+            if column in self.source_df.columns:
+                self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
 
     def format_date(self,df,date_formats,date_column):
         df['original_date'] = df[date_column].astype(str).apply(lambda x: x.strip() if isinstance(x,str) else x)
@@ -309,9 +314,20 @@ class Transformer:
     def fill_na_as_0(self,df):
         columns = self.get_columns_to_fill_na_as_0()
         for column in columns:
-            df[column] = df[column].fillna(0)
-            df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
+            if column in df.columns:
+                df[column] = df[column].fillna(0)
+                df[column] = df[column].astype(str).apply(lambda x: 0 if x == '-' else x)
         return df
+
+    def format_numbers(self, df):
+        columns = self.get_column_name_to_convert_to_numeric()
+        for column in columns:
+            if column in df.columns:
+                df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
+        return df
+
+    def extract(self):
+        pass
 
     def process(self, args):
         try:
@@ -352,12 +368,13 @@ class DirectTransformer(Transformer):
     def __init__(self):
         super().__init__()
 
-    def transform(self, file):
+    def transform(self, file):# call here
+        self.extract()
         if self.hashing == 1:
             self.hashing_job()
-
         self.load_target_df()
-        if self.target_df.empty: 
+        if self.target_df.empty:
+
             self.new_records = self.source_df 
             self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
             return True
@@ -408,6 +425,9 @@ class BillTransformer(DirectTransformer):
     def get_column_needed(self):
         return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash', 'file_upload', 'transform', 'index']
 
+    def get_column_name_to_convert_to_numeric(self):
+        return ['Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due']
+
 class ClaimbookTransformer(DirectTransformer):
     def __init__(self):
         super().__init__()
@@ -416,6 +436,7 @@ class ClaimbookTransformer(DirectTransformer):
         self.hashing = 1
         self.clean_utr = 1
         self.utr_column_name = 'utr_number'
+        self.is_truncate_excess_char = True
 
     def get_columns_to_hash(self):
         return ['unique_id', 'settled_amount']
@@ -443,6 +464,22 @@ class ClaimbookTransformer(DirectTransformer):
 
     def get_column_needed(self):
         return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size','final_utr_number','hash', 'file_upload', 'transform', 'index']
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ['final_bill_amount','claim_amount','requested_amount','approved_amount','provisional_bill_amount','settled_amount','tds_amount','tpa_shortfall_amount','patient_paid','patientpayable']
+
+    def unique_id_validation(self):
+        if 'unique_id' not in self.source_df.columns:
+            self.source_df['unique_id'] = self.source_df['Hospital'].str.strip() + '-' + self.source_df[
+                'preauth_claim_id'].astype(str).str.strip()
+
+    def rename_column(self):
+        if 'v_tenant' in self.source_df.columns:
+            self.source_df.rename(columns={'v_tenant': 'Hospital'}, inplace=True)
+
+    def extract(self):
+        self.rename_column()
+        self.unique_id_validation()
 
 class StagingTransformer(Transformer):
     def __init__(self):
@@ -473,7 +510,6 @@ class StagingTransformer(Transformer):
         null_index = self.source_df.index[self.source_df[column].isnull()].min()
         self.source_df = self.source_df.loc[:null_index - 1]
         return True
-
 
     def transform(self,file):
         configuration = self.get_configuration()
@@ -507,16 +543,8 @@ class BankTransformer(StagingTransformer):
         self.document_type = 'Bank Transaction Staging'
         self.header = None
 
-    def get_files_to_transform(self):
-        file_query = f"""SELECT 
-                            upload,name,date,bank_account 
-                        FROM 
-                            `tabFile upload` 
-                        WHERE 
-                            status = 'Open' AND document_type = '{self.file_type}'
-                            ORDER BY creation"""
-        files = frappe.db.sql(file_query, as_dict=True)
-        return files
+    def get_file_columns(self):
+        return "upload,name,date,bank_account"
 
     def clean_header(self, list_to_clean):
         return [self.trim_and_lower(value) for value in list_to_clean]
@@ -610,8 +638,8 @@ class BankTransformer(StagingTransformer):
 
         return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
 
-    def extract_utr_from_narration(self, configuration,bank_account):
-        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),bank_account,eval(configuration.delimiters)), axis = 1)
+    def extract_utr_from_narration(self, configuration):
+        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),str(row['bank_account']),eval(configuration.delimiters)), axis = 1)
 
     def validate_reference(self,source_ref):# chnage the unvalid reference number as 0
         source_ref['reference_number'] = source_ref.apply(lambda row: 0 if str(row['reference_number']).isalpha() else row['reference_number'], axis=1)
@@ -649,7 +677,7 @@ class BankTransformer(StagingTransformer):
         self.source_df = self.convert_into_common_format(self.source_df,columns_to_select)
         self.add_search_column()
         self.convert_column_to_numeric()
-        self.extract_utr_from_narration(configuration,file['bank_account'])
+        self.extract_utr_from_narration(configuration)
         self.add_source_and_bank_account_column(file['name'], file['bank_account'])
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
         self.source_df = self.fill_na_as_0(self.source_df)
@@ -665,7 +693,10 @@ class AdjustmentTransformer(Transformer):
         self.document_type = 'Bill Adjustment'
 
     def get_column_needed(self):
-        return ["bill","tds","disallowance","posting_date","source_file", 'file_upload', 'transform', 'index']
+        return ["bill_no","tds_amount","disallowed_amount","posting_date","source_file", 'file_upload', 'transform', 'index']
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ["tds_amount","disallowed_amount"]
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -680,7 +711,7 @@ class AdjustmentTransformer(Transformer):
 
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,["bill","tds","disallowance","posting_date","source_file", 'file_upload', 'transform', 'index'])
+        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
         configuration = frappe.get_single('Bank Configuration')
         if "posting_date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
@@ -696,6 +727,9 @@ class WritebackTransformer(Transformer):
     def get_column_needed(self):
         return ["reference_number","date","region","entity","branch_type","deposit","withdrawal","bank_account","description","custom_cg_utr_number",
                 "transaction_id","transaction_type","allocated_amount","unallocated_amount","party_type","party", 'file_upload', 'transform', 'index']
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ["allocated_amount","unallocated_amount","withdrawal","deposit"]
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -723,6 +757,9 @@ class WriteoffTransformer(Transformer):
     def get_column_needed(self):
         return ["bill_no","bill_date","customer","customer_group","claim_amount","outstanding_amount","branch","entity","region","mrn",
                 "patient_name","claim_id","ma_claim_id","payer_name", 'file_upload', 'transform', 'index']
+
+    def get_column_name_to_convert_to_numeric(self):
+        return ["claim_amount","outstanding_amount"]
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -758,6 +795,9 @@ class BankBulkTransformer(BankTransformer):
                 raise Exception(f"Header is invalid {head}")
         return df.rename(columns=rename_value)
 
+    def get_column_name_to_convert_to_numeric(self):
+        return ['deposit','withdrawal','credit','debit']
+
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
         self.source_df = self.find_and_rename_column(self.source_df,
@@ -765,7 +805,7 @@ class BankBulkTransformer(BankTransformer):
         configuration = frappe.get_single('Bank Configuration')
         if "date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df, eval(configuration.date_formats), 'date')
-        self.extract_utr_from_narration(configuration,self.source_df['bank_account'])
+        self.extract_utr_from_narration(configuration)
         self.source_df['credit'] = self.source_df['deposit']
         self.source_df['debit'] = self.source_df['withdrawal']
         self.add_search_column()

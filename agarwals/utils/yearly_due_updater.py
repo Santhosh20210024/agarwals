@@ -1,4 +1,5 @@
 import frappe
+from agarwals.utils.error_handler import log_error as error_handler
 
 
 class YearlyDueUpdater:
@@ -12,10 +13,7 @@ class YearlyDueUpdater:
         self.entity_field = ""
         self.status = ()
     def log_error(self, msg):
-        error_log = frappe.new_doc('Error Record Log')
-        error_log.set('doctype_name', 'Yearly Due')
-        error_log.set('error_message', msg)
-        error_log.save()
+        error_handler(error=msg, doc='Yearly Due')
 
     def update_previous_year_due(self):
         try:

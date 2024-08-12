@@ -41,7 +41,14 @@ class Processor:
             return None
         if type(e.args) == tuple:
             if e.args[0] != None:
-                self.log_error("Job", None, e)
+                (val,) = e.args
+                if type(val) == dict:
+                    if "doctype" in val and "message" in val:
+                        self.log_error(val["doctype"], None, val["message"])
+                    elif "message" in val:
+                        self.log_error("Job", None, val["message"])
+                else:
+                    self.log_error("Job", None, e)
         else:
             (val,) = e.args
             if "doctype" in val and "message" in val:
@@ -67,10 +74,11 @@ class Processor:
             elif len(steps_list) == len(
                     self.get_data({self.parent_field_name: parent_id, "status": 'Processed'})):
                 parent_doc.status = 'Processed'
+            else:
+                return None
             parent_doc.end_time = frappe.utils.now_datetime()
             parent_doc.save()
             frappe.db.commit()
-            worker.kill()
         except Exception as e:
             self.raise_exception(
                 {"doctype": self.doc_name, "message": f"Failed To Change the step status and end time of due to {e}"})

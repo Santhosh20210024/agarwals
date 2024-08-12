@@ -1,5 +1,5 @@
 [
-{
+  {
     "doctype": "Custom Field",
     "dt": "Bank Transaction",
     "name": "Bank Transaction-cg_utr_number",
@@ -28,7 +28,7 @@
     "label": "Yearly Due",
     "insert_after": "custom_fiscal_year"
   },
-    {
+  {
     "doctype": "Custom Field",
     "dt": "Payment Entry",
     "name": "Payment Entry-custom_file_upload",
@@ -38,7 +38,7 @@
     "label": "File upload",
     "insert_after": "custom_disallowed_amount"
   },
-      {
+  {
     "doctype": "Custom Field",
     "dt": "Payment Entry",
     "name": "Payment Entry-custom_transform",
@@ -57,8 +57,7 @@
     "label": "Index",
     "insert_after": "custom_transform"
   },
-
-      {
+  {
     "doctype": "Custom Field",
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_file_upload",
@@ -68,7 +67,7 @@
     "label": "File upload",
     "insert_after": "repost_required"
   },
-      {
+  {
     "doctype": "Custom Field",
     "dt": "Sales Invoice",
     "name": "Sales Invoice-custom_transform",
@@ -87,8 +86,7 @@
     "label": "Index",
     "insert_after": "custom_transform"
   },
-
-        {
+  {
     "doctype": "Custom Field",
     "dt": "Bank Transaction",
     "name": "Bank Transaction-custom_file_upload",
@@ -98,7 +96,7 @@
     "label": "File upload",
     "insert_after": "bank_party_iban"
   },
-      {
+  {
     "doctype": "Custom Field",
     "dt": "Bank Transaction",
     "name": "Bank Transaction-custom_transform",
@@ -117,15 +115,15 @@
     "label": "Index",
     "insert_after": "custom_transform"
   },
-
-
   {
     "doctype": "SA Downloader Configuration",
     "name": "VidalHealthDownloader",
     "website_url": "https://tips.vidalhealthtpa.com/hospitallogin/hospital/login/",
     "class_name": "VidalHealthDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -133,24 +131,23 @@
     "website_url": "https://cashless.cholainsurance.com/login",
     "class_name": "CholasPdfDownloader",
     "incoming_file_type": "PDF",
-    "is_headless":1
+    "is_headless": 1
   },
-
   {
     "doctype": "SA Downloader Configuration",
     "name": "EricsonDownloader",
     "website_url": "https://www.ericsontpa.com/",
     "class_name": "EricsonDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "CarehealthDownloader",
-    "website_url": "https://cashless.cholainsurance.com",
+    "website_url": "https://healthconnect.careinsurance.com",
     "class_name": "CarehealthDownloader",
-    "incoming_file_type": "Excel",
-    "is_headless":1
+    "incoming_file_type": "HTML",
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -158,31 +155,33 @@
     "website_url": "https://provider.reliancegeneral.co.in//",
     "class_name": "RelianceGeneralDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "MDIndiaDownloader",
-    "website_url": "https://provider.ihx.in/#/",
+    "website_url": "https://eclaim.mdindia.com:94/",
     "class_name": "MDIndiaDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "GoodHealthDownloader",
     "website_url": "https://webace.goodhealthtpa.in/Provider/ProviderLogin.aspx",
     "class_name": "GoodHealthDownloader",
-    "incoming_file_type": "Excel",
-    "is_headless":1
+    "incoming_file_type": "HTML",
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "StarVitrayaDownloader",
     "website_url": "https://shpv.starhealth.in/",
     "class_name": "StarVitrayaDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -190,15 +189,17 @@
     "website_url": "https://provider.paramounttpa.com/Login.aspx",
     "class_name": "ParamountDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "FHPLDownloader",
     "website_url": "https://fhpl.net/FhplLogins/NetworkHospitals/ProviderLogin.aspx",
     "class_name": "FHPLDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -206,7 +207,7 @@
     "website_url": "https://healthindiatpa.com/Logins/LoginProvider.aspx",
     "class_name": "HealthIndiaDownloader",
     "incoming_file_type": "HTML",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -214,31 +215,35 @@
     "website_url": "https://www.safewaytpa.in/Hospitallogin.aspx",
     "class_name": "SafewayDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "NivaBupaDownloader",
-    "website_url": "https://www.safewaytpa.in/Hospitallogin.aspx",
+    "website_url": "https://nbhiclaims.vitrayatech.com/",
     "class_name": "NivaBupaDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 29,
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "BajajAllianzDownloader",
     "website_url": "https://ecare.bajajallianz.com",
     "class_name": "BajajAllianzDownloader",
+    "is_date_limit": 1,
+    "date_limit_period": 85,
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
     "name": "ProviderIhxDownloader",
     "website_url": "https://provider.ihx.in/",
     "class_name": "ProviderIhxDownloader",
-    "incoming_file_type": "HTML",
-    "is_headless":1
+    "incoming_file_type": "Excel",
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -246,7 +251,7 @@
     "website_url": "https://ilhc.icicilombard.com/",
     "class_name": "ICICLombardDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -254,7 +259,7 @@
     "website_url": "https://cashless.cholainsurance.com",
     "class_name": "CholasDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
   {
     "doctype": "SA Downloader Configuration",
@@ -262,652 +267,958 @@
     "website_url": "https://spp.starhealth.in/#/",
     "class_name": "StarHealthDownloader",
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
-    {
+  {
     "doctype": "SA Downloader Configuration",
     "name": "HeritageDownloader",
     "website_url": "http://www.heritagehealthtpa.in/HospitalPortal/LogIn.aspx",
     "class_name": "HeritageDownloader",
+    "is_date_limit": 1,
     "incoming_file_type": "Excel",
-    "is_headless":1
+    "is_headless": 1
   },
-      {
-    "doctype": "SA Downloader Configuration",
-    "name": "HeritageDownloader",
-    "website_url": "http://www.heritagehealthtpa.in/HospitalPortal/LogIn.aspx",
-    "class_name": "HeritageDownloader",
-    "incoming_file_type": "Excel",
-    "is_headless":1
-  },
-{
+  {
     "doctype": "Data Import Mapping",
     "name": "Bill",
     "mapping_columns": [
-        {
-            "column_in_doctype": "0",
-            "column_index_in_import_file": "entity"
-        },
-        {
-            "column_in_doctype": "1",
-            "column_index_in_import_file": "branch"
-        },
-        {
-            "column_in_doctype": "2",
-            "column_index_in_import_file": "bill_no"
-        },
-              {
-            "column_in_doctype": "4",
-            "column_index_in_import_file": "bill_date"
-        },
-        {
-            "column_in_doctype": "5",
-            "column_index_in_import_file": "mrn"
-        },
-        {
-            "column_in_doctype": "6",
-            "column_index_in_import_file": "patient_name"
-        },        {
-            "column_in_doctype": "3",
-            "column_index_in_import_file": "bedtype"
-        },
-        {
-            "column_in_doctype": "17",
-            "column_index_in_import_file": "status"
-        },
-        {
-            "column_in_doctype": "18",
-            "column_index_in_import_file": "cancelled_date"
-        },        {
-            "column_in_doctype": "7",
-            "column_index_in_import_file": "consultant"
-        },
-        {
-            "column_in_doctype": "19",
-            "column_index_in_import_file": "claim_id"
-        },
-        {
-            "column_in_doctype": "16",
-            "column_index_in_import_file": "claim_status"
-        },        {
-            "column_in_doctype": "8",
-            "column_index_in_import_file": "payer"
-        },
-        {
-            "column_in_doctype": "9",
-            "column_index_in_import_file": "discount"
-        },
-        {
-            "column_in_doctype": "10",
-            "column_index_in_import_file": "net_amount"
-        },        {
-            "column_in_doctype": "11",
-            "column_index_in_import_file": "paid_amount"
-        },
-        {
-            "column_in_doctype": "12",
-            "column_index_in_import_file": "due_amount"
-        },
-        {
-            "column_in_doctype": "13",
-            "column_index_in_import_file": "refund"
-        },
-        {
-            "column_in_doctype": "14",
-            "column_index_in_import_file": "claim_amount"
-        },
-        {
-            "column_in_doctype": "15",
-            "column_index_in_import_file": "claim_amount_due"
-        },
-        {
-            "column_in_doctype": "21",
-            "column_index_in_import_file": "hash_value"
-        },
-       {
-            "column_in_doctype": "22",
-            "column_index_in_import_file": "file_upload"
-        },
-        {
-            "column_in_doctype": "23",
-            "column_index_in_import_file": "transform"
-        },
-        {
-            "column_in_doctype": "24",
-            "column_index_in_import_file": "index"
-        },        {
-            "column_in_doctype": "20",
-            "column_index_in_import_file": "ma_claim_id"
-        }
-
+      {
+        "column_index_in_import_file": "0",
+        "column_in_doctype": "entity"
+      },
+      {
+        "column_index_in_import_file": "1",
+        "column_in_doctype": "branch"
+      },
+      {
+        "column_index_in_import_file": "2",
+        "column_in_doctype": "bill_no"
+      },
+      {
+        "column_index_in_import_file": "4",
+        "column_in_doctype": "bill_date"
+      },
+      {
+        "column_index_in_import_file": "5",
+        "column_in_doctype": "mrn"
+      },
+      {
+        "column_index_in_import_file": "6",
+        "column_in_doctype": "patient_name"
+      },
+      {
+        "column_index_in_import_file": "3",
+        "column_in_doctype": "bedtype"
+      },
+      {
+        "column_index_in_import_file": "17",
+        "column_in_doctype": "status"
+      },
+      {
+        "column_index_in_import_file": "18",
+        "column_in_doctype": "cancelled_date"
+      },
+      {
+        "column_index_in_import_file": "7",
+        "column_in_doctype": "consultant"
+      },
+      {
+        "column_index_in_import_file": "19",
+        "column_in_doctype": "claim_id"
+      },
+      {
+        "column_index_in_import_file": "16",
+        "column_in_doctype": "claim_status"
+      },
+      {
+        "column_index_in_import_file": "8",
+        "column_in_doctype": "payer"
+      },
+      {
+        "column_index_in_import_file": "9",
+        "column_in_doctype": "discount"
+      },
+      {
+        "column_index_in_import_file": "10",
+        "column_in_doctype": "net_amount"
+      },
+      {
+        "column_index_in_import_file": "11",
+        "column_in_doctype": "paid_amount"
+      },
+      {
+        "column_index_in_import_file": "12",
+        "column_in_doctype": "due_amount"
+      },
+      {
+        "column_index_in_import_file": "13",
+        "column_in_doctype": "refund"
+      },
+      {
+        "column_index_in_import_file": "14",
+        "column_in_doctype": "claim_amount"
+      },
+      {
+        "column_index_in_import_file": "15",
+        "column_in_doctype": "claim_amount_due"
+      },
+      {
+        "column_index_in_import_file": "21",
+        "column_in_doctype": "hash_value"
+      },
+      {
+        "column_index_in_import_file": "22",
+        "column_in_doctype": "file_upload"
+      },
+      {
+        "column_index_in_import_file": "23",
+        "column_in_doctype": "transform"
+      },
+      {
+        "column_index_in_import_file": "24",
+        "column_in_doctype": "index"
+      },
+      {
+        "column_index_in_import_file": "20",
+        "column_in_doctype": "ma_claim_id"
+      }
     ]
-},
+  },
   {
     "doctype": "Data Import Mapping",
     "name": "Write Off",
     "mapping_columns": [
-        {
-            "column_in_doctype": "7",
-            "column_index_in_import_file": "entity"
-        },
-        {
-            "column_in_doctype": "8",
-            "column_index_in_import_file": "region"
-        },
-        {
-            "column_in_doctype": "6",
-            "column_index_in_import_file": "branch"
-        },
-              {
-            "column_in_doctype": "0",
-            "column_index_in_import_file": "bill_no"
-        },
-                    {
-            "column_in_doctype": "1",
-            "column_index_in_import_file": "bill_date"
-        },
-        {
-            "column_in_doctype": "9",
-            "column_index_in_import_file": "mrn"
-        },
-        {
-            "column_in_doctype": "10",
-            "column_index_in_import_file": "patient_name"
-        },        {
-            "column_in_doctype": "11",
-            "column_index_in_import_file": "claim_id"
-        },
-        {
-            "column_in_doctype": "12",
-            "column_index_in_import_file": "ma_claim_id"
-        },
-        {
-            "column_in_doctype": "13",
-            "column_index_in_import_file": "payer_name"
-        },
-        {
-            "column_in_doctype": "2",
-            "column_index_in_import_file": "customer"
-        },
-        {
-            "column_in_doctype": "3",
-            "column_index_in_import_file": "customer_group"
-        },        {
-            "column_in_doctype": "4",
-            "column_index_in_import_file": "claim_amount"
-        },
-        {
-            "column_in_doctype": "5",
-            "column_index_in_import_file": "outstanding_amount"
-        },
-        {
-            "column_in_doctype": "14",
-            "column_index_in_import_file": "file_upload"
-        },        {
-            "column_in_doctype": "15",
-            "column_index_in_import_file": "transform"
-        },
-        {
-            "column_in_doctype": "16",
-            "column_index_in_import_file": "index"
-        }
-
-
+      {
+        "column_index_in_import_file": "7",
+        "column_in_doctype": "entity"
+      },
+      {
+        "column_index_in_import_file": "8",
+        "column_in_doctype": "region"
+      },
+      {
+        "column_index_in_import_file": "6",
+        "column_in_doctype": "branch"
+      },
+      {
+        "column_index_in_import_file": "0",
+        "column_in_doctype": "bill_no"
+      },
+      {
+        "column_index_in_import_file": "1",
+        "column_in_doctype": "bill_date"
+      },
+      {
+        "column_index_in_import_file": "9",
+        "column_in_doctype": "mrn"
+      },
+      {
+        "column_index_in_import_file": "10",
+        "column_in_doctype": "patient_name"
+      },
+      {
+        "column_index_in_import_file": "11",
+        "column_in_doctype": "claim_id"
+      },
+      {
+        "column_index_in_import_file": "12",
+        "column_in_doctype": "ma_claim_id"
+      },
+      {
+        "column_index_in_import_file": "13",
+        "column_in_doctype": "payer_name"
+      },
+      {
+        "column_index_in_import_file": "2",
+        "column_in_doctype": "customer"
+      },
+      {
+        "column_index_in_import_file": "3",
+        "column_in_doctype": "customer_group"
+      },
+      {
+        "column_index_in_import_file": "4",
+        "column_in_doctype": "claim_amount"
+      },
+      {
+        "column_index_in_import_file": "5",
+        "column_in_doctype": "outstanding_amount"
+      },
+      {
+        "column_index_in_import_file": "14",
+        "column_in_doctype": "file_upload"
+      },
+      {
+        "column_index_in_import_file": "15",
+        "column_in_doctype": "transform"
+      },
+      {
+        "column_index_in_import_file": "16",
+        "column_in_doctype": "index"
+      }
     ]
-},
-    {
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "Write Back",
     "mapping_columns": [
-        {
-            "column_in_doctype": "1",
-            "column_index_in_import_file": "date"
-        },
-        {
-            "column_in_doctype": "2",
-            "column_index_in_import_file": "region"
-        },
-        {
-            "column_in_doctype": "3",
-            "column_index_in_import_file": "entity"
-        },
-              {
-            "column_in_doctype": "4",
-            "column_index_in_import_file": "branch_type"
-        },
-                    {
-            "column_in_doctype": "7",
-            "column_index_in_import_file": "bank_account"
-        },
-        {
-            "column_in_doctype": "5",
-            "column_index_in_import_file": "deposit"
-        },
-        {
-            "column_in_doctype": "6",
-            "column_index_in_import_file": "withdrawal"
-        },        {
-            "column_in_doctype": "8",
-            "column_index_in_import_file": "description"
-        },
-        {
-            "column_in_doctype": "0",
-            "column_index_in_import_file": "reference_number"
-        },
-        {
-            "column_in_doctype": "10",
-            "column_index_in_import_file": "transaction_id"
-        },
-        {
-            "column_in_doctype": "11",
-            "column_index_in_import_file": "transaction_type"
-        },
-        {
-            "column_in_doctype": "9",
-            "column_index_in_import_file": "cg_utr_number"
-        },        {
-            "column_in_doctype": "12",
-            "column_index_in_import_file": "allocated_amount"
-        },
-        {
-            "column_in_doctype": "13",
-            "column_index_in_import_file": "unallocated_amount"
-        },
-        {
-            "column_in_doctype": "14",
-            "column_index_in_import_file": "party_type"
-        },        {
-            "column_in_doctype": "15",
-            "column_index_in_import_file": "party"
-        },
-        {
-            "column_in_doctype": "16",
-            "column_index_in_import_file": "file_upload"
-        },        {
-            "column_in_doctype": "17",
-            "column_index_in_import_file": "transform"
-        },        {
-            "column_in_doctype": "18",
-            "column_index_in_import_file": "index"
-        }
-    ]
-},
       {
+        "column_index_in_import_file": "1",
+        "column_in_doctype": "date"
+      },
+      {
+        "column_index_in_import_file": "2",
+        "column_in_doctype": "region"
+      },
+      {
+        "column_index_in_import_file": "3",
+        "column_in_doctype": "entity"
+      },
+      {
+        "column_index_in_import_file": "4",
+        "column_in_doctype": "branch_type"
+      },
+      {
+        "column_index_in_import_file": "7",
+        "column_in_doctype": "bank_account"
+      },
+      {
+        "column_index_in_import_file": "5",
+        "column_in_doctype": "deposit"
+      },
+      {
+        "column_index_in_import_file": "6",
+        "column_in_doctype": "withdrawal"
+      },
+      {
+        "column_index_in_import_file": "8",
+        "column_in_doctype": "description"
+      },
+      {
+        "column_index_in_import_file": "0",
+        "column_in_doctype": "reference_number"
+      },
+      {
+        "column_index_in_import_file": "10",
+        "column_in_doctype": "transaction_id"
+      },
+      {
+        "column_index_in_import_file": "11",
+        "column_in_doctype": "transaction_type"
+      },
+      {
+        "column_index_in_import_file": "9",
+        "column_in_doctype": "cg_utr_number"
+      },
+      {
+        "column_index_in_import_file": "12",
+        "column_in_doctype": "allocated_amount"
+      },
+      {
+        "column_index_in_import_file": "13",
+        "column_in_doctype": "unallocated_amount"
+      },
+      {
+        "column_index_in_import_file": "14",
+        "column_in_doctype": "party_type"
+      },
+      {
+        "column_index_in_import_file": "15",
+        "column_in_doctype": "party"
+      },
+      {
+        "column_index_in_import_file": "16",
+        "column_in_doctype": "file_upload"
+      },
+      {
+        "column_index_in_import_file": "17",
+        "column_in_doctype": "transform"
+      },
+      {
+        "column_index_in_import_file": "18",
+        "column_in_doctype": "index"
+      }
+    ]
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "Settlement Advice Staging",
     "mapping_columns": [
-        {
-            "column_in_doctype": "0",
-            "column_index_in_import_file": "claim_id"
-        },
-        {
-            "column_in_doctype": "1",
-            "column_index_in_import_file": "claim_amount"
-        },
-        {
-            "column_in_doctype": "2",
-            "column_index_in_import_file": "utr_number"
-        },
-              {
-            "column_in_doctype": "3",
-            "column_index_in_import_file": "disallowed_amount"
-        },
-                    {
-            "column_in_doctype": "4",
-            "column_index_in_import_file": "payers_remark"
-        },
-        {
-            "column_in_doctype": "5",
-            "column_index_in_import_file": "settled_amount"
-        },
-        {
-            "column_in_doctype": "6",
-            "column_index_in_import_file": "tds_amount"
-        },        {
-            "column_in_doctype": "7",
-            "column_index_in_import_file": "claim_status"
-        },
-        {
-            "column_in_doctype": "8",
-            "column_index_in_import_file": "paid_date"
-        },
-        {
-            "column_in_doctype": "9",
-            "column_index_in_import_file": "bill_number"
-        },
-        {
-            "column_in_doctype": "10",
-            "column_index_in_import_file": "final_utr_number"
-        },
-        {
-            "column_in_doctype": "11",
-            "column_index_in_import_file": "hash"
-        },        {
-            "column_in_doctype": "12",
-            "column_index_in_import_file": "file_upload"
-        },
-        {
-            "column_in_doctype": "13",
-            "column_index_in_import_file": "transform"
-        },
-        {
-            "column_in_doctype": "14",
-            "column_index_in_import_file": "index"
-        }
-
+      {
+        "column_in_doctype": "claim_id",
+        "column_index_in_import_file": "0"
+      },
+      {
+        "column_in_doctype": "cl_number",
+        "column_index_in_import_file": "1"
+      },
+      {
+        "column_in_doctype": "bill_number",
+        "column_index_in_import_file": "2"
+      },
+      {
+        "column_in_doctype": "mrn",
+        "column_index_in_import_file": "3"
+      },
+      {
+        "column_in_doctype": "utr_number",
+        "column_index_in_import_file": "4"
+      },
+      {
+        "column_in_doctype": "final_utr_number",
+        "column_index_in_import_file": "5"
+      },
+      {
+        "column_in_doctype": "claim_status",
+        "column_index_in_import_file": "6"
+      },
+      {
+        "column_in_doctype": "paid_date",
+        "column_index_in_import_file": "7"
+      },
+      {
+        "column_in_doctype": "insurance_company",
+        "column_index_in_import_file": "8"
+      },
+      {
+        "column_in_doctype": "patient_name",
+        "column_index_in_import_file": "9"
+      },
+      {
+        "column_in_doctype": "insurance_policy_number",
+        "column_index_in_import_file": "10"
+      },
+      {
+        "column_in_doctype": "date_of_admission",
+        "column_index_in_import_file": "11"
+      },
+      {
+        "column_in_doctype": "date_of_discharge",
+        "column_index_in_import_file": "12"
+      },
+      {
+        "column_in_doctype": "hospital_name",
+        "column_index_in_import_file": "13"
+      },
+      {
+        "column_in_doctype": "bank_account_number",
+        "column_index_in_import_file": "14"
+      },
+      {
+        "column_in_doctype": "bank_name",
+        "column_index_in_import_file": "15"
+      },
+      {
+        "column_in_doctype": "bank_branch",
+        "column_index_in_import_file": "16"
+      },
+      {
+        "column_in_doctype": "claim_amount",
+        "column_index_in_import_file": "17"
+      },
+      {
+        "column_in_doctype": "settled_amount",
+        "column_index_in_import_file": "18"
+      },
+      {
+        "column_in_doctype": "tds_amount",
+        "column_index_in_import_file": "29"
+      },
+      {
+        "column_in_doctype": "disallowed_amount",
+        "column_index_in_import_file": "20"
+      },
+      {
+        "column_in_doctype": "payers_remark",
+        "column_index_in_import_file": "21"
+      },
+      {
+        "column_in_doctype": "hash",
+        "column_index_in_import_file": "22"
+      },
+      {
+        "column_in_doctype": "file_upload",
+        "column_index_in_import_file": "23"
+      },
+      {
+        "column_in_doctype": "transform",
+        "column_index_in_import_file": "24"
+      },
+      {
+        "column_in_doctype": "index",
+        "column_index_in_import_file": "25"
+      }
     ]
-},
-        {
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "ClaimBook",
     "mapping_columns": [
-        {
-            "column_in_doctype": "0",
-            "column_index_in_import_file": "hospital"
-        },
-        {
-            "column_in_doctype": "1",
-            "column_index_in_import_file": "preauth_claim_id"
-        },
-        {
-            "column_in_doctype": "2",
-            "column_index_in_import_file": "mrn"
-        },
-              {
-            "column_in_doctype": "3",
-            "column_index_in_import_file": "doctor"
-        },
-                    {
-            "column_in_doctype": "4",
-            "column_index_in_import_file": "department"
-        },
-        {
-            "column_in_doctype": "5",
-            "column_index_in_import_file": "case_id"
-        },
-        {
-            "column_in_doctype": "6",
-            "column_index_in_import_file": "first_name"
-        },        {
-            "column_in_doctype": "26",
-            "column_index_in_import_file": "utr_number"
-        },
-        {
-            "column_in_doctype": "22",
-            "column_index_in_import_file": "current_workflow_state"
-        },
-        {
-            "column_in_doctype": "17",
-            "column_index_in_import_file": "final_bill_number"
-        },
-        {
-            "column_in_doctype": "45",
-            "column_index_in_import_file": "unique_id"
-        },
-        {
-            "column_in_doctype": "11",
-            "column_index_in_import_file": "is_bulk_closure"
-        },        {
-            "column_in_doctype": "7",
-            "column_index_in_import_file": "tpa_name"
-        },
-        {
-            "column_in_doctype": "8",
-            "column_index_in_import_file": "insurance_company_name"
-        },
-        {
-            "column_in_doctype": "9",
-            "column_index_in_import_file": "tpa_member_id"
-        },
-              {
-            "column_in_doctype": "10",
-            "column_index_in_import_file": "insurance_policy_number"
-        },
-        {
-            "column_in_doctype": "38",
-            "column_index_in_import_file": "tracking_number"
-        },
-        {
-            "column_in_doctype": "12",
-            "column_index_in_import_file": "al_number"
-        },
-              {
-            "column_in_doctype": "13",
-            "column_index_in_import_file": "cl_number"
-        },
-                    {
-            "column_in_doctype": "25",
-            "column_index_in_import_file": "reconcilled_status"
-        },
-        {
-            "column_in_doctype": "16",
-            "column_index_in_import_file": "room_type"
-        },
-        {
-            "column_in_doctype": "43",
-            "column_index_in_import_file": "visit_type"
-        },        {
-            "column_in_doctype": "37",
-            "column_index_in_import_file": "courier_vendor"
-        },
-        {
-            "column_in_doctype": "21",
-            "column_index_in_import_file": "current_request_type"
-        },
-        {
-            "column_in_doctype": "14",
-            "column_index_in_import_file": "doa"
-        },
-        {
-            "column_in_doctype": "15",
-            "column_index_in_import_file": "dod"
-        },
-        {
-            "column_in_doctype": "39",
-            "column_index_in_import_file": "sent_date"
-        },        {
-            "column_in_doctype": "40",
-            "column_index_in_import_file": "received_date"
-        },
-        {
-            "column_in_doctype": "27",
-            "column_index_in_import_file": "paid_on_date"
-        },
-        {
-            "column_in_doctype": "24",
-            "column_index_in_import_file": "claim_submitted_date"
-        },
-        {
-            "column_in_doctype": "18",
-            "column_index_in_import_file": "final_bill_date"
-        },
-        {
-            "column_in_doctype": "42",
-            "column_index_in_import_file": "is_admitted"
-        },
-        {
-            "column_in_doctype": "44",
-            "column_index_in_import_file": "case_closed_in_preauth"
-        },
-              {
-            "column_in_doctype": "23",
-            "column_index_in_import_file": "current_state_time"
-        },
-        {
-            "column_in_doctype": "41",
-            "column_index_in_import_file": "preauth_submitted_date_time"
-        },
-        {
-            "column_in_doctype": "28",
-            "column_index_in_import_file": "requested_amount"
-        },
-        {
-            "column_in_doctype": "20",
-            "column_index_in_import_file": "claim_amount"
-        },        {
-            "column_in_doctype": "29",
-            "column_index_in_import_file": "approved_amount"
-        },
-        {
-            "column_in_doctype": "31",
-            "column_index_in_import_file": "settled_amount"
-        },
-        {
-            "column_in_doctype": "34",
-            "column_index_in_import_file": "tds_amount"
-        },
-        {
-            "column_in_doctype": "35",
-            "column_index_in_import_file": "tpa_shortfall_amount"
-        },
-        {
-            "column_in_doctype": "19",
-            "column_index_in_import_file": "final_bill_amount"
-        },        {
-            "column_in_doctype": "39",
-            "column_index_in_import_file": "forwarded_to_claims_date"
-        },
-        {
-            "column_in_doctype": "30",
-            "column_index_in_import_file": "provisional_bill_amount"
-        },
-        {
-            "column_in_doctype": "33",
-            "column_index_in_import_file": "patient_paid"
-        },
-              {
-            "column_in_doctype": "32",
-            "column_index_in_import_file": "patient_payable"
-        },
-        {
-            "column_in_doctype": "38",
-            "column_index_in_import_file": "tracking_number"
-        },
-        {
-            "column_in_doctype": "46",
-            "column_index_in_import_file": "sub_date"
-        },
-              {
-            "column_in_doctype": "47",
-            "column_index_in_import_file": "remarks"
-        },
-                    {
-            "column_in_doctype": "48",
-            "column_index_in_import_file": "file_size"
-        },
-        {
-            "column_in_doctype": "50",
-            "column_index_in_import_file": "hash"
-        },
-        {
-            "column_in_doctype": "51",
-            "column_index_in_import_file": "file_upload"
-        },        {
-            "column_in_doctype": "52",
-            "column_index_in_import_file": "transform"
-        },
-        {
-            "column_in_doctype": "53",
-            "column_index_in_import_file": "index"
-        }
-
+      {
+        "column_index_in_import_file": "0",
+        "column_in_doctype": "hospital"
+      },
+      {
+        "column_index_in_import_file": "1",
+        "column_in_doctype": "preauth_claim_id"
+      },
+      {
+        "column_index_in_import_file": "2",
+        "column_in_doctype": "mrn"
+      },
+      {
+        "column_index_in_import_file": "3",
+        "column_in_doctype": "doctor"
+      },
+      {
+        "column_index_in_import_file": "4",
+        "column_in_doctype": "department"
+      },
+      {
+        "column_index_in_import_file": "5",
+        "column_in_doctype": "case_id"
+      },
+      {
+        "column_index_in_import_file": "6",
+        "column_in_doctype": "first_name"
+      },
+      {
+        "column_index_in_import_file": "26",
+        "column_in_doctype": "utr_number"
+      },
+      {
+        "column_index_in_import_file": "22",
+        "column_in_doctype": "current_workflow_state"
+      },
+      {
+        "column_index_in_import_file": "17",
+        "column_in_doctype": "final_bill_number"
+      },
+      {
+        "column_index_in_import_file": "45",
+        "column_in_doctype": "unique_id"
+      },
+      {
+        "column_index_in_import_file": "11",
+        "column_in_doctype": "is_bulk_closure"
+      },
+      {
+        "column_index_in_import_file": "7",
+        "column_in_doctype": "tpa_name"
+      },
+      {
+        "column_index_in_import_file": "8",
+        "column_in_doctype": "insurance_company_name"
+      },
+      {
+        "column_index_in_import_file": "9",
+        "column_in_doctype": "tpa_member_id"
+      },
+      {
+        "column_index_in_import_file": "10",
+        "column_in_doctype": "insurance_policy_number"
+      },
+      {
+        "column_index_in_import_file": "38",
+        "column_in_doctype": "tracking_number"
+      },
+      {
+        "column_index_in_import_file": "12",
+        "column_in_doctype": "al_number"
+      },
+      {
+        "column_index_in_import_file": "13",
+        "column_in_doctype": "cl_number"
+      },
+      {
+        "column_index_in_import_file": "25",
+        "column_in_doctype": "reconcilled_status"
+      },
+      {
+        "column_index_in_import_file": "16",
+        "column_in_doctype": "room_type"
+      },
+      {
+        "column_index_in_import_file": "43",
+        "column_in_doctype": "visit_type"
+      },
+      {
+        "column_index_in_import_file": "37",
+        "column_in_doctype": "courier_vendor"
+      },
+      {
+        "column_index_in_import_file": "21",
+        "column_in_doctype": "current_request_type"
+      },
+      {
+        "column_index_in_import_file": "14",
+        "column_in_doctype": "doa"
+      },
+      {
+        "column_index_in_import_file": "15",
+        "column_in_doctype": "dod"
+      },
+      {
+        "column_index_in_import_file": "39",
+        "column_in_doctype": "sent_date"
+      },
+      {
+        "column_index_in_import_file": "40",
+        "column_in_doctype": "received_date"
+      },
+      {
+        "column_index_in_import_file": "27",
+        "column_in_doctype": "paid_on_date"
+      },
+      {
+        "column_index_in_import_file": "24",
+        "column_in_doctype": "claim_submitted_date"
+      },
+      {
+        "column_index_in_import_file": "18",
+        "column_in_doctype": "final_bill_date"
+      },
+      {
+        "column_index_in_import_file": "42",
+        "column_in_doctype": "is_admitted"
+      },
+      {
+        "column_index_in_import_file": "44",
+        "column_in_doctype": "case_closed_in_preauth"
+      },
+      {
+        "column_index_in_import_file": "23",
+        "column_in_doctype": "current_state_time"
+      },
+      {
+        "column_index_in_import_file": "41",
+        "column_in_doctype": "preauth_submitted_date_time"
+      },
+      {
+        "column_index_in_import_file": "28",
+        "column_in_doctype": "requested_amount"
+      },
+      {
+        "column_index_in_import_file": "20",
+        "column_in_doctype": "claim_amount"
+      },
+      {
+        "column_index_in_import_file": "29",
+        "column_in_doctype": "approved_amount"
+      },
+      {
+        "column_index_in_import_file": "31",
+        "column_in_doctype": "settled_amount"
+      },
+      {
+        "column_index_in_import_file": "34",
+        "column_in_doctype": "tds_amount"
+      },
+      {
+        "column_index_in_import_file": "35",
+        "column_in_doctype": "tpa_shortfall_amount"
+      },
+      {
+        "column_index_in_import_file": "19",
+        "column_in_doctype": "final_bill_amount"
+      },
+      {
+        "column_index_in_import_file": "39",
+        "column_in_doctype": "forwarded_to_claims_date"
+      },
+      {
+        "column_index_in_import_file": "30",
+        "column_in_doctype": "provisional_bill_amount"
+      },
+      {
+        "column_index_in_import_file": "33",
+        "column_in_doctype": "patient_paid"
+      },
+      {
+        "column_index_in_import_file": "32",
+        "column_in_doctype": "patient_payable"
+      },
+      {
+        "column_index_in_import_file": "38",
+        "column_in_doctype": "tracking_number"
+      },
+      {
+        "column_index_in_import_file": "46",
+        "column_in_doctype": "sub_date"
+      },
+      {
+        "column_index_in_import_file": "47",
+        "column_in_doctype": "remarks"
+      },
+      {
+        "column_index_in_import_file": "48",
+        "column_in_doctype": "file_size"
+      },
+      {
+        "column_index_in_import_file": "50",
+        "column_in_doctype": "hash"
+      },
+      {
+        "column_index_in_import_file": "51",
+        "column_in_doctype": "file_upload"
+      },
+      {
+        "column_index_in_import_file": "52",
+        "column_in_doctype": "transform"
+      },
+      {
+        "column_index_in_import_file": "53",
+        "column_in_doctype": "index"
+      }
     ]
-},
-{
+  },
+  {
     "doctype": "Data Import Mapping",
     "name": "Bank Transaction Staging",
     "mapping_columns": [
-        {
-            "column_in_doctype": "6",
-            "column_index_in_import_file": "source"
-        },
-        {
-            "column_in_doctype": "0",
-            "column_index_in_import_file": "date"
-        },
-        {
-            "column_in_doctype": "7",
-            "column_index_in_import_file": "bank_account"
-        },
-              {
-            "column_in_doctype": "3",
-            "column_index_in_import_file": "deposit"
-        },
-                    {
-            "column_in_doctype": "4",
-            "column_index_in_import_file": "withdrawal"
-        },
-        {
-            "column_in_doctype": "1",
-            "column_index_in_import_file": "description"
-        },
-        {
-            "column_in_doctype": "8",
-            "column_index_in_import_file": "reference_number"
-        },
-        {
-            "column_in_doctype": "2",
-            "column_index_in_import_file": "source_reference_number"
-        },
-        {
-            "column_in_doctype": "5",
-            "column_index_in_import_file": "search"
-        },        {
-            "column_in_doctype": "9",
-            "column_index_in_import_file": "internal_id"
-        },
-        {
-            "column_in_doctype": "10",
-            "column_index_in_import_file": "file_upload"
-        },
-        {
-            "column_in_doctype": "11",
-            "column_index_in_import_file": "transform"
-        },
-        {
-            "column_in_doctype": "12",
-            "column_index_in_import_file": "index"
-        }
-
+      {
+        "column_index_in_import_file": "6",
+        "column_in_doctype": "source"
+      },
+      {
+        "column_index_in_import_file": "0",
+        "column_in_doctype": "date"
+      },
+      {
+        "column_index_in_import_file": "7",
+        "column_in_doctype": "bank_account"
+      },
+      {
+        "column_index_in_import_file": "3",
+        "column_in_doctype": "deposit"
+      },
+      {
+        "column_index_in_import_file": "4",
+        "column_in_doctype": "withdrawal"
+      },
+      {
+        "column_index_in_import_file": "1",
+        "column_in_doctype": "description"
+      },
+      {
+        "column_index_in_import_file": "8",
+        "column_in_doctype": "reference_number"
+      },
+      {
+        "column_index_in_import_file": "2",
+        "column_in_doctype": "source_reference_number"
+      },
+      {
+        "column_index_in_import_file": "5",
+        "column_in_doctype": "search"
+      },
+      {
+        "column_index_in_import_file": "9",
+        "column_in_doctype": "internal_id"
+      },
+      {
+        "column_index_in_import_file": "10",
+        "column_in_doctype": "file_upload"
+      },
+      {
+        "column_index_in_import_file": "11",
+        "column_in_doctype": "transform"
+      },
+      {
+        "column_index_in_import_file": "12",
+        "column_in_doctype": "index"
+      }
     ]
-},
+  },
   {
     "doctype": "Data Import Mapping",
     "name": "Bill Adjustment",
     "mapping_columns": [
-        {
-            "column_in_doctype": "0",
-            "column_index_in_import_file": "bill"
-        },
-        {
-            "column_in_doctype": "1",
-            "column_index_in_import_file": "tds"
-        },
-        {
-            "column_in_doctype": "2",
-            "column_index_in_import_file": "disallowance"
-        },
-              {
-            "column_in_doctype": "3",
-            "column_index_in_import_file": "posting_date"
-        },
-                    {
-            "column_in_doctype": "4",
-            "column_index_in_import_file": "source_file"
-        },
-        {
-            "column_in_doctype": "5",
-            "column_index_in_import_file": "file_upload"
-        }
-
+      {
+        "column_index_in_import_file": "0",
+        "column_in_doctype": "bill"
+      },
+      {
+        "column_index_in_import_file": "1",
+        "column_in_doctype": "tds"
+      },
+      {
+        "column_index_in_import_file": "2",
+        "column_in_doctype": "disallowance"
+      },
+      {
+        "column_index_in_import_file": "3",
+        "column_in_doctype": "posting_date"
+      },
+      {
+        "column_index_in_import_file": "4",
+        "column_in_doctype": "source_file"
+      },
+      {
+        "column_index_in_import_file": "5",
+        "column_in_doctype": "file_upload"
+      }
     ]
-},
+  },
   {
     "doctype": "Settlement Advice Configuration",
     "name": "Settlement Advice Configuration",
-    "header_row_patterns": "[\"CLAIM NO\",\"Claim Number\",\"Claimno\",\"ClaimId\",\"CCNNumber\",\"al_number\",\"AL-Number\",\"AL Number\",\"Insurer Claim Number\",\"Insurance Claim No\",\"PreAuth Number\",\"PA No\",\"preauthid\",\"FIR\",\"Case Id\",\"CCN\",\"File No\",\"INTIMATION_NUM\",\"INSURER_CLAIM_NO\", \"Ref Id\",\"Ref No.\",\"Case Number\"]",
-    "target_columns": "{\n    \"claim_id\":[[\"PreAuth Number\",\"PA No\",\"preauthid\",\"al_number\",\"AL-Number\",\"AL Number\",\"Insurer Claim Number\",\"InsurerClaimID\",\"Insurance Claim No\",\"INSURER_CLAIM_NO\",\"AL/ Cashless Authorisation No\"],[ \"FIR\",\"Case Id\",\"CCN\",\"File No\",\"CLAIM NO\", \"CCNNumber\",\"Claim Number\",\"Claimno\",\"ClaimId\", \"INTIMATION_NUM\", \"Ref Id\", \"Ref No.\",\"Case Number\"]],\n    \"claim_amount\":[\"Amount Intim\",\"AL_AMOUNT\",\"GROSS AMOUNT\",\"Claim-Amount Claimed\", \"Lodge_Amount\",\"Request Amount\",\"Request_Amount\",\"claim_amount\", \"Claimed Amount\",\"Claim Amt\",\"Claimed Amt\",\"Claim Initiation Amount\",\"Sum of Claimed Amount\",\"Claim Amt\",\"Request_Amount\",\"Claimed amount (A)\",\"Claim Amount\",\"Approved Amount\",\"claimamount\",\"claimedamount\",\"CLAIMED_AMOUNT\",\"ClaimedAmt\",\"Bill Amt.\",\"App. Amt.\",\"App Amt(INR)\"],\n    \"utr_number\":[\"Claim UTR Number\", \"Fund Transfer No.\",\"utr_number\",\"UTR Number\",\"UTR NO\",\"Cheque/ NEFT/ UTR No.\", \"UTR_NO\",\"UTR\",\"Cheque/NEFT No\",\"UTR No\", \"UTR/Chq No.\",\"NEFT Transaction Number\",\"Payment_Reference_Number\",\"UTR/Chq No.\",\"Cheque/NEFT Number\",\"Claim-Cheque Number\", \"Cheque_No\",\"Cheque Number\",\"Chq No\",\"CHEQUE_NUM\",\"Instrument/NEFT No\",\"E-Transaction No./ChequeNo\",\"Map Cheque/NEFT Number\",\"Chequeno\",\"TRASACTION_NO\",\"Bank EFT Ref Id.\"],\n    \"disallowed_amount\":[\"total_disallowance\",\"Claim-Disallowed Amount\", \"Deductable Amount\",\"Deduction\",\"Disallowed Amount\",\"Shortfall Amount\",\"Disallowance\",\"Deduction_Amount (B)\",\"totaldisallowances\",\"FinalDisallowedAmt\",\"DISC_AMT\",\"AMOUNT_DEDUCTED\"],\n    \"payers_remark\":[\"Claim-Disallowed Reasons\", \"Deductable Reason\",\"Dis Allowence Reason1\",\"Deduction Details\",\"Payers Remark\",\"Deduction Reason\",\"Reason For Disallowance\",\"DEDUCTED_REMARKS\",\"Claim-Disallowed Reasons\",\"REASONS\",\"Remarks_of_TPA\"],\n    \"settled_amount\":[[\"Cheque Amount\",\"Paid_Amount\",\"Net Amount Paid\",\"Net Approved Amt\",\"ECS_Amount\"],[\"Amount Paid\",\"Claim-Transferred Amt\",\"AMOUNT_PAID\",\"Claim Net Pay Amount\",\"Final Payment\",\"ClaimNetPayAmount\",\"Total_amount_Claim_Paid\",\"Total Amount Paid\",\"Passed Amount\", \"NetPaybleAmount (J)=(G-I)\",\"paidamount\",\"Net Payable\",\"NETPAYBLE\",\"settled_amount\",\"Settled Amount\",\"Settled Amt\",\"Sum of Settled Amount\",\"settledamt\",\"NET AMOUNT\",\"PassedAmt\",\"Net Approved Amt\",\"Approved_Amount\",\"ApprovedAmt\",\"Claim Amount\",\"Claim Approved Amount\"]],\n    \"tds_amount\":[\"tds_amount\",\"TDS AMOUNT\",\"Claim-TDS Amt\", \"TDS_Amount\",\"TDS Amount\",\"TDS_AMT\",\"TDS Amount\",\"T.D.S.\",\"TDS Amount\",\"Sum of TDS Amount\",\"TDS Amt\", \"Tds\",\"TDS_Rs\",\"TDS_Amount (I) = (G*H)\",\"TDS\",\"Tax Deducted\",\"DeductionAmt\"],\n    \"claim_status\":[\"Claim Status\",\"portal_status\",\"NEW_STATUS\",\"CLAIMStatusNM\",\"Claim-Status\", \"Claim-Status\",\"Claim Status\", \"Status\",\"Status Name\",\"Status\",\"Claim Status\"],\n    \"paid_date\":[\"Claim Paid Date\",\"paid_on_date\",\"TRANSFER DATE\",\"paid_date\",\"Cheque/ NEFT/ UTR Date\",\"DT_OF_PAYMENT\",\"Cheque Date\",\"Settlement Date\",\"Cheque/NEFT Date\",\"Claim Paid Date\",\"UTR Date\",\"UTR Date/Chq Date\",\"Chq Date\",\"NEFT/RTGS Date\",\"Chequedate\",\"UTR_Dt\",\"CHEQUE_DT\",\"Cheque/NEFT Date\",\"CHEQUE_DT\",\"Instrument/NEFT Date\",\"E- Transaction Date/Cheque Date\",\"Paid Date\",\"Map Cheque/NEFT Date\",\"PAYMENT_TRANSACTION_DATE\",\"Date of Transaction\",\"Claim-Cheque Date\",\"Date_Of_Payment\",\"Payment Confirmation Time\",\"EFT Creation Time\"],\n    \"bill_number\":[\"bill no.\",\"bill number\",\"bill\",\"final_bill_number\",\"Billno\",\"Bill No\"]\n}",
-    "char_to_replace_in_header": "[\" \",\"-\",\"/\",\"_\",\"\\'\",\"\\\"\",\".\",\"(\",\")\",\"₹\",\"`\",\"<\",\">\",\"?\",\":\",\";\",\"[\",\"]\",\"{\",\"}\",\"|\",\"+\",\"=\",\"*\",\"&\",\"^\",\"%\",\"$\",\"#\",\"@\",\"!\",\"~\"]"
-  }
+    "header_row_patterns": "[\"alnumber\", \"preauthnumber\", \"pano\", \"preauthid\", \"alcashlessauthorisationno\", \"ccn\", \"ccnno\", \"fileno\", \"paclaimid\", \"incidentno\", \"refid\", \"uhid\", \"casenumber\", \"fir\", \"insurerclaimnumber\", \"ccnnumber\", \"insuranceclaimno\", \"caseid\", \"intimationnum\", \"refno\",\"claimnumber\", \"claimid\", \"claimno\", \"insurerclaimno\", \"tpaclaimno\", \"refccn\", \"insurerclaimid\", \"memberidtpa\"]",
+    "target_columns": "{\r\n\"cl_number\": [\"claimnumber\", \"claimid\", \"claimno\", \"insurerclaimno\", \"refccn\", \"insurerclaimid\", \"memberidtpa\"],\r\n\r\n\"claim_id\": [[\"alnumber\", \"preauthnumber\", \"pano\", \"preauthid\", \"alcashlessauthorisationno\", \"ccn\", \"ccnno\", \"fileno\", \"paclaimid\", \"incidentno\", \"refid\", \"uhid\", \"casenumber\",\"fir\", \"insurerclaimnumber\", \"ccnnumber\", \"tpaclaimno\", \"insuranceclaimno\", \"caseid\"],[\"insuranceclaimno\", \"caseid\", \"claimnumber\", \"claimid\",\"claimno\", \"insurerclaimno\", \"insurerclaimid\", \"refccn\"]],\r\n\r\n\"bill_number\": [\"billno\", \"billnumber\", \"bill\", \"finalbillnumber\"],\r\n\r\n\"mrn\": [\"patientidnumber\", \"patientipnumber\", \"inpatientnumber\", \"branchmrnno\", \"ipnumber\"],\r\n\r\n\"utr_number\": [\"utr\", \"claimchequenumber\", \"instrumentneftno\", \"chequeneftutrno\", \"utrno\", \"chequeno\", \"chequenumber\", \"etransactionnochequeno\", \"mapchequeneftnumber\", \"utrnumber\", \"trasactionno\", \"paymentreferencenumber\", \"fundtransferno\", \"nefttransactionnumber\", \"utrchqno\", \"ddchequeecsrefno\", \"paymenttransactionidutr\", \"instrumentno\", \"bankeftrefid\", \"paymentutr\", \"claimutrnumber\", \"chequeneftno\", \"chequeneftnumber\", \"chqno\", \"chequenum\", \"chqutrno\", \"rumentno\", \"cdsdsa\", \"neftchqddrefno\"],\r\n\r\n\"claim_status\": [\"statusname\", \"status\", \"claimstatus\", \"finalstatus\", \"interimstatus\", \"portalstatus\", \"newstatus\", \"claimstatusnm\"],\r\n\r\n\"paid_date\": [\"settlementdate\", \"chequeneftutrdate\", \"dtofpayment\", \"utrdt\", \"chequedate\", \"transferdate\", \"chequeneftno\", \"claimchequedate\", \"etransactiondatechequedate\", \"mapchequeneftdate\", \"utrdate\", \"paymenttransactiondate\", \"dateofpayment\", \"dateoftransaction\", \"neftrtgsdate\", \"utrdatechqdate\", \"chequeddecsdate\", \"paiddate\", \"paymentdate\", \"paymentconfirmationtime\", \"claimpaiddate\", \"instrumentneftdate\", \"paidondate\", \"chequeneftdate\", \"chqdate\", \"chequedt\", \"eftcreationtime\",  \"chqutrdate\", \"utrnoupdatedate\", \"dateneftchqdd\"],\r\n\r\n\"insurance_company\": [\"insurancecompany\", \"insurancecompanyname\", \"nameofinsuranceco\", \"icname\", \"inscompname\", \"insurername\", \"insurancename\", \"insurer\", \"payorname\", \"tpaname\", \"tpabranchname\"],\r\n\r\n\"patient_name\": [\"patientname\", \"name\", \"claimantname\", \"nameoftheinsured\", \"insuredname\", \"nameofpatient\", \"patient\"],\r\n\r\n\"insurance_policy_number\": [\"policynumber\"],\r\n\r\n\"doa\": [\"dateofadmission\", \"doa\", \"claimdateofadmission\", \"dtofadmission\", \"cddoa\", \"admissiondate\", \"admdate\", \"doaopdtreatmentfrom\", \"hospfrom\"],\r\n\r\n\"dod\": [\"dateofdischarge\", \"dod\", \"dtofdischarge\", \"cddod\", \"disdate\", \"claimdateofdischarge\", \"dodopdtreatmentto\", \"hospto\", \"dischargedate\"],\r\n\r\n\"hospital_name\": [\"providername\", \"hospitalname\", \"hospname\", \"claimhospitalname\", \"nameofthehospital\", \"nameofthepayee\", \"payeename\"],\r\n\r\n\"bank_account_no\": [\"bankacno\", \"bankaccountno\", \"payeebankaccount\", \"accountno\", \"accountnumber\", \"accno\", \"payeeaccount\", \"payeebankaccno\"],\r\n\r\n\"bank_name\": [\"bankname\", \"bank\", \"payeebankname\"],\r\n\r\n\"bank_branch\": [\"bankbranchname\", \"payebankbranchname\", \"branch\", \"accountbranch\"],\r\n\r\n\"claim_amount\": [\"claimamount\", \"claimedamount\", \"sumofclaimedamount\", \"alamount\", \"lodgeamount\", \"grossamount\", \"claimamt\", \"claimedamt\", \"claimamountclaimed\", \"claimedamounta\", \"requestamount\", \"payeramount\", \"totalamountclaimed\", \"amountclaimed\", \"claimapprovalamount\", \"approvedamount\", \"appamt\", \"amountintim\", \"claiminitiationamount\", \"billamt\", \"appamtinr\", \"grossamt\"],\r\n\r\n\"settled_amount\": [[\"claimnetpayamount\", \"settledamount\", \"sumofsettledamount\", \"amountpaid\", \"ecsamount\", \"paidamount\", \"netamount\", \"chequeamount\", \"settledamt\", \"netamountpaid\", \"claimtransferredamt\", \"netpaybleamountjgi\", \"totalamountpaid\", \"totalamountclaimpaid\", \"netpayable\", \"passedamount\", \"netapprovedamt\", \"ecsamt\", \"finalpayableamount\", \"passedamt\", \"netamountpaidincludinggstaftertds\", \"netpayble\", \"paidamountaftertax\", \"amtcredited\", \"amountpaidtohospital\", \"finalpayment\", \"transferedamount\", \"netpaidamount\", \"netclaimpayableaftertds\"], [\"approvedamt\", \"approvedamount\", \"claimamount\", \"claimapprovedamount\"]],\r\n\r\n\"tds_amount\": [\"tds\", \"tdsamount\", \"sumoftdsamount\", \"tdsamt\", \"claimtdsamt\", \"tdsamountigh\", \"tdsrs\", \"taxdeducted\", \"tdstds\", \"tdsforcashlessclaim\"],\r\n\r\n\"disallowed_amount\": [\"shortfallamount\", \"deductableamount\", \"totaldeductions\", \"deduction\", \"totaldisallowances\", \"deductionamt\", \"disallowedamount\", \"claimdisallowedamount\", \"finaldisallowedamt\", \"deductionamountb\", \"amountdeducted\", \"totaldisallowance\", \"disallowance\", \"discamt\"],\r\n\r\n\"payers_remark\": [\"deductablereason\", \"deduction\", \"disallowencereason1\", \"claimdisallowedreasons\", \"deductionreason\", \"deductiondetails\", \"reasonfordisallowance\", \"deductedremarks\", \"payersremark\", \"reasons\", \"remarksoftpa\"],\r\n\r\n\"tds_percentage\": [\"tdsdeduction\"]\r\n}",
+    "char_to_replace_in_header": "[\" \",\"-\",\"/\",\"_\",\"\\'\",\"\\\"\",\".\",\"(\",\")\",\"₹\",\"`\",\"<\",\">\",\"?\",\":\",\";\",\"[\",\"]\",\"{\",\"}\",\"|\",\"+\",\"=\",\"*\",\"&\",\"^\",\"%\",\"$\",\"#\",\"@\",\"!\",\"~\"]",
+    "tpa": [
+      {
+        "customer": "Family Health Plan TPA Ltd"
+      },
+      {
+        "customer": "Ericson Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "KASP-PMJAY"
+      },
+      {
+        "customer": "ECHS"
+      },
+      {
+        "customer": "Medisep"
+      },
+      {
+        "customer": "CHIEF MINISTERS COMPREHENSIVE HEALTH INS SCHEME"
+      },
+      {
+        "customer": "IFFCO TOKIO GENERAL INSURANCE COMPANY"
+      },
+      {
+        "customer": "SBI GENERAL INSURANCE CO LTD"
+      },
+      {
+        "customer": "Volo Health Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "Medsave TPA Healthcare TPA Ltd"
+      },
+      {
+        "customer": "Genins India TPA Ltd"
+      },
+      {
+        "customer": "Raksha Health Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "Heritage Health TPA P Ltd"
+      },
+      {
+        "customer": "Niva Bupa Health Insurance"
+      },
+      {
+        "customer": "Health India Insurance TPA Services Pvt Ltd"
+      },
+      {
+        "customer": "Health India Insurance TPA"
+      },
+      {
+        "customer": "Healthindia Insurance TPA Services Pvt Ltd"
+      },
+      {
+        "customer": "Star Health & Allied Insurance Co Ltd"
+      },
+      {
+        "customer": "Health Insurance TPA of India Ltd"
+      },
+      {
+        "customer": "GOOD HEALTH INSURANCE TPA LIMITED"
+      },
+      {
+        "customer": "Reliance General Insurance Co. Ltd"
+      },
+      {
+        "customer": "Reliance Industries Ltd"
+      },
+      {
+        "customer": "Care Health Insurance Limited"
+      },
+      {
+        "customer": "Paramount Health Services TPA Ltd"
+      },
+      {
+        "customer": "Bajaj Allianz General Insurance"
+      },
+      {
+        "customer": "MD India Healthcare TPA Service Ltd"
+      },
+      {
+        "customer": "Mediassist India TPA P Ltd"
+      },
+      {
+        "customer": "HDFC ERGO GENERAL INSURANCE CO LTD"
+      },
+      {
+        "customer": "Safeway Insurance TPA Pvt Ltd"
+      },
+      {
+        "customer": "Safeway TPA Services Ltd"
+      },
+      {
+        "customer": "ICICI Lombard General Insurance"
+      },
+      {
+        "customer": "ICICI Prudential General Insurance"
+      },
+      {
+        "customer": "VIDAL HEALTH TPA PVT LTD"
+      },
+      {
+        "customer": "Manual"
+      },
+      {
+        "customer": "National Insurance Company Limited"
+      },
+      {
+        "customer": "Liberty General Insurance Limited"
+      },
+      {
+        "customer": "Future Generali General Insurance"
+      }
+    ],
+    "calculate_settled_amount": [
+      {
+        "has_tds_percentage": 0,
+        "tpa": "IFFCO TOKIO GENERAL INSURANCE COMPANY"
+      },
+      {
+        "has_tds_percentage": 1,
+        "tpa": "Care Health Insurance Limited"
+      }
+    ]
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_referencetable",
+    "fieldname": "custom_referencetable",
+    "fieldtype": "HTML",
+    "label": "ReferenceTable",
+    "insert_after": "custom_section_break_xyfew"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_reference_matcher",
+    "fieldname": "custom_reference_matcher",
+    "fieldtype": "HTML",
+    "label": "Matcher Reference",
+    "insert_after": "custom_referencetable"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_settled_amount",
+    "fieldname": "custom_settled_amount",
+    "fieldtype": "HTML",
+    "label": "Settled Amount",
+    "insert_after": "customer"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_tds_amount",
+    "fieldname": "custom_tds_amount",
+    "fieldtype": "HTML",
+    "label": "Total TDS Amount",
+    "insert_after": "posting_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_disallowance_amount",
+    "fieldname": "custom_disallowance_amount",
+    "fieldtype": "HTML",
+    "label": "Total Disallowance Amount",
+    "insert_after": "total"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_writeoff_amount",
+    "fieldname": "custom_writeoff_amount",
+    "fieldtype": "HTML",
+    "label": "Total WriteOff Amount",
+    "insert_after": "outstanding_amount"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_settled_amount",
+    "fieldname": "custom_total_settled_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label": "Total Settled Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_tds_amount",
+    "fieldname": "custom_total_tds_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label": "Total TDS Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_disallowance_amount",
+    "fieldname": "custom_total_disallowance_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label": "Total Disallowance Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_total_writeoff_amount",
+    "fieldname": "custom_total_writeoff_amount",
+    "fieldtype": "Currency",
+    "options": "currency",
+    "label": "Total WriteOff Amount",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_matcher_reference",
+    "fieldname": "custom_matcher_reference",
+    "fieldtype": "Table",
+    "options": "Matcher Reference",
+    "label": "Matcher Reference",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_reference",
+    "fieldname": "custom_reference",
+    "fieldtype": "Table",
+    "label": "Reference",
+    "options": "Sales Invoice Reference",
+    "hidden": "1"
+  },
+  {
+    "doctype": "Client Script",
+    "name": "Sales Invoice custom table",
+    "owner": "Administrator",
+    "creation": "2024-07-14 10:43:03.166280",
+    "modified": "2024-08-08 20:07:45.953431",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "dt": "Sales Invoice",
+    "view": "Form",
+    "script": "frappe.ui.form.on('Sales Invoice', {\r\n    refresh: function (frm) {\r\n        // Fetch default currency\r\n        let currency = frappe.defaults.get_default(\"currency\");\r\n\r\n        frappe.call({\r\n            method: 'agarwals.utils.invoice_reference.get_sales_invoice_references',\r\n            args: {\r\n                doc_name: frm.doc.name,\r\n                jv_ac_name: 'Debtors - A'\r\n            },\r\n            callback: function (r) {\r\n                // Function to format amounts as currency\r\n                function formatCurrency(amount) {\r\n                    return amount.toLocaleString(currency, { style: 'currency', currency: currency });\r\n                }\r\n                \r\n                // Cal  culate the totals for each amount\r\n                    let total_settled_amount = 0;\r\n                    let total_disallowance_amount = 0;\r\n                    let total_tds_amount = 0;\r\n                    let total_writeoff_amount = 0;\r\n                    \r\n                    let sales_invoice_reference = r.message[0];\r\n    \r\n                    sales_invoice_reference.forEach(row => {\r\n                        total_settled_amount += row.settled_amount || 0;\r\n                        total_disallowance_amount += row.disallowance_amount || 0;\r\n                        total_tds_amount += row.tds_amount || 0;\r\n                        total_writeoff_amount += row.writeoff_amount || 0;\r\n                    });\r\n                    \r\n                    let settled_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Settled Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_settled_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let disallowance_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total Disallowance Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_disallowance_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let tds_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total TDS Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_tds_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    let writeoff_amount = `\r\n                        <div class=\"form-group\">\r\n                            <label class=\"control-label\">Total WriteOff Amount</label>\r\n                            <div class=\"control-input-wrapper\">\r\n                                <div class=\"control-value like-disabled-input\">${formatCurrency(total_writeoff_amount)}</div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n                    \r\n                frm.get_field('custom_settled_amount').html(settled_amount);\r\n                frm.get_field('custom_disallowance_amount').html(disallowance_amount);\r\n                frm.get_field('custom_tds_amount').html(tds_amount);\r\n                frm.get_field('custom_writeoff_amount').html(writeoff_amount);\r\n                    \r\n                    // Generate HTML table using provided Bootstrap structure\r\n                    let sales_invoice_table_html = `\r\n                    <label class=\"control-label\">Sales Invoice Reference</label>\r\n                        <div class=\"form-grid form-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\" title=\"Entry Type\">\r\n                                            <div class=\"static-area ellipsis\">Entry Type</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\" title=\"Entry Name\">\r\n                                            <div class=\"static-area ellipsis\">Entry Name</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"utr_date\" title=\"Utr Date\">\r\n                                            <div class=\"static-area ellipsis\">UTR Date</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\" title=\"UTR Number\">\r\n                                            <div class=\"static-area ellipsis\">UTR Number</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\" title=\"Settled Amount\">\r\n                                            <div class=\"static-area ellipsis\">Settled Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\" title=\"TDS Amount\">\r\n                                            <div class=\"static-area ellipsis\">TDS Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\" title=\"Disallowance Amount\">\r\n                                            <div class=\"static-area ellipsis\">Disallowance Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"allocated_amount\" title=\"Allocated Amount\">\r\n                                            <div class=\"static-area ellipsis\">Allocated Amount</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\" title=\"WriteOff Amount\">\r\n                                            <div class=\"static-area ellipsis\">Write Off</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\" title=\"Created Date\">\r\n                                            <div class=\"static-area ellipsis\">Posting Date</div>\r\n                                        </div>\r\n                                       \r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n\r\n                    sales_invoice_reference.forEach((row) => {\r\n                        sales_invoice_table_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_type\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/doctype/${row.entry_type}\" data-doctype=\"DocType\" data-name=\"${row.entry_type}\" data-value=\"${row.entry_type}\">${row.entry_type}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/${row.entry_type.toLowerCase().replace(/ /g, \"-\")}/${row.entry_name}\" data-doctype=\"${row.entry_type}\" data-name=\"${row.entry_name}\" data-value=\"${row.entry_name}\">${row.entry_name}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1 \" data-fieldname=\"utr_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"utr_number\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${row.utr_number}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"paid_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.settled_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"tds_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.tds_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"disallowance_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.disallowance_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"allocated_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.allocated_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-1\" data-fieldname=\"writeoff_amount\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            ${formatCurrency(row.writeoff_amount)}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"created_date\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        ${row.posting_date}\r\n                                        </div>\r\n                                    </div>\r\n                                    \r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    sales_invoice_table_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_referencetable').html(sales_invoice_table_html);\r\n                \r\n                    // Create Matcher Reference HTML table\r\n                    let matcher_reference = r.message[1];\r\n                    let matcher_reference_html = `\r\n                    <label class=\"control-label\">Matcher Reference</label>\r\n                        <div class=\"form-grid from-group\">\r\n                            <div class=\"grid-heading-row\">\r\n                                <div class=\"grid-row\">\r\n                                    <div class=\"data-row row\">\r\n                                        <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                            <span>No.</span>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"matcher_id\" title=\"ID\">\r\n                                            <div class=\"static-area ellipsis\">ID</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcher_logic\" title=\"Match Logic\">\r\n                                            <div class=\"static-area ellipsis\">Matcher Logic</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Settlement Advice</div>\r\n                                        </div>\r\n                                        <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advice\" title=\"Settlement Advice\">\r\n                                            <div class=\"static-area ellipsis\">Claimbook</div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"grid-body\">\r\n                                <div class=\"rows\">\r\n                    `;\r\n    \r\n                    matcher_reference.forEach((row, index) => {\r\n                        matcher_reference_html += `\r\n                            <div class=\"grid-row\">\r\n                                <div class=\"data-row row\">\r\n                                    <div class=\"row-index sortable-handle col col-xs-1\">\r\n                                        <span>${index + 1}</span>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"entry_name\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/matcher/${row.matcher_id.replace('/', \"%2F\")}\" >${row.matcher_id}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-2\" data-fieldname=\"matcer_logic\">\r\n                                        <div class=\"static-area ellipsis\">${row.matcher_logic}\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"settlement_advise\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                            <a href=\"/app/settlement-advice/${row.settlement_advice}\">${row.settlement_advice}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                    <div class=\"col grid-static-col col-xs-3\" data-fieldname=\"claimbook\">\r\n                                        <div class=\"static-area ellipsis\">\r\n                                        <a href=\"/app/claimbook/${row.claimbook}\">${row.claimbook}</a>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                            </div>\r\n                        `;\r\n                    });\r\n    \r\n                    matcher_reference_html += `\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    `;\r\n    \r\n                    frm.get_field('custom_reference_matcher').html(matcher_reference_html);\r\n                    \r\n            }\r\n        });\r\n    }\r\n});\r\n",
+    "enabled": 1
+  },
+  {"name":"HOOK-0002","owner":"Administrator","creation":"2024-08-06 18:54:47.196113","modified":"2024-08-06 19:05:18.100354","modified_by":"Administrator","docstatus":0,"idx":0,"naming_series":"HOOK-.####","webhook_doctype":"SA Downloader Run Log","webhook_docevent":"after_insert","enabled":0,"condition":"doc.status == 'Processed'","request_url":"https://techfinite.zulipchat.com/api/v1/external/slack_incoming?api_key=VUnQv9hLNRAPoNNaGBhWGOXgRVxepGHr&stream=445136&topic=SA+Bot","timeout":5,"request_method":"POST","request_structure":"JSON","enable_security":0,"webhook_json":"{\n \"text\": \"**Success** : {{doc.parent1}} ,Processed for Dr.Agarwals.\"\n}\n","meets_condition":"Select a document to check if it meets conditions.","preview_request_body":"Select a document to preview request data","doctype":"Webhook","webhook_headers":[{"name":"aq9onub167","owner":"Administrator","creation":"2024-08-06 18:54:47.196113","modified":"2024-08-06 19:05:18.100354","modified_by":"Administrator","docstatus":0,"idx":1,"key":"Content-Type","value":"application/json","parent":"HOOK-0002","parentfield":"webhook_headers","parenttype":"Webhook","doctype":"Webhook Header"}],"webhook_data":[],"__last_sync_on":"2024-08-08T13:17:13.938Z"},
+  {"name":"HOOK-0001","owner":"Administrator","creation":"2024-08-06 17:42:41.217099","modified":"2024-08-06 17:43:47.504307","modified_by":"Administrator","docstatus":0,"idx":0,"naming_series":"HOOK-.####","webhook_doctype":"SA Downloader Run Log","webhook_docevent":"after_insert","enabled":0,"condition":"doc.status == \"Error\"","request_url":"https://techfinite.zulipchat.com/api/v1/external/slack_incoming?api_key=VUnQv9hLNRAPoNNaGBhWGOXgRVxepGHr&stream=445136&topic=SA+Bot","timeout":10,"request_method":"POST","request_structure":"JSON","enable_security":0,"webhook_json":"{\n \"text\": \"**Error** : {{doc.parent1}} ,Check Error Log **{{doc.reference_name}}**  for Dr.Agarwals.\"\n}\n","meets_condition":"Select a document to check if it meets conditions.","preview_request_body":"Select a document to preview request data","doctype":"Webhook","webhook_headers":[{"name":"9g1scghi1b","owner":"Administrator","creation":"2024-08-06 17:42:41.217099","modified":"2024-08-06 17:43:47.504307","modified_by":"Administrator","docstatus":0,"idx":1,"key":"Content-Type","value":"application/json","parent":"HOOK-0001","parentfield":"webhook_headers","parenttype":"Webhook","doctype":"Webhook Header"}],"webhook_data":[],"__last_sync_on":"2024-08-08T13:20:46.035Z"}
 ]
 

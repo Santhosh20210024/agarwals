@@ -3,21 +3,18 @@ import frappe
 from frappe.core.doctype.data_import.data_import import start_import
 from agarwals.utils.file_util import SITE_PATH
 import os
+from agarwals.utils.error_handler import log_error as error_handler
 
 class Loader():
     def __init__(self,document_type):
         self.document_type = document_type
 
     def log_error(self, doctype_name, reference_name, error_message):
-        error_log = frappe.new_doc('Error Record Log')
-        error_log.set('doctype_name', doctype_name)
-        error_log.set('reference_name', reference_name)
-        error_log.set('error_message', error_message)
-        error_log.save()
+        error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
 
     def get_files_to_load(self):
         file_query = f"""SELECT 
-                            name,file_url,type
+                            name,file_url,type,parent
                         FROM 
                             `tabTransform` 
                         WHERE 
@@ -64,11 +61,17 @@ class Loader():
     def move_file(self,source_file,target_file):
         shutil.move(source_file,target_file)
 
-    def update_file_url(self,file,target_file,import_name):
-        file_list_name = frappe.get_list('File', filters = {'file_url':file['file_url'],'attached_to_doctype':'Data Import','attached_to_name':import_name},pluck = 'name')[0]
-        frappe.db.set_value("File", file_list_name, {'file_url':target_file,'folder':'Home/DrAgarwals/Load'})
-        frappe.db.set_value("Transform",file['name'],'file_url',target_file)
-        frappe.db.set_value("Data Import",import_name, 'import_file', target_file)
+    def update_file_url(self,file,target_file,import_name=None,status=None):
+        if status == 'Error':
+            file_doc = frappe.get_doc("File",{'attached_to_name':file['parent']})
+            frappe.db.set_value("File", file_doc.name, {'file_url': target_file, 'folder': 'Home/DrAgarwals/Load/Error'})
+        else:
+            file_list_name = frappe.get_list('File', filters = {'file_url':file['file_url'],'attached_to_doctype':'Data Import','attached_to_name':import_name},pluck = 'name')[0]
+            frappe.db.set_value("File", file_list_name, {'file_url':target_file,'folder':'Home/DrAgarwals/Load'})
+            frappe.db.set_value("Data Import",import_name, 'import_file', target_file)
+        frappe.db.set_value("Transform", file['name'], 'file_url', target_file)
+
+
 
     def delete_file_in_outside_folder(self, file_name,file):
         if file_name in os.listdir(SITE_PATH + '/private/files/'):
@@ -109,9 +112,13 @@ class Loader():
                 self.update_file_url(file, target_file, import_name)
                 self.delete_file_in_outside_folder(file_name,file)
             except Exception as e:
+                target_file = source_file.replace('/Transform/','/Load/Error/')
+                self.update_file_url(file, target_file,status = 'Error')
                 self.update_status('Transform', file['name'], 'Error')
                 self.log_error('Transform', file['name'], e)
             self.move_file(SITE_PATH + source_file, SITE_PATH + target_file)
+
+
 
 
 

@@ -1,5 +1,6 @@
 import frappe
 from agarwals.reconciliation.step.adjust_bill import JournalUtils
+from agarwals.utils.error_handler import log_error as error_handler
 
 
 class RoundOffCreation(JournalUtils):
@@ -17,12 +18,8 @@ class RoundOffCreation(JournalUtils):
                 self.save_je(je)
 
             except Exception as e:
-                error_log = frappe.new_doc('Error Record Log')
-                error_log.set('doctype_name', 'Journal Entry')
-                error_log.set('reference_name', invoice_.name)
-                error_log.set('error_message', '' + str(e))
-                error_log.save()
-            
+                error_handler(error=str(e), doc='Journal Entry', doc_name=invoice_.name)
+
 
 @frappe.whitelist()
 def run(_chunk_size):

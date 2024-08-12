@@ -31,11 +31,7 @@ class SalesInvoiceCreator:
                                     transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
                                     record=bill, index=sales_invoice_record.custom_index)
             except Exception as e:
-                error_log = frappe.new_doc('Error Record Log')
-                error_log.set('doctype_name', 'Bill')
-                error_log.set('reference_name', bill)
-                error_log.set('error_message', e)
-                error_log.save()
+                log_error(error=e, doc="Bill",doc_name=bill)
 
     def delete_sales_invoice_reference(self, bill):
         frappe.db.sql(f"DELETE FROM `tabSales Invoice Reference` WHERE parent = '{bill}'")
@@ -72,17 +68,14 @@ class SalesInvoiceCreator:
                         sales_invoice_record.cancel()
                     frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
-                    update_fiscal_year(sales_invoice_record,'Sales Invoice')
+                    if sales_invoice_record.status != 'Cancelled':
+                       update_fiscal_year(sales_invoice_record,'Sales Invoice')
                     
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                         transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
                                         record=bill_number, index=sales_invoice_record.custom_index)
                 except Exception as e:
-                    error_log = frappe.new_doc('Error Record Log')
-                    error_log.set('doctype_name', 'Bill')
-                    error_log.set('reference_name', bill_number)
-                    error_log.set('error_message', 'Unable to Create Sales Invoice: ' + str(e))
-                    error_log.save()
+                    log_error(error= 'Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
             chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
             chunk.update_status(chunk_doc, "Error")

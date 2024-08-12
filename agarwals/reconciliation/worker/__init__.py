@@ -23,10 +23,4 @@ def add(count, queue="cg_queue"):
         for i in range(worker_to_add):
             os.system(f"bench worker --queue {queue} --burst &")
     except Exception as e:
-        print("error")
         log_error(f"Error in Adding Worker: {e}")
-
-def kill(queue="cg_queue"):
-    current_worker = get_workers(get_queue(queue))
-    for worker in current_worker:
-        send_shutdown_command(get_redis_conn, worker.name)

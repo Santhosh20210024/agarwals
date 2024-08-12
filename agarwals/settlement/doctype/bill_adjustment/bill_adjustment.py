@@ -34,6 +34,7 @@ class BillAdjustment(Document):
 			self.status = 'Error'
 			self.error_remark = 'Paid Bill'
 			return
+
 		if sales_doc.status == 'Cancelled':
 			self.status = 'Error'
 			self.error_remark = 'Cancelled Bill'
@@ -86,3 +87,4 @@ class BillAdjustment(Document):
 			record=self.name,
 			index=self.index
 		)
+

@@ -15,11 +15,13 @@
   "bank_account",
   "wb_date",
   "wo_date",
+  "download_template",
   "upload",
   "is_bot",
   "is_mail",
   "column_break_ppbz4",
   "tpa_login_id",
+  "tpa_branch",
   "total_records",
   "insert_records",
   "update_records",
@@ -66,6 +68,7 @@
    "depends_on": "eval:doc.document_type=='Settlement Advice' ",
    "fieldname": "payer_type",
    "fieldtype": "Link",
+   "in_standard_filter": 1,
    "label": "Payer",
    "options": "Customer"
   },
@@ -77,9 +80,11 @@
    "options": "Bank Account"
   },
   {
+   "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
    "hidden": 1,
+   "in_standard_filter": 1,
    "label": "Status",
    "options": "Open\nIn Process\nPartial Success\nSuccess\nError\nZip"
   },
@@ -113,6 +118,7 @@
   {
    "fieldname": "file_format",
    "fieldtype": "Select",
+   "in_standard_filter": 1,
    "label": "File Format",
    "options": "\nEXCEL\nZIP"
   },
@@ -208,6 +214,7 @@
    "depends_on": "eval:doc.document_type=='Settlement Advice'",
    "fieldname": "is_bot",
    "fieldtype": "Check",
+   "in_standard_filter": 1,
    "label": "Is Bot"
   },
   {
@@ -267,6 +274,7 @@
    "depends_on": "eval:doc.document_type=='Settlement Advice'",
    "fieldname": "is_mail",
    "fieldtype": "Check",
+   "in_standard_filter": 1,
    "label": "Is Mail"
   },
   {
@@ -283,6 +291,13 @@
    "label": "TPA Login ID"
   },
   {
+   "depends_on": "eval:doc.document_type && doc.file_format == 'EXCEL'",
+   "fieldname": "download_template",
+   "fieldtype": "Button",
+   "label": "Download Template"
+  },
+  {
+   "depends_on": "eval:doc.is_bot == 1 && doc.file_format != 'ZIP'&& doc.document_type == 'Settlement Advice' ",
    "fieldname": "tpa_branch",
    "fieldtype": "Data",
    "label": "TPA Branch"
@@ -290,7 +305,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-17 12:52:33.895496",
+ "modified": "2024-08-06 16:01:12.414649",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",

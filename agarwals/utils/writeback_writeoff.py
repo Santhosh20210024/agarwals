@@ -1,6 +1,7 @@
 import frappe
 from agarwals.reconciliation.step.adjust_bill import JournalUtils
 from datetime import datetime
+from agarwals.utils.error_handler import log_error as error_handler
 
 @frappe.whitelist()
 def create_writeback_jv():
@@ -62,11 +63,7 @@ def reconcile_document(doctype, docname, payment_document,payment_entry,allocate
 
 
 def log_error(doctype,ref_name,error_message):
-    error_log = frappe.new_doc('Error Record Log')
-    error_log.set('doctype_name', doctype)
-    error_log.set('reference_name', ref_name)
-    error_log.set('error_message', '' + str(error_message))
-    error_log.save()
+    error_handler(error=str(error_message), doc=doctype, doc_name=ref_name)
 
 def update_doc_status(doctype,docname, status):
     document = frappe.get_doc(doctype, docname)
