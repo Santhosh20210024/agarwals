@@ -714,7 +714,7 @@ class AdjustmentTransformer(Transformer):
 
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,["bill_no","tds_amount","disallowed_amount","posting_date","source_file", 'file_upload', 'transform', 'index'])
+        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
         configuration = frappe.get_single('Bank Configuration')
         if "posting_date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
