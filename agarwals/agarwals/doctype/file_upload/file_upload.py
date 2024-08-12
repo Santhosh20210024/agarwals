@@ -280,7 +280,7 @@ class Fileupload(Document):
 		upload_columns = set(self.compress(upload_columns))
 		missing_in_upload = template_columns - upload_columns
 		if missing_in_upload:
-			return f'Templates are missing in the uploaded file: {missing_in_upload}'
+			return f'Columns are missing in the uploaded file: {missing_in_upload}'
 		else:
 			return None
 
