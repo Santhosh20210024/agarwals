@@ -1,3 +1,8 @@
+from .staging_transformer import StagingTransformer
+import frappe
+import re
+import json
+
 class BankTransformer(StagingTransformer):
     def __init__(self):
         super().__init__()

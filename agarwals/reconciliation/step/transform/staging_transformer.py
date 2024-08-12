@@ -1,4 +1,5 @@
 from .transformer import Transformer
+import pandas as pd
 
 class StagingTransformer(Transformer):
     def __init__(self):

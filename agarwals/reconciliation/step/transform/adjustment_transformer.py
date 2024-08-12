@@ -1,4 +1,6 @@
 from .transformer import Transformer
+import frappe
+
 
 class AdjustmentTransformer(Transformer):
     def __init__(self):

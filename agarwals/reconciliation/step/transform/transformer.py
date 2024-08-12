@@ -1,9 +1,8 @@
+import json
 import pandas as pd
 import frappe
 from datetime import date
 import hashlib
-import re
-import json
 from agarwals.utils.loader import Loader
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error as error_handler
@@ -52,8 +51,8 @@ class Transformer:
         return []
 
     def get_join_columns(self):
-        left_df_column = eval(self.loading_configuration.column_to_join['left'])
-        right_df_column = eval(self.loading_configuration.column_to_join['right'])
+        left_df_column = json.loads(self.loading_configuration.column_to_join.replace("'", '"'))["left"]
+        right_df_column = json.loads(self.loading_configuration.column_to_join.replace("'", '"'))["right"]
         return left_df_column, right_df_column
 
     def left_join(self,file):

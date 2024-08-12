@@ -4,7 +4,7 @@ HOME_PATH = "Home/DrAgarwals"
 SHELL_PATH = "private/files"
 SUB_DIR = ["Extract", "Transform", "Load", "Bin","CheckList","Settlement Advice","Zip"]
 INNER_SUB_DIR = ["Error"]
-SITE_PATH = "/home/frappe/frappe-bench/sites/agarwals.claimgenie.ai"
+SITE_PATH = "/home/balamurugan/work/transformer-refactoring/sites/agarwals.com"
 
 def construct_file_url(*args):
     list_of_items = []
