@@ -167,7 +167,7 @@ class Transformer:
             if file['upload'].lower().endswith('.csv'):
                 self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
             else:
-                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
+                 self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
             self.log_error(self.document_type, file['name'], e)
@@ -325,6 +325,9 @@ class Transformer:
             if column in df.columns:
                 df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
         return df
+
+    def extract(self):
+        pass
 
     def process(self, args):
         try:
