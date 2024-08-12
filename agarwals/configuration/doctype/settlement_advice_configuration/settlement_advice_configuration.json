@@ -9,6 +9,8 @@
  "field_order": [
   "header_row_patterns",
   "target_columns",
+  "tpa",
+  "calculate_settled_amount",
   "char_to_replace_in_header"
  ],
  "fields": [
@@ -26,12 +28,24 @@
    "fieldname": "char_to_replace_in_header",
    "fieldtype": "Code",
    "label": "Char to replace in header"
+  },
+  {
+   "fieldname": "tpa",
+   "fieldtype": "Table MultiSelect",
+   "label": "TPA's",
+   "options": "SA Configured Customers"
+  },
+  {
+   "fieldname": "calculate_settled_amount",
+   "fieldtype": "Table",
+   "label": "Calculate Settled Amount",
+   "options": "Settled Amount Calculation Configuration"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-02-15 19:41:54.472376",
+ "modified": "2024-07-30 18:05:43.489986",
  "modified_by": "Administrator",
  "module": "Configuration",
  "name": "Settlement Advice Configuration",

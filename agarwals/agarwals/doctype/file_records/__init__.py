@@ -13,4 +13,4 @@ def create(**kwargs):
         doc.insert(ignore_permissions=True)
         frappe.db.commit()
     except Exception as e:
-        log_error(f"cannot insert File Records due to error: {e}", doc_name, None)
+        log_error(f"cannot insert File Records due to error: {e}", doc_name, f"{kwargs['file_upload']}-{kwargs['reference_doc']}-{kwargs['record']}")

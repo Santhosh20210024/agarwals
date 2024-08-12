@@ -5,6 +5,7 @@ from datetime import date
 from agarwals.utils.loader import Loader
 import hashlib
 from agarwals.reconciliation import chunk
+from agarwals.utils.error_handler import log_error as error_handler
 
 SITE_PATH = frappe.get_single('Control Panel').site_path
 
@@ -143,7 +144,7 @@ def reorder_columns(column_orders,df):
     return df[column_orders]
 
 def get_column_needed():
-    return ["claim_id", "claim_amount", "utr_number", "disallowed_amount", "payer_remark", "settled_amount","tds_amount", "claim_status", "paid_date", "bill_number", "final_utr_number", "hash", "file_upload", "transform", "index"]
+    return ["claim_id", "cl_number", "bill_number", "mrn", "utr_number", "final_utr_number", "claim_status", "paid_date", "insurance_company", "patient_name", "insurance_policy_number", "doa", "dod", "hospital_name", "bank_account_no", "bank_name", "bank_branch", "claim_amount", "settled_amount", "tds_amount", "disallowed_amount", "payers_remark", "hash", "file_upload", "transform", "index"]
 
 def write_excel(df, file_path, type, target_folder):
     column_orders = get_column_needed()
@@ -234,11 +235,7 @@ def format_utr(source_df):
         source_df['final_utr_number'] = new_utr_list
 
 def log_error(doctype_name, reference_name, error_message):
-    error_log = frappe.new_doc('Error Record Log')
-    error_log.set('doctype_name', doctype_name)
-    error_log.set('reference_name', reference_name)
-    error_log.set('error_message', error_message)
-    error_log.save()
+    error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
 
 def split_and_move_to_transform(df,file):
     global source_df

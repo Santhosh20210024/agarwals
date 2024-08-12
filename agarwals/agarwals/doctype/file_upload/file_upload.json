@@ -290,6 +290,7 @@
    "label": "TPA Login ID"
   },
   {
+   "depends_on": "eval:doc.document_type && doc.file_format == 'EXCEL'",
    "fieldname": "download_template",
    "fieldtype": "Button",
    "label": "Download Template"
@@ -303,7 +304,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-23 11:10:49.555560",
+ "modified": "2024-08-06 16:01:12.414649",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
