@@ -102,7 +102,7 @@ class ClaimBookUTRKeyMapper(UTRKeyMapper):
         )
  
 @frappe.whitelist()
-def process(args):
+def process(args={"type":"utr_key","step_id":"","queue":"long"}):
     try:
         args = cast_to_dic(args)
         chunk_size = int(args.get("chunk_size"))
@@ -136,4 +136,4 @@ def process_records(query, mapper_class, chunk_size, args):
         for index in range(0, len(records), chunk_size):
             chunk_doc = chunk.create_chunk(args.get("step_id"))
             records_chunk = records[index : index + chunk_size]
-            enqueue_record_processing(mapper_class, records_chunk, chunk_doc, args)
+            enqueue_record_processing(mapper_class, records_chunk, chunk_doc, args, job_name = "UTR key Creator")

@@ -220,4 +220,4 @@ def process(args):
     except Exception as e:
         chunk_doc = chunk.create_chunk(args["step_id"])
         chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')
+        log_error(e, 'Step')

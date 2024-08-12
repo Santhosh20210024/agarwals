@@ -110,6 +110,9 @@ class KeyCreator:
             if not self._validate_variant(variant):
                 key_variants.add(variant)
         return key_variants
+    
+    def is_regex_present(self, regex, text):
+        return re.search(rf'{regex}', text)
 
     def process(self, variants):
         """
