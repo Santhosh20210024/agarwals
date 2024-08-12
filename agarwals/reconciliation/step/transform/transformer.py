@@ -167,7 +167,7 @@ class Transformer:
             if file['upload'].lower().endswith('.csv'):
                 self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
             else:
-                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
+                 self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
             self.log_error(self.document_type, file['name'], e)
@@ -326,6 +326,9 @@ class Transformer:
                 df[column] = pd.to_numeric(df[column].astype(str).str.replace(r"[^0-9.-]", "", regex=True)).round(2)
         return df
 
+    def extract(self):
+        pass
+
     def process(self, args):
         try:
             files = self.get_files_to_transform()
@@ -365,11 +368,13 @@ class DirectTransformer(Transformer):
     def __init__(self):
         super().__init__()
 
-    def transform(self, file):
+    def transform(self, file):# call here
+        self.extract()
         if self.hashing == 1:
             self.hashing_job()
         self.load_target_df()
-        if self.target_df.empty: 
+        if self.target_df.empty:
+
             self.new_records = self.source_df 
             self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
             return True
@@ -462,6 +467,19 @@ class ClaimbookTransformer(DirectTransformer):
 
     def get_column_name_to_convert_to_numeric(self):
         return ['final_bill_amount','claim_amount','requested_amount','approved_amount','provisional_bill_amount','settled_amount','tds_amount','tpa_shortfall_amount','patient_paid','patientpayable']
+
+    def unique_id_validation(self):
+        if 'unique_id' not in self.source_df.columns:
+            self.source_df['unique_id'] = self.source_df['Hospital'].str.strip() + '-' + self.source_df[
+                'preauth_claim_id'].astype(str).str.strip()
+
+    def rename_column(self):
+        if 'v_tenant' in self.source_df.columns:
+            self.source_df.rename(columns={'v_tenant': 'Hospital'}, inplace=True)
+
+    def extract(self):
+        self.rename_column()
+        self.unique_id_validation()
 
 class StagingTransformer(Transformer):
     def __init__(self):
@@ -675,10 +693,10 @@ class AdjustmentTransformer(Transformer):
         self.document_type = 'Bill Adjustment'
 
     def get_column_needed(self):
-        return ["bill","tds","disallowance","posting_date","source_file", 'file_upload', 'transform', 'index']
+        return ["bill_no","tds_amount","disallowed_amount","posting_date","source_file", 'file_upload', 'transform', 'index']
 
     def get_column_name_to_convert_to_numeric(self):
-        return ["tds","disallowance"]
+        return ["tds_amount","disallowed_amount"]
 
     def find_and_rename_column(self,df,list_to_check):
         header = df.columns.values.tolist()
@@ -693,7 +711,7 @@ class AdjustmentTransformer(Transformer):
 
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,["bill","tds","disallowance","posting_date","source_file", 'file_upload', 'transform', 'index'])
+        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
         configuration = frappe.get_single('Bank Configuration')
         if "posting_date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
