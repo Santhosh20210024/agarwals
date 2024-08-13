@@ -158,8 +158,8 @@ class SeleniumDownloader:
                  else:
                      doc.status = "Completed"
                  doc.save()
-         except:
-             self.log_error('Settlement Advice Downloader UI',self.tpa," Status Update Failed ")
+         except Exception as e:
+             self.log_error('Settlement Advice Downloader UI',self.tpa,f" Status Update Failed due to {e}")
 
 
     def update_tpa_reference(self,status):
