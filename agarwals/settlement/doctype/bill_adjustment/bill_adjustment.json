@@ -8,6 +8,10 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "connection_section",
+  "tds_entry_id",
+  "dis_entry_id",
+  "section_break_yy3dq",
   "bill",
   "tds",
   "disallowance",
@@ -82,11 +86,33 @@
    "fieldtype": "Int",
    "label": "File Index",
    "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "connection_section",
+   "fieldtype": "Section Break",
+   "label": "Connection"
+  },
+  {
+   "fieldname": "tds_entry_id",
+   "fieldtype": "Link",
+   "label": "TDS Entry ID",
+   "options": "Journal Entry"
+  },
+  {
+   "fieldname": "dis_entry_id",
+   "fieldtype": "Link",
+   "label": "DIS Entry ID",
+   "options": "Journal Entry"
+  },
+  {
+   "fieldname": "section_break_yy3dq",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-16 17:06:45.824650",
+ "modified": "2024-08-18 22:57:37.181173",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Bill Adjustment",
