@@ -1,0 +1,110 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:bank_account",
+ "creation": "2024-07-18 13:14:23.698639",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "bank_account",
+  "opening_balance",
+  "deposit",
+  "withdrawal",
+  "cg_closing_balance",
+  "ag_closing_balance",
+  "difference",
+  "skip",
+  "file_upload",
+  "index",
+  "transform"
+ ],
+ "fields": [
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Bank Account",
+   "unique": 1
+  },
+  {
+   "fieldname": "opening_balance",
+   "fieldtype": "Float",
+   "label": "Opening Balance"
+  },
+  {
+   "fieldname": "deposit",
+   "fieldtype": "Float",
+   "label": "Deposit"
+  },
+  {
+   "fieldname": "withdrawal",
+   "fieldtype": "Float",
+   "label": "Withdrawal"
+  },
+  {
+   "fieldname": "ag_closing_balance",
+   "fieldtype": "Float",
+   "label": "AG Closing Balance"
+  },
+  {
+   "fieldname": "difference",
+   "fieldtype": "Float",
+   "label": "Difference"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip",
+   "fieldtype": "Check",
+   "label": "Skip"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "File Upload",
+   "options": "File upload"
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Data",
+   "label": "Index"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Data",
+   "label": "Transform"
+  },
+  {
+   "depends_on": "eval:doc.bank_account != null",
+   "fieldname": "cg_closing_balance",
+   "fieldtype": "Float",
+   "label": "CG Closing Balance"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-08-07 11:35:33.331972",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Closing Balance",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
