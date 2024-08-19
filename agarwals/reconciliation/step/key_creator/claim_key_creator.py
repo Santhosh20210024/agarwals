@@ -21,7 +21,7 @@ class ClaimKeyCreator(KeyCreator):
             ClaimKeyCreator._load_key_configuration()
 
     @classmethod
-    def _load_key_configuration(cls) -> tuple:
+    def _load_key_configuration(cls):
         """
         Fetch key configuration from the database.
         Return: Tuple of compiled_patterns
