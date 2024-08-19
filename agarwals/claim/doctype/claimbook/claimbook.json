@@ -448,14 +448,14 @@
   },
   {
    "fieldname": "file_upload",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "File upload",
    "options": "File upload",
    "read_only": 1
   },
   {
    "fieldname": "transform",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Transform",
    "options": "Transform",
    "read_only": 1
