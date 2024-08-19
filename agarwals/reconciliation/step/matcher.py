@@ -55,7 +55,7 @@ class MatcherValidation:
         
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount ):
             difference_amount = claim_amount - (settled_amount + tds_amount + disallowed_amount)
-            if difference_amount > 0:
+            if difference_amount > 1:
                 if self.record['advice']:
                     Matcher.update_advice_status(self.record['advice'], 'Warning', "Claim Amount is greater than the sum of Settled Amount, TDS Amount and Disallowance Amount.")
                 return False
