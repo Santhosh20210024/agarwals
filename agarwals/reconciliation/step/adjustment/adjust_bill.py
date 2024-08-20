@@ -19,6 +19,7 @@ class BillAdjustmentProcessor(JournalEntryUtils):
         self.error_items = []
 
     def _add_custom_fields(self, je, invoice):
+        je.custom_sales_invoice = invoice.name
         je.custom_entity = invoice.entity
         je.custom_branch = invoice.branch
         je.custom_region = invoice.region
