@@ -34,7 +34,7 @@ class BillAdjustmentProcessor(JournalEntryUtils):
         try:
             if str(amount).strip():
                 je = self.create_journal_entry("Credit Note", bill_adjt.posting_date)
-                je = self.set_journal_name(invoice, "-", entry_type)
+                je = self.set_je_name(invoice.name, "-", entry_type,je=je)
                 je = self.add_account_entries(
                     je, invoice, account_debit, account_credit, amount
                 )
@@ -53,26 +53,32 @@ class BillAdjustmentProcessor(JournalEntryUtils):
 
     def process_bill_adjust(self, bill_adjustment_list, chunk_doc):
         chunk.update_status(chunk_doc, "InProgress")
+        
         try:
             for bill_adjt in bill_adjustment_list:
+                bill_adjt = frappe.get_doc('Bill Adjustment', bill_adjt)
                 invoice = self.fetch_doc_details('Sales Invoice', bill_adjt.bill)
+	            
                 if self.check_invoice(invoice):
-                    bill_adjt.tds_entry_id = self.process_entry(
-                        bill_adjt,
-                        invoice,
-                        "TDS",
-                        self.DEBTORS_ACCOUNT,
-                        self.TDS_ACCOUNT,
-                        bill_adjt.tds,
-                    )
-                    bill_adjt.dis_entry_id = self.process_entry(
-                        bill_adjt,
-                        invoice,
-                        "DIS",
-                        self.DEBTORS_ACCOUNT,
-                        self.DISALLOWANCE_ACCOUNT,
-                        bill_adjt.disallowance,
-                    )
+                    if bill_adjt.tds >= 1:
+                        bill_adjt.tds_entry_id = self.process_entry(
+	                        bill_adjt,
+	                        invoice,
+	                        "TDS",
+	                        self.DEBTORS_ACCOUNT,
+	                        self.TDS_ACCOUNT,
+	                        bill_adjt.tds,
+	                    )
+                      
+                    if bill_adjt.disallowance >= 1:
+                        bill_adjt.dis_entry_id = self.process_entry(
+	                        bill_adjt,
+	                        invoice,
+	                        "DIS",
+	                        self.DEBTORS_ACCOUNT,
+	                        self.DISALLOWANCE_ACCOUNT,
+	                        bill_adjt.disallowance,
+	                    )
 
                     if not self.error_items:
                         bill_adjt.status = "Processed"
@@ -85,10 +91,12 @@ class BillAdjustmentProcessor(JournalEntryUtils):
                         bill_adjt.error_remark = self.error_message
                         log_error(bill_adjt.error_remark, doc='Bill Adjustment', doc_name=bill_adjt.name)
                 else:
+                    bill_adjt.status = 'Error'
                     bill_adjt.error_remark = f'{invoice.status} Bill'
                     log_error(bill_adjt.error_remark, doc='Bill Adjustment', doc_name=bill_adjt.name)
-            
-            bill_adjt.save()
+	        
+                bill_adjt.save()
+                frappe.db.commit()
             chunk.update_status(chunk_doc, "Processed")
         except Exception as _:
             chunk.update_status(chunk_doc, "Error")
@@ -100,8 +108,8 @@ class BillAdjustmentOrchestrator:
     def get_bill_adjustments(self):
         return frappe.get_list(
             "Bill Adjustment",
-            fields=["bill", "tds", "disallowance", "posting_date"],
             filters={"status": "Open"},
+            pluck='name'
         )
 
     def start_process(self, args):
@@ -144,8 +152,6 @@ class BillAdjustmentOrchestrator:
         chunk.update_status(chunk_doc, "Error")
         log_error(error, "Step")
 
-
-# start the process
 @frappe.whitelist()
 def process(args):
     BillAdjustmentOrchestrator().start_process(args)

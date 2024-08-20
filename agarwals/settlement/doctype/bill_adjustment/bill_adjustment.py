@@ -9,13 +9,13 @@ class BillAdjustment(Document):
 	"""A class to represent Bill Adjustments and handle validations and 
 	updates before insert the document"""
 
-	def before_insert(self):
+	def before_save(self):
 		"""Method to handle operations before save"""
-		if self.name:
+		if self.name and self.status == 'Open':
 			sales_doc = frappe.get_doc("Sales Invoice", self.name)
 			self._handle_invoice_status(sales_doc)
 			if self.status == 'Error':
-				return
+				return 
 			self._validate_amount(sales_doc)
 			self._set_posting_date(sales_doc)
 
@@ -36,7 +36,10 @@ class BillAdjustment(Document):
 
 		if float(self.disallowance) - outstanding_amount > tolerance:
 			error_messages.append('Disallowance amount is greater than the outstanding amount')
-
+   
+		if float(self.tds + self.disallowance) - outstanding_amount > tolerance:
+				error_messages.append('Cumulative of Disallowance and TDS amount is greater than the outstanding amount ')
+    
 		if error_messages:
 			self.status = 'Error'
 			self.error_remark = "\n".join(error_messages)
