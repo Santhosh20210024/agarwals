@@ -33,7 +33,7 @@ def update_tpa_receipts():
      frappe.db.sql("""
                     UPDATE `tabBank Transaction Staging` tbt SET tbt.payer_type = 'Customer', 
                     tbt.payer_name = %(payer)s, tbt.payer_group = %(payer_group)s where tbt.payer_name is NULL
-                    """, values = { 'payer' : 'TPA Receipt', 'payer_group' : 'TPA/INSURANCE'})
+                    """, values = { 'payer' : 'TPA Receipts', 'payer_group' : 'TPA/INSURANCE'})
      frappe.db.commit()
 
 def map_payer():
