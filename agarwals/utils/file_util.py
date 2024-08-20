@@ -1,30 +1,20 @@
 import frappe
 from agarwals.utils.error_handler import log_error
 
-PROJECT_FOLDER = "DrAgarwals"
-HOME_PATH = "Home/DrAgarwals"
-SHELL_PATH = "private/files"
-SUB_DIR = [
-    "Extract",
-    "Transform",
-    "Load",
-    "Bin",
-    "CheckList",
-    "Settlement Advice",
-    "Zip",
-]
-INNER_SUB_DIR = ["Error"]
-SITE_PATH = "/home/frappe/frappe-bench/sites/agarwals.claimgenie.ai"
-
-
+def get_sub_directory(control_panel):
+    sub_dir = control_panel.get('sub_directory')
+    return sub_dir if sub_dir else ''
+    
 def construct_file_url(*args):
-    list_of_items = []
-    for arg in args:
-        list_of_items.append(arg)
+    return "/".join(args)
 
-    formatted_url = "/".join(list_of_items)
-    return formatted_url
-
+control_panel = frappe.get_single('Control Panel')
+PROJECT_FOLDER = control_panel.get('project_folder', None)
+HOME_PATH = f"Home/{PROJECT_FOLDER}"
+SITE_PATH = control_panel.get('site_path', None)
+SHELL_PATH = "private/files"
+SUB_DIR = get_sub_directory(control_panel).split(',')
+INNER_SUB_DIR = ["Error"]
 
 @frappe.whitelist()
 def is_template_exist(attached_to_name, attached_to_doctype):
@@ -55,4 +45,4 @@ def is_template_exist(attached_to_name, attached_to_doctype):
         return "Not Found"
     except Exception as e:
         log_error(str(e), "File upload")
-        return "System Error"
+        return "System Error"   

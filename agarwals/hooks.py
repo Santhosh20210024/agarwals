@@ -6,6 +6,7 @@ app_publisher = "Agarwals"
 app_description = "Agarwals"
 app_email = "tfs-agarwals@techfinite.com"
 app_license = "MIT"
+required_apps = ["frappe/tfs"]
 
 # Includes in <head>
 # ------------------

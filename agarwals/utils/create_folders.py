@@ -1,17 +1,16 @@
 import frappe
 import os
-
-from agarwals.utils.file_util import HOME_PATH,SUB_DIR,SITE_PATH,PROJECT_FOLDER,INNER_SUB_DIR
 from agarwals.utils.error_handler import log_error
-#SITE PATH
-SITE_PATH = os.getcwd() + frappe.get_site_path()[1:] + "/private/files/"
+from agarwals.utils.file_util import HOME_PATH, SUB_DIR, SHELL_PATH, SITE_PATH, INNER_SUB_DIR, construct_file_url
 
-def get_file_list(filter_type,dict):
-    if filter_type == "all":
-        folders_list = frappe.get_all("File", filters = dict, pluck='name')
-    if filter_type == "or":
-        folders_list = frappe.get_all("File", or_filters = dict, pluck='name')
-    return folders_list
+def get_site_path():
+    try:
+        return os.path.join(SITE_PATH, SHELL_PATH)
+    except Exception as e:
+        print(f"Error: {e}")
+
+def get_file_list(filters):
+    return frappe.get_all("File", filters = filters, pluck='name')
 
 def create_new_folder(file_name, folder):
 	file = frappe.new_doc("File")
@@ -21,50 +20,64 @@ def create_new_folder(file_name, folder):
 	file.insert(ignore_if_duplicate=True)
 	frappe.db.commit()
 
-def get_file_path(parent_folder_item = None,sub_folder_item = None,bank_item = None,tpa_item = None):
-    path_components = []
-    if parent_folder_item:
-        path_components.append(parent_folder_item)
+def get_file_path(parent_folder_item = None, sub_folder_item = None):
+    from agarwals.utils.file_util import PROJECT_FOLDER
 
+    path_components = [parent_folder_item]
     if sub_folder_item:
         path_components.append(sub_folder_item)
-    
-    COMBINED_PATH = "/".join(path_components)
-    file_path = SITE_PATH + PROJECT_FOLDER + "/" + COMBINED_PATH
-    return file_path
+
+    COMBINED_PATH = os.path.join(*path_components)
+    return os.path.join(get_site_path(), PROJECT_FOLDER, COMBINED_PATH)
 
 def folder_structure_creation():
-    print("------ File Structure Initialization --------")
+    from agarwals.utils.file_util import PROJECT_FOLDER
+    print("**------ Folder Structure Creating --------**")
 
-    # Agarwals directory
-    if not os.path.exists(SITE_PATH + PROJECT_FOLDER):
-        os.mkdir(SITE_PATH + PROJECT_FOLDER)
-
-    if HOME_PATH not in get_file_list('all',{'is_folder':1}):
-        create_new_folder(PROJECT_FOLDER, "Home")
-    
-    # Parent Folders at both places
-    for parent_folder_item in SUB_DIR:
-        create_new_folder(parent_folder_item, HOME_PATH)
+    try:
+        if not PROJECT_FOLDER:
+            while True:
+                project_name = input('Please enter the project name (i.e., DrAgarwals, EyeFoundation): ')
+                if project_name:
+                    PROJECT_FOLDER = project_name.strip()
+                    break
         
-        if not os.path.exists(get_file_path(parent_folder_item)):
-            os.mkdir(get_file_path(parent_folder_item))
+        if not SITE_PATH or not SHELL_PATH:
+            frappe.throw('Tfs control panel site configurations are mandatory to configure')
 
-        # Sub folders
-        for sub_folder_item in INNER_SUB_DIR:
-            dir = HOME_PATH + "/" + parent_folder_item
-            create_new_folder(sub_folder_item, dir)
+        if not SUB_DIR or not INNER_SUB_DIR:
+            frappe.throw("Please specify the sub directory in control panel:")
 
-            if not os.path.exists(get_file_path(parent_folder_item,sub_folder_item)):
-                os.mkdir(get_file_path(parent_folder_item,sub_folder_item))
+        PROJECT_FOLDER_PATH = "".join([get_site_path(), PROJECT_FOLDER])
+        if not os.path.exists(PROJECT_FOLDER_PATH):
+            os.mkdir(PROJECT_FOLDER_PATH)
 
-    print("-------- File Structure Completed --------")
+        if HOME_PATH not in get_file_list({'is_folder': 1}):
+            create_new_folder(PROJECT_FOLDER, "Home")
+        
+        for sub_item in SUB_DIR:
+            print(HOME_PATH, sub_item)
+            if construct_file_url(HOME_PATH, sub_item) not in get_file_list({'is_folder': 1}):
+                create_new_folder(sub_item, HOME_PATH)
+            
+            sub_item_path = get_file_path(sub_item)
+            os.makedirs(sub_item_path, exist_ok=True)
 
+            for inner_folder_item in INNER_SUB_DIR:
+                dir_path = os.path.join(HOME_PATH, sub_item)
+                create_new_folder(inner_folder_item, dir_path)
+
+                inner_item_path = get_file_path(sub_item, inner_folder_item)
+                os.makedirs(inner_item_path, exist_ok=True)
+
+        print("**-------- Folder Structure Created --------**")
+    except Exception as e:
+        frappe.throw(f"Error: {e}")
 
 @frappe.whitelist()
 def create_sa_folders():
     path = frappe.get_single("Control Panel").site_path + "/private/files/DrAgarwals/Settlement Advice"
-    alredy_exits = False
+    already_exists = False
     try:
         if os.path.exists(path):
             folder_names = set(frappe.db.sql("SELECT tpa FROM `tabTPA Login Credentials` WHERE is_enable = 1",pluck ="tpa"))
@@ -74,8 +87,8 @@ def create_sa_folders():
                     os.mkdir(folder)
                 else:
                     log_error(error = f"Folder {name} Already Exists")
-                    alredy_exits = True
-            return "folder created" if alredy_exits == False else "folder already exists"
+                    already_exists = True
+            return "folder created" if already_exists == False else "folder already exists"
         else:
             return "path not found"
     except Exception as e:
