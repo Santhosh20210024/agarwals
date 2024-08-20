@@ -173,16 +173,17 @@ class PaymentEntryCreator:
         process_payment_entry_timer = Timer().start(f"process_payment_entry {self.si_doc.name}")
         try:
             name = self.__get_entry_name()
-            company = frappe.defaults.get_global_default('company')
             party_type = 'Customer'
             party = self.si_doc.customer
-            posting_date = self.__get_posting_date()
             paid_from = 'Debtors - A'
             paid_to = self.bank_account
+            company = frappe.defaults.get_global_default('company')
+            posting_date = self.__get_posting_date()
             get_party_and_account_balance_timer = Timer().start(f"get_party_and_account_balance {self.si_doc.name}")
             party_and_bank_balance = get_party_and_account_balance(company, posting_date, paid_from, paid_to,
                                                                    party_type, party)
             get_party_and_account_balance_timer.end()
+            # party_and_bank_balance = {'paid_to_account_balance': 1, 'paid_from_account_balance': 1, 'party_balance': 1}
             pe_dict = {
                 "doctype": "Payment Entry",
                 'name': name,
@@ -342,8 +343,8 @@ def process(args):
         bt_records = frappe.db.sql("""SELECT bank_transaction, JSON_ARRAYAGG(name) as matcher_names
                                         FROM `tabMatcher`
                                         where match_logic in  %(m_logic)s and status = 'Open'
-                                        GROUP BY bank_transaction ORDER BY sales_invoice,unallocated DESC;"""
-                                       ,values={"m_logic": m_logic}
+                                        GROUP BY bank_transaction ORDER BY sales_invoice, payment_order, unallocated DESC LIMIT %(limit)s;"""
+                                       ,values={"m_logic": m_logic, "limit" : chunk_size*4}
                                        ,as_dict=True)
         if bt_records:
             for record in range(0, len(bt_records), chunk_size):
