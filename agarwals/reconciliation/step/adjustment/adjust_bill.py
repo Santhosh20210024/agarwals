@@ -38,6 +38,7 @@ class BillAdjustmentProcessor(JournalEntryUtils):
                 je = self.add_account_entries(
                     je, invoice, account_debit, account_credit, amount
                 )
+                je = self._add_custom_fields(je,invoice)
                 self.save_je(je, bill_adjt)
                 return je.name
         except Exception as e:
