@@ -172,32 +172,22 @@ class PaymentEntryCreator:
     def __process_payment_entry(self):
         process_payment_entry_timer = Timer().start(f"process_payment_entry {self.si_doc.name}")
         try:
-            name = self.__get_entry_name()
-            party_type = 'Customer'
-            party = self.si_doc.customer
-            paid_from = 'Debtors - A'
-            paid_to = self.bank_account
-            company = frappe.defaults.get_global_default('company')
-            posting_date = self.__get_posting_date()
-            get_party_and_account_balance_timer = Timer().start(f"get_party_and_account_balance {self.si_doc.name}")
-            party_and_bank_balance = get_party_and_account_balance(company, posting_date, paid_from, paid_to,
-                                                                   party_type, party)
-            get_party_and_account_balance_timer.end()
-            # party_and_bank_balance = {'paid_to_account_balance': 1, 'paid_from_account_balance': 1, 'party_balance': 1}
+            party_and_bank_balance = {'paid_to_account_balance': 1, 'paid_from_account_balance': 1, 'party_balance': 1}
+            #balance fields are set to default 1 as it is slowing down payment creation and these fields are not used in any ledgers
             pe_dict = {
                 "doctype": "Payment Entry",
-                'name': name,
+                'name': self.__get_entry_name(),
                 'custom_sales_invoice': self.si_doc.name,
                 'payment_type': 'Receive',
                 'mode_of_payment': 'Bank Draft',
-                'party_type': party_type,
-                'party': party,
+                'party_type': 'Customer',
+                'party': self.si_doc.customer,
                 'bank_account': self.bt_doc.bank_account,
                 'party_balance': party_and_bank_balance['party_balance'],
-                'paid_from': paid_from,
+                'paid_from': 'Debtors - A',
                 'paid_from_account_currency': 'INR',
                 'paid_from_account_balance': party_and_bank_balance["paid_from_account_balance"],
-                'paid_to': paid_to,
+                'paid_to': self.bank_account,
                 'paid_to_account_currency': 'INR',
                 'paid_to_account_balance': party_and_bank_balance['paid_to_account_balance'],
                 'paid_amount': self.settled_amount,
