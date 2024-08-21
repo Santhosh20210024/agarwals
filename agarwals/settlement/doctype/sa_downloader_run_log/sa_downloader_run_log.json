@@ -12,7 +12,8 @@
   "document_reference",
   "reference_name",
   "parent1",
-  "tpa_name"
+  "tpa_name",
+  "message"
  ],
  "fields": [
   {
@@ -24,7 +25,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Processed\nError"
+   "options": "Warning\nInfo\nProcessed\nError"
   },
   {
    "fieldname": "document_reference",
@@ -47,11 +48,16 @@
    "fieldname": "tpa_name",
    "fieldtype": "Data",
    "label": "TPA Name"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Long Text",
+   "label": "Message"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-03 13:29:02.000954",
+ "modified": "2024-08-11 21:54:08.620780",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "SA Downloader Run Log",

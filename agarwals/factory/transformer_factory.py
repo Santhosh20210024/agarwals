@@ -26,5 +26,8 @@ def get_transformer(type):
             return WriteoffTransformer()
         elif type == "bank_transaction":
             return BankBulkTransformer()
+        elif type =="closing_balance":
+            return ClosingBalanceTransformer()
+
     except Exception as e:
        return e
