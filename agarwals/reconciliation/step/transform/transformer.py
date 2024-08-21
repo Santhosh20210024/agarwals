@@ -423,10 +423,10 @@ class BillTransformer(DirectTransformer):
         return {'hash': 'hash_x'}
 
     def get_column_needed(self):
-        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash', 'file_upload', 'transform', 'index']
+        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Patient Age','Consultant','Payer','Bill Amount','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash', 'file_upload', 'transform', 'index']
 
     def get_column_name_to_convert_to_numeric(self):
-        return ['Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due']
+        return ['Bill Amount','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due']
 
 class ClaimbookTransformer(DirectTransformer):
     def __init__(self):
