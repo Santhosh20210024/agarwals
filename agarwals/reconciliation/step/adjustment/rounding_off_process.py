@@ -42,6 +42,7 @@ class RoundOffProcess(JournalEntryUtils):
     def process_round_off(self, round_off_items):
         for round_off_item in round_off_items:
             try:
+                
                 round_off_doc, date = self.get_round_off_details(round_off_item)
                 if not round_off_doc:
                     continue
@@ -59,7 +60,7 @@ class RoundOffProcess(JournalEntryUtils):
                 )
 
                 je = self.create_journal_entry(self.JOURNAL_TYPE, posting_date)
-                je = self.set_journal_name(round_off_doc.name, "-", self.ENTRY_TYPE)
+                je = self.set_je_name(round_off_doc.name, "-", self.ENTRY_TYPE,je=je)
                 je = self.add_account_entries(
                     je, round_off_doc, from_account, self.ROUNDED_ACCOUNT, amount
                 )
@@ -73,6 +74,7 @@ class RoundOffProcess(JournalEntryUtils):
 
 
 class RoundOffOrchestrator:
+    
     def start_process(self, type, round_off_items, chunk_size=100):
         if not round_off_items:
             return
@@ -97,12 +99,13 @@ class RoundOffOrchestrator:
                 timeout=25000,
                 round_off_items=round_off_chunk,
             )
+            
         except Exception as e:
             log_error(f"Error enqueuing round off process for batch {batch_no}: {e}", doc_name='RoundOffOrchestrator._enqueue_round_off')
 
 @frappe.whitelist()
 def get_invoices():
-    invoice_qb = frappe.qb.Doctype("Sales Invoice")
+    invoice_qb = frappe.qb.DocType("Sales Invoice")
     invoice_query = (
         frappe.qb.from_(invoice_qb)
         .select(
@@ -117,7 +120,7 @@ def get_invoices():
             invoice_qb.branch_type,
         )
         .where((invoice_qb.outstanding_amount <= 9.9))
-        .where((invoice_qb.status == "Partly Paid"))
+        .where((invoice_qb.status in ("Partly Paid","Unpaid")))
     )
     return frappe.db.sql(invoice_query, as_dict=True)
 
@@ -139,8 +142,8 @@ def get_transactions():
 def process(_type):
     if _type == "Bank Transaction":
         bank_transactions = get_transactions()
-        RoundOffOrchestrator(_type).start_process(bank_transactions)
+        RoundOffOrchestrator().start_process(_type,bank_transactions)
 
     elif _type == "Sales Invoice":
         invoices = get_invoices()
-        RoundOffOrchestrator(_type).start_process(invoices)
+        RoundOffOrchestrator().start_process(_type,invoices)
