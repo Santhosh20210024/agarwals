@@ -1,14 +1,10 @@
 import frappe
 from agarwals.agarwals.doctype import file_records
-from erpnext.accounts.doctype.payment_entry.payment_entry import get_account_details, get_party_and_account_balance
-from erpnext.accounts.utils import get_balance_on
-from frappe import utils
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from tfs.profiler.timer import Timer
-from agarwals.utils.reconciliation_utils import update_error, get_document_record
-from frappe.utils.caching import redis_cache
+from agarwals.utils.reconciliation_utils import update_error, get_document_record, get_posting_date, get_entity_closing_date
 
 chunk_status = "Processed"
 
@@ -112,26 +108,12 @@ class PaymentEntryCreator:
         get_entry_name_timer.end()
         return name
 
-    @staticmethod
-    @redis_cache
-    def get_entity_closing_date(entity):
-        get_posting_date_timer = Timer().start(f"get_posting_date {entity}")
-        closing_date_list = frappe.get_list('Period Closure by Entity',
-                                            filters={'entity': entity}
-                                            , order_by='creation desc'
-                                            , pluck='posting_date')
-        closing_date = max(closing_date_list) if closing_date_list else None
-        get_posting_date_timer.end()
-        return closing_date
-
-    def __get_posting_date(self):
+    def __get_entity_posting_date(self):
         get_posting_date_timer = Timer().start(f"get_posting_date {self.matcher_record.name}")
-        closing_date = self.get_entity_closing_date(self.matcher_record.si_entity)
-        if closing_date and self.bt_doc.date < closing_date:
-            get_posting_date_timer.end()
-            return utils.today()
+        entity_closing_date = get_entity_closing_date(self.matcher_record.si_entity)
+        posting_date = get_posting_date(self.bt_doc.date, entity_closing_date)
         get_posting_date_timer.end()
-        return self.bt_doc.date
+        return posting_date
 
     def __add_deduction(self, account, description, amount):
         return {'account': account, 'cost_center': self.si_doc.cost_center,
@@ -200,7 +182,7 @@ class PaymentEntryCreator:
                 'region': self.si_doc.region,
                 'branch_type': self.si_doc.branch_type,
                 'custom_due_date': self.si_doc.posting_date,
-                'posting_date': self.__get_posting_date(),
+                'posting_date': self.__get_entity_posting_date(),
                 'references': [
                     {
                         'reference_doctype': 'Sales Invoice',

@@ -1,6 +1,7 @@
 import frappe
 from tfs.profiler.timer import Timer
 from frappe.utils.caching import redis_cache
+from frappe import utils
 from agarwals.utils.error_handler import log_error
 
 def get_document_record(doctype, name):
@@ -40,3 +41,20 @@ def get_company_account(bank_account_name):
         return None
     get_company_timer.end()
     return bank_account.account
+
+@redis_cache
+def get_entity_closing_date(entity):
+    get_posting_date_timer = Timer().start(f"get_posting_date {entity}")
+    closing_date_list = frappe.get_list('Period Closure by Entity',
+                                        filters={'entity': entity}
+                                        , order_by='creation desc'
+                                        , pluck='posting_date')
+    closing_date = max(closing_date_list) if closing_date_list else None
+    get_posting_date_timer.end()
+    return closing_date
+
+@redis_cache
+def get_posting_date(bt_date, entity_closing_date):
+    if entity_closing_date and bt_date < entity_closing_date:
+        return utils.today()
+    return bt_date
