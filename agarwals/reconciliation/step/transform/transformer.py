@@ -6,9 +6,10 @@ import hashlib
 from agarwals.utils.loader import Loader
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error as error_handler
+from agarwals.utils.file_utils import HOME_PATH
 
 SITE_PATH = frappe.get_single('Control Panel').site_path
-FOLDER = frappe.get_single('Control Panel').folder_path
+FOLDER = HOME_PATH
 IS_PRIVATE = 1
 
 class Transformer:
