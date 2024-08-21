@@ -15,7 +15,22 @@ class RoundOffProcess(JournalEntryUtils):
         self.JOURNAL_TYPE = "Credit Note"
         self.DEBTORS_ACCOUNT = "Debtors - A"
         self.ROUNDED_ACCOUNT = "Rounded Off - A"
-
+        
+    def _add_custom_fields(self, je, invoice):
+        je.custom_sales_invoice = invoice.name
+        je.custom_entity = invoice.entity
+        je.custom_branch = invoice.branch
+        je.custom_region = invoice.region
+        je.custom_branch_type = invoice.branch_type
+        je.custom_bill_date = invoice.posting_date
+        je.custom_party_group = invoice.customer_group
+        je.custom_party = invoice.customer
+        return je
+    
+    def get_bank_account(self,bank_account):
+        bank_account = frappe.get_doc('Bank Account',bank_account)
+        return bank_account.account
+    
     def get_round_off_details(self, round_off_item):
         doc = self.fetch_doc_details(self.type, round_off_item)
         if self.type == "Sales Invoice":
@@ -51,7 +66,7 @@ class RoundOffProcess(JournalEntryUtils):
                 from_account = (
                     self.DEBTORS_ACCOUNT
                     if self.type == "Sales Invoice"
-                    else round_off_doc.bank_account
+                    else self.get_bank_account(round_off_doc.bank_account)
                 )
                 amount = (
                     round_off_doc.outstanding_amount
@@ -64,13 +79,15 @@ class RoundOffProcess(JournalEntryUtils):
                 je = self.add_account_entries(
                     je, round_off_doc, from_account, self.ROUNDED_ACCOUNT, amount
                 )
+                if self.type == "Sales Invoice":
+                    je = self._add_custom_fields(je,round_off_doc)
                 self.save_je(je)
-
+                
                 if self.type == "Bank Transaction":
                     self.update_transaction_entry(round_off_doc.name, je)
             except Exception as e:
-                self.error_message += f"Error while processing {self.ENTRY_TYPE} entry in {self.type}: {e}"
-                log_error(self.error_message, doc_name=round_off_item)
+                error_message += f"Error while processing {self.ENTRY_TYPE} entry in {self.type}: {e}"
+                log_error(error_message, doc_name=round_off_item)
 
 
 class RoundOffOrchestrator:
@@ -91,14 +108,15 @@ class RoundOffOrchestrator:
 
     def _enqueue_round_off(self, type, round_off_chunk, batch_no):
         try:
-            frappe.enqueue(
-                RoundOffProcess(type).process_round_off,
-                queue="long",
-                is_async=True,
-                job_name=f"RoundOff_Batch{batch_no}",
-                timeout=25000,
-                round_off_items=round_off_chunk,
-            )
+            # frappe.enqueue(
+            #     RoundOffProcess(type).process_round_off,
+            #     queue="long",
+            #     is_async=True,
+            #     job_name=f"RoundOff_{type}_Batch{batch_no}",
+            #     timeout=25000,
+            #     round_off_items=round_off_chunk,
+            # )
+            RoundOffProcess(type).process_round_off(round_off_chunk)
             
         except Exception as e:
             log_error(f"Error enqueuing round off process for batch {batch_no}: {e}", doc_name='RoundOffOrchestrator._enqueue_round_off')
@@ -120,7 +138,9 @@ def get_invoices():
             invoice_qb.branch_type,
         )
         .where((invoice_qb.outstanding_amount <= 9.9))
-        .where((invoice_qb.status in ("Partly Paid","Unpaid")))
+        .where(
+        (invoice_qb.status == "Partly Paid") | (invoice_qb.status == "Unpaid")
+    )
     )
     return frappe.db.sql(invoice_query, as_dict=True)
 
@@ -131,7 +151,7 @@ def get_transactions():
         frappe.qb.from_(bank_qb)
         .select(bank_qb.name, 
                 bank_qb.date, 
-                bank_qb.unallocated_aount
+                bank_qb.unallocated_amount
         )
         .where((bank_qb.unallocated_amount <= 9.9))
         .where((bank_qb.status == "Unreconciled"))

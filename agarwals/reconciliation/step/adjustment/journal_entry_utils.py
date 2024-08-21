@@ -29,7 +29,7 @@ class JournalEntryUtils:
             je, from_account, doc, amount, credit=True
         )
         je = self._add_account_entry(
-            je, to_account, doc, amount, credit=False
+            je, to_account,doc, amount, credit=False
         )
         return je
     
@@ -39,7 +39,7 @@ class JournalEntryUtils:
                 "party_type": self.party_type,
                 "party": doc.get('customer', doc.get('party')),
                 "region": doc.get('region', doc.get('custom_region','')),
-                "entity": doc.get('entity', doc.get('custom_region','')),
+                "entity": doc.get('entity', doc.get('custom_entity','')),
                 "branch": doc.get('branch', doc.get('custom_branch', '')),
                 "cost_center": doc.get('cost_center', ''),
                 "branch_type": doc.get('custom_branch_type', doc.get('branch_type', ''))
