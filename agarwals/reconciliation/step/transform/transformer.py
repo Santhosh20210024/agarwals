@@ -1,16 +1,16 @@
+import json
 import pandas as pd
 import frappe
 from datetime import date
 import hashlib
-import re
-import json
 from agarwals.utils.loader import Loader
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error as error_handler
+from agarwals.utils.file_utils import HOME_PATH
 
-FOLDER = "Home/DrAgarwals/"
-IS_PRIVATE = 1
 SITE_PATH = frappe.get_single('Control Panel').site_path
+FOLDER = HOME_PATH
+IS_PRIVATE = 1
 
 class Transformer:
     def __init__(self):
@@ -28,6 +28,7 @@ class Transformer:
         self.header = 0
         self.is_truncate_excess_char = False
         self.max_trim_length = 140
+        self.loading_configuration = None
 
     def get_file_columns(self):
         return "upload,name"
@@ -51,8 +52,8 @@ class Transformer:
         return []
 
     def get_join_columns(self):
-        left_df_column = ''
-        right_df_column = ''
+        left_df_column = json.loads(self.loading_configuration.column_to_join.replace("'", '"'))["left"]
+        right_df_column = json.loads(self.loading_configuration.column_to_join.replace("'", '"'))["right"]
         return left_df_column, right_df_column
 
     def left_join(self,file):
@@ -81,10 +82,10 @@ class Transformer:
         return df
 
     def get_columns_to_prune(self):
-        return []
+        return eval(self.loading_configuration.column_to_prune)
 
     def get_columns_to_check(self):
-        return {}
+        return eval(self.loading_configuration.column_to_check_the_difference)
 
     def split_modified_and_unmodified_records(self, df):
         columns_to_check = self.get_columns_to_check()
@@ -98,7 +99,7 @@ class Transformer:
         error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
 
     def get_column_needed(self):
-        return []
+        return eval(self.loading_configuration.column_needed)
 
     def reorder_columns(self,column_orders,df):
         df = self.convert_into_common_format(df,column_orders)
@@ -174,7 +175,7 @@ class Transformer:
             self.update_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
-        return []
+        return eval(self.loading_configuration.column_to_hash)
 
     def hashing_job(self):
         self.source_df['hash_column'] = ''
@@ -289,7 +290,7 @@ class Transformer:
         return df
 
     def get_column_name_to_convert_to_numeric(self):
-        return []
+        return eval(self.loading_configuration.column_to_convert_the_values_to_numeric)
 
     def convert_column_to_numeric(self):
         columns = self.get_column_name_to_convert_to_numeric()
@@ -331,6 +332,7 @@ class Transformer:
 
     def process(self, args):
         try:
+            self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)
             files = self.get_files_to_transform()
             if not files:
                 chunk_doc = chunk.create_chunk(args["step_id"])
@@ -363,477 +365,3 @@ class Transformer:
         except Exception as e:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Error")
-
-class DirectTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-
-    def transform(self, file):# call here
-        self.extract()
-        if self.hashing == 1:
-            self.hashing_job()
-        self.load_target_df()
-        if self.target_df.empty:
-
-            self.new_records = self.source_df 
-            self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
-            return True
-        else:
-            merged_df = self.left_join(file)
-            if merged_df.empty:
-                return False
-            self.new_records = merged_df[merged_df['_merge'] == 'left_only']
-            existing_df = merged_df[merged_df['_merge'] == 'both']
-            self.modified_records, self.unmodified_records = self.split_modified_and_unmodified_records(
-                existing_df)
-            self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
-            self.move_to_transform(file, self.modified_records, 'Update', 'Transform', True)
-            self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', True, 'Skipped')
-        return True
-
-class BillTransformer(DirectTransformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Debtors Report'
-        self.document_type = 'Bill'
-        self.hashing = 1
-
-    def load_target_df(self):
-        query = f"""
-                     SELECT 
-                         name, hash
-                     FROM 
-                         `tab{self.document_type}`
-                     """
-        records = frappe.db.sql(query, as_list=True)
-        self.target_df = pd.DataFrame(records,columns = ['name','hash'])
-
-    def get_columns_to_hash(self):
-        return ['Status', 'Claim Reference ID']
-
-    def get_join_columns(self):
-        left_df_column = 'Bill No'
-        right_df_column = 'name'
-        return left_df_column, right_df_column
-
-    def get_columns_to_prune(self):
-        return ['name', '_merge', 'hash_x', 'hash_column']
-
-    def get_columns_to_check(self):
-        return {'hash': 'hash_x'}
-
-    def get_column_needed(self):
-        return ['Company','Branch','Bill No','Bed Type','Revenue Date','MRN',' Name','Consultant','Payer','Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due','Claim Status','Status','Cancelled Date','Claim ID','Claim Reference ID','hash', 'file_upload', 'transform', 'index']
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ['Discount','Net Amount','Patient Amount','Due Amount','Refund','Claim Amount','Claim Amount Due']
-
-class ClaimbookTransformer(DirectTransformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Claim Book'
-        self.document_type = 'ClaimBook'
-        self.hashing = 1
-        self.clean_utr = 1
-        self.utr_column_name = 'utr_number'
-        self.is_truncate_excess_char = True
-
-    def get_columns_to_hash(self):
-        return ['unique_id', 'settled_amount']
-
-    def load_target_df(self):
-        query = f"""
-                      SELECT 
-                          name, hash
-                      FROM 
-                          `tab{self.document_type}`
-                      """
-        records = frappe.db.sql(query, as_list=True)
-        self.target_df = pd.DataFrame(records, columns=['name', 'hash'])
-
-    def get_join_columns(self):
-        left_df_column = 'unique_id'
-        right_df_column = 'name'
-        return left_df_column, right_df_column
-
-    def get_columns_to_prune(self):
-        return ['name', '_merge', 'hash_x', 'hash_column']
-
-    def get_columns_to_check(self):
-        return {'hash': 'hash_x'}
-
-    def get_column_needed(self):
-        return ['Hospital','preauth_claim_id','mrn','doctor','department','case_id','first_name','tpa_name','insurance_company_name','tpa_member_id','insurance_policy_number','is_bulk_closure','al_number','cl_number','doa','dod','room_type','final_bill_number','final_bill_date','final_bill_amount','claim_amount','current_request_type','current_workflow_state','current_state_time','claim_submitted_date','reconciled_status','utr_number','paid_on_date','requested_amount','approved_amount','provisional_bill_amount','settled_amount','patientpayable','patient_paid','tds_amount','tpa_shortfall_amount','forwarded_to_claim_date','courier_vendor','tracking_number','send_date','received_date','preauth_submitted_date_time','is_admitted','visit_type','case_closed_in_preauth','unique_id','sub_date','Remarks','File Size','final_utr_number','hash', 'file_upload', 'transform', 'index']
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ['final_bill_amount','claim_amount','requested_amount','approved_amount','provisional_bill_amount','settled_amount','tds_amount','tpa_shortfall_amount','patient_paid','patientpayable']
-
-    def unique_id_validation(self):
-        if 'unique_id' not in self.source_df.columns:
-            self.source_df['unique_id'] = self.source_df['Hospital'].str.strip() + '-' + self.source_df[
-                'preauth_claim_id'].astype(str).str.strip()
-
-    def rename_column(self):
-        if 'v_tenant' in self.source_df.columns:
-            self.source_df.rename(columns={'v_tenant': 'Hospital'}, inplace=True)
-
-    def extract(self):
-        self.rename_column()
-        self.unique_id_validation()
-
-class StagingTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-
-
-    def get_configuration(self):
-        return []
-
-    def get_header_identification_keys(self, configuration):
-        return []
-
-    def get_source_column_dict(self, configuration):
-        return {}
-
-    def verify_file(self,file,header_index):
-        return
-
-    def extract(self,configuration,key,file):
-        return
-
-    def extract_transactions(self, column):
-        if pd.isna(self.source_df.at[0, column]):
-            if len(self.source_df) > 1:
-                self.source_df = self.source_df.loc[1:]
-            else:
-                return False
-        null_index = self.source_df.index[self.source_df[column].isnull()].min()
-        self.source_df = self.source_df.loc[:null_index - 1]
-        return True
-
-    def transform(self,file):
-        configuration = self.get_configuration()
-        header_identification_keys = self.get_header_identification_keys(configuration)
-        source_column_dict = self.get_source_column_dict(configuration)
-        key, header_index, cleaned_header_row = self.find_and_validate_header(header_identification_keys,source_column_dict)
-
-        if key == 'Not Identified':
-            self.log_error(self.document_type, file['name'], 'Unable to Identify the Header row')
-            self.update_status('File upload', file['name'], 'Error')
-            return False
-
-        valid = self.verify_file(file,header_index)
-        if not valid:
-            return False
-
-        self.load_source_df(file, header_index)
-        self.source_df.columns = self.clean_header(self.source_df.columns)
-        self.source_df = self.prune_columns(self.source_df)
-        self.source_df.columns = cleaned_header_row
-        is_extracted = self.extract(configuration,key,file)
-        if not is_extracted:
-            return False
-        return True
-
-
-class BankTransformer(StagingTransformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Bank Statement'
-        self.document_type = 'Bank Transaction Staging'
-        self.header = None
-
-    def get_file_columns(self):
-        return "upload,name,date,bank_account"
-
-    def clean_header(self, list_to_clean):
-        return [self.trim_and_lower(value) for value in list_to_clean]
-
-    def validate_header(self, header_row_index, source_column_list):
-        identified_header_row = [self.trim_and_lower(column) for column in
-                                 self.source_df.loc[header_row_index].to_list() if
-                                 'nan' not in str(column) and str(column) != '*' and str(column) != '.']
-        identified_header_row.pop()
-        for key, columns in source_column_list.items():
-            columns = [self.trim_and_lower(column) for column in columns]
-            if set(identified_header_row) == set(columns):
-                identified_header_row.append("index")
-                return key, header_row_index, identified_header_row
-        return 'Not Identified', 0, []
-
-    def verify_file(self,file,header_index):
-        valid = False
-        bank_account = file['bank_account'].split('-')[-2].strip()
-        df = self.source_df.loc[:header_index]
-        for index, row in df.iterrows():
-            if any(bank_account in str(value) for value in row.values):
-                valid = True
-        if not valid:
-            self.log_error(self.document_type, file['name'], 'Wrong Bank Account Statement Uploaded')
-            self.update_status('File upload', file['name'], 'Error')
-        return valid
-
-    def get_column_needed(self):
-        return ['date','narration','utr_number','credit','debit','search','source','bank_account','reference_number','internal_id', 'file_upload', 'transform', 'index']
-
-    def get_configuration(self):
-        return frappe.get_single('Bank Configuration')
-
-    def add_search_column(self):
-        self.source_df['search'] = self.source_df['narration'].str.replace(r'[\'"\s]', '', regex=True).str.lower()
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ['credit','debit']
-
-
-    def utr_validation(self, pattern, token):
-        return bool(re.match(pattern, token))
-
-    def extract_utr_by_length(self,narration, length, delimiters, pattern):
-        if len(narration) < length:
-            return None
-
-        for delimiter in delimiters:
-            for token in map(str.strip, narration.split(delimiter)):
-                if len(token) == length and len(token.strip()) == length:
-                    if self.utr_validation(pattern, token):
-                        if not token.startswith("CX"):
-                            return token
-
-        return None
-
-    def extract_utr(self, narration, reference, bank_account, delimiters):
-        numeric = '^[0-9]+$'
-        alphanumeric_pattern = '^[a-zA-Z]*[0-9]+[a-zA-Z0-9]*$'
-        if "IMPS" in narration:
-            length = 12
-            pattern = numeric
-        elif "NEFT" in narration or narration.startswith('N/'):
-            pattern = alphanumeric_pattern
-            utr_13 = None
-            utr_16 = None
-            if "CMS" in narration:
-                utr_13 = self.extract_utr_by_length(narration, 13, delimiters, pattern)
-            utr_16 = self.extract_utr_by_length(narration, 16, delimiters, pattern)
-            return utr_13 or utr_16 or reference
-        elif "RTGS" in narration:
-            length = 22
-            pattern = alphanumeric_pattern
-        elif "IFT" in narration:
-            length = 12
-            pattern = alphanumeric_pattern
-        elif "UPI" in narration:
-            length = 12
-            pattern = numeric
-        elif "INFT" in narration:
-            length = 12
-            pattern = numeric
-        else:
-            if bank_account == 'BELGAUM - 32628850028 - STATE BANK OF INDIA' :
-                pattern = alphanumeric_pattern
-                utr_20 = self.extract_utr_by_length(reference, 20, delimiters, pattern )
-                return utr_20
-            else:
-                return reference
-
-        return self.extract_utr_by_length(narration, length, delimiters, pattern) or reference
-
-    def extract_utr_from_narration(self, configuration):
-        self.source_df['reference_number'] = self.source_df.apply(lambda row: self.extract_utr(str(row['narration']), str(row['utr_number']),str(row['bank_account']),eval(configuration.delimiters)), axis = 1)
-
-    def validate_reference(self,source_ref):# chnage the unvalid reference number as 0
-        source_ref['reference_number'] = source_ref.apply(lambda row: 0 if str(row['reference_number']).isalpha() else row['reference_number'], axis=1)
-        return source_ref
-
-    def add_source_and_bank_account_column(self, source, bank_account):
-        self.source_df['source'] = source
-        self.source_df['bank_account'] = bank_account
-
-    def get_columns_to_fill_na_as_0(self):
-        return ['reference_number']
-
-    def get_header_identification_keys(self,configuration):
-        return eval(configuration.types_of_narration_column)
-
-    def get_source_column_dict(self,configuration):
-        return json.loads(configuration.bank_and_source_columns.replace("'", '"'))
-
-    def get_columns_to_prune(self):
-        return ['nan','*','.']
-
-    def extract(self,configuration,key,file):
-        self.source_df = self.rename_columns(self.source_df,json.loads(configuration.bank_and_target_columns.replace("'", '"'))[key])
-        if key in eval(configuration.first_row_empty):
-            self.source_df = self.source_df[1:]
-        is_extracted = self.extract_transactions("narration")
-        if not is_extracted:
-            self.log_error(self.document_type, file['name'], 'Transaction is Empty')
-            self.update_status('File upload', file['name'], 'Error')
-            return False
-        if key in eval(configuration.banks_having_crdr_column):
-            self.source_df['credit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower().str.contains('cr'))
-            self.source_df['debit'] = self.source_df['amount'].where(self.source_df['cr/dr'].str.lower().str.contains('dr'))
-        columns_to_select = self.get_column_needed()
-        self.source_df = self.convert_into_common_format(self.source_df,columns_to_select)
-        self.add_search_column()
-        self.convert_column_to_numeric()
-        self.extract_utr_from_narration(configuration)
-        self.add_source_and_bank_account_column(file['name'], file['bank_account'])
-        self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
-        self.source_df = self.fill_na_as_0(self.source_df)
-        self.source_df = self.validate_reference(self.source_df)
-        self.new_records = self.source_df
-        self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
-        return True
-    
-class AdjustmentTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Bill Adjustment'
-        self.document_type = 'Bill Adjustment'
-
-    def get_column_needed(self):
-        return ["bill_no","tds_amount","disallowed_amount","posting_date","source_file", 'file_upload', 'transform', 'index']
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ["tds_amount","disallowed_amount"]
-
-    def find_and_rename_column(self,df,list_to_check):
-        header = df.columns.values.tolist()
-        rename_value = {}
-        for head in header:
-            replace_str = head.strip().lower().replace(" ","_").replace("-","").replace("\'","").replace("\"","")
-            if replace_str in list_to_check:
-                rename_value[head] = replace_str
-            else:
-               raise Exception(f"Header is invalid {head}")
-        return df.rename(columns=rename_value)
-
-    def transform(self, file):
-        self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
-        configuration = frappe.get_single('Bank Configuration')
-        if "posting_date" in self.source_df.columns.values:
-            self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'posting_date')
-        self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
-        return True
-
-class WritebackTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Write Back'
-        self.document_type = 'Write Back'
-
-    def get_column_needed(self):
-        return ["reference_number","date","region","entity","branch_type","deposit","withdrawal","bank_account","description","custom_cg_utr_number",
-                "transaction_id","transaction_type","allocated_amount","unallocated_amount","party_type","party", 'file_upload', 'transform', 'index']
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ["allocated_amount","unallocated_amount","withdrawal","deposit"]
-
-    def find_and_rename_column(self,df,list_to_check):
-        header = df.columns.values.tolist()
-        rename_value = {}
-        for head in header:
-            replace_str = head.strip().lower().replace(" ","_").replace("-","").replace("\'","").replace("\"","")
-            if replace_str in list_to_check:
-                rename_value[head] = replace_str
-            else:
-               raise Exception(f"Header is invalid {head}")
-        return df.rename(columns=rename_value)
-
-    def transform(self, file):
-        self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
-        self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
-        return True
-
-class WriteoffTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Write Off'
-        self.document_type = 'Write Off'
-
-    def get_column_needed(self):
-        return ["bill_no","bill_date","customer","customer_group","claim_amount","outstanding_amount","branch","entity","region","mrn",
-                "patient_name","claim_id","ma_claim_id","payer_name", 'file_upload', 'transform', 'index']
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ["claim_amount","outstanding_amount"]
-
-    def find_and_rename_column(self,df,list_to_check):
-        header = df.columns.values.tolist()
-        rename_value = {}
-        for head in header:
-            replace_str = head.strip().lower().replace(" ","_").replace("-","").replace("\'","").replace("\"","")
-            if replace_str in list_to_check:
-                rename_value[head] = replace_str
-            else:
-               raise Exception(f"Header is invalid {head}")
-        return df.rename(columns=rename_value)
-
-    def transform(self, file):
-        self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
-        self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
-        return True
-
-class BankBulkTransformer(BankTransformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Bank Statement Bulk'
-        self.header = 0
-
-    def find_and_rename_column(self, df, list_to_check):
-        header = df.columns.values.tolist()
-        rename_value = {}
-        for head in header:
-            replace_str = head.strip().lower().replace(" ", "_").replace("-", "").replace("\'", "").replace("\"", "")
-            if replace_str in list_to_check:
-                rename_value[head] = replace_str
-            else:
-                raise Exception(f"Header is invalid {head}")
-        return df.rename(columns=rename_value)
-
-    def get_column_name_to_convert_to_numeric(self):
-        return ['deposit','withdrawal','credit','debit']
-
-    def transform(self, file):
-        self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,
-                                                     ['date','narration', 'deposit','withdrawal','internal_id','utr_number','bank_account', 'file_upload', 'transform', 'index'])
-        configuration = frappe.get_single('Bank Configuration')
-        if "date" in self.source_df.columns.values:
-            self.source_df = self.format_date(self.source_df, eval(configuration.date_formats), 'date')
-        self.extract_utr_from_narration(configuration)
-        self.source_df['credit'] = self.source_df['deposit']
-        self.source_df['debit'] = self.source_df['withdrawal']
-        self.add_search_column()
-        self.move_to_transform(file, self.source_df, 'Insert', 'Transform', False)
-        return True
-    
-class ClosingBalanceTransformer(Transformer):
-    def __init__(self):
-        super().__init__()
-        self.file_type = 'Closing Balance'
-        self.document_type = 'Closing Balance'
-    
-    def get_column_needed(self):
-        return  ["bank_account","ag_closing_balance","source_file", 'file_upload', 'transform', 'index']
-    
-    def find_and_rename_column(self,df,list_to_check):
-        header = df.columns.values.tolist()
-        rename_value = {}
-        for head in header:
-            replace_str = head.strip().lower().replace(" ","_").replace("-","").replace("\'","").replace("\"","")
-            if replace_str in list_to_check:
-                rename_value[head] = replace_str
-            else:
-               raise Exception(f"Header is invalid {head}")
-        return df.rename(columns=rename_value)
-    
-    def transform(self, file):
-        self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df,self.get_column_needed())
-        self.move_to_transform(file, self.source_df, 'Update', 'Transform', False)	
-        return True
