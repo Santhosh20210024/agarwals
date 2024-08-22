@@ -196,7 +196,7 @@ def set_writeoff_account_data(sales_invoice,debt_account,amount):
 
     }
     debit_data = {
-                'account': "Write Off - "+get_abbr(),
+                'account': "Write Off - "+ get_abbr(),
                 'debit_in_account_currency': amount,
                 'region': sales_invoice.region,
                 'entity': sales_invoice.entity,

@@ -4,9 +4,10 @@ from agarwals.agarwals.doctype import file_records
 
 class JournalEntryUtils:
     """This Utils is only for creating journal entry against the sales invoice and bank transaction"""
+
     def __init__(self, doctype):
         self.doctype = doctype
-        self.party_type = 'Customer'
+        self.party_type = "Customer"
 
     def create_journal_entry(self, type, date):
         je = frappe.new_doc("Journal Entry")
@@ -15,7 +16,7 @@ class JournalEntryUtils:
         return je
 
     def set_je_name(self, *args, je=None):
-        je.name  = "".join(args)
+        je.name = "".join(args)
         return je
 
     def fetch_doc_details(self, doctype, doc_id):
@@ -25,39 +26,34 @@ class JournalEntryUtils:
             frappe.throw(f"{doctype} {doc_id} not found.")
 
     def add_account_entries(self, je, doc, from_account, to_account, amount):
-        je = self._add_account_entry(
-            je, from_account, doc, amount, credit=True
-        )
-        je = self._add_account_entry(
-            je, to_account,doc, amount, credit=False
-        )
+        je = self._add_account_entry(je, from_account, doc, amount, credit=True)
+        je = self._add_account_entry(je, to_account, doc, amount, credit=False)
         return je
-    
+
     def _add_account_entry(self, je, account, doc, amount, credit):
         entry = {
-                "account": account,
-                "party_type": self.party_type,
-                "party": doc.get('customer', doc.get('party')),
-                "region": doc.get('region', doc.get('custom_region','')),
-                "entity": doc.get('entity', doc.get('custom_entity','')),
-                "branch": doc.get('branch', doc.get('custom_branch', '')),
-                "cost_center": doc.get('cost_center', ''),
-                "branch_type": doc.get('custom_branch_type', doc.get('branch_type', ''))
-            }
-        
+            "account": account,
+            "party_type": self.party_type,
+            "party": doc.get("customer", doc.get("party")),
+            "region": doc.get("region", doc.get("custom_region", "")),
+            "entity": doc.get("entity", doc.get("custom_entity", "")),
+            "branch": doc.get("branch", doc.get("custom_branch", "")),
+            "cost_center": doc.get("cost_center", ""),
+            "branch_type": doc.get("custom_branch_type", doc.get("branch_type", "")),
+        }
 
         if credit:
             entry["credit_in_account_currency"] = amount
             entry["reference_type"] = self.doctype
             entry["reference_name"] = doc.name
-            entry["reference_due_date"] = doc.get('posting_date', doc.get('date'))
+            entry["reference_due_date"] = doc.get("posting_date", doc.get("date"))
         else:
             entry["debit_in_account_currency"] = amount
             entry["user_remark"] = account
 
         je.append("accounts", entry)
         return je
-    
+
     def save_je(self, je, parent_doc=None):
         self._set_custom_fields(je, parent_doc)
         je.save()
