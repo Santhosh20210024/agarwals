@@ -17,6 +17,7 @@
   "column_break_kire",
   "mrn",
   "patient_name",
+  "patient_age",
   "bedtype",
   "status",
   "cancelled_date",
@@ -360,6 +361,11 @@
    "fieldtype": "Int",
    "label": "File Index",
    "read_only": 1
+  },
+  {
+   "fieldname": "patient_age",
+   "fieldtype": "Data",
+   "label": "Patient Age"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -370,7 +376,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-05-29 12:18:02.701074",
+ "modified": "2024-08-21 17:57:25.668003",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
