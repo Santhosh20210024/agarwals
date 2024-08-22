@@ -46,12 +46,13 @@ class StepProcessor(Processor):
         return eval(param)
 
     def execute_method(self, steps):
+        worker_count_dict = {}
         for i in range(0, len(steps)):
             self.update_start_status(steps[i].name)
             param = self.replace_placeholders(steps[i])
             frappe.call(steps[i].method + ".process", args = param)
-            if steps[i].number_of_workers != 0:
-                worker.add(steps[i].number_of_workers, param["queue"])
+            worker_count_dict = worker.get_worker_dict(steps[i].number_of_workers, param["queue"] , worker_count_dict)
+        worker.add_workers(worker_count_dict)
 
     def start(self, name):
         step_doc = frappe.get_doc("Step", name)
