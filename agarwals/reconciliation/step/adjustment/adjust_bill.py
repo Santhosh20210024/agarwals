@@ -5,6 +5,7 @@ from agarwals.utils.error_handler import log_error
 from agarwals.reconciliation.step.adjustment.journal_entry_utils import (
     JournalEntryUtils
 )
+from agarwals.utils.accounting_utils import get_abbr
 
 
 class BillAdjustmentProcessor(JournalEntryUtils):
@@ -12,9 +13,9 @@ class BillAdjustmentProcessor(JournalEntryUtils):
     
     def __init__(self):
         super().__init__('Sales Invoice')
-        self.TDS_ACCOUNT = "TDS - A"
-        self.DISALLOWANCE_ACCOUNT = "Disallowance - A"
-        self.DEBTORS_ACCOUNT = "Debtors - A"
+        self.TDS_ACCOUNT = "TDS - " + get_abbr()
+        self.DISALLOWANCE_ACCOUNT = "Disallowance - " + get_abbr()
+        self.DEBTORS_ACCOUNT = "Debtors - " + get_abbr()
         self.error_message = ""
         self.error_items = []
 

@@ -10,3 +10,6 @@ def update_posting_date(_date):
         return _date.today().strftime("%Y-%m-%d")
     else:
         return _date.strftime("%Y/%m/%d")
+    
+def get_abbr():
+    return frappe.get_list('Company',pluck = 'abbr')[0]

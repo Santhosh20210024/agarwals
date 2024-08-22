@@ -4,6 +4,7 @@ from agarwals.utils.accounting_utils import update_posting_date
 from agarwals.reconciliation.step.adjustment.journal_entry_utils import (
     JournalEntryUtils,
 )
+from agarwals.utils.accounting_utils import get_abbr
 
 
 class RoundOffProcess(JournalEntryUtils):
@@ -13,8 +14,8 @@ class RoundOffProcess(JournalEntryUtils):
         self.type = type
         self.ENTRY_TYPE = "RND"
         self.JOURNAL_TYPE = "Credit Note"
-        self.DEBTORS_ACCOUNT = "Debtors - A"
-        self.ROUNDED_ACCOUNT = "Rounded Off - A"
+        self.DEBTORS_ACCOUNT = "Debtors - " + get_abbr()
+        self.ROUNDED_ACCOUNT = "Rounded Off - " + get_abbr()
         
     def _add_custom_fields(self, je, invoice):
         je.custom_sales_invoice = invoice.name
