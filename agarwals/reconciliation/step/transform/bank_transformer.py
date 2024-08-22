@@ -111,7 +111,7 @@ class BankTransformer(StagingTransformer):
         self.source_df['bank_account'] = bank_account
 
     def get_columns_to_fill_na_as_0(self):
-        return ['reference_number']
+        return eval(self.loading_configuration.column_to_convert_na_to_0)
 
     def get_header_identification_keys(self,configuration):
         return eval(configuration.types_of_narration_column)
@@ -140,6 +140,8 @@ class BankTransformer(StagingTransformer):
         self.source_df = self.format_date(self.source_df,eval(configuration.date_formats),'date')
         self.source_df = self.fill_na_as_0(self.source_df)
         self.source_df = self.validate_reference(self.source_df)
+        self.source_df['deposit'] = self.source_df['credit']
+        self.source_df['withdrawal'] = self.source_df['debit']
         self.new_records = self.source_df
         self.move_to_transform(file, self.new_records, 'Insert', 'Transform', True)
         return True
@@ -165,7 +167,7 @@ class BankBulkTransformer(BankTransformer):
 
     def transform(self, file):
         self.source_df["file_upload"] = file['name']
-        self.source_df = self.find_and_rename_column(self.source_df, self.get_columm_needed())
+        self.source_df = self.find_and_rename_column(self.source_df, self.get_column_needed())
         configuration = frappe.get_single('Bank Configuration')
         if "date" in self.source_df.columns.values:
             self.source_df = self.format_date(self.source_df, eval(configuration.date_formats), 'date')
