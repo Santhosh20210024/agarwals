@@ -103,9 +103,9 @@ class PaymentEntryCreator:
                 self.__add_deduction('Write Off - A', 'WriteOff', round(float(si_outstanding_amount), 2)))
             pe_dict["references"][0]["allocated_amount"] = round(float(pe_dict["references"][0]["allocated_amount"]),
                                                                  2) + round(float(si_outstanding_amount), 2)
-            if "deductions" in pe_dict.keys():
-                pe_dict["deductions"] = pe_dict["deductions"] + deductions
-            pe_dict["deductions"] = deductions
+            if "deductions" not in pe_dict.keys():
+                pe_dict["deductions"] = []
+            pe_dict["deductions"] = pe_dict["deductions"] + deductions
         process_round_timer.end()
         return pe_dict
 
