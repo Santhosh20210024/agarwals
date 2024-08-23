@@ -18,9 +18,8 @@
   },
   {
    "fieldname": "claimbook",
-   "fieldtype": "Link",
-   "label": "ClaimBook",
-   "options": "ClaimBook"
+   "fieldtype": "Data",
+   "label": "ClaimBook"
   }
  ],
  "index_web_pages_for_search": 1,
