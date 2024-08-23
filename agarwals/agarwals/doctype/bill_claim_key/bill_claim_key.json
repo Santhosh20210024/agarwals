@@ -18,9 +18,8 @@
   },
   {
    "fieldname": "bill",
-   "fieldtype": "Link",
-   "label": "Bill",
-   "options": "Bill"
+   "fieldtype": "Data",
+   "label": "Bill"
   }
  ],
  "index_web_pages_for_search": 1,
