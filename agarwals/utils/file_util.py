@@ -1,4 +1,5 @@
 import frappe
+import os
 from agarwals.utils.error_handler import log_error
 
 def get_sub_directory(control_panel):
@@ -6,7 +7,11 @@ def get_sub_directory(control_panel):
     return sub_dir if sub_dir else ''
     
 def construct_file_url(*args):
-    return "/".join(args)
+    """Get the path to the site's shell directory"""
+    try:
+        return os.path.join(*args)
+    except Exception as e:
+        frappe.throw(f"Error constructing site path: {e}")
 
 control_panel = frappe.get_single('Control Panel')
 PROJECT_FOLDER = control_panel.get('project_folder', None)

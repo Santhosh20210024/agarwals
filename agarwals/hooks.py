@@ -64,7 +64,7 @@ required_apps = ["frappe/tfs"]
 # Installation
 # ------------
 
-# before_install = "agarwals.utils.create_folders.folder_structure_creation"
+# before_install = "agarwals.utils.create_folders.create_project_folders"
 # after_install = "agarwals.install.after_install"
 
 # Uninstallation
@@ -80,7 +80,7 @@ required_apps = ["frappe/tfs"]
 
 
 # Agarwals  Integration Setup
-before_install = "agarwals.utils.create_folders.folder_structure_creation"
+before_install = "agarwals.utils.create_folders.create_project_folders"
 
 # Agarwals Deletion Setup
 # before_uninstall = "agarwals.utils.create_folders.folder_structure_deletion"
