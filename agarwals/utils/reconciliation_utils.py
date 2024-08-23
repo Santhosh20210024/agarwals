@@ -2,7 +2,8 @@ from datetime import date, datetime
 import frappe
 from tfs.profiler.timer import Timer
 from frappe.utils.caching import redis_cache
-from frappe import utils, Document
+from frappe import utils
+from frappe.model.document import Document
 from agarwals.utils.error_handler import log_error
 
 

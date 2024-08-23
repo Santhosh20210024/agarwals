@@ -3,7 +3,7 @@ from agarwals.agarwals.doctype import file_records
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
-from frappe import Document
+from frappe.model.document import Document
 from tfs.profiler.timer import Timer
 from datetime import date
 from agarwals.utils.reconciliation_utils import update_error, get_document_record, get_posting_date, get_entity_closing_date
