@@ -155,17 +155,16 @@ class Matcher:
         create_matcher_record(matcher_records): Processes and saves matcher records.
     """
 
-    def __init__(self, chunk_doc, match_logics, payment_logics):
+    def __init__(self, chunk_doc, match_logics):
         self.chunk_doc = chunk_doc
         self.match_logics = match_logics
-        self.payment_logics = payment_logics
-        self.matcher_delete_queury = """Delete from `tabMatcher` where match_logic not in %(match_logic)s"""
+        self.matcher_delete_queury = """Delete from `tabMatcher` where match_logic not in %(match_logics)s"""
         self.preprocess_update_queury = """UPDATE `tabSettlement Advice` SET status = 'Open', remark = NULL, matcher_id = NULL WHERE status IN ('Unmatched', 'Open')"""
         self.postprocess_update_query = """UPDATE `tabSettlement Advice` set status = 'Unmatched', remark = %(remark)s where status = 'Open'"""
         self.notprocessed_update_query = """UPDATE `tabSettlement Advice`SET status = %(status)s, matcher_id = %(matcher_id)s WHERE name = %(name)s"""
         self.status_update_query = """UPDATE `tabSettlement Advice` SET status = %(status)s, remark = %(remark)s WHERE name = %(name)s"""
         
-    def add_log_error(self, error, doc, doc_name):
+    def add_log_error(self, error, doc=None, doc_name=None):
         """Logs errors encountered during processing."""
         log_error(error=error, doc=doc, doc_name=doc_name)
 
@@ -194,56 +193,60 @@ class Matcher:
         advice_doc.remark = msg
         advice_doc.save()
 
-    def create_matcher_record(self, matcher_records):
-        """Processes and saves matcher records based on provided matcher logic and payment logic."""
+    def create_matcher_record(self, matcher_records, batch_size=100):
+        """Processes and saves matcher records based on provided matcher logic."""
+        processed_count = 0
+
         for record in matcher_records:
             if not MatcherValidation(record).is_valid():
                 continue
 
             try:
-                matcher_record = {}
-                matcher_record["sales_invoice"] = record["bill"]
+                matcher_record = frappe.new_doc("Matcher")
+                matcher_record.set('sales_invoice', record['bill'])
                 matcher_record = self.update_matcher_amount(matcher_record, record)
 
-                if record["advice"]:
-                    matcher_record["settlement_advice"] = record["advice"]
-                
-                if record["claim"]:
-                    matcher_record["claimbook"] = record["claim"]
-                    matcher_record["insurance_company_name"] = record["insurance_name"]
-                
-                if record["logic"] in self.payment_logics:
-                    if record["payment_order"]:
-                        matcher_record = self.update_payment_order( matcher_record, record)
-                
-                if record["bank"]:
-                    matcher_record["bank_transaction"] = record["bank"]
-                    matcher_record["name"] = self.get_matcher_name(record["bill"], record["bank"])
-                else:
-                    if record["claim"]:
-                        matcher_record["name"] = self.get_matcher_name(record["bill"], record["claim"])
-                    else:
-                        matcher_record["name"] = self.get_matcher_name(record["bill"], record["advice"])
+                if record['advice']:
+                    matcher_record.set('settlement_advice', record['advice'])
 
-                matcher_record["match_logic"] = record["logic"]
-                matcher_record["status"] = "Open"
+                if record['claim']:
+                    matcher_record.set('claimbook', record['claim'])
+                    matcher_record.set('insurance_company_name', record['insurance_name'])
+
+                if record['logic'] in self.payment_logic:
+                    if record.payment_order:
+                        matcher_record = self.update_payment_order(matcher_record, record)
+
+                if record['bank']:
+                    matcher_record.set('bank_transaction', record['bank'])
+                    matcher_record.set('name', self.get_matcher_name(record['bill'], record['bank']))
+                else:
+                    if record['claim']:
+                        matcher_record.set('name', self.get_matcher_name(record['bill'], record['claim']))
+                    else:
+                        matcher_record.set('name', self.get_matcher_name(record['bill'], record['advice']))
+
+                matcher_record.set('match_logic', record['logic'])
+                matcher_record.set('status', 'Open')
             except Exception as err:
                 self.add_log_error(f'{err}: create_matcher_record', "Matcher", matcher_record.get("name", "Unknown"))
 
             try:
-                matcher_record_doc = frappe.get_doc('Matcher', matcher_record)
-                matcher_record_doc.save()
+                matcher_record.save()
                 
                 if record["advice"]:
                     frappe.db.sql(
                         self.notprocessed_update_query,
                         values={
                             "status": "Not Processed",
-                            "matcher_id": matcher_record_doc.name,
-                            "name": matcher_record_doc.settlement_advice,
-                        },
+                            "matcher_id": matcher_record.name,
+                            "name": matcher_record.settlement_advice,
+                        }
                     )
-                frappe.db.commit()
+                processed_count += 1
+
+                if processed_count % batch_size == 0:
+                    frappe.db.commit()
 
             except Exception as err:
                 if record["advice"]:
@@ -252,10 +255,11 @@ class Matcher:
                         values={
                             "status": "Error",
                             "remark": err,
-                            "name": matcher_record_doc.settlement_advice
-                        },
+                            "name": matcher_record.settlement_advice
+                        }
                     )
-                frappe.db.commit()
+                    
+        frappe.db.commit() #safe commit
 
 class MatcherOrchestrator(Matcher):
     """
@@ -267,18 +271,16 @@ class MatcherOrchestrator(Matcher):
         get_records(): Fetches records from the database for processing.
         start_process(): The main function to trigger the processing of matcher records.
     """
-    def __init__(self, chunk_doc, match_logics, payment_logics):
-        super().__init__(chunk_doc, match_logics, payment_logics)
+    def __init__(self, chunk_doc, match_logics):
+        super().__init__(chunk_doc, match_logics)
 
     def preprocess_entries(self):
         """
         Runs SQL queries to prepare the database for processing.
         """
         try:
-            match_logic = ("MA5-BN", "MA3-CN", "MA1-CN")
             update_bill_no_separate_column()
-            
-            frappe.db.sql(self.matcher_delete_queury, values={"match_logic": match_logic})
+            frappe.db.sql(self.matcher_delete_queury, values={"match_logics": self.match_logics})
             frappe.db.sql(self.preprocess_update_queury)
             frappe.db.commit()
         except Exception as e:
@@ -322,14 +324,11 @@ class MatcherOrchestrator(Matcher):
 def get_control_panel_conf():
     control_panel = frappe.get_single("Control Panel")
     match_logics = control_panel.get('match_logic','').split(",") 
-    payment_logics = control_panel.get('payment_logic','').split(",")
 
     if not match_logics:
         frappe.throw('Match Logic is not defined in control panel')
-    elif not payment_logics:
-        frappe.throw('Payment Logic is not defined in control panel')
 
-    return match_logics, payment_logics
+    return match_logics
 
 @frappe.whitelist()
 def process(args):
@@ -338,10 +337,10 @@ def process(args):
         step_id = args["step_id"]
         
         try:
-            match_logics, payment_logics = get_control_panel_conf()
+            match_logics = get_control_panel_conf()
             chunk_doc = chunk.create_chunk(step_id)
             
-            matcher_orcestrator = MatcherOrchestrator(chunk_doc, match_logics, payment_logics)
+            matcher_orcestrator = MatcherOrchestrator(chunk_doc, match_logics)
             matcher_orcestrator.start_process()
         except Exception as err:
             log_error(f'{err}: process', "Matcher")

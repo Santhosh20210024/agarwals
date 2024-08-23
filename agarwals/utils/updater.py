@@ -23,4 +23,3 @@ def update_bill_no_separate_column():
     frappe.db.sql(bill_no_debtors_update_query)
     frappe.db.sql(bill_no_claim_update_query_ma)
     frappe.db.sql(bill_no_claim_update_query)
-    frappe.db.commit()
