@@ -213,7 +213,7 @@ class Matcher:
                     matcher_record.set('claimbook', record['claim'])
                     matcher_record.set('insurance_company_name', record['insurance_name'])
 
-                if record['logic'] in self.payment_logic:
+                if record['logic'] in self.match_logics:
                     if record.payment_order:
                         matcher_record = self.update_payment_order(matcher_record, record)
 
