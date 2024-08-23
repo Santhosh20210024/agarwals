@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:document_type",
  "creation": "2024-08-12 13:09:42.153012",
@@ -15,7 +16,8 @@
   "column_to_prune",
   "column_to_check_the_difference",
   "column_to_join",
-  "column_to_convert_the_values_to_numeric"
+  "column_to_convert_the_values_to_numeric",
+  "column_to_convert_na_to_0"
  ],
  "fields": [
   {
@@ -61,11 +63,16 @@
    "fieldname": "column_to_convert_the_values_to_numeric",
    "fieldtype": "Code",
    "label": "Column to Convert the Values to Numeric"
+  },
+  {
+   "fieldname": "column_to_convert_na_to_0",
+   "fieldtype": "Code",
+   "label": "Columns to Convert the NA to 0"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-12 13:12:44.552140",
+ "modified": "2024-08-22 15:51:30.698266",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Data Loading Configuration",

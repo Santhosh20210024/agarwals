@@ -17,6 +17,7 @@ class AdviceTransformer(StagingTransformer):
         self.utr_column_name = 'final_utr_number'
         self.rename_value = None
         self.list_of_char_to_replace = None
+        self.skip_invalid_rows_in_csv = True
 
     def get_file_columns(self):
         return "upload,name,payer_type,is_mail"
@@ -76,13 +77,13 @@ class AdviceTransformer(StagingTransformer):
         return False
 
     def get_columns_to_prune(self):
-        return ['name', '_merge', 'hash_x', 'hash_column']
+        return eval(self.loading_configuration.column_to_prune)
 
     def get_column_name_to_convert_to_numeric(self):
-        return ['claim_amount', 'settled_amount', 'tds_amount', 'disallowed_amount']
+        return eval(self.loading_configuration.column_to_convert_the_values_to_numeric)
 
     def get_columns_to_fill_na_as_0(self):
-        return ['claim_amount', 'settled_amount', 'tds_amount', 'disallowed_amount']
+        return eval(self.loading_configuration.column_to_convert_na_to_0)
 
     def calculate_settled_amount(self, file, df):
         tpa_to_calculate_settled_amount = frappe.db.sql("""SELECT tpa FROM `tabSettled Amount Calculation Configuration` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount';""", as_list=True)
@@ -125,8 +126,7 @@ class AdviceTransformer(StagingTransformer):
         return df
 
     def get_columns_to_hash(self):
-        return ["claim_id", "bill_number", "utr_number", "claim_status", "claim_amount", "disallowed_amount",
-                "payers_remark", "settled_amount", "tds_amount"]
+        return eval(self.loading_configuration.column_to_hash)
 
     def load_target_df(self):
         query = f"""
@@ -144,7 +144,7 @@ class AdviceTransformer(StagingTransformer):
         return left_df_column, right_df_column
 
     def get_column_needed(self):
-        return ["claim_id", "cl_number", "bill_number", "mrn", "utr_number", "final_utr_number", "claim_status", "paid_date", "insurance_company", "patient_name", "insurance_policy_number", "doa", "dod", "hospital_name", "bank_account_no", "bank_name", "bank_branch", "claim_amount", "settled_amount", "tds_amount", "disallowed_amount", "payers_remark", "hash", "file_upload", "transform", "index"]
+        return eval(self.loading_configuration.column_needed)
 
     def extract(self, configuration, key, file):
         self.source_df.rename(columns=self.rename_value, inplace=True)

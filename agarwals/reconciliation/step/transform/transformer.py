@@ -1,3 +1,4 @@
+import os
 import json
 import pandas as pd
 import frappe
@@ -6,7 +7,7 @@ import hashlib
 from agarwals.utils.loader import Loader
 from agarwals.reconciliation import chunk
 from agarwals.utils.error_handler import log_error as error_handler
-from agarwals.utils.file_utils import HOME_PATH
+from agarwals.utils.file_util import HOME_PATH
 
 SITE_PATH = frappe.get_single('Control Panel').site_path
 FOLDER = HOME_PATH
@@ -29,6 +30,7 @@ class Transformer:
         self.is_truncate_excess_char = False
         self.max_trim_length = 140
         self.loading_configuration = None
+        self.skip_invalid_rows_in_csv = False
 
     def get_file_columns(self):
         return "upload,name"
@@ -95,7 +97,7 @@ class Transformer:
             df = df[df[left_column] == df[right_column]]
         return modified_records, df
 
-    def log_error(self, doctype_name, reference_name, error_message):
+    def log_error(self, doctype_name, error_message , reference_name = None):
         error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
 
     def get_column_needed(self):
@@ -120,7 +122,7 @@ class Transformer:
         file = frappe.new_doc('File')
         file.set('file_name', file_name)
         file.set('is_private', IS_PRIVATE)
-        file.set('folder', FOLDER + folder)
+        file.set('folder', os.path.join(FOLDER,folder))
         file.set('file_url', file_url)
         file.save()
         frappe.db.set_value('File',file.name,'file_url',file_url)
@@ -166,16 +168,16 @@ class Transformer:
     def load_source_df(self, file, header):
         try:
             if file['upload'].lower().endswith('.csv'):
-                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header)
+                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header , on_bad_lines='skip') if self.skip_invalid_rows_in_csv else pd.read_csv(SITE_PATH + file['upload'], header=header)
             else:
                  self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
-            self.log_error(self.document_type, file['name'], e)
+            self.log_error(doctype_name=self.document_type, reference_name=file['name'],error_message=e)
             self.update_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
-        return eval(self.loading_configuration.column_to_hash)
+        return self.loading_configuration.column_to_hash
 
     def hashing_job(self):
         self.source_df['hash_column'] = ''
@@ -310,7 +312,7 @@ class Transformer:
         return df
 
     def get_columns_to_fill_na_as_0(self):
-        return []
+        return eval(self.loading_configuration.column_to_convert_na_to_0)
 
     def fill_na_as_0(self,df):
         columns = self.get_columns_to_fill_na_as_0()
@@ -342,9 +344,9 @@ class Transformer:
             chunk.update_status(chunk_doc, "InProgress")
             status = "Processed"
             for file in files:
-                self.update_status('File upload', file['name'], 'In Process')
-                self.load_source_df(file, self.header)
                 try:
+                    self.update_status('File upload', file['name'], 'In Process')
+                    self.load_source_df(file, self.header)
                     if self.source_df.empty:
                         self.log_error(self.document_type, file['name'], 'The File is Empty')
                         self.update_status('File upload', file['name'], 'Error')
@@ -365,3 +367,5 @@ class Transformer:
         except Exception as e:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Error")
+            self.log_error(error_message=e,doctype_name='Settlement Advice Staging')
+
