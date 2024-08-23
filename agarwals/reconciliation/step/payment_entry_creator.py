@@ -88,8 +88,7 @@ class PaymentEntryCreator:
         if 0.00 < si_outstanding_amount <= 9.9:
             deductions.append(
                 self.__add_deduction('Write Off - A', 'WriteOff', round(float(si_outstanding_amount), 2)))
-            pe_dict["references"][0]["allocated_amount"] = round(float(pe_dict["references"][0]["allocated_amount"]),
-                                                                 2) + round(float(si_outstanding_amount), 2)
+            pe_dict["references"][0]["allocated_amount"] = round(float(pe_dict["references"][0]["allocated_amount"] + si_outstanding_amount), 2)
             if "deductions" not in pe_dict.keys():
                 pe_dict["deductions"] = []
             pe_dict["deductions"] = pe_dict["deductions"] + deductions
@@ -276,21 +275,21 @@ def process(args):
         bt_records = frappe.db.sql("""SELECT bank_transaction, JSON_ARRAYAGG(name) as matcher_names
                                         FROM `tabMatcher`
                                         where match_logic in  %(m_logic)s and status = 'Open'
-                                        GROUP BY bank_transaction ORDER BY sales_invoice, payment_order, unallocated DESC LIMIT %(limit)s"""
-                                   , values={"m_logic": m_logic, "limit": chunk_size}
+                                        GROUP BY bank_transaction ORDER BY sales_invoice, payment_order, unallocated DESC"""
+                                   , values={"m_logic": m_logic}
                                    , as_dict=True)
         if bt_records:
             for record in range(0, len(bt_records), chunk_size):
                 chunk_doc = chunk.create_chunk(args["step_id"])
                 seq_no = seq_no + 1
-                reconcile_bank_transaction(bt_records=bt_records, chunk_doc=chunk_doc, batch = "Batch" + str(seq_no))
-                # frappe.enqueue(reconcile_bank_transaction
-                #                , queue='long'
-                #                , is_async=True
-                #                , job_name="Batch" + str(seq_no)
-                #                , timeout=25000
-                #                , bt_records=bt_records[record:record + chunk_size]
-                #                , chunk_doc=chunk_doc, batch="Batch" + str(seq_no))
+                # reconcile_bank_transaction(bt_records=bt_records, chunk_doc=chunk_doc, batch = "Batch" + str(seq_no))
+                frappe.enqueue(reconcile_bank_transaction
+                               , queue='long'
+                               , is_async=True
+                               , job_name="Batch" + str(seq_no)
+                               , timeout=25000
+                               , bt_records=bt_records[record:record + chunk_size]
+                               , chunk_doc=chunk_doc, batch="Batch" + str(seq_no))
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
