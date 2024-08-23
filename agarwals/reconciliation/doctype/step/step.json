@@ -24,7 +24,7 @@
    "fieldname": "method",
    "fieldtype": "Select",
    "label": "Method",
-   "options": "\nagarwals.reconciliation.step.transform\nagarwals.reconciliation.step.sales_invoice_creator\nagarwals.reconciliation.step.insurance_tagger\nagarwals.reconciliation.step.payer_match\nagarwals.reconciliation.step.transcation_creator\nagarwals.reconciliation.step.advice_creator\nagarwals.reconciliation.step.claim_key_mapper\nagarwals.reconciliation.step.matcher\nagarwals.reconciliation.step.payment_entry_creator\nagarwals.reconciliation.step.adjust_bill\nagarwals.reconciliation.step.advice_downloader\nagarwals.reconciliation.step.test",
+   "options": "\nagarwals.reconciliation.step.transform\nagarwals.reconciliation.step.sales_invoice_creator\nagarwals.reconciliation.step.insurance_tagger\nagarwals.reconciliation.step.payer_match\nagarwals.reconciliation.step.transcation_creator\nagarwals.reconciliation.step.advice_creator\nagarwals.reconciliation.step.claim_key_mapper\nagarwals.reconciliation.step.matcher\nagarwals.reconciliation.step.payment_entry_creator\nagarwals.reconciliation.step.adjust_bill\nagarwals.reconciliation.step.advice_downloader\nagarwals.reconciliation.step.key_mapper.utr_key_mapper\nagarwals.reconciliation.step.key_mapper.claim_key_mapper",
    "read_only": 1
   },
   {

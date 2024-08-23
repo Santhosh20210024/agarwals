@@ -19,6 +19,7 @@ def update_fiscal_year(doc,type):
         except Exception as e:
            log_error(str(e),type,doc.name)
            frappe.db.commit()
+
     
     
     

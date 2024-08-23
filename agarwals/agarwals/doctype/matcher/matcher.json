@@ -10,6 +10,7 @@
  "engine": "InnoDB",
  "field_order": [
   "sales_invoice",
+  "claim_amount",
   "claimbook",
   "insurance_company_name",
   "settlement_advice",
@@ -91,11 +92,16 @@
    "fieldname": "payment_order",
    "fieldtype": "Data",
    "label": "Payment Order"
+  },
+  {
+   "fieldname": "claim_amount",
+   "fieldtype": "Data",
+   "label": "Claim Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-22 12:56:38.287312",
+ "modified": "2024-07-17 18:20:21.483553",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",

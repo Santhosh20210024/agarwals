@@ -434,15 +434,17 @@ def update_reconciled_status():
 @frappe.whitelist()
 def process(args):
     try:
-        args=cast_to_dic(args)
+        args = cast_to_dic(args)
         seq_no = 0
         chunk_size = int(args["chunk_size"])
-        m_logic = tuple(frappe.get_single('Control Panel').match_logic.split(','))
-        bt_doc_records = frappe.db.sql("""SELECT name, bank_account, reference_number, date, custom_entity FROM `tabBank Transaction`
+        m_logic = tuple(frappe.get_single("Control Panel").payment_logic.split(","))
+        bt_doc_records = frappe.db.sql(
+            """SELECT name, bank_account, reference_number, date, custom_entity FROM `tabBank Transaction`
                                    WHERE name in ( select bank_transaction from `tabMatcher` where match_logic in %(m_logic)s and status = 'Open' )
-                                   AND LENGTH(reference_number) > 4 AND status in ('Pending','Unreconciled') AND deposit > 8 ORDER BY unallocated_amount DESC"""
-                                   ,values = { "m_logic" : m_logic }
-                                   ,as_dict=True)
+                                   AND LENGTH(reference_number) > 4 AND status in ('Pending','Unreconciled') AND deposit > 8 ORDER BY unallocated_amount DESC""",
+            values={"m_logic": m_logic},
+            as_dict=True,
+        )
         update_reconciled_status()
         if bt_doc_records:
             for record in range(0, len(bt_doc_records), chunk_size):
