@@ -34,7 +34,7 @@ class MatcherValidation:
         return (
             self._validate_advice()
             and self._validate_amount()
-            and self._validate_bill_status()
+            and self._validate_invoice_status()
             and self._validate_bank_transaction()
         )
 
@@ -94,18 +94,17 @@ class MatcherValidation:
                 return False
         return True
 
-    def _validate_bill_status(self):
+    def _validate_invoice_status(self):
         """Checks the status of the bill to ensure it is valid for processing."""
-        if frappe.get_value("Bill", self.record["bill"], "status") in [
-            "CANCELLED",
-            "CANCELLED AND DELETED",
+        if frappe.get_value("Sales Invoice", self.record["bill"], "status") in [
+            "CANCELLED"
         ]:
             if self.record["advice"]:
                 Matcher.update_advice_status(
                     self.record["advice"], "Warning", "Cancelled Bill"
                 )
             return False
-        if frappe.get_value("Bill", self.record["bill"], "status") == "Paid":
+        if frappe.get_value("Sales Invoice", self.record["bill"], "status") == "Paid":
             if self.record["advice"]:
                 Matcher.update_advice_status(
                     self.record["advice"], "Warning", "Already Paid Bill"
