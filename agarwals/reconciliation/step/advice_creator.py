@@ -75,7 +75,7 @@ def create_settlement_advice_doc(doc_to_insert):
     except Exception as e:
         if "Duplicate entry" in str(e):
             sa_doc = frappe.get_doc('Settlement Advice', name)
-            if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount == doc_to_insert.disallowed_amount:
+            if float(sa_doc.tds_amount) == float(doc_to_insert.tds_amount) and float(sa_doc.settled_amount) == float(doc_to_insert.settled_amount) and float(sa_doc.disallowed_amount) == float(doc_to_insert.disallowed_amount):
                 return update_error(doc_to_insert, 'S100')
             if sa_doc.status == 'Warning' and sa_doc.remark == "Claim amount lesser than the cumulative of other amounts":
                 sa_doc.update(data)
@@ -92,9 +92,9 @@ def validate_advice(advice_staging_doc):
     if advice_staging_doc.status == "Open" and (
             advice_staging_doc.final_utr_number == "0" or advice_staging_doc.final_utr_number is None or advice_staging_doc.claim_id == "0" or advice_staging_doc.utr_number is None):
         return update_error(advice_staging_doc, "S101"), False
-    if advice_staging_doc.settled_amount is None or advice_staging_doc.settled_amount == 0:
+    if advice_staging_doc.settled_amount is None or float(advice_staging_doc.settled_amount) == 0:
         return update_error(advice_staging_doc, "S102"), False
-    if advice_staging_doc.settled_amount < 0 or advice_staging_doc.tds_amount < 0 or advice_staging_doc.disallowed_amount < 0:
+    if float(advice_staging_doc.settled_amount) < 0 or float(advice_staging_doc.tds_amount) < 0 or float(advice_staging_doc.disallowed_amount) < 0:
         return update_error(advice_staging_doc, "S105"), False
     if "e+" in advice_staging_doc.final_utr_number.lower() or "e+" in advice_staging_doc.utr_number.lower():
         return update_error(advice_staging_doc, "S103"), False
