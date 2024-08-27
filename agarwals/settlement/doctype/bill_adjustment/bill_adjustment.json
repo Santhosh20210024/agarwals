@@ -8,6 +8,10 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "connection_section",
+  "tds_entry_id",
+  "dis_entry_id",
+  "section_break_yy3dq",
   "bill",
   "tds",
   "disallowance",
@@ -23,7 +27,6 @@
   {
    "fieldname": "bill",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Bill",
    "unique": 1
   },
@@ -43,6 +46,7 @@
    "fieldname": "posting_date",
    "fieldtype": "Date",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Posting Date"
   },
   {
@@ -54,6 +58,8 @@
   {
    "fieldname": "file_upload",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "File upload",
    "options": "File upload",
    "read_only": 1
@@ -62,6 +68,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Status",
    "options": "Open\nProcessed\nPartially Processed\nError"
   },
@@ -82,11 +89,37 @@
    "fieldtype": "Int",
    "label": "File Index",
    "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "connection_section",
+   "fieldtype": "Section Break",
+   "label": "Connection"
+  },
+  {
+   "fieldname": "tds_entry_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "TDS Entry ID",
+   "options": "Journal Entry"
+  },
+  {
+   "fieldname": "dis_entry_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "DIS Entry ID",
+   "options": "Journal Entry"
+  },
+  {
+   "fieldname": "section_break_yy3dq",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-16 17:06:45.824650",
+ "modified": "2024-08-20 16:05:07.422350",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Bill Adjustment",

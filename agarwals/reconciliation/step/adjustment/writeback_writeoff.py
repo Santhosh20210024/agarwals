@@ -2,6 +2,7 @@ import frappe
 from agarwals.reconciliation.step.adjust_bill import JournalUtils
 from datetime import datetime
 from agarwals.utils.error_handler import log_error as error_handler
+from agarwals.utils.accounting_utils import get_abbr
 
 @frappe.whitelist()
 def create_writeback_jv():
@@ -82,7 +83,7 @@ def set_writeback_account_data(bank_transaction,company_account, amount):
                 'credit_in_account_currency' : amount
                }
     debit_data = {
-                'account' : "WriteBack - A",
+                'account' : "WriteBack - "+ get_abbr(),
                 'region' : bank_transaction.custom_region,
                 'entity' : bank_transaction.custom_entity,
                 'branch_type' : bank_transaction.custom_branch_type,
@@ -147,7 +148,7 @@ def create_writeoff_jv():
                         file_upload_list = get_doc_list("File upload",{"name":writeoff.file_upload},["*"])
                         #get posting and debt_account
                         posting_date = file_upload_list[0].wo_date
-                        debt_account = "Debtors - A"
+                        debt_account = "Debtors - "+get_abbr()
                         #init je
                         je = create_journal_entry("Journal Entry", str(posting_date), "WO",sales_invoice)
                         je.bill_no = writeoff.name
@@ -195,7 +196,7 @@ def set_writeoff_account_data(sales_invoice,debt_account,amount):
 
     }
     debit_data = {
-                'account': "Write Off - A",
+                'account': "Write Off - "+ get_abbr(),
                 'debit_in_account_currency': amount,
                 'region': sales_invoice.region,
                 'entity': sales_invoice.entity,

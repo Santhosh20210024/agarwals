@@ -222,7 +222,7 @@ class Fileupload(Document):
 	def read_file(self, file, columns = False):
 		if os.path.exists(file):
 			if file.endswith('.csv'):
-				file_data = pd.read_csv(file)
+				file_data = pd.read_csv(file,on_bad_lines = 'skip')
 				if columns:
 					return list(file_data.columns)
 				return file_data

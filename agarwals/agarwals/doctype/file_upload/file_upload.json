@@ -42,7 +42,8 @@
   "mapping_advice",
   "other_mapping_section",
   "mapping_other",
-  "is_uploaded"
+  "is_uploaded",
+  "tpa_branch"
  ],
  "fields": [
   {
