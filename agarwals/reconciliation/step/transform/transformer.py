@@ -369,4 +369,3 @@ class Transformer:
             chunk.update_status(chunk_doc, "Error")
             self.log_error(error_message=e,doctype_name='Settlement Advice Staging')
 
-

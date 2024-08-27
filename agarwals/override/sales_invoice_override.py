@@ -535,38 +535,7 @@ class SalesInvoiceOverride(SellingController):
 	def on_update(self):
 		self.set_paid_amount()
 		
-
-	def update_total_tds_disallowance(self):
-		child_docs=frappe.db.sql(""" 
-						   SELECT 
-						        sum(tds_amount) total_tds,sum(disallowance_amount) total_dis ,sum(writeoff_amount) writeoff,sum(paid_amount) Settled_amount
-						    FROM
-						        `tabSales Invoice Reference` 
-						    WHERE 
-						   		parent='{name}'
-						   """.format(name=self.name),as_dict=True)
-		
-		if self.custom_total_tds_amount != child_docs[0]['total_tds']:
-				self.custom_total_tds_amount = child_docs[0]['total_tds']
-				self.save()
-
-		if self.custom_total_disallowance_amount != child_docs[0]['total_dis']:
-			self.custom_total_disallowance_amount = child_docs[0]['total_dis']
-			self.save()
-
-		if self.custom_total_writeoff_amount != child_docs[0]['writeoff']:
-			self.custom_total_writeoff_amount = child_docs[0]['writeoff']
-			self.save()
-
-		if self.custom_total_settled_amount != child_docs[0]['Settled_amount']:
-				self.custom_total_settled_amount = child_docs[0]['Settled_amount']
-				self.save()
-			
-		frappe.db.commit()
-
-		
 	def on_update_after_submit(self):
-		self.update_total_tds_disallowance()
 		if hasattr(self, "repost_required"):
 			fields_to_check = [
 				"additional_discount_account",
