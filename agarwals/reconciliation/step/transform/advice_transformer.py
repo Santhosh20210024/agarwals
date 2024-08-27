@@ -19,9 +19,6 @@ class AdviceTransformer(StagingTransformer):
         self.list_of_char_to_replace = None
         self.skip_invalid_rows_in_csv = True
 
-    def get_file_columns(self):
-        return "upload,name,payer_type,is_mail"
-
     def clean_header(self, list_to_clean):
         cleaned_list = []
         for header in list_to_clean:
@@ -76,15 +73,6 @@ class AdviceTransformer(StagingTransformer):
         self.update_status('File upload', file['name'], 'Error')
         return False
 
-    def get_columns_to_prune(self):
-        return eval(self.loading_configuration.column_to_prune)
-
-    def get_column_name_to_convert_to_numeric(self):
-        return eval(self.loading_configuration.column_to_convert_the_values_to_numeric)
-
-    def get_columns_to_fill_na_as_0(self):
-        return eval(self.loading_configuration.column_to_convert_na_to_0)
-
     def calculate_settled_amount(self, file, df):
         tpa_to_calculate_settled_amount = frappe.db.sql("""SELECT tpa FROM `tabSettled Amount Calculation Configuration` WHERE parent = 'Settlement Advice Configuration' AND parentfield = 'calculate_settled_amount';""", as_list=True)
         if [file["payer_type"]] not in tpa_to_calculate_settled_amount or 'linkedclaimnumber' in df.columns:
@@ -125,8 +113,6 @@ class AdviceTransformer(StagingTransformer):
         df = self.convert_into_common_format(df,self.get_column_needed())
         return df
 
-    def get_columns_to_hash(self):
-        return eval(self.loading_configuration.column_to_hash)
 
     def load_target_df(self):
         query = f"""
@@ -138,13 +124,6 @@ class AdviceTransformer(StagingTransformer):
         records = frappe.db.sql(query, as_list=True)
         self.target_df = pd.DataFrame(records, columns=['name', 'hash'])
 
-    def get_join_columns(self):
-        left_df_column = "hash"
-        right_df_column = "hash"
-        return left_df_column, right_df_column
-
-    def get_column_needed(self):
-        return eval(self.loading_configuration.column_needed)
 
     def extract(self, configuration, key, file):
         self.source_df.rename(columns=self.rename_value, inplace=True)
