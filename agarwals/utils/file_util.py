@@ -2,25 +2,28 @@ import frappe
 import os
 from agarwals.utils.error_handler import log_error
 
-def get_sub_directory(control_panel):
-    sub_dir = control_panel.get('sub_directory')
-    return sub_dir if sub_dir else ''
-    
-def construct_file_url(*args):
-    """Get the path to the site's shell directory"""
-    try:
-        return os.path.join(*args)
-    except Exception as e:
-        frappe.throw(f"Error constructing site path: {e}")
-
-control_panel = frappe.get_single('Control Panel')
-PROJECT_FOLDER = control_panel.get('project_folder', None)
+control_panel = frappe.get_single("Control Panel")
+PROJECT_FOLDER = control_panel.get("project_folder", None)
 HOME_PATH = f"Home/{PROJECT_FOLDER}"
-SITE_PATH = control_panel.get('site_path', None)
+SITE_PATH = control_panel.get("site_path", None)
 SHELL_PATH = "private/files"
-SUB_DIR = get_sub_directory(control_panel).split(',')
+SUB_DIR = [
+    "Extract",
+    "Transform",
+    "Load",
+    "Bin",
+    "CheckList",
+    "Settlement Advice",
+    "Zip",
+]
 INNER_SUB_DIR = ["Error"]
 
+def construct_file_url(*args):
+    """Construct a file URL from the given path components, handling None values."""
+    args = [str(arg) for arg in args if arg is not None]
+    formatted_url = "/".join(args)
+    return formatted_url
+  
 @frappe.whitelist()
 def is_template_exist(attached_to_name, attached_to_doctype):
     """
@@ -50,4 +53,4 @@ def is_template_exist(attached_to_name, attached_to_doctype):
         return "Not Found"
     except Exception as e:
         log_error(str(e), "File upload")
-        return "System Error"   
+        return "System Error"
