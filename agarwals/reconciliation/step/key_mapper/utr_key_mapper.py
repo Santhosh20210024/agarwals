@@ -4,7 +4,7 @@ from agarwals.reconciliation.step.key_creator.utr_key_creator import UTRKeyCreat
 from agarwals.reconciliation.step.key_mapper.utils import process_records
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from tfs.orchestration import ChunkOrchestrator
+from tfs.orchestration import chunk
 
 
 class UTRKeyMapper(KeyMapper):
@@ -13,11 +13,11 @@ class UTRKeyMapper(KeyMapper):
     Methods:
         map_key : return None
     """
-
-    def __init__(self, records, record_type, query):
-        super().__init__(records, record_type, "UTR Key")
+ 
+    def __init__(self, records, record_type, query, chunk_doc):
+        super().__init__(records, record_type, "UTR Key", chunk_doc)
         self.query = query
-
+ 
     def map_key(self, record):
         """ 
         Map Key is used to create a new key or to check whether there is any existing key for that variants,
@@ -46,7 +46,7 @@ class UTRKeyMapper(KeyMapper):
                 self.record_type,
             )
             frappe.throw(f"KeyError while processing UTR keys: {str(e)}")
-
+ 
         except frappe.DoesNotExistError as e:
             log_error(
                 f"DoesNotExistError in map_key: {str(e)}",
@@ -54,7 +54,7 @@ class UTRKeyMapper(KeyMapper):
                 self.record_type,
             )
             frappe.throw(f"DoesNotExistError while processing UTR keys: {str(e)}")
-
+ 
         except frappe.ValidationError as e:
             log_error(
                 f"ValidationError in map_key: {str(e)}",
@@ -62,7 +62,7 @@ class UTRKeyMapper(KeyMapper):
                 self.record_type,
             )
             frappe.throw(f"ValidationError while processing UTR keys: {str(e)}")
-
+ 
         except Exception as e:
             log_error(
                 f"Unexpected error in map_key: {str(e)}",
@@ -71,31 +71,31 @@ class UTRKeyMapper(KeyMapper):
             )
             frappe.throw(f"Unexpected error while processing UTR keys: {str(e)}")
 
-
-class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records):
-        super().__init__(
-            records,
-            "Settlement Advice",
-            """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s"""
-        )
-
-
 class BankTransactionUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "Bank Transaction",
-            """UPDATE `tabBank Transaction` SET custom_utr_key = %(key)s WHERE name = %(name)s"""
+            """UPDATE `tabBank Transaction` SET custom_utr_key = %(key)s WHERE name = %(name)s""",
+            chunk_doc
         )
 
-
 class ClaimBookUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "ClaimBook",
-            """UPDATE `tabClaimBook` SET utr_key = %(key)s WHERE name = %(name)s"""
+            """UPDATE `tabClaimBook` SET utr_key = %(key)s WHERE name = %(name)s""",
+            chunk_doc
+        )
+ 
+class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
+    def __init__(self, records, chunk_doc):
+        super().__init__(
+            records,
+            "Settlement Advice",
+            """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s""",
+            chunk_doc
         )
 
 query_mapper = {
@@ -109,12 +109,19 @@ query_mapper = {
                }
 
 @frappe.whitelist()
-def process(args={"type": "utr_key", "step_id": "", "queue": "long"}):
-    args = cast_to_dic(args)
-    mappers = {
-        "Bank Transaction": BankTransactionUTRKeyMapper,
-        "ClaimBook": ClaimBookUTRKeyMapper,
-        "Settlement Advice": SettlementAdviceUTRKeyMapper
-    }
-    ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
-                                mappers=mappers, args=args, job_name="UTRKeyMapper")
+def process(args={"type":"utr_key","step_id":"","queue":"long"}):
+    try:
+        args = cast_to_dic(args)
+        chunk_size = int(args.get("chunk_size"))
+ 
+        mappers = {
+            "Bank Transaction": BankTransactionUTRKeyMapper,
+            "ClaimBook": ClaimBookUTRKeyMapper,
+            "Settlement Advice": SettlementAdviceUTRKeyMapper
+        }
+ 
+        for record_type, query in query_mapper.items():
+            process_records(query, mappers[record_type], chunk_size, args)
+ 
+    except Exception as e:
+        log_error("Error While Processing: " + str(e), doc = "UTR Key")

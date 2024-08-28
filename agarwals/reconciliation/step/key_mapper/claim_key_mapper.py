@@ -4,18 +4,18 @@ from agarwals.reconciliation.step.key_creator.claim_key_creator import ClaimKeyC
 from agarwals.reconciliation.step.key_mapper.utils import process_records
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from tfs.orchestration import ChunkOrchestrator
+from tfs.orchestration import chunk
 
 
 class ClaimKeyMapper(KeyMapper):
-    def __init__(self, records, record_type, query):
-        super().__init__(records, record_type, "Claim Key")
     """ 
     ClaimKeyMapper is used as base class for various UTR related doctypes
     Methods:
         insert_claim_keys: return None
         map_key : return None
     """
+    def __init__(self, records, record_type, query, chunk_doc):
+        super().__init__(records, record_type, "Claim Key", chunk_doc)
         self.query = query
     
     def insert_claim_keys(self, name, claim_key):
@@ -94,29 +94,32 @@ class ClaimKeyMapper(KeyMapper):
             frappe.throw(f"Unexpected error while processing Claim keys: {str(e)}")
 
 class BillClaimKeyMapper(ClaimKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "Bill",
             {'claim_key_id': """UPDATE `tabBill` SET claim_key = %(key)s WHERE name = %(name)s"""
-            ,'ma_key_id': """UPDATE `tabBill` SET ma_claim_key = %(key)s WHERE name = %(name)s"""}
+            ,'ma_key_id': """UPDATE `tabBill` SET ma_claim_key = %(key)s WHERE name = %(name)s"""},
+            chunk_doc
         )
 
 class ClaimBookClaimKeyMapper(ClaimKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "ClaimBook",
             {'al_key_id': """UPDATE `tabClaimBook` SET al_key = %(key)s WHERE name = %(name)s"""
-            ,'cl_key_id': """UPDATE `tabClaimBook` SET cl_key = %(key)s WHERE name = %(name)s"""}
+            ,'cl_key_id': """UPDATE `tabClaimBook` SET cl_key = %(key)s WHERE name = %(name)s"""},
+            chunk_doc
         )
 
 class SettlementAdviceClaimKeyMapper(ClaimKeyMapper):
-    def __init__(self, records):
+    def __init__(self, records, chunk_doc):
         super().__init__(
             records,
             "Settlement Advice",
-            {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""}
+            {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""},
+            chunk_doc
         )
 
 query_mapper = {
@@ -131,12 +134,19 @@ query_mapper = {
                 }
 
 @frappe.whitelist()
-def process(args={"type": "claim_key", "step_id": "", "queue": "long"}):
-    args = cast_to_dic(args)
-    mappers = {
-        "Bill": BillClaimKeyMapper,
-        "ClaimBook": ClaimBookClaimKeyMapper,
-        "Settlement Advice": SettlementAdviceClaimKeyMapper
-    }
-    ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
-                                mappers=mappers, args=args, job_name="ClaimKeyMapper")
+def process(args={"type":"claim_key", "step_id":"", "queue":"long"}): 
+    try:
+        args = cast_to_dic(args)
+        chunk_size = int(args.get("chunk_size", 100))
+
+        mappers = {
+            "Bill": BillClaimKeyMapper,
+            "ClaimBook": ClaimBookClaimKeyMapper,
+            "Settlement Advice": SettlementAdviceClaimKeyMapper
+        }
+
+        for record_type, query in query_mapper.items():
+            process_records(query, mappers[record_type], chunk_size, args)
+
+    except Exception as e:
+        log_error("Error While Processing: " + str(e), doc="Claim Key")

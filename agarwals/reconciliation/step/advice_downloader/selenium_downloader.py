@@ -10,6 +10,7 @@ from agarwals.utils.error_handler import log_error as error_handler
 import os
 import shutil
 from twocaptcha import TwoCaptcha
+from tfs.orchestration import chunk
 from PIL import Image
 import os
 import shutil
@@ -502,18 +503,20 @@ class SeleniumDownloader:
             self.raise_exception(" SA Downloader Configuration not found ")
 
 
-    def download(self, tpa_doc, child=None, parent=None):
+    def download(self, tpa_doc, chunk_doc=None, child=None, parent=None):
         """
         Usage : This method Manages the process of downloading settlement advice file by performing a series of steps including
         credential loading, configuration setup, login,navigate to report page and download document.
 
         Parameters:
         tpa_doc (object): The document or data required for authentication and download.
+        chunk_doc (object, optional): document for the chunk being processed.
         child (object, optional): child doc of the SA UI Downloader ,Only used of Captcha type TPA's.
         parent (object, optional): Parent doc of the SA UI Downloader ,Only used of Captcha type TPA's.
 
         """
         try:
+            chunk.update_status(chunk_doc, "InProgress")
             self.load_credential_doc(tpa_doc,child,parent)
             self.load_configuration()
             self.create_download_directory()
@@ -522,7 +525,7 @@ class SeleniumDownloader:
             self.navigate()
             self._download()
             self.update_status_and_log('Valid')
-            return "Processed"
+            chunk.update_status(chunk_doc, "Processed")
         except ValueError as e:
             if str(e) in 'Invalid user name or password':
                 self.update_status_and_log(status='Invalid', remarks=e)
@@ -530,10 +533,10 @@ class SeleniumDownloader:
                 self.update_status_and_log(status='Error',retry=1,remarks=e)
             else:
                 self.update_status_and_log(status='Error')
-            return "Error"
+            chunk.update_status(chunk_doc, "Error")
         except Exception as e:
             self.update_status_and_log('Error',remarks=e)
-            return "Error"
+            chunk.update_status(chunk_doc, "Error")
         finally:
             self._exit()
 

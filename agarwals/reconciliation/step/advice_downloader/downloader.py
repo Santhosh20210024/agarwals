@@ -2,6 +2,7 @@ import pandas as pd
 import frappe
 import shutil
 import os
+from tfs.orchestration import chunk
 from agarwals.utils.error_handler import log_error as error_handler
 
 class Downloader():
@@ -151,15 +152,16 @@ class Downloader():
             cookies=eval(cookies)
         return url, eval(header), body, params, cookies
         
-    def download(self, tpa_doc):
+    def download(self, tpa_doc, chunk_doc):
         try:
+            chunk.update_status(chunk_doc, "InProgress")
             self.set_self_variable(tpa_doc)
             content = self.get_content()
             file_name=self.get_file_details()
             if not content or not file_name:
                 self.log_error('TPA Login Credentials', self.credential_doc.name, "No Data")
             self.write_file(file_name=file_name,content=content)
-            return "Processed"
+            chunk.update_status(chunk_doc, "Processed")
         except Exception as e:
+            chunk.update_status(chunk_doc, "Error")
             self.log_error('TPA Login Credentials',self.credential_doc.name,e)
-            return "Error"
