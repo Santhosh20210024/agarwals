@@ -97,6 +97,7 @@ def create_project_folders():
                 create_dir(construct_file_url(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, sub_item, inner_folder_item))
 
         print("**-------- Folder Structure Created --------**")
+        
         setting_control_panel(PROJECT_FOLDER, SITE_PATH)
         
     except Exception as e:
