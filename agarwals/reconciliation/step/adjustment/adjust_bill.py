@@ -1,5 +1,5 @@
 import frappe
-from agarwals.reconciliation import chunk
+from tfs.orchestration import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.reconciliation.step.adjustment.journal_entry_utils import (

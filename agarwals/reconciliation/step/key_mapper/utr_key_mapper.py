@@ -4,9 +4,9 @@ from agarwals.reconciliation.step.key_creator.utr_key_creator import UTRKeyCreat
 from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from agarwals.reconciliation import chunk
- 
- 
+from tfs.orchestration import chunk
+
+
 class UTRKeyMapper(KeyMapper):
     """ 
     UTRKeyMapper is used as base class for various UTR related doctypes
