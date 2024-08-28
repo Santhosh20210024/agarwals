@@ -17,7 +17,8 @@
   "column_to_check_the_difference",
   "column_to_join",
   "column_to_convert_the_values_to_numeric",
-  "column_to_convert_na_to_0"
+  "column_to_convert_na_to_0",
+  "columns_to_get_from_file"
  ],
  "fields": [
   {
@@ -68,11 +69,16 @@
    "fieldname": "column_to_convert_na_to_0",
    "fieldtype": "Code",
    "label": "Columns to Convert the NA to 0"
+  },
+  {
+   "fieldname": "columns_to_get_from_file",
+   "fieldtype": "Code",
+   "label": "Columns to get from file"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-22 15:51:30.698266",
+ "modified": "2024-08-27 11:04:45.651858",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Data Loading Configuration",

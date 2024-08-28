@@ -33,7 +33,7 @@ class Transformer:
         self.skip_invalid_rows_in_csv = False
 
     def get_file_columns(self):
-        return "upload,name"
+        return self.loading_configuration.columns_to_get_from_file
 
     def get_files_to_transform(self):
         fields = self.get_file_columns()
@@ -177,7 +177,7 @@ class Transformer:
             self.update_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
-        return self.loading_configuration.column_to_hash
+        return eval(self.loading_configuration.column_to_hash)
 
     def hashing_job(self):
         self.source_df['hash_column'] = ''
