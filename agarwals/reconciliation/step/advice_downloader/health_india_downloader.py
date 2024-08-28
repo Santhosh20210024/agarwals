@@ -6,16 +6,19 @@ from selenium.webdriver.common.by import By
 import time
 
 class HealthIndiaDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
-        
+
+    def check_login_status(self)->bool:
+        try:
+            self.wait.until(EC.visibility_of_element_located((By.XPATH,"//span[@id='ctl00_ContentPlaceHolder1_lblMessage' and text()='Invalid User name / password.']")))
+            return False
+        except:
+            return True
+
     def login(self):
-        self.wait.until(EC.visibility_of_element_located((By.ID,'ctl00_ContentPlaceHolder1_txtprovidercode')))
-        user_name = self.driver.find_element(By.ID,'ctl00_ContentPlaceHolder1_txtprovidercode')
-        user_name.send_keys(self.user_name)
-        password = self.driver.find_element(By.ID,'ctl00_ContentPlaceHolder1_txtproviderpassword')
-        password.send_keys(self.password)
-        self.driver.find_element(By.ID,'ctl00_ContentPlaceHolder1_btnLogin').click()
+        self.wait.until(EC.visibility_of_element_located((By.ID,'ctl00_ContentPlaceHolder1_txtprovidercode'))).send_keys(self.user_name)
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'ctl00_ContentPlaceHolder1_txtproviderpassword'))).send_keys(self.password)
+        self.wait.until(EC.element_to_be_clickable((By.ID, 'ctl00_ContentPlaceHolder1_btnLogin'))).click()
+
 
     def navigate(self):
         time.sleep(5)

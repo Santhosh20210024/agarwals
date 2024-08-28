@@ -10,8 +10,20 @@ import os
 
 
 class BajajAllianzDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
+
+    def check_captcha_value(self,captcha_api):
+        try:
+            self.driver.implicitly_wait(3)
+            alert = Alert(self.driver)
+            if alert.text == "enter valid captcha code":
+                if self.enable_captcha_api == 1:
+                    solver = TwoCaptcha(captcha_api[1])
+                    solver.report(captcha_api[0]['captchaId'], False)
+                else:
+                    self.update_tpa_reference("Retry")
+                raise ValueError('Invalid Captcha Entry')
+        except:
+            pass
     def login(self):
         username = self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
         username.send_keys(self.user_name)
@@ -27,24 +39,11 @@ class BajajAllianzDownloader(SeleniumDownloader):
                 captcha_entry.send_keys(captcha_code)
                 self.wait.until(
                     EC.element_to_be_clickable((By.CSS_SELECTOR, "input.btn.bg-orange.btn-block[type='submit']"))).click()
-                try:
-                    time.sleep(2)
-                    alert = Alert(self.driver)
-                    if alert.text == "enter valid captcha code":
-                        if self.enable_captcha_api == 1:
-                            solver = TwoCaptcha(captcha_api[1])
-                            solver.report(captcha_api[0]['captchaId'], False)
-                            self.update_retry()
-                        else:
-                            self.update_tpa_reference("Retry")
-                        self.raise_exception("Invalid Captcha")
-                except:
-                    pass
+                self.check_captcha_value(captcha_api)
             else:
-                self.update_retry()
                 if self.enable_captcha_api == 0:
                     self.update_tpa_reference("Retry")
-                self.raise_exception("Invalid Captcha")
+                raise ValueError('No captcha value found')
         else:
                 self.raise_exception("Captcha ID NOT FOUND")
     def navigate(self):

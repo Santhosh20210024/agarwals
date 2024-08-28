@@ -31,7 +31,9 @@ class SeleniumDownloader:
         self.public_path = "public/files"
         self.full_img_path = None
         self.crop_img_path = None
-
+        self.webdriver_wait_time = 60
+        self.status_message_list = ['Invalid UserName / Password']
+        self.file_not_found_remarks = ""
 
     def construct_file_url(*args):
         list_of_items = []
@@ -74,6 +76,7 @@ class SeleniumDownloader:
                                            caseSensitive=1,
                                            lang='en')
                     return result,api_key
+
                 elif captcha_type == "ReCaptcha":
                     result = solver.recaptcha(
                         sitekey=sitekey,
@@ -83,9 +86,8 @@ class SeleniumDownloader:
             print(f"An error occurred: {e}")
             return None
 
-    def extract_table_data(self, table_id):
-        table = self.wait.until(EC.presence_of_element_located((By.ID, table_id)))
-        table_html = table.get_attribute('outerHTML')
+    def extract_table_data(self, table_element):
+        table_html = table_element.get_attribute('outerHTML')
         with open(f'{self.download_directory}/{self.tpa}.html', 'w') as file:
             file.write(table_html)
 
@@ -121,7 +123,7 @@ class SeleniumDownloader:
                     frappe.db.sql(f"DELETE FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ")
                     frappe.db.commit()
                 else:
-                    self.log_error('Settlement Advice Downloader UI',self.tpa,"No  captcha image found to delete ")
+                    self.log_error(doctype_name = 'Settlement Advice Downloader UI',reference_name=self.tpa,error_message = "No  captcha image found to delete ")
 
 
     def get_captcha_image(self,captcha_identifier):
@@ -159,8 +161,7 @@ class SeleniumDownloader:
                      doc.status = "Completed"
                  doc.save()
          except Exception as e:
-             self.log_error('Settlement Advice Downloader UI',self.tpa,f" Status Update Failed due to {e}")
-
+             self.log_error('Settlement Advice Downloader UI',f" Status Update Failed due to {e}",self.tpa)
 
     def update_tpa_reference(self,status):
         try:
@@ -176,14 +177,19 @@ class SeleniumDownloader:
                 parent_doc.save(ignore_permissions = True)
                 frappe.db.commit()
         except Exception as E:
-            self.log_error('Settlement Advice Downloader UI',self.tpa, E)
+            self.log_error('Settlement Advice Downloader UI',E,self.tpa)
 
     def _login(self):
         self.driver.get(self.url)
         self.driver.maximize_window()
-        return self.login()
+        self.login()
+        if self.check_login_status()== False:
+            raise ValueError("Invalid user name or password")
 
     def login(self):
+        return None
+
+    def check_login_status(self):
         return None
 
     def navigate(self):
@@ -220,6 +226,7 @@ class SeleniumDownloader:
                 numbers.append(random_number)
                 run = False
         return random_number
+
     def rename_downloaded_file(self, download_directory, file_name,from_date,to_date):
         get_all_files =  glob.glob(os.path.join(download_directory,'*'))
         recent_downloaded_file = max(get_all_files,key=os.path.getctime)
@@ -248,36 +255,29 @@ class SeleniumDownloader:
         if os.path.exists(file_path):
             os.remove(file_path)
 
-    def log_error(self,doctype_name, reference_name, error_message):
+    def log_error(self,doctype_name,error_message,reference_name = None):
         log = error_handler(error=error_message, doc=doctype_name,doc_name=reference_name)
-        if reference_name:
-            self.insert_run_log({"doctype": "SA Downloader Run Log","last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":log.name,"status":"Error","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
+        return log
 
     def raise_exception(self,exception):
         raise Exception(exception)
 
-    def _exit(self, e = None):
-        if self.download_directory:
-            self.delete_folder(self.download_directory)
-            self.download_directory = None
-        if self.driver:
-            self.driver.quit()
-        if e:
-            self.log_error('TPA Login Credentials', self.user_name, e)
-            self.update_doc_status('Error')
-        else:
-            self.update_doc_status('Valid')
-            self.insert_run_log(
-                {"doctype": "SA Downloader Run Log","last_executed_time": self.last_executed_time, "document_reference": "TPA Login Credentials",
-                 "reference_name": self.credential_doc.name, "status": "Processed","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
-        if self.is_captcha == True:
-            if e:
-                self.update_tpa_reference('Error')
-                self.update_doc_status('Error')
-            else:
-                self.update_tpa_reference('Completed')
-            self.delete_captcha_images()
-            self.update_settlement_advice_downloader_status()
+    def _exit(self)->None:
+        try:
+            # Delete Download Directory
+            if self.download_directory:
+                self.delete_folder(self.download_directory)
+                self.download_directory = None
+            # WebDriver Exits
+            if self.driver:
+                self.driver.quit()
+            # Delete Captacha Image
+            if self.is_captcha == True:
+                self.delete_captcha_images()
+                self.update_settlement_advice_downloader_status()
+        except Exception as e:
+            self.update_status_and_log(status='Error',remarks=e)
+
 
     def convert_file_format(self,original_file,formated_file):
         #HTML
@@ -287,13 +287,11 @@ class SeleniumDownloader:
                 html_io = StringIO(html_content)
                 data = pd.read_html(html_io)
         except Exception as e:
-            # self.delete_backend_files(original_file)
             self.raise_exception(f"An error occurred while reading the file: {e}")
         if len(data) == 1 or self.extract_first_table == True:
             data[0].to_excel(formated_file, index=False)
             self.delete_backend_files(original_file)
         else:
-            # self.delete_backend_files(original_file)
             self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
 
     def download_with_date_range(self):
@@ -326,7 +324,7 @@ class SeleniumDownloader:
         from_date = self.from_date if temp_from_date is None else temp_from_date
         to_date = self.to_date if temp_to_date is None else temp_to_date
         if self.previous_files_count == downloaded_files_count:
-            self.insert_run_log({"doctype": "SA Downloader Run Log", "last_executed_time": self.last_executed_time,"document_reference": "Error Record Log", "reference_name": self.credential_doc.name,"status": "Info", 'message':f'NO FILE FOUND FOR {from_date} to {to_date}',"tpa_name": self.credential_doc.tpa})
+            self.file_not_found_remarks += f"\nFile Not Found for the Date Range Between {self.from_date} and {self.to_date}"
         else:
             self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,from_date,to_date)
             self.move_file(self.download_directory,self.formatted_file_name)
@@ -348,12 +346,46 @@ class SeleniumDownloader:
             for path in extension_path:
                 self.options.add_argument(f'--load-extension={path}')
 
-    def update_doc_status(self,status):
-        doc = frappe.get_doc("TPA Login Credentials", self.credential_doc.name)
-        doc.status = status
-        if status == "Valid":
-            doc.retry = 0
-        doc.save()
+    def update_status_and_log(self, status: str, retry: int = 0, remarks: str = None) -> None:
+        """
+        Update the status of the TPA Login Credentials document , chuck document  and log the result .
+        Args:
+            status (str): The status to set on the document.
+            retry (int, optional): The retry count. Defaults to 0.
+            remarks (str, optional): Remarks for logging. Defaults to None.
+        """
+
+        try:
+            # Update TPA Login Credentials Status
+            doc = frappe.get_doc("TPA Login Credentials" , self.credential_doc.name)
+            doc.status,doc.retry  = status,retry
+            doc.save()
+            # Update Settlement Advice ui downloader if SA ui downloader enabled
+            if self.is_captcha:
+                if retry == 1:
+                    self.update_tpa_reference('Retry')
+                elif status == 'Valid':
+                    self.update_tpa_reference('Completed')
+                else:
+                    self.update_tpa_reference('Error')
+            # logging
+            log_data = {"doctype": "SA Downloader Run Log",
+                        "last_executed_time": self.last_executed_time,
+                        "document_reference": "TPA Login Credentials",
+                        "parent1": self.credential_doc.name,
+                        "tpa_name": self.credential_doc.tpa,
+                        "remarks": f"{self.file_not_found_remarks} \n {str(remarks) if remarks else ''}" or None
+                        }
+            if status == 'Error':
+                error_log = self.log_error(doctype_name='TPA Login Credentials',error_message=remarks,reference_name=self.tpa)
+                log_data.update({"document_reference": "Error Record Log", "reference_name": error_log.name,"status": "Error"})
+            elif self.file_not_found_remarks or status == 'Info':
+                log_data.update({"status":"Info"})
+            else:
+                log_data.update({"status": "Warning","remarks": remarks}) if status == 'Invalid' or retry == 1 else log_data.update({"status": "Processed"})
+            self.insert_run_log(log_data)
+        except Exception as e:
+            self.log_error(doctype_name='TPA Login Credentials',error_message=e,reference_name=self.tpa if self.tpa else None)
 
     def web_driver_init(self):
         self.options = webdriver.ChromeOptions()
@@ -361,7 +393,8 @@ class SeleniumDownloader:
         self.options.add_experimental_option("prefs", prefs)
         self.add_driver_argument()
         self.driver = webdriver.Chrome(options=self.options)
-        self.wait = WebDriverWait(self.driver, 45)
+        self.wait = WebDriverWait(self.driver, self.webdriver_wait_time)
+        self.min_wait = WebDriverWait(self.driver,10)
 
     def load_credential_doc(self,tpa_doc,child,parent):
         self.credential_doc = tpa_doc
@@ -376,7 +409,7 @@ class SeleniumDownloader:
         else:
             self.raise_exception('TPA Credential Doc Not Found')
 
-    def load_configuration(self):
+    def load_configuration(self)->None:
         configuration_values = frappe.db.sql(
             f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",
             as_dict=True
@@ -412,11 +445,16 @@ class SeleniumDownloader:
             self._login()
             self.navigate()
             self._download()
-            self._exit()
+            self.update_status_and_log('Valid')
             chunk.update_status(chunk_doc, "Processed")
-        except Exception as e:
+        except ValueError as e:
+            self.update_status_and_log('Invalid',remarks=e) if str(e) in 'Invalid user name or password' else self.update_status_and_log('Error',retry=1,remarks=e)
             chunk.update_status(chunk_doc, "Error")
-            self._exit(e)
+        except Exception as e:
+            self.update_status_and_log('Error',remarks=e)
+            chunk.update_status(chunk_doc, "Error")
+        finally:
+            self._exit()
 
 
 

@@ -9,8 +9,13 @@ from selenium.webdriver.support.ui import Select
 
 
 class ProviderIhxDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
+    def check_login_status(self)->bool:
+        try:
+            error_message = self.min_wait.until(EC.visibility_of_element_located((By.XPATH, "//span[@class='message-text']"))).text
+            if "Incorrect username" in error_message or "Incorrect password" in error_message:
+                return False
+        except :
+            return True
 
     def login(self):
         username = self.wait.until(EC.visibility_of_element_located((By.ID, 'login-form_username')))
@@ -19,36 +24,17 @@ class ProviderIhxDownloader(SeleniumDownloader):
         pwd.send_keys(self.password)
         login_button = self.driver.find_element(By.XPATH, "//button[@class='ant-btn ant-btn-primary login-btn']")
         login_button.click()
+        if self.check_login_status() == False:
+            raise ValueError("Invalid user name or password")
 
+    def navigate(self):
         try:
-            skip = self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME,'skip-verification')))
+            skip = self.min_wait.until(EC.visibility_of_element_located((By.CLASS_NAME,'skip-verification')))
             skip.click()
         except:
             pass
-        # ToDo To identify invalid username password
-        # try:
-        #     # Wait for the error message to be visible
-        #     error_message = self.wait.until(
-        #         EC.visibility_of_element_located((By.XPATH, "//span[@class='message-text']"))
-        #     )
-        #
-        #     # Extract the text of the error message
-        #     error_text = error_message.text
-        #
-        #     # Check if the error message contains "Incorrect username" or "Login failed due to incorrect password"
-        #     if "Incorrect username" in error_text:
-        #         print(error_text)
-        #         raise Exception("Login failed due to incorrect username")
-        #     elif "Incorrect password. Please try again or click on 'Need help?" in error_text:
-        #         print(error_text)
-        #         raise Exception("Login failed due to incorrect password")
-        # except TimeoutException:
-        #     print("No error message found. Login successful.")
-
-    def navigate(self):
         # Wait for the sidebar to be present
         sidebar = self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "ant-layout-sider")))
-
         # Move the mouse cursor over the sidebar to trigger expansion
         action = ActionChains(self.driver)
         action.move_to_element(sidebar).perform()

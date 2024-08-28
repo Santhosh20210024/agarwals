@@ -11,18 +11,29 @@ class FHPLDownloader(SeleniumDownloader):
     def __init__(self):
         SeleniumDownloader.__init__(self)
 
+    def check_login_status(self)->bool:
+        """
+        Use to checks the user's authentication status .
+        """
+        try:
+            status_message = self.min_wait.until(EC.visibility_of_element_located((By.ID,'ContentPlaceHolder1_lblError'))).text
+            return False if status_message in self.status_message_list else True
+        except Exception as e:
+            print(e)
+            return True
 
     def login(self):
         self.wait.until(EC.presence_of_element_located((By.ID, 'ContentPlaceHolder1_txtUserName'))).send_keys(
             self.user_name)
         self.wait.until(EC.presence_of_element_located((By.ID, 'ContentPlaceHolder1_txtPassword'))).send_keys(
             self.password)
-        self.driver.find_element(By.ID, 'ContentPlaceHolder1_btnLogin').click()
-        time.sleep(5)
+        self.wait.until(EC.element_to_be_clickable((By.ID, 'ContentPlaceHolder1_btnLogin'))).click()
+        login_status =  self.check_login_status()
+        if login_status == False:
+            raise ValueError('Invalid user name or password')
 
     def navigate(self):
         return
-
 
     def download_from_web(self,temp_from_date=None,temp_to_date=None):
         from_date = self.from_date if temp_from_date is None else temp_from_date
