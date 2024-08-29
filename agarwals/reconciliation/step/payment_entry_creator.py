@@ -284,7 +284,7 @@ def process(args):
                 seq_no = seq_no + 1
                 # reconcile_bank_transaction(bt_records=bt_records, chunk_doc=chunk_doc, batch = "Batch" + str(seq_no))
                 frappe.enqueue(reconcile_bank_transaction
-                               , queue='long'
+                               , queue=args.get('queue','long')
                                , is_async=True
                                , job_name="Batch" + str(seq_no)
                                , timeout=25000
