@@ -14,7 +14,7 @@
   "si_status",
   "si_bill_date",
   "si_customer",
-  "si_total",
+  "claim_amount",
   "column_break_vwd4c",
   "si_region",
   "si_entity",
@@ -235,12 +235,6 @@
    "label": "Unallocated"
   },
   {
-   "fetch_from": "sales_invoice.total",
-   "fieldname": "si_total",
-   "fieldtype": "Data",
-   "label": "SI Total"
-  },
-  {
    "fieldname": "company_bank_account",
    "fieldtype": "Data",
    "label": "Company Bank Account"
@@ -261,11 +255,18 @@
    "fieldname": "index",
    "fieldtype": "Int",
    "label": "Index"
+  },
+  {
+   "fetch_from": "sales_invoice.total",
+   "fetch_if_empty": 1,
+   "fieldname": "claim_amount",
+   "fieldtype": "Data",
+   "label": "SI Total (Claim Amount)"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-19 14:56:44.710674",
+ "modified": "2024-08-29 11:02:43.435515",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",
