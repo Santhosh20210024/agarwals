@@ -75,7 +75,7 @@ def create_settlement_advice_doc(doc_to_insert):
     except Exception as e:
         if "Duplicate entry" in str(e):
             sa_doc = frappe.get_doc('Settlement Advice', name)
-            if float(sa_doc.tds_amount) == float(doc_to_insert.tds_amount) and float(sa_doc.settled_amount) == float(doc_to_insert.settled_amount) and float(sa_doc.disallowed_amount) == float(doc_to_insert.disallowed_amount):
+            if sa_doc.tds_amount == doc_to_insert.tds_amount and sa_doc.settled_amount == doc_to_insert.settled_amount and sa_doc.disallowed_amount == doc_to_insert.disallowed_amount:
                 return update_error(doc_to_insert, 'S100')
             if sa_doc.status == 'Warning' and sa_doc.remark == "Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount.":
                 sa_doc.update(data)
@@ -92,16 +92,29 @@ def validate_advice(advice_staging_doc):
     if advice_staging_doc.status == "Open" and (
             advice_staging_doc.final_utr_number == "0" or advice_staging_doc.final_utr_number is None or advice_staging_doc.claim_id == "0" or advice_staging_doc.utr_number is None):
         return update_error(advice_staging_doc, "S101"), False
-    if advice_staging_doc.settled_amount is None or float(advice_staging_doc.settled_amount) == 0:
+    if advice_staging_doc.settled_amount is None or advice_staging_doc.settled_amount == 0:
         return update_error(advice_staging_doc, "S102"), False
-    if float(advice_staging_doc.settled_amount) < 0 or float(advice_staging_doc.tds_amount) < 0 or float(advice_staging_doc.disallowed_amount) < 0:
+    if advice_staging_doc.settled_amount < 0 or advice_staging_doc.tds_amount < 0 or advice_staging_doc.disallowed_amount < 0:
         return update_error(advice_staging_doc, "S105"), False
     if "e+" in advice_staging_doc.final_utr_number.lower() or "e+" in advice_staging_doc.utr_number.lower():
         return update_error(advice_staging_doc, "S103"), False
     return advice_staging_doc, True
 
-def clean_sa_data(data):
+def replace_0_and_strip(data):
     return data.replace(".0","").strip() if data else data
+
+def convert_to_float(data):
+    return float(data) if data else 0
+
+def clean_sa_data(staging_doc):
+    staging_doc.claim_id = replace_0_and_strip(staging_doc.claim_id)
+    staging_doc.final_utr_number = replace_0_and_strip(staging_doc.final_utr_number)
+    staging_doc.utr_number = replace_0_and_strip(staging_doc.utr_number)
+    staging_doc.claim_amount = convert_to_float(staging_doc.claim_amount)
+    staging_doc.settled_amount = convert_to_float(staging_doc.settled_amount)
+    staging_doc.tds_amount = convert_to_float(staging_doc.tds_amount)
+    staging_doc.disallowed_amount = convert_to_float(staging_doc.disallowed_amount)
+    return staging_doc
 
 def create_settlement_advices(advices, chunk_doc):
     chunk.update_status(chunk_doc, "InProgress")
@@ -110,13 +123,11 @@ def create_settlement_advices(advices, chunk_doc):
         for advice in advices:
             advice_staging_doc=frappe.get_doc(staging_doc,advice[0])
             try:
+                advice_staging_doc = clean_sa_data(advice_staging_doc)
                 advice_staging_doc, flag = validate_advice(advice_staging_doc)
                 if not flag:
                     continue
                 advice_staging_doc.date = date.today()
-                advice_staging_doc.claim_id= clean_sa_data(advice_staging_doc.claim_id)
-                advice_staging_doc.final_utr_number = clean_sa_data(advice_staging_doc.final_utr_number)
-                advice_staging_doc.utr_number = clean_sa_data(advice_staging_doc.utr_number)
                 advice_staging_doc = create_settlement_advice_doc(advice_staging_doc)
             except Exception as e:
                 advice_staging_doc = log_error(staging_doc, advice_staging_doc,e)
