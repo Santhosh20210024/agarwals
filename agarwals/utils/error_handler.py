@@ -1,16 +1,15 @@
 import frappe
 
-def log_error(error,doc=None,doc_name=None):
-    error = str(error)
+def log_error(error, doc=None, doc_name=None, status=None):
     if doc_name and len(doc_name) > 140:
         doc_name = doc_name[:139]
-    
-    if error and len(error) > 140:
-        error = error[:139]
         
-    error_log = frappe.new_doc('Error Record Log')
-    error_log.set('doctype_name', doc)
-    error_log.set('reference_name', doc_name)
-    error_log.set('error_message',  error)
-    error_log.save()
-    return error_log
+    error_log = frappe.get_doc({
+        'doctype': 'Error Record Log',
+        'doctype_name': doc,
+        'reference_name': doc_name,
+        'error_message': error,
+        'status': status
+    })
+    
+    error_log.insert(ignore_permissions=True)

@@ -1,56 +1,69 @@
 {
- "actions": [],
- "allow_rename": 1,
- "creation": "2023-12-20 17:57:01.636625",
- "default_view": "List",
- "doctype": "DocType",
- "editable_grid": 1,
- "engine": "InnoDB",
- "field_order": [
-  "doctype_name",
-  "reference_name",
-  "error_message"
- ],
- "fields": [
-  {
-   "fieldname": "doctype_name",
-   "fieldtype": "Link",
-   "label": "Doctype Name",
-   "options": "DocType"
-  },
-  {
-   "fieldname": "error_message",
-   "fieldtype": "Long Text",
-   "label": "Error Message"
-  },
-  {
-   "fieldname": "reference_name",
-   "fieldtype": "Data",
-   "label": "Reference Name"
-  }
- ],
- "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-05-23 15:16:52.545277",
- "modified_by": "Administrator",
- "module": "Agarwals",
- "name": "Error Record Log",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
-}
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2023-12-20 17:57:01.636625",
+    "default_view": "List",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+     "doctype_name",
+     "reference_name",
+     "status",
+     "error_message"
+    ],
+    "fields": [
+     {
+      "fieldname": "doctype_name",
+      "fieldtype": "Link",
+      "in_list_view": 1,
+      "in_standard_filter": 1,
+      "label": "Doctype Name",
+      "options": "DocType"
+     },
+     {
+      "fieldname": "error_message",
+      "fieldtype": "Long Text",
+      "label": "Error Message"
+     },
+     {
+      "fieldname": "reference_name",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "in_standard_filter": 1,
+      "label": "Reference Name"
+     },
+     {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "in_standard_filter": 1,
+      "label": "Status",
+      "options": "\nCRITICAL\nERROR\nWARNING\nINFO\nDEBUG"
+     }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [],
+    "modified": "2024-08-29 16:29:20.462748",
+    "modified_by": "Administrator",
+    "module": "Agarwals",
+    "name": "Error Record Log",
+    "owner": "Administrator",
+    "permissions": [
+     {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+     }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+   }
