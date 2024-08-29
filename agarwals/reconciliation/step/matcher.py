@@ -81,8 +81,8 @@ class MatcherValidation:
             return False
 
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount):
-            advice_amount = settled_amount + tds_amount + disallowed_amount
-            difference_amount = abs(claim_amount - advice_amount)
+            cumulative_amount = settled_amount + tds_amount + disallowed_amount
+            difference_amount = abs(claim_amount - cumulative_amount)
 
             if difference_amount < tolerance:
                 if self.record["advice"]:
