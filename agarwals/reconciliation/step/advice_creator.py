@@ -77,7 +77,7 @@ def create_settlement_advice_doc(doc_to_insert):
             sa_doc = frappe.get_doc('Settlement Advice', name)
             if float(sa_doc.tds_amount) == float(doc_to_insert.tds_amount) and float(sa_doc.settled_amount) == float(doc_to_insert.settled_amount) and float(sa_doc.disallowed_amount) == float(doc_to_insert.disallowed_amount):
                 return update_error(doc_to_insert, 'S100')
-            if sa_doc.status == 'Warning' and sa_doc.remark == "Claim amount lesser than the cumulative of other amounts":
+            if sa_doc.status == 'Warning' and sa_doc.remark == "Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount.":
                 sa_doc.update(data)
                 sa_doc.save()
                 return update_processed_status(doc_to_insert)
