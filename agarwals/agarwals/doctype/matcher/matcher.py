@@ -19,10 +19,10 @@ class Matcher(Document):
 			error = 'Settled Amount Should Not Be Zero'
 		elif float(self.settled_amount) < 0 or float(self.tds_amount) < 0 or float(self.disallowance_amount) < 0:
 			error = 'Amount Should Not Be Negative'
-		elif self.bt_status == 'Reconciled':  # Already Reconciled
+		elif self.bt_status == 'Reconciled' or self.bt_status == 'Settled':  # Already Reconciled
 			error = 'Already Reconciled'
-		elif self.bt_status not in ['Pending', 'Unreconciled']:
-			error = 'Bank Status Should not be other then Pending, Unreconciled'
+		elif self.bt_status == 'Cancelled':
+			error = 'Bank transaction is Cancelled'
 		elif self.si_status == 'Cancelled':
 			error = 'Cancelled Bill'
 		elif self.si_status == 'Paid':

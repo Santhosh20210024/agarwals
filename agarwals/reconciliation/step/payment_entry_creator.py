@@ -224,10 +224,10 @@ class BankReconciliator:
 
     def __validate(self, matcher_record: "Document") -> bool:
         error = None
-        if self.bt_doc.status == 'Reconciled':
+        if self.bt_doc.status == 'Reconciled' or self.bt_doc.status == 'Settled':  # Already Reconciled
             error = 'Already Reconciled'
-        elif self.bt_doc.status not in ['Pending', 'Unreconciled']:
-            error = 'Status Should be other then Pending, Unreconciled'
+        elif self.bt_doc.status == 'Cancelled':
+            error = 'Bank transaction is Cancelled'
         if error:
             update_error(matcher_record, error)
             return False
