@@ -41,22 +41,24 @@ class PaymentEntryCreator:
     def __set_amount(self) -> None:
         unallocated_amount: float = float(self.bt_doc.unallocated_amount)
         si_outstanding: float = float(self.si_doc.outstanding_amount)
+        total_amount: float = self.settled_amount + self.tds_amount + self.disallowance_amount
         if self.settled_amount > unallocated_amount:
             self.settled_amount = unallocated_amount
             self.__set_sa_vars(remark="Bank transaction unallocated is less than settled amount")
         if si_outstanding < self.settled_amount:
             self.settled_amount = si_outstanding
             self.__set_sa_vars(remark="Sales Invoice Outstanding is less than settled amount")
-        if self.settled_amount + self.tds_amount + self.disallowance_amount > si_outstanding >= self.settled_amount + self.tds_amount:
-            self.disallowance_amount = 0
-            self.__set_sa_vars(remark='Disallowed amount is greater than Outstanding Amount')
-        elif self.settled_amount + self.tds_amount + self.disallowance_amount > si_outstanding >= self.settled_amount + self.disallowance_amount:
-            self.tds_amount = 0
-            self.__set_sa_vars(remark='TDS amount is greater than Outstanding Amount')
-        elif si_outstanding < self.settled_amount + self.tds_amount + self.disallowance_amount:
-            self.tds_amount = 0
-            self.disallowance_amount = 0
-            self.__set_sa_vars(remark='Both Disallowed and TDS amount is greater than Outstanding Amount')
+        if total_amount > si_outstanding:
+            if si_outstanding >= self.settled_amount + self.tds_amount:
+                self.disallowance_amount = 0
+                self.__set_sa_vars(remark='Disallowed amount is greater than Outstanding Amount')
+            elif si_outstanding >= self.settled_amount + self.disallowance_amount:
+                self.tds_amount = 0
+                self.__set_sa_vars(remark='TDS amount is greater than Outstanding Amount')
+            else:
+                self.tds_amount = 0
+                self.disallowance_amount = 0
+                self.__set_sa_vars(remark='Both Disallowed and TDS amount is greater than Outstanding Amount')
 
     def __get_entry_name(self) -> str:
         existing_payment_entries = frappe.get_list('Payment Entry'
