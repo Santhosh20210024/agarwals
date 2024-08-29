@@ -34,7 +34,6 @@ class ICICLombardDownloader(SeleniumDownloader):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
         self.driver.find_element(By.ID,'username').send_keys(self.user_name)  #Username
         self.driver.find_element(By.ID,'password').send_keys(self.password) #password
-        # captcha = self.driver.find_element(By.XPATH,"//h5[@style='font-size:20px;color:red;user-select:none']").get_attribute("innerHTML")
         captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
         if captcha:
             self.get_captcha_image(captcha)
