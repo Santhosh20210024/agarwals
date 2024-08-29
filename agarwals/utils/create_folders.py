@@ -32,7 +32,7 @@ def create_new_folder(file_name, folder):
         frappe.throw(f"Error while creating new folder: {e}")
 
 
-def setting_control_panel(PROJECT_FOLDER, SITE_PATH):
+def set_control_panel(PROJECT_FOLDER, SITE_PATH):
     """Setting up the default values in control panel"""
     control_panel_doc = frappe.get_single("Control Panel")
     control_panel_doc.project_folder = PROJECT_FOLDER
@@ -98,7 +98,7 @@ def create_project_folders():
 
         print("**-------- Folder Structure Created --------**")
         
-        setting_control_panel(PROJECT_FOLDER, SITE_PATH)
+        set_control_panel(PROJECT_FOLDER, SITE_PATH)
         
     except Exception as e:
         frappe.throw(f"Error: {e}")
