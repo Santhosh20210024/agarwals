@@ -80,14 +80,14 @@ class PaymentEntryCreator:
                 'entity': self.si_doc.entity, 'region': self.si_doc.region,
                 'branch_type': self.si_doc.branch_type, 'amount': amount}
 
-    def __process_write_off(self, pe_dict: dict) -> dict:
+    def __process_round_off(self, pe_dict: dict) -> dict:
         deductions: list = []
         si_outstanding_amount: float = float(self.si_doc.outstanding_amount)
         si_allocated_amount: float = pe_dict["references"][0]["allocated_amount"]
         si_outstanding_amount = round(float(si_outstanding_amount - si_allocated_amount), 2)
         if 0.00 < si_outstanding_amount <= 9.9:
             deductions.append(
-                self.__add_deduction('Write Off' + self.abbr, 'WriteOff', round(float(si_outstanding_amount), 2)))
+                self.__add_deduction('Rounded Off' + self.abbr, 'RoundedOff', round(float(si_outstanding_amount), 2)))
             pe_dict["references"][0]["allocated_amount"] = round(float(pe_dict["references"][0]["allocated_amount"] + si_outstanding_amount), 2)
             if "deductions" not in pe_dict.keys():
                 pe_dict["deductions"] = []
@@ -153,7 +153,7 @@ class PaymentEntryCreator:
                 pe_dict["custom_disallowed_amount"] = self.disallowance_amount
             if deductions:
                 pe_dict["deductions"] = deductions
-            pe_dict = self.__process_write_off(pe_dict)
+            pe_dict = self.__process_round_off(pe_dict)
             self.pe_doc = self.__create_payment_entry(pe_dict)
             file_records.create(file_upload=self.pe_doc.custom_file_upload,
                                 transform=self.pe_doc.custom_transform, reference_doc=self.pe_doc.doctype,
