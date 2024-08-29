@@ -5,23 +5,8 @@ from frappe.model.document import Document
 from agarwals.utils.reconciliation_utils import update_error, get_company_account
 
 class Matcher(Document):
-	def before_save(self):
-		if self.status != "Open":
-			return
-		if not self.settlement_advice:
-			ref_doc = frappe.get_doc("ClaimBook", self.claimbook)
-		else:
-			ref_doc = frappe.get_doc("Settlement Advice", self.settlement_advice)
-		self.file_upload = ref_doc.file_upload
-		self.transform = ref_doc.transform
-		self.index = ref_doc.index
-		if self.bt_bank_account:
-			self.company_bank_account = get_company_account(self.bt_bank_account)
-
-	def on_update(self):
-		if self.status != "Open":
-			return
-		error = None
+	def validate_matcher(self) -> bool:
+		error: str = ''
 		if not self.bank_transaction:
 			error = "No Bank Transaction"
 		elif len(self.bank_transaction) < 4:
@@ -42,7 +27,23 @@ class Matcher(Document):
 			error = 'Cancelled Bill'
 		elif self.si_status == 'Paid':
 			error = 'Already Paid Bill'
-		elif self.si_total < (float(self.settled_amount) + float(self.tds_amount) + float(self.disallowance_amount)):
-			error = 'Claim amount lesser than the cumulative of other amounts'
 		if error:
 			update_error(self, error)
+			return False
+		return True
+
+	def before_save(self):
+		if self.status != "Open":
+			return
+		if not self.validate_matcher():
+			return
+		if not self.settlement_advice:
+			ref_doc = frappe.get_doc("ClaimBook", self.claimbook)
+		else:
+			ref_doc = frappe.get_doc("Settlement Advice", self.settlement_advice)
+		self.file_upload = ref_doc.file_upload
+		self.transform = ref_doc.transform
+		self.index = ref_doc.index
+		if self.bt_bank_account:
+			self.company_bank_account = get_company_account(self.bt_bank_account)
+
