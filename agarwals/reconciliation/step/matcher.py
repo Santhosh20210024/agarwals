@@ -1,5 +1,5 @@
 import frappe
-from agarwals.utils.updater import update_bill_no_separate_column
+from apps.agarwals.agarwals.utils.matcher_utils import update_bill_no_separate_column
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
