@@ -29,8 +29,6 @@ class PaymentEntryCreator:
             error = 'Cancelled Bill'
         elif self.si_doc.status == 'Paid':
             error = 'Already Paid Bill'
-        elif self.si_doc.total < (self.settled_amount + self.tds_amount + self.disallowance_amount):
-            error = 'Claim amount lesser than the cumulative of other amounts'
         if error:
             update_error(self.matcher_record, error)
             return False
