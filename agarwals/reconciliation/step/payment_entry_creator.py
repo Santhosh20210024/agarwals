@@ -6,10 +6,11 @@ from agarwals.utils.error_handler import log_error
 from frappe.model.document import Document
 from datetime import date
 from agarwals.utils.reconciliation_utils import update_error, get_document_record, get_posting_date, get_entity_closing_date
+from agarwals.utils.accounting_utils import get_abbr
 
 
 class PaymentEntryCreator:
-    def __init__(self, matcher_record: "Document", bt_doc: "Document"):
+    def __init__(self, matcher_record: "Document", bt_doc: "Document", abbr: str):
         self.matcher_record = matcher_record
         self.settled_amount: float = round(float(matcher_record.settled_amount),
                                            2) if matcher_record.settled_amount else 0
@@ -21,6 +22,7 @@ class PaymentEntryCreator:
         self.sa_remark: str = ''
         self.pe_doc = None
         self.bt_doc = bt_doc
+        self.abbr = abbr
 
     def __validate(self) -> bool:
         self.si_doc: "Document" = get_document_record('Sales Invoice', self.matcher_record.sales_invoice)
@@ -85,7 +87,7 @@ class PaymentEntryCreator:
         si_outstanding_amount = round(float(si_outstanding_amount - si_allocated_amount), 2)
         if 0.00 < si_outstanding_amount <= 9.9:
             deductions.append(
-                self.__add_deduction('Write Off - A', 'WriteOff', round(float(si_outstanding_amount), 2)))
+                self.__add_deduction('Write Off' + self.abbr, 'WriteOff', round(float(si_outstanding_amount), 2)))
             pe_dict["references"][0]["allocated_amount"] = round(float(pe_dict["references"][0]["allocated_amount"] + si_outstanding_amount), 2)
             if "deductions" not in pe_dict.keys():
                 pe_dict["deductions"] = []
@@ -113,7 +115,7 @@ class PaymentEntryCreator:
                 'party': self.si_doc.customer,
                 'bank_account': self.bt_doc.bank_account,
                 'party_balance': party_and_bank_balance['party_balance'],
-                'paid_from': 'Debtors - A',
+                'paid_from': 'Debtors' + self.abbr,
                 'paid_from_account_currency': 'INR',
                 'paid_from_account_balance': party_and_bank_balance["paid_from_account_balance"],
                 'paid_to': self.bank_account,
@@ -144,10 +146,10 @@ class PaymentEntryCreator:
             }
             deductions = []
             if self.tds_amount > 0:
-                deductions.append(self.__add_deduction('TDS - A', 'TDS', self.tds_amount))
+                deductions.append(self.__add_deduction('TDS' + self.abbr, 'TDS', self.tds_amount))
                 pe_dict["custom_tds_amount"] = self.tds_amount
             if self.disallowance_amount > 0:
-                deductions.append(self.__add_deduction('Disallowance - A', 'Disallowance', self.disallowance_amount))
+                deductions.append(self.__add_deduction('Disallowance' + self.abbr, 'Disallowance', self.disallowance_amount))
                 pe_dict["custom_disallowed_amount"] = self.disallowance_amount
             if deductions:
                 pe_dict["deductions"] = deductions
@@ -233,7 +235,7 @@ class BankReconciliator:
             return False
         return True
 
-    def process(self, bt: dict) -> str:
+    def process(self, bt: dict, abbr:str) -> str:
         try:
             chunk_status: str = "Processed"
             self.bt_doc: "Document" = get_document_record("Bank Transaction", bt.bank_transaction)
@@ -243,7 +245,7 @@ class BankReconciliator:
                 if not self.__validate(matcher_doc):
                     chunk_status = "Error"
                     continue
-                process_status = PaymentEntryCreator(matcher_doc, self.bt_doc).process()
+                process_status = PaymentEntryCreator(matcher_doc, self.bt_doc, abbr).process()
                 chunk_status = chunk.get_status(chunk_status, process_status)
                 self.bt_doc.reload()
             return chunk_status
@@ -255,8 +257,9 @@ def reconcile_bank_transaction(bt_records: list[dict], chunk_doc: "Document") ->
     chunk.update_status(chunk_doc, "InProgress")
     chunk_status: str = "Processed"
     try:
+        abbr: str = " - " + get_abbr()
         for bt in bt_records:
-            process_status = BankReconciliator().process(bt)
+            process_status = BankReconciliator().process(bt, abbr)
             chunk_status = chunk.get_status(chunk_status, process_status)
     except Exception as e:
         chunk_status = "Error"
