@@ -221,7 +221,7 @@ class PaymentEntryCreator:
             frappe.db.commit()
 
 
-class BankReconciliation:
+class BankReconciliator:
     def __init__(self):
         self.bt_doc = None
 
@@ -256,7 +256,7 @@ def reconcile_bank_transaction(bt_records: list[dict], chunk_doc: "Document", ba
     chunk.update_status(chunk_doc, "InProgress")
     try:
         for bt in bt_records:
-            BankReconciliation().process(bt)
+            BankReconciliator().process(bt)
     except Exception as e:
         global chunk_status
         chunk_status = "Error"
