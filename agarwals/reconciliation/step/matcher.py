@@ -81,15 +81,15 @@ class MatcherValidation:
             return False
 
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount):
-            difference_amount = claim_amount - (
-                settled_amount + tds_amount + disallowed_amount
-            )
-            if difference_amount > tolerance:
+            advice_amount = settled_amount + tds_amount + disallowed_amount
+            difference_amount = abs(claim_amount - advice_amount)
+
+            if difference_amount < tolerance:
                 if self.record["advice"]:
                     Matcher.update_advice_status(
                         self.record["advice"],
                         "Warning",
-                        "Claim Amount is greater than the sum of Settled Amount, TDS Amount and Disallowance Amount.",
+                        "Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount."
                     )
                 return False
         return True
@@ -102,13 +102,17 @@ class MatcherValidation:
         ]:
             if self.record["advice"]:
                 Matcher.update_advice_status(
-                    self.record["advice"], "Warning", "Cancelled Bill"
+                    self.record["advice"], 
+                    "Warning", 
+                    "Cancelled Bill"
                 )
             return False
         if frappe.get_value("Sales Invoice", self.record["bill"], "status") == "Paid":
             if self.record["advice"]:
                 Matcher.update_advice_status(
-                    self.record["advice"], "Warning", "Already Paid Bill"
+                    self.record["advice"],
+                    "Warning",
+                    "Already Paid Bill"
                 )
             return False
         return True
@@ -121,7 +125,7 @@ class MatcherValidation:
                     Matcher.update_advice_status(
                         self.record["advice"],
                         "Warning",
-                        "Reference number should be minimum of 5 digits",
+                        "Reference number should be minimum of 4 digits"
                     )
                 return False
 
@@ -130,16 +134,24 @@ class MatcherValidation:
                     Matcher.update_advice_status(
                         self.record["advice"],
                         "Warning",
-                        "Deposit amount should be greater than 8",
+                        "Deposit amount should be greater than 7"
                     )
                 return False
 
-            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") == "Reconciled"):
+            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") in ["Reconciled", "Settled"]):
                 if self.record["advice"]:
                     Matcher.update_advice_status(
                         self.record["advice"], "Warning", "Already Reconciled"
                     )
                 return False
+            
+            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") == "Cancelled"):
+                if self.record["advice"]:
+                    Matcher.update_advice_status(
+                        self.record["advice"], "Warning", "Cancelled Bank Transaction"
+                    )
+                return False
+            
         return True
 
 
