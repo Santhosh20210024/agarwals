@@ -22,7 +22,7 @@ class Matcher(Document):
 		elif self.bt_status == 'Reconciled':  # Already Reconciled
 			error = 'Already Reconciled'
 		elif self.bt_status not in ['Pending', 'Unreconciled']:
-			error = 'Status Should be other then Pending, Unreconciled'
+			error = 'Bank Status Should not be other then Pending, Unreconciled'
 		elif self.si_status == 'Cancelled':
 			error = 'Cancelled Bill'
 		elif self.si_status == 'Paid':
