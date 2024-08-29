@@ -43,13 +43,13 @@ class PaymentEntryCreator:
         si_outstanding: float = float(self.si_doc.outstanding_amount)
         if self.settled_amount > unallocated_amount:
             self.settled_amount = unallocated_amount
-            self.__set_sa_vars(remark="Bank Transcation unalllocated is less than settled amount")
+            self.__set_sa_vars(remark="Bank transaction unallocated is less than settled amount")
         if si_outstanding < self.settled_amount:
             self.settled_amount = si_outstanding
             self.__set_sa_vars(remark="Sales Invoice Outstanding is less than settled amount")
         if self.settled_amount + self.tds_amount + self.disallowance_amount > si_outstanding >= self.settled_amount + self.tds_amount:
             self.disallowance_amount = 0
-            self.__set_sa_vars(remark='Disallowance amount is greater than Outstanding Amount')
+            self.__set_sa_vars(remark='Disallowed amount is greater than Outstanding Amount')
         elif self.settled_amount + self.tds_amount + self.disallowance_amount > si_outstanding >= self.settled_amount + self.disallowance_amount:
             self.tds_amount = 0
             self.__set_sa_vars(remark='TDS amount is greater than Outstanding Amount')
