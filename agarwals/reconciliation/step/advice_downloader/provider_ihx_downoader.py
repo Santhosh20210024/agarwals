@@ -24,8 +24,6 @@ class ProviderIhxDownloader(SeleniumDownloader):
         pwd.send_keys(self.password)
         login_button = self.driver.find_element(By.XPATH, "//button[@class='ant-btn ant-btn-primary login-btn']")
         login_button.click()
-        if self.check_login_status() == False:
-            raise ValueError("Invalid user name or password")
 
     def navigate(self):
         try:

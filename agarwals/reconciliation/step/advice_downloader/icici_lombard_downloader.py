@@ -1,16 +1,35 @@
 import frappe
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 import time
 from twocaptcha import TwoCaptcha
-import os
 
 class ICICLombardDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
-        
+
+    def check_captcha_value(self):
+        try:
+            modal = self.min_wait.until(EC.presence_of_element_located((By.ID, 'simplemodal-container')))
+            undefined_link = modal.find_element(By.XPATH, "//a[@href='/undefined']//span[text()='undefined']")
+            if undefined_link.text == "undefined":
+                if self.enable_captcha_api == 1:
+                    solver = TwoCaptcha(self.captcha_value[1])
+                    solver.report(self.captcha_value[0]['captchaId'], False)
+                return False
+            return True
+        except:
+            return True
+
+    def check_login_status(self):
+        try:
+            if self.check_captcha_value() == False:
+                return self.captcha_alert
+            alert_message = self.min_wait.until(EC.alert_is_present())
+            if alert_message.text == "Invalid User Name or Password.":
+                return False
+        except:
+            return True if self.driver.current_url != self.url else False
+
     def login(self):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
         self.driver.find_element(By.ID,'username').send_keys(self.user_name)  #Username
@@ -19,31 +38,10 @@ class ICICLombardDownloader(SeleniumDownloader):
         captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
         if captcha:
             self.get_captcha_image(captcha)
-            captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
-            captcha_code = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
-            if captcha_code != None:
-                self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_code)
-                self.driver.find_element(By.ID, 'btnLogin').click()
-                try:
-                    modal = self.wait.until(
-                        EC.presence_of_element_located((By.ID, 'simplemodal-container'))
-                    )
-                    undefined_link = modal.find_element(By.XPATH, "//a[@href='/undefined']//span[text()='undefined']")
-                    if undefined_link.text == "undefined":
-                        if self.enable_captcha_api == 1:
-                            solver = TwoCaptcha(captcha_api[1])
-                            solver.report(captcha_api[0]['captchaId'], False)
-                            self.update_retry()
-                        else:
-                            self.update_tpa_reference("Retry")
-                        self.raise_exception("Invalid Captcha")
-                except Exception as e:
-                    pass
-            else:
-                self.update_retry()
-                if self.enable_captcha_api == 0:
-                    self.update_tpa_reference("Retry")
-                self.raise_exception("Invalid Captcha")
+            self.captcha_value = self.get_captcha_value(captcha_type="Normal Captcha")
+            captcha_answer = self.captcha_value[0]['code'] if self.enable_captcha_api == 1 else self.captcha_value
+            self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_answer)
+            self.driver.find_element(By.ID, 'btnLogin').click()
         else:
             self.raise_exception(" No Captcha Image Found ")
 

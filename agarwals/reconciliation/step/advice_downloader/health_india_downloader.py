@@ -9,7 +9,7 @@ class HealthIndiaDownloader(SeleniumDownloader):
 
     def check_login_status(self)->bool:
         try:
-            self.wait.until(EC.visibility_of_element_located((By.XPATH,"//span[@id='ctl00_ContentPlaceHolder1_lblMessage' and text()='Invalid User name / password.']")))
+            self.min_wait.until(EC.visibility_of_element_located((By.XPATH,"//span[@id='ctl00_ContentPlaceHolder1_lblMessage' and text()='Invalid User name / password.']")))
             return False
         except:
             return True

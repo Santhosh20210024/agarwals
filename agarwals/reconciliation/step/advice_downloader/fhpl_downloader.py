@@ -12,14 +12,11 @@ class FHPLDownloader(SeleniumDownloader):
         SeleniumDownloader.__init__(self)
 
     def check_login_status(self)->bool:
-        """
-        Use to checks the user's authentication status .
-        """
         try:
             status_message = self.min_wait.until(EC.visibility_of_element_located((By.ID,'ContentPlaceHolder1_lblError'))).text
-            return False if status_message in self.status_message_list else True
-        except Exception as e:
-            print(e)
+            if status_message == 'Invalid UserName / Password':
+                return False
+        except:
             return True
 
     def login(self):
@@ -29,8 +26,7 @@ class FHPLDownloader(SeleniumDownloader):
             self.password)
         self.wait.until(EC.element_to_be_clickable((By.ID, 'ContentPlaceHolder1_btnLogin'))).click()
         login_status =  self.check_login_status()
-        if login_status == False:
-            raise ValueError('Invalid user name or password')
+
 
     def navigate(self):
         return

@@ -18,8 +18,6 @@ class GoodHealthDownloader(SeleniumDownloader):
         self.wait.until(EC.visibility_of_element_located((By.ID,'txtUsrName'))).send_keys(self.user_name)
         self.wait.until(EC.visibility_of_element_located((By.ID,'txtPassword'))).send_keys(self.password)
         self.wait.until(EC.element_to_be_clickable((By.ID, 'btnLogin'))).click()
-        if self.check_login_status() == False:
-            raise ValueError("Invalid user name or password")
 
     def navigate(self):
         self.driver.get('https://webace.goodhealthtpa.in/Provider/ProviderDownloadMIS.aspx')

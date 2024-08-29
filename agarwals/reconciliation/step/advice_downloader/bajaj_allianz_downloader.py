@@ -11,52 +11,47 @@ import os
 
 class BajajAllianzDownloader(SeleniumDownloader):
 
-    def check_captcha_value(self,captcha_api):
+    def check_captcha_value(self):
         try:
             self.driver.implicitly_wait(3)
-            alert = Alert(self.driver)
+            alert = self.min_wait.until(EC.alert_is_present())
             if alert.text == "enter valid captcha code":
                 if self.enable_captcha_api == 1:
-                    solver = TwoCaptcha(captcha_api[1])
-                    solver.report(captcha_api[0]['captchaId'], False)
-                else:
-                    self.update_tpa_reference("Retry")
-                raise ValueError('Invalid Captcha Entry')
+                    solver = TwoCaptcha(self.captcha_api[1])
+                    solver.report(self.captcha_api[0]['captchaId'], False)
+                return False
+            return True
         except:
-            pass
+            return True
+
+    def check_login_status(self):
+        try:
+            if self.check_captcha_value() == False:
+                return self.captcha_alert
+            message = self.min_wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 'message-text text-danger'))).text
+            if message == "Invalid username or password":
+                return False
+        except:
+            return True
+
     def login(self):
-        username = self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
-        username.send_keys(self.user_name)
-        self.driver.find_element(By.ID, 'password').send_keys(self.password)
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'username'))).send_keys(self.user_name)
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'password'))).send_keys(self.password)
         captcha_img = self.wait.until(EC.visibility_of_element_located((By.ID, 'valicode')))
         if captcha_img:
             self.get_captcha_image(captcha_img)
-            captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
-            captcha_code = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
-            if captcha_code != None:
-                captcha_entry = self.wait.until(
-                    EC.visibility_of_element_located((By.XPATH, "//*[@placeholder='please enter captcha']")))
-                captcha_entry.send_keys(captcha_code)
-                self.wait.until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, "input.btn.bg-orange.btn-block[type='submit']"))).click()
-                self.check_captcha_value(captcha_api)
-            else:
-                if self.enable_captcha_api == 0:
-                    self.update_tpa_reference("Retry")
-                raise ValueError('No captcha value found')
+            self.captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
+            captcha_code = self.captcha_api[0]['code'] if self.enable_captcha_api == 1 else self.captcha_api
+            self.wait.until(EC.visibility_of_element_located((By.XPATH, "//*[@placeholder='please enter captcha']"))).send_keys(captcha_code)
+            self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input.btn.bg-orange.btn-block[type='submit']"))).click()
         else:
-                self.raise_exception("Captcha ID NOT FOUND")
+            self.raise_exception("Captcha ID NOT FOUND")
+
     def navigate(self):
-        time.sleep(5)
-        payments_tab = self.wait.until(EC.visibility_of_element_located((By.ID, 'payments')))
-        payments_tab.click()
-        paid_claim_details = self.wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT,"BAJAJ")))
-        paid_claim_details.click()
-        time.sleep(5)
+        self.wait.until(EC.element_to_be_clickable((By.ID, 'payments'))).click()
+        self.wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT,"BAJAJ"))).click()
 
     def download_from_web(self):
         download_button = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="app"]/div[2]/div[1]/div/div/div/div/div/div/div[2]/div/button/button')))
-        action_chains = ActionChains(self.driver)
-        time.sleep(5)
-        action_chains.move_to_element(download_button).click().perform()
+        self.actions.move_to_element(download_button).click().perform()
         time.sleep(10)

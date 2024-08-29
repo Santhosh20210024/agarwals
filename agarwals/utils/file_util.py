@@ -14,7 +14,7 @@ SUB_DIR = [
     "Zip",
 ]
 INNER_SUB_DIR = ["Error"]
-SITE_PATH = "/home/frappe/frappe-bench/sites/agarwals.claimgenie.ai"
+SITE_PATH = "/home/kavi_tfs/frappe-bench/sites/agarwals.com"
 
 
 def construct_file_url(*args):

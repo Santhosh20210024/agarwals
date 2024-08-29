@@ -6,18 +6,22 @@ from selenium.webdriver.common.by import By
 import time
 
 class StarVitrayaDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
+
+    def check_login_status(self):
+        try:
+            message = self.min_wait.until(EC.visibility_of_element_located((By.ID,'alertMessage'))).text
+            if message == 'Invalid username or password':
+                return False
+        except:
+            return True
 
     def login(self):
-       
-        user = self.wait.until(EC.visibility_of_element_located((By.ID,'email')))
-        user.send_keys(self.user_name)
-        password = self.wait.until(EC.visibility_of_element_located((By.ID,'password')))
-        password.send_keys(self.password)
-        
+        self.wait.until(EC.visibility_of_element_located((By.ID,'email'))).send_keys(self.user_name)
+        self.wait.until(EC.visibility_of_element_located((By.ID,'password'))).send_keys(self.password)
+        self.wait.until(EC.element_to_be_clickable((By.ID,'loginBtn1'))).click()
+
     def navigate(self):
-        self.driver.find_element(By.ID,'loginBtn1').click()
+        return
 
     def download_from_web(self,temp_from_date=None,temp_to_date=None):
         from_date = self.from_date.strftime('%d-%m-%Y') if temp_from_date is None else temp_from_date.strftime('%d-%m-%Y')
