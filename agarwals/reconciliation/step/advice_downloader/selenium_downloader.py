@@ -20,7 +20,7 @@ import glob
 from io import StringIO
 import random
 from frappe.model.document import Document
-from agarwals.utils.file_util import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH
+from agarwals.utils.file_util import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH,construct_file_url
 
 class SeleniumDownloader:
     def __init__(self):
@@ -36,13 +36,6 @@ class SeleniumDownloader:
         self.file_not_found_remarks = ""
         self.captcha_alert = "Invalid Captcha"
 
-    def construct_file_url(*args):
-        list_of_items = []
-        for arg in args:
-            if type(arg)==str:
-                list_of_items.append(arg)
-        formatted_url = '/'.join(list_of_items)
-        return formatted_url
 
     def get_captcha_value(self,captcha_type=None,sitekey= None):
         """
@@ -113,7 +106,7 @@ class SeleniumDownloader:
         file_doc = frappe.new_doc("File")
         file_doc.file_name = f"{self.tpa}_{frappe.utils.now_datetime()}captcha.png"
         file_doc.is_private = 1
-        file_doc.file_url = "/" + self.construct_file_url(self.SHELL_PATH,f"{self.tpa}_captcha.png")
+        file_doc.file_url = "/" + construct_file_url(self.SHELL_PATH,f"{self.tpa}_captcha.png")
         file_doc.attached_to_doctype = "Settlement Advice Downloader UI"
         file_doc.attached_to_name = self.captcha_tpa_doc
         file_doc.attached_to_field = 'captcha_img'
@@ -137,8 +130,8 @@ class SeleniumDownloader:
 
 
     def get_captcha_image(self,captcha_identifier):
-        self.full_img_path = self.construct_file_url(self.SITE_PATH,self.SHELL_PATH, f"{self.tpa}full_img.png")
-        self.crop_img_path = self.construct_file_url(self.SITE_PATH,self.SHELL_PATH,f"{self.tpa}_captcha.png")
+        self.full_img_path = construct_file_url(self.SITE_PATH,self.SHELL_PATH, f"{self.tpa}full_img.png")
+        self.crop_img_path = construct_file_url(self.SITE_PATH,self.SHELL_PATH,f"{self.tpa}_captcha.png")
         self.driver.save_screenshot(self.full_img_path)
         location =  captcha_identifier.location
         size =  captcha_identifier.size
