@@ -39,7 +39,7 @@
       "in_list_view": 1,
       "in_standard_filter": 1,
       "label": "Status",
-      "options": "\nERROR\nINFO\nDEBUG"
+      "options": "\nERROR\nINFO\nDEBUG\nWARNING"
      }
     ],
     "index_web_pages_for_search": 1,
