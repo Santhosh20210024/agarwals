@@ -9,19 +9,44 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "sales_invoice_section",
   "sales_invoice",
+  "si_status",
+  "si_bill_date",
+  "si_customer",
   "claim_amount",
+  "column_break_vwd4c",
+  "si_region",
+  "si_entity",
+  "si_branch",
+  "si_branch_type",
+  "claimbook_section",
   "claimbook",
+  "column_break_8czzl",
   "insurance_company_name",
+  "settlement_advice_section",
   "settlement_advice",
+  "bank_transaction_section",
   "bank_transaction",
+  "bt_date",
+  "bt_bank_account",
+  "company_bank_account",
+  "column_break_wztl4",
+  "deposit",
+  "unallocated",
+  "bt_status",
+  "matcher_section",
   "settled_amount",
   "tds_amount",
   "disallowance_amount",
   "match_logic",
   "status",
+  "column_break_znys2",
   "remarks",
-  "payment_order"
+  "payment_order",
+  "file_upload",
+  "transform",
+  "index"
  ],
  "fields": [
   {
@@ -69,16 +94,19 @@
    "search_index": 1
   },
   {
+   "default": "0",
    "fieldname": "tds_amount",
    "fieldtype": "Data",
    "label": "TDS Amount"
   },
   {
+   "default": "0",
    "fieldname": "disallowance_amount",
    "fieldtype": "Data",
    "label": "Disallowance Amount"
   },
   {
+   "default": "0",
    "fieldname": "settled_amount",
    "fieldtype": "Data",
    "label": "Settled Amount"
@@ -94,14 +122,151 @@
    "label": "Payment Order"
   },
   {
+   "fieldname": "sales_invoice_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Invoice"
+  },
+  {
+   "fetch_from": "sales_invoice.status",
+   "fieldname": "si_status",
+   "fieldtype": "Data",
+   "label": "SI status"
+  },
+  {
+   "fetch_from": "sales_invoice.posting_date",
+   "fieldname": "si_bill_date",
+   "fieldtype": "Data",
+   "label": "SI Bill Date"
+  },
+  {
+   "fetch_from": "sales_invoice.customer",
+   "fieldname": "si_customer",
+   "fieldtype": "Data",
+   "label": "SI Customer"
+  },
+  {
+   "fieldname": "column_break_vwd4c",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "sales_invoice.region",
+   "fieldname": "si_region",
+   "fieldtype": "Data",
+   "label": "SI Region"
+  },
+  {
+   "fetch_from": "sales_invoice.entity",
+   "fieldname": "si_entity",
+   "fieldtype": "Data",
+   "label": "SI Entity"
+  },
+  {
+   "fetch_from": "sales_invoice.branch",
+   "fieldname": "si_branch",
+   "fieldtype": "Data",
+   "label": "SI Branch"
+  },
+  {
+   "fetch_from": "sales_invoice.branch_type",
+   "fieldname": "si_branch_type",
+   "fieldtype": "Data",
+   "label": "SI Branch Type"
+  },
+  {
+   "fieldname": "claimbook_section",
+   "fieldtype": "Section Break",
+   "label": "Claimbook"
+  },
+  {
+   "fieldname": "column_break_8czzl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "settlement_advice_section",
+   "fieldtype": "Section Break",
+   "label": "Settlement Advice"
+  },
+  {
+   "fieldname": "bank_transaction_section",
+   "fieldtype": "Section Break",
+   "label": "Bank Transaction"
+  },
+  {
+   "fetch_from": "bank_transaction.date",
+   "fieldname": "bt_date",
+   "fieldtype": "Data",
+   "label": "BT Date"
+  },
+  {
+   "fieldname": "column_break_wztl4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "bank_transaction.status",
+   "fieldname": "bt_status",
+   "fieldtype": "Data",
+   "label": "BT Status"
+  },
+  {
+   "fetch_from": "bank_transaction.bank_account",
+   "fieldname": "bt_bank_account",
+   "fieldtype": "Data",
+   "label": "BT Bank Account"
+  },
+  {
+   "fieldname": "matcher_section",
+   "fieldtype": "Section Break",
+   "label": "Matcher"
+  },
+  {
+   "fieldname": "column_break_znys2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "bank_transaction.deposit",
+   "fieldname": "deposit",
+   "fieldtype": "Data",
+   "label": "Deposit"
+  },
+  {
+   "fetch_from": "bank_transaction.unallocated_amount",
+   "fieldname": "unallocated",
+   "fieldtype": "Data",
+   "label": "Unallocated"
+  },
+  {
+   "fieldname": "company_bank_account",
+   "fieldtype": "Data",
+   "label": "Company Bank Account"
+  },
+  {
+   "fieldname": "file_upload",
+   "fieldtype": "Link",
+   "label": "File Upload",
+   "options": "File upload"
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "label": "Transform",
+   "options": "Transform"
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "label": "Index"
+  },
+  {
+   "fetch_from": "sales_invoice.total",
+   "fetch_if_empty": 1,
    "fieldname": "claim_amount",
    "fieldtype": "Data",
-   "label": "Claim Amount"
+   "label": "SI Total (Claim Amount)"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-17 18:20:21.483553",
+ "modified": "2024-08-29 11:02:43.435515",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Matcher",
