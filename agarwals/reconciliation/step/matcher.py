@@ -83,15 +83,16 @@ class MatcherValidation:
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount):
             cumulative_amount = settled_amount + tds_amount + disallowed_amount
             difference_amount = abs(claim_amount - cumulative_amount)
-
-            if difference_amount < tolerance:
-                if self.record["advice"]:
-                    Matcher.update_advice_status(
-                        self.record["advice"],
-                        "Warning",
-                        "Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount."
-                    )
-                return False
+            
+            if difference_amount != 0:
+                if difference_amount < tolerance:
+                    if self.record["advice"]:
+                        Matcher.update_advice_status(
+                            self.record["advice"],
+                            "Warning",
+                            "Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount."
+                        )
+                    return False
         return True
 
     def _validate_bill_status(self):
