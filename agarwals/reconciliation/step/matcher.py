@@ -64,7 +64,7 @@ class MatcherValidation:
         settled_amount = MatcherValidation.round_off(self.record.settled_amount)
         tds_amount = MatcherValidation.round_off(self.record.tds_amount)
         disallowed_amount = MatcherValidation.round_off(self.record.disallowed_amount)
-        tolerance = 1
+        tolerance = -1
 
         if claim_amount <= 0:
             if self.record["advice"]:
@@ -82,7 +82,7 @@ class MatcherValidation:
 
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount):
             cumulative_amount = settled_amount + tds_amount + disallowed_amount
-            difference_amount = abs(claim_amount - cumulative_amount)
+            difference_amount = claim_amount - cumulative_amount
             
             if difference_amount != 0:
                 if difference_amount < tolerance:
