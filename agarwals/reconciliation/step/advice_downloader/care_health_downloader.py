@@ -13,9 +13,6 @@ class CarehealthDownloader(SeleniumDownloader):
         try:
             message = self.min_wait.until(EC.presence_of_element_located((By.ID, 'Capitchaerror'))).text
             if message == 'Invalid Captcha':
-                if self.enable_captcha_api:
-                    solver = TwoCaptcha(self.captcha[1])
-                    solver.report(self.captcha[0]['captchaId'], False)
                 return False
             return True
         except:
@@ -24,12 +21,16 @@ class CarehealthDownloader(SeleniumDownloader):
     def check_login_status(self):
         try:
             if self.check_captcha_value() == False:
-                return False
+                if self.enable_captcha_api == 1:
+                    solver = TwoCaptcha(self.captcha[1])
+                    solver.report(self.captcha[0]['captchaId'], False)
+                return self.captcha_alert
             message = self.min_wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='col-sm-12 col-lg-12' and @style='color:red;']"))).text
             if message == 'Invalid Username or Password':
                 return False
+            return True if self.login_url != self.driver.current_url else False
         except:
-            return True
+            return True if self.login_url != self.driver.current_url else False
 
     def login(self):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'UserName'))).send_keys(self.user_name)
@@ -44,13 +45,13 @@ class CarehealthDownloader(SeleniumDownloader):
             g_recaptcha_response.send_keys(self.captcha[0]['code'])
         else:
             time.sleep(self.max_wait_time)
-        self.driver.find_element(By.CLASS_NAME, 'btn-primary').click()
+        self.login_url = self.driver.current_url
+        self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'btn-primary'))).click()
 
     def navigate(self):
         modal = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "modal-content")))
         cancel_button = modal.find_element(By.XPATH, ".//button[contains(text(),'Cancel')]")
         cancel_button.click()
-
 
     def download_from_web(self):
         main_menu = self.wait.until(
@@ -59,6 +60,5 @@ class CarehealthDownloader(SeleniumDownloader):
         sub_menu = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(., 'Paid')]")))
         sub_menu.click()
-        export_button = self.wait.until(EC.element_to_be_clickable((By.ID, "btnGenerateRE")))
-        export_button.click()
-        time.sleep(5)
+        self.wait.until(EC.element_to_be_clickable((By.ID, "btnGenerateRE"))).click()
+        time.sleep(10)
