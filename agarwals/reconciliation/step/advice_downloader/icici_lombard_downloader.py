@@ -1,3 +1,4 @@
+from selenium.common import TimeoutException
 import frappe
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,7 +8,7 @@ from twocaptcha import TwoCaptcha
 
 class ICICLombardDownloader(SeleniumDownloader):
 
-    def check_captcha_value(self):
+    def is_invalid_captcha(self):
         try:
             modal = self.min_wait.until(EC.presence_of_element_located((By.ID, 'simplemodal-container')))
             undefined_link = modal.find_element(By.XPATH, "//a[@href='/undefined']//span[text()='undefined']")
@@ -15,20 +16,26 @@ class ICICLombardDownloader(SeleniumDownloader):
                 if self.enable_captcha_api == 1:
                     solver = TwoCaptcha(self.captcha_value[1])
                     solver.report(self.captcha_value[0]['captchaId'], False)
-                return False
-            return True
-        except:
-            return True
+                return True
+            return False
+        except TimeoutException:
+            return False
+        except Exception as e:
+            return e
 
     def check_login_status(self):
-        try:
-            if self.check_captcha_value() == False:
-                return self.captcha_alert
-            alert_message = self.min_wait.until(EC.alert_is_present())
-            if alert_message.text == "Invalid User Name or Password.":
-                return False
-        except:
-            return True if self.driver.current_url != self.url else False
+        is_invalid = self.is_invalid_captcha()
+        if is_invalid == True:
+            return self.captcha_alert
+        elif is_invalid == False:
+            try:
+                alert_message = self.min_wait.until(EC.alert_is_present())
+                if alert_message.text == "Invalid User Name or Password.":
+                    return False
+            except:
+                return True if self.driver.current_url != self.url else False
+        else:
+            return is_invalid
 
     def login(self):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))

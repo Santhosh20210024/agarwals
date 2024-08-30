@@ -8,8 +8,7 @@ import time
 
 
 class FHPLDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
+
 
     def check_login_status(self)->bool:
         try:

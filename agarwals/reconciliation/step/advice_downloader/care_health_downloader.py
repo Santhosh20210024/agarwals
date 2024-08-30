@@ -4,33 +4,42 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 import time
+from selenium.common.exceptions import TimeoutException
 from twocaptcha import TwoCaptcha
 from selenium.webdriver.support.ui import WebDriverWait
 
 class CarehealthDownloader(SeleniumDownloader):
 
-    def check_captcha_value(self):
+    def is_invalid_captcha(self):
         try:
             message = self.min_wait.until(EC.presence_of_element_located((By.ID, 'Capitchaerror'))).text
             if message == 'Invalid Captcha':
-                return False
-            return True
-        except:
-            return True
+                return True
+            return False
+        except TimeoutException:
+            return False
+        except Exception as e:
+            return e
+
 
     def check_login_status(self):
-        try:
-            if self.check_captcha_value() == False:
-                if self.enable_captcha_api == 1:
-                    solver = TwoCaptcha(self.captcha[1])
-                    solver.report(self.captcha[0]['captchaId'], False)
-                return self.captcha_alert
-            message = self.min_wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='col-sm-12 col-lg-12' and @style='color:red;']"))).text
-            if message == 'Invalid Username or Password':
-                return False
-            return True if self.login_url != self.driver.current_url else False
-        except:
-            return True if self.login_url != self.driver.current_url else False
+        is_invalid = self.is_invalid_captcha()
+        if is_invalid is True:
+            if self.enable_captcha_api == 1:
+                solver = TwoCaptcha(self.captcha[1])
+                solver.report(self.captcha[0]['captchaId'], False)
+            return self.captcha_alert
+        elif is_invalid is False:
+            try:
+                message = self.min_wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='col-sm-12 col-lg-12' and @style='color:red;']"))).text
+                if message == 'Invalid Username or Password':
+                    return False
+                return True if self.login_url != self.driver.current_url else False
+            except:
+                return True if self.login_url != self.driver.current_url else False
+        else:
+            return is_invalid
+
 
     def login(self):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'UserName'))).send_keys(self.user_name)

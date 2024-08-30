@@ -1,3 +1,4 @@
+from selenium.common import TimeoutException
 import frappe
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,28 +12,33 @@ import os
 
 class BajajAllianzDownloader(SeleniumDownloader):
 
-    def check_captcha_value(self):
+    def is_invalid_captcha(self):
         try:
-            self.driver.implicitly_wait(3)
             alert = self.min_wait.until(EC.alert_is_present())
             if alert.text == "enter valid captcha code":
                 if self.enable_captcha_api == 1:
                     solver = TwoCaptcha(self.captcha_api[1])
                     solver.report(self.captcha_api[0]['captchaId'], False)
-                return False
-            return True
-        except:
-            return True
+                return True
+            return False
+        except TimeoutException:
+            return False
+        except Exception as e:
+            return e
 
     def check_login_status(self):
-        try:
-            if self.check_captcha_value() == False:
-                return self.captcha_alert
-            message = self.min_wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 'message-text text-danger'))).text
-            if message == "Invalid username or password":
-                return False
-        except:
-            return True
+        is_invalid = self.is_invalid_captcha()
+        if is_invalid == True:
+            return self.captcha_alert
+        elif is_invalid == False:
+            try:
+                message = self.min_wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 'message-text text-danger'))).text
+                if message == "Invalid username or password":
+                    return False
+            except:
+                return True
+        else:
+            return is_invalid
 
     def login(self):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'username'))).send_keys(self.user_name)

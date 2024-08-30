@@ -221,12 +221,14 @@ class SeleniumDownloader:
                 None: If the login status is valid and no errors are raised.
         """
         login_status = self.check_login_status()
-        if login_status == False:
-            raise ValueError("Invalid user name or password")
+        if login_status == True:
+            return None
         elif login_status == self.captcha_alert:
             raise ValueError("Invalid Captcha")
+        elif login_status == False:
+            raise ValueError("Invalid user name or password")
         else:
-            return None
+            self.raise_exception(login_status)
 
     def check_login_status(self)->bool | str | None:
         return None
