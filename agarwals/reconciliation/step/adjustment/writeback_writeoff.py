@@ -1,5 +1,5 @@
 import frappe
-from agarwals.reconciliation.step.adjust_bill import JournalUtils
+from agarwals.reconciliation.step.adjustment.journal_entry_utils import JournalUtils
 from datetime import datetime
 from agarwals.utils.error_handler import log_error as error_handler
 from agarwals.utils.accounting_utils import get_abbr
