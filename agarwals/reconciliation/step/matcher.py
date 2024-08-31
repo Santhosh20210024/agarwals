@@ -33,9 +33,9 @@ class MatcherValidation:
         """Runs all validation checks on the record."""
         return (
             self._validate_advice()
-            and self._validate_amount()
             and self._validate_bill_status()
             and self._validate_bank_transaction()
+            and self._validate_amount()
         )
 
     def _validate_advice(self):
@@ -64,7 +64,7 @@ class MatcherValidation:
         settled_amount = MatcherValidation.round_off(self.record.settled_amount)
         tds_amount = MatcherValidation.round_off(self.record.tds_amount)
         disallowed_amount = MatcherValidation.round_off(self.record.disallowed_amount)
-        tolerance = 1
+        tolerance = -1
 
         if claim_amount <= 0:
             if self.record["advice"]:
@@ -81,17 +81,18 @@ class MatcherValidation:
             return False
 
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount):
-            difference_amount = claim_amount - (
-                settled_amount + tds_amount + disallowed_amount
-            )
-            if difference_amount > tolerance:
-                if self.record["advice"]:
-                    Matcher.update_advice_status(
-                        self.record["advice"],
-                        "Warning",
-                        "Claim Amount is greater than the sum of Settled Amount, TDS Amount and Disallowance Amount.",
-                    )
-                return False
+            cumulative_amount = settled_amount + tds_amount + disallowed_amount
+            difference_amount = claim_amount - cumulative_amount
+            
+            if difference_amount != 0:
+                if difference_amount <= tolerance:
+                    if self.record["advice"]:
+                        Matcher.update_advice_status(
+                            self.record["advice"],
+                            "Warning",
+                            "Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount."
+                        )
+                    return False
         return True
 
     def _validate_bill_status(self):
@@ -102,13 +103,17 @@ class MatcherValidation:
         ]:
             if self.record["advice"]:
                 Matcher.update_advice_status(
-                    self.record["advice"], "Warning", "Cancelled Bill"
+                    self.record["advice"], 
+                    "Warning", 
+                    "Cancelled Bill"
                 )
             return False
         if frappe.get_value("Sales Invoice", self.record["bill"], "status") == "Paid":
             if self.record["advice"]:
                 Matcher.update_advice_status(
-                    self.record["advice"], "Warning", "Already Paid Bill"
+                    self.record["advice"],
+                    "Warning",
+                    "Already Paid Bill"
                 )
             return False
         return True
@@ -121,7 +126,7 @@ class MatcherValidation:
                     Matcher.update_advice_status(
                         self.record["advice"],
                         "Warning",
-                        "Reference number should be minimum of 5 digits",
+                        "Reference number should be minimum of 4 digits"
                     )
                 return False
 
@@ -130,16 +135,24 @@ class MatcherValidation:
                     Matcher.update_advice_status(
                         self.record["advice"],
                         "Warning",
-                        "Deposit amount should be greater than 8",
+                        "Deposit amount should be greater than 7"
                     )
                 return False
 
-            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") == "Reconciled"):
+            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") in ["Reconciled", "Settled"]):
                 if self.record["advice"]:
                     Matcher.update_advice_status(
                         self.record["advice"], "Warning", "Already Reconciled"
                     )
                 return False
+            
+            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") == "Cancelled"):
+                if self.record["advice"]:
+                    Matcher.update_advice_status(
+                        self.record["advice"], "Warning", "Cancelled Bank Transaction"
+                    )
+                return False
+            
         return True
 
 

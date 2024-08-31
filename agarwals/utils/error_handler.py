@@ -1,7 +1,6 @@
 import frappe
 
 def log_error(error,doc=None,doc_name=None):
-    error = str(error)
     if doc_name and len(doc_name) > 140:
         doc_name = doc_name[:139]
     error_log = frappe.new_doc('Error Record Log')
