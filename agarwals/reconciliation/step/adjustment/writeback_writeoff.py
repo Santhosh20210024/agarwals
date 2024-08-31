@@ -1,5 +1,5 @@
 import frappe
-from agarwals.reconciliation.step.adjustment.journal_entry_utils import JournalUtils
+from agarwals.reconciliation.step.adjustment.journal_entry_utils import JournalEntryUtils
 from datetime import datetime
 from agarwals.utils.error_handler import log_error as error_handler
 from agarwals.utils.accounting_utils import get_abbr
@@ -14,7 +14,7 @@ def create_writeback_jv():
                 if bank_transaction.unallocated_amount <= int(writeback.unallocated_amount) + 10:
                     if bank_transaction.unallocated_amount != 0:
                         # init save_je class
-                        jv = JournalUtils()
+                        jv = JournalEntryUtils()
                         # get file_upload_list
                         file_upload_list = get_doc_list("File upload",{"name":writeback.file_upload},["*"])
                         # get posting and debt_account
