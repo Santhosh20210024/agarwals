@@ -1,5 +1,5 @@
 import frappe
-from tfs.orchestration import chunk
+from tfs.orchestration import chunk, Orchestrator, update_chunk_status
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.reconciliation.step.adjustment.journal_entry_utils import (
@@ -54,9 +54,8 @@ class BillAdjustmentProcessor(JournalEntryUtils):
             return False
         return True
 
-    def process_bill_adjust(self, bill_adjustment_list, chunk_doc):
-        chunk.update_status(chunk_doc, "InProgress")
-
+    @update_chunk_status
+    def process_bill_adjust(self, bill_adjustment_list):
         try:
             for bill_adjt in bill_adjustment_list:
                 bill_adjt = frappe.get_doc("Bill Adjustment", bill_adjt)
@@ -108,9 +107,9 @@ class BillAdjustmentProcessor(JournalEntryUtils):
 
                 bill_adjt.save()
                 frappe.db.commit()
-            chunk.update_status(chunk_doc, "Processed")
+            return "Processed"
         except Exception as _:
-            chunk.update_status(chunk_doc, "Error")
+            return "Error"
 
 
 class BillAdjustmentOrchestrator:
@@ -124,42 +123,17 @@ class BillAdjustmentOrchestrator:
     def start_process(self, args):
         args = cast_to_dic(args)
         chunk_size = int(args.get("chunk_size", 100))
-        batch_no = 0
-
         bill_adjustments = self.get_bill_adjustments()
-        if not bill_adjustments:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
-            return
-
-        for bill_adjt_chunk in self._chunk_list(bill_adjustments, chunk_size):
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            batch_no = batch_no + 1
-            self._enqueue_bill_adjustment(args, bill_adjt_chunk, chunk_doc, batch_no)
-
-    def _chunk_list(self, iterable, n):
-        """Yield successive n-sized chunks from the iterable."""
-        for i in range(0, len(iterable), n):
-            yield iterable[i : i + n]
-
-    def _enqueue_bill_adjustment(self, args, bill_adjt_chunk, chunk_doc, batch_no):
-        try:
-            frappe.enqueue(
-                BillAdjustmentProcessor().process_bill_adjust,
-                queue=args.get("queue", "long"),
-                is_async=True,
-                job_name=f"BillAdjustment_Batch{batch_no}",
-                timeout=25000,
-                bill_adjustment_list=bill_adjt_chunk,
-                chunk_doc=chunk_doc,
-            )
-        except Exception as e:
-            self._handle_error(e, args["step_id"])
-
-    def _handle_error(self, error, step_id):
-        chunk_doc = chunk.create_chunk(step_id)
-        chunk.update_status(chunk_doc, "Error")
-        log_error(error, "Step")
+        Orchestrator().process(BillAdjustmentProcessor().process_bill_adjust, step_id=args["step_id"],
+                               is_enqueueable=True,
+                               chunk_size=chunk_size,
+                               data_var_name="bill_adjustment_list",
+                               set_job_name=True,
+                               queue=args.get("queue", "long"),
+                               is_async=True,
+                               job_name="BillAdjustment_Batch",
+                               timeout=25000,
+                               bill_adjustment_list=bill_adjustments)
 
 
 @frappe.whitelist()
