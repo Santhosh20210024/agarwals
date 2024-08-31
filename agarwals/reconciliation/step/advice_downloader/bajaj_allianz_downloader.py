@@ -1,3 +1,4 @@
+from selenium.common import TimeoutException
 import frappe
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from selenium.webdriver.support import expected_conditions as EC
@@ -10,54 +11,53 @@ import os
 
 
 class BajajAllianzDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
+
+    def is_invalid_captcha(self):
+        try:
+            alert = self.min_wait.until(EC.alert_is_present())
+            if alert.text == "enter valid captcha code":
+                if self.enable_captcha_api == 1:
+                    solver = TwoCaptcha(self.captcha_api[1])
+                    solver.report(self.captcha_api[0]['captchaId'], False)
+                return True
+            return False
+        except TimeoutException:
+            return False
+        except Exception as e:
+            return e
+
+    def check_login_status(self):
+        is_invalid = self.is_invalid_captcha()
+        if is_invalid == True:
+            return self.captcha_alert
+        elif is_invalid == False:
+            try:
+                message = self.min_wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 'message-text text-danger'))).text
+                if message == "Invalid username or password":
+                    return False
+            except:
+                return True
+        else:
+            return is_invalid
+
     def login(self):
-        username = self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
-        username.send_keys(self.user_name)
-        self.driver.find_element(By.ID, 'password').send_keys(self.password)
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'username'))).send_keys(self.user_name)
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'password'))).send_keys(self.password)
         captcha_img = self.wait.until(EC.visibility_of_element_located((By.ID, 'valicode')))
         if captcha_img:
             self.get_captcha_image(captcha_img)
-            captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
-            captcha_code = captcha_api[0]['code'] if self.enable_captcha_api == 1 else captcha_api
-            if captcha_code != None:
-                captcha_entry = self.wait.until(
-                    EC.visibility_of_element_located((By.XPATH, "//*[@placeholder='please enter captcha']")))
-                captcha_entry.send_keys(captcha_code)
-                self.wait.until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, "input.btn.bg-orange.btn-block[type='submit']"))).click()
-                try:
-                    time.sleep(2)
-                    alert = Alert(self.driver)
-                    if alert.text == "enter valid captcha code":
-                        if self.enable_captcha_api == 1:
-                            solver = TwoCaptcha(captcha_api[1])
-                            solver.report(captcha_api[0]['captchaId'], False)
-                            self.update_retry()
-                        else:
-                            self.update_tpa_reference("Retry")
-                        self.raise_exception("Invalid Captcha")
-                except:
-                    pass
-            else:
-                self.update_retry()
-                if self.enable_captcha_api == 0:
-                    self.update_tpa_reference("Retry")
-                self.raise_exception("Invalid Captcha")
+            self.captcha_api = self.get_captcha_value(captcha_type="Normal Captcha")
+            captcha_code = self.captcha_api[0]['code'] if self.enable_captcha_api == 1 else self.captcha_api
+            self.wait.until(EC.visibility_of_element_located((By.XPATH, "//*[@placeholder='please enter captcha']"))).send_keys(captcha_code)
+            self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input.btn.bg-orange.btn-block[type='submit']"))).click()
         else:
-                self.raise_exception("Captcha ID NOT FOUND")
+            self.raise_exception("Captcha ID NOT FOUND")
+
     def navigate(self):
-        time.sleep(5)
-        payments_tab = self.wait.until(EC.visibility_of_element_located((By.ID, 'payments')))
-        payments_tab.click()
-        paid_claim_details = self.wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT,"BAJAJ")))
-        paid_claim_details.click()
-        time.sleep(5)
+        self.wait.until(EC.element_to_be_clickable((By.ID, 'payments'))).click()
+        self.wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT,"BAJAJ"))).click()
 
     def download_from_web(self):
         download_button = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="app"]/div[2]/div[1]/div/div/div/div/div/div/div[2]/div/button/button')))
-        action_chains = ActionChains(self.driver)
-        time.sleep(5)
-        action_chains.move_to_element(download_button).click().perform()
+        self.actions.move_to_element(download_button).click().perform()
         time.sleep(10)

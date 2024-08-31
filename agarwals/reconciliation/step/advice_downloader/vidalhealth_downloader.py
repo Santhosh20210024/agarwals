@@ -6,16 +6,20 @@ from selenium.webdriver.common.by import By
 import time
 
 class VidalHealthDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
 
+    def check_login_status(self):
+        try:
+            messages = self.min_wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME,'p')))
+            for message in messages:
+                if message.text == "Dear Customer, your username/password does not match with our database, please confirm the details.":
+                    return False
+        except:
+            return True
 
     def login(self):
-        username =  self.wait.until(EC.visibility_of_element_located((By.ID,'hosUserID')))
-        username.send_keys(self.user_name)
-        user_password = self.driver.find_element(By.ID,'hosPassword')
-        user_password.send_keys(self.password)
-        self.driver.find_element(By.CLASS_NAME,'vd-btn-primary').click()
+        self.wait.until(EC.visibility_of_element_located((By.ID,'hosUserID'))).send_keys(self.user_name)
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'hosPassword'))).send_keys(self.password)
+        self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME,'vd-btn-primary'))).click()
 
     def navigate(self):
         time.sleep(5)

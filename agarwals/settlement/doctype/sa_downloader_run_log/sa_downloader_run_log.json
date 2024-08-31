@@ -13,51 +13,58 @@
   "reference_name",
   "parent1",
   "tpa_name",
-  "message"
+  "remarks"
  ],
  "fields": [
   {
    "fieldname": "last_executed_time",
    "fieldtype": "Datetime",
-   "label": "Last Executed Time "
+   "label": "Last Executed Time ",
+   "read_only": 1
   },
   {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Warning\nInfo\nProcessed\nError"
+   "options": "Warning\nInfo\nProcessed\nError",
+   "read_only": 1
   },
   {
    "fieldname": "document_reference",
    "fieldtype": "Data",
    "label": "Document Reference",
-   "options": "DocType"
+   "options": "DocType",
+   "read_only": 1
   },
   {
    "fieldname": "reference_name",
    "fieldtype": "Data",
    "label": "Reference Name",
-   "options": "document_reference"
+   "options": "document_reference",
+   "read_only": 1
   },
   {
    "fieldname": "parent1",
    "fieldtype": "Data",
-   "label": "Parent"
+   "label": "Parent",
+   "read_only": 1
   },
   {
    "fieldname": "tpa_name",
    "fieldtype": "Data",
-   "label": "TPA Name"
+   "label": "TPA Name",
+   "read_only": 1
   },
   {
-   "fieldname": "message",
+   "fieldname": "remarks",
    "fieldtype": "Long Text",
-   "label": "Message"
+   "label": "Remarks",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-11 21:54:08.620780",
+ "modified": "2024-08-28 18:16:41.259098",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "SA Downloader Run Log",
@@ -78,5 +85,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
