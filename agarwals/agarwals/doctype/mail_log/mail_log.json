@@ -35,8 +35,7 @@
    "default": "0",
    "fieldname": "is_sent",
    "fieldtype": "Check",
-   "label": "Is Sent",
-   "reqd": 1
+   "label": "Is Sent"
   },
   {
    "fieldname": "amended_from",
@@ -51,8 +50,7 @@
   {
    "fieldname": "file_name",
    "fieldtype": "Data",
-   "label": "File Name",
-   "reqd": 1
+   "label": "File Name"
   },
   {
    "fieldname": "status",
@@ -65,9 +63,8 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "is_submittable": 1,
  "links": [],
- "modified": "2024-08-31 17:47:30.764467",
+ "modified": "2024-08-31 19:53:17.958426",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Mail log",

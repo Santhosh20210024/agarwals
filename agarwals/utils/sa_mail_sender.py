@@ -51,7 +51,6 @@ class SARecordCreator:
                 except Exception as e:
                     log_error(e, "File Upload", fu_name)
 
-            print(self.advice_records)
         except Exception as e:
             log_error(e, "Mail log")
 
@@ -287,7 +286,8 @@ class MailLogUpdater(MailSender):
                         'file_upload': fu_record[0]['fu_name'],
                         'file_name' : fu_record[0]['file_name'], 
                         'file_type': 'Settlement Advice',
-                        'is_sent' : 1
+                        'is_sent' : 1,
+                        'status' : "Processed"
                         }
                         for key,value in mail_log_params.items():
                             mail_log_record.set(key,value)
