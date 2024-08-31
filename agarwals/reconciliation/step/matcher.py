@@ -33,9 +33,9 @@ class MatcherValidation:
         """Runs all validation checks on the record."""
         return (
             self._validate_advice()
-            and self._validate_amount()
             and self._validate_bill_status()
             and self._validate_bank_transaction()
+            and self._validate_amount()
         )
 
     def _validate_advice(self):
@@ -85,7 +85,7 @@ class MatcherValidation:
             difference_amount = claim_amount - cumulative_amount
             
             if difference_amount != 0:
-                if difference_amount < tolerance:
+                if difference_amount <= tolerance:
                     if self.record["advice"]:
                         Matcher.update_advice_status(
                             self.record["advice"],
