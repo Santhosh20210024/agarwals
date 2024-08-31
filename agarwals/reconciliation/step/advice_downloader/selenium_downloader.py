@@ -19,7 +19,7 @@ import openpyxl
 import glob
 from io import StringIO
 import random
-from agarwals.utils.file_util import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH
+from agarwals.utils.file_util import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH,construct_file_url
 
 class SeleniumDownloader:
     def __init__(self):
@@ -31,63 +31,66 @@ class SeleniumDownloader:
         self.public_path = "public/files"
         self.full_img_path = None
         self.crop_img_path = None
+        self.webdriver_wait_time = 60
+        self.file_not_found_remarks = ""
+        self.captcha_alert = "Invalid Captcha"
+        self.numbers = []
 
 
-    def construct_file_url(*args):
-        list_of_items = []
-        for arg in args:
-            if type(arg)==str:
-                list_of_items.append(arg)
-        formatted_url = '/'.join(list_of_items)
-        return formatted_url
+    def get_captcha_value(self,captcha_type=None,sitekey= None):
+        """
+        Usage:
+        To retrieves the value of a captcha  from SA UI Downloader
+        or by solving it using an external captcha solving API.
+        Args:
+        captcha_type (str, optional): The type of captcha to solve. Can be "Normal Captcha" or "ReCaptcha". Defaults to None.
+        sitekey (str, optional): The sitekey required for solving ReCaptcha. Defaults to None.
+        returns:
+        str : The value of a captcha if SA UI Downloader is used
+        union[list,dict] : solving it using an external captcha solving API.
+        """
+        if self.enable_captcha_api == 0:
+            captcha = None
+            end_time = time.time() + self.max_wait_time
+            while time.time() < end_time:
+                frappe.db.commit()
+                captcha_value = frappe.db.sql(f"SELECT captcha FROM `tabSettlement Advice Downloader UI` WHERE name = '{self.captcha_tpa_doc}'",as_dict = True)
+                if captcha_value[0].captcha:
+                    captcha = captcha_value[0].captcha
+                    break
+                time.sleep(5)
+            return captcha
+        elif self.enable_captcha_api == 1:
+            #api method
+            api_key = os.getenv('APIKEY_2CAPTCHA',self.api_key)
+            solver = TwoCaptcha(api_key)
+            if captcha_type == "Normal Captcha":
+                result = solver.normal(file=self.crop_img_path,
+                                       minLen=1,
+                                       maxLen=20,
+                                       phrase=1,
+                                       caseSensitive=1,
+                                       lang='en')
+                return result,api_key
 
-    def update_retry(self):
-        doc = frappe.get_doc('TPA Login Credentials',self.credential_doc.name)
-        doc.retry = 1
-        doc.save()
+            elif captcha_type == "ReCaptcha":
+                result = solver.recaptcha(
+                    sitekey=sitekey,
+                    url=self.url)
+                return result,api_key
 
-    def get_captcha_value(self,captcha_type=None,sitekey=None):
-        try:
-            if self.enable_captcha_api == 0:
-                captcha = ''
-                end_time = time.time() + self.max_wait_time
-                while time.time() < end_time:
-                    frappe.db.commit()
-                    captcha_value = frappe.db.sql(f"SELECT captcha FROM `tabSettlement Advice Downloader UI` WHERE name = '{self.captcha_tpa_doc}'",as_dict = True)
-                    if captcha_value[0].captcha:
-                        captcha = captcha_value[0].captcha
-                        break
-                    time.sleep(5)
-                return captcha if captcha !='' else None
+    def extract_table_data(self, table_element):
+        """
+        Extracts the HTML content of a given table element and saves it as a Html file.
 
-            elif self.enable_captcha_api == 1:
-                #api method
-                control_panel = frappe.get_doc('Control Panel')
-                api_key =control_panel.captcha_api_key
-                api_key = os.getenv('APIKEY_2CAPTCHA', api_key)
-                solver = TwoCaptcha(api_key)
-                if captcha_type == "Normal Captcha":
-                    result = solver.normal(file=self.crop_img_path,
-                                           minLen=1,
-                                           maxLen=20,
-                                           phrase=1,
-                                           caseSensitive=1,
-                                           lang='en')
-                    return result,api_key
-                elif captcha_type == "ReCaptcha":
-                    result = solver.recaptcha(
-                        sitekey=sitekey,
-                        url=self.url)
-                    return result,api_key
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return None
+        Parameters:
+        table_element (WebElement): This should be an instance of a Selenium WebElement representing a table in an HTML document.
 
-    def extract_table_data(self, table_id):
-        table = self.wait.until(EC.presence_of_element_located((By.ID, table_id)))
-        table_html = table.get_attribute('outerHTML')
+        """
+        table_html = table_element.get_attribute('outerHTML')
         with open(f'{self.download_directory}/{self.tpa}.html', 'w') as file:
             file.write(table_html)
+
 
     def attach_captcha_img(self,file_url=None):
         captcha_reference_doc = frappe.get_doc('Settlement Advice Downloader UI',self.captcha_tpa_doc)
@@ -101,7 +104,7 @@ class SeleniumDownloader:
         file_doc = frappe.new_doc("File")
         file_doc.file_name = f"{self.tpa}_{frappe.utils.now_datetime()}captcha.png"
         file_doc.is_private = 1
-        file_doc.file_url = "/" + self.construct_file_url(self.SHELL_PATH,f"{self.tpa}_captcha.png")
+        file_doc.file_url = "/" + construct_file_url(self.SHELL_PATH,f"{self.tpa}_captcha.png")
         file_doc.attached_to_doctype = "Settlement Advice Downloader UI"
         file_doc.attached_to_name = self.captcha_tpa_doc
         file_doc.attached_to_field = 'captcha_img'
@@ -121,12 +124,12 @@ class SeleniumDownloader:
                     frappe.db.sql(f"DELETE FROM tabFile WHERE attached_to_name = '{self.captcha_tpa_doc}' and attached_to_doctype = 'Settlement Advice Downloader UI'  ORDER BY creation ASC LIMIT 1 ")
                     frappe.db.commit()
                 else:
-                    self.log_error('Settlement Advice Downloader UI',self.tpa,"No  captcha image found to delete ")
+                    self.log_error(doctype_name = 'Settlement Advice Downloader UI',reference_name=self.tpa,error_message = "No  captcha image found to delete ")
 
 
     def get_captcha_image(self,captcha_identifier):
-        self.full_img_path = self.construct_file_url(self.SITE_PATH,self.SHELL_PATH, f"{self.tpa}full_img.png")
-        self.crop_img_path = self.construct_file_url(self.SITE_PATH,self.SHELL_PATH,f"{self.tpa}_captcha.png")
+        self.full_img_path = construct_file_url(self.SITE_PATH,self.SHELL_PATH, f"{self.tpa}full_img.png")
+        self.crop_img_path = construct_file_url(self.SITE_PATH,self.SHELL_PATH,f"{self.tpa}_captcha.png")
         self.driver.save_screenshot(self.full_img_path)
         location =  captcha_identifier.location
         size =  captcha_identifier.size
@@ -137,7 +140,6 @@ class SeleniumDownloader:
         img = Image.open(self.full_img_path)
         img = img.crop((left, top, right, bottom))
         img.save(self.crop_img_path)
-
         if self.enable_captcha_api == 0:
             self.create_captcha_file()
 
@@ -159,8 +161,7 @@ class SeleniumDownloader:
                      doc.status = "Completed"
                  doc.save()
          except Exception as e:
-             self.log_error('Settlement Advice Downloader UI',self.tpa,f" Status Update Failed due to {e}")
-
+             self.log_error('Settlement Advice Downloader UI',f" Status Update Failed due to {e}",self.tpa)
 
     def update_tpa_reference(self,status):
         try:
@@ -176,16 +177,50 @@ class SeleniumDownloader:
                 parent_doc.save(ignore_permissions = True)
                 frappe.db.commit()
         except Exception as E:
-            self.log_error('Settlement Advice Downloader UI',self.tpa, E)
+            self.log_error('Settlement Advice Downloader UI',E,self.tpa)
 
     def _login(self):
+        """
+            Usage:
+            This method Performs the login process .
+                1. Navigates to the URL specified by `self.url`.
+                2. Maximizes the browser window.
+                3. Calls the `login` method to perform the login action.
+                4. Verifies the login status using the `__check_login_status` method.
+            Raises:
+                ValueError: If the login status indicates invalid credentials or captcha issues.
+            """
         self.driver.get(self.url)
         self.driver.maximize_window()
-        return self.login()
+        self.login()
+        self.__check_login_status()
 
-    def login(self):
+
+    def login(self) -> None:
         return None
 
+    def __check_login_status(self)->None:
+        """
+            Usage : Checks the current login status of the user.
+            It calls an method `check_login_status()` to determine if the user is logged in.
+            Raises:
+                ValueError: If the login status indicates either an invalid username or password,
+                or an invalid Captcha.
+            Returns:
+                None: If the login status is valid and no errors are raised.
+        """
+        login_status = self.check_login_status()
+        if login_status == True:
+            return None
+        elif login_status == self.captcha_alert:
+            raise ValueError("Invalid Captcha")
+        elif login_status == False:
+            raise ValueError("Invalid user name or password")
+        else:
+            self.raise_exception(login_status)
+
+    def check_login_status(self)->bool | str | None:
+        return None
     def navigate(self):
         return None
 
@@ -193,34 +228,39 @@ class SeleniumDownloader:
         return None
 
     def download_from_web_with_date_range(self,temp_from_date, temp_to_date,logout):
-        pass
-
-    def insert_run_log(self, data):
-        frappe.get_doc(data).insert(ignore_permissions=True)
-        frappe.db.commit()
         return None
 
-    def create_download_directory(self):
+    def insert_run_log(self, data):
+        doc = frappe.get_doc(data).insert(ignore_permissions=True)
+        return doc
+
+    def get_file_name(self):
         suffix =  f"{self.credential_doc.tpa}-{self.credential_doc.branch_code if self.credential_doc.branch_code else ''}-".replace(' ','').lower()
         self.file_name = f"{self.credential_doc.user_name}-{suffix}"
-        self.folder_path = os.path.join(SITE_PATH,SHELL_PATH,PROJECT_FOLDER,'Settlement Advice',self.credential_doc.tpa) + "/"
+
+
+    def create_download_directory(self):
+        self.get_file_name()
+        self.folder_path = os.path.join(SITE_PATH,SHELL_PATH,PROJECT_FOLDER,'Settlement Advice',self.credential_doc.tpa) + os.sep
         if not os.path.exists(self.folder_path):
-            self.raise_exception("Download Directory Not Found To Download Settlement Advice")
+            self.raise_exception("Payer Based Download Directory Not Found To Download Settlement Advice")
         file_path =self.folder_path + self.file_name
         os.mkdir(file_path)
+        if not os.path.exists(file_path):
+            return FileNotFoundError('User Based Download Directory Not Found  Download Settlement Advice')
         self.download_directory = file_path
         self.previous_files_count = len(os.listdir(self.download_directory))
 
-    def generate_random_number(self):
-        numbers = []
+    def generate_random_number(self)->int:
         run = True
         while run == True:
             random_number = random.randint(1000, 99999)
-            if not random_number in numbers:
-                numbers.append(random_number)
+            if not random_number in  self.numbers:
+                self.numbers.append(random_number)
                 run = False
         return random_number
-    def rename_downloaded_file(self, download_directory, file_name,from_date,to_date):
+
+    def rename_downloaded_file(self, download_directory, file_name,from_date,to_date)->str:
         get_all_files =  glob.glob(os.path.join(download_directory,'*'))
         recent_downloaded_file = max(get_all_files,key=os.path.getctime)
         if self.incoming_file_type == 'HTML':
@@ -248,36 +288,32 @@ class SeleniumDownloader:
         if os.path.exists(file_path):
             os.remove(file_path)
 
-    def log_error(self,doctype_name, reference_name, error_message):
+    def log_error(self,doctype_name,error_message,reference_name = None):
         log = error_handler(error=error_message, doc=doctype_name,doc_name=reference_name)
-        if reference_name:
-            self.insert_run_log({"doctype": "SA Downloader Run Log","last_executed_time":self.last_executed_time,"document_reference":"Error Record Log","reference_name":log.name,"status":"Error","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
+        return log
 
     def raise_exception(self,exception):
         raise Exception(exception)
 
-    def _exit(self, e = None):
-        if self.download_directory:
-            self.delete_folder(self.download_directory)
-            self.download_directory = None
-        if self.driver:
-            self.driver.quit()
-        if e:
-            self.log_error('TPA Login Credentials', self.user_name, e)
-            self.update_doc_status('Error')
-        else:
-            self.update_doc_status('Valid')
-            self.insert_run_log(
-                {"doctype": "SA Downloader Run Log","last_executed_time": self.last_executed_time, "document_reference": "TPA Login Credentials",
-                 "reference_name": self.credential_doc.name, "status": "Processed","parent1":self.credential_doc.name,"tpa_name":self.credential_doc.tpa})
-        if self.is_captcha == True:
-            if e:
-                self.update_tpa_reference('Error')
-                self.update_doc_status('Error')
-            else:
-                self.update_tpa_reference('Completed')
-            self.delete_captcha_images()
-            self.update_settlement_advice_downloader_status()
+    def _exit(self):
+        try:
+            # Delete Download Directory
+            if self.download_directory:
+                self.delete_folder(self.download_directory)
+                self.download_directory = None
+            # Exits the WebDriver
+            if self.driver:
+                self.driver.quit()
+            # Delete Captacha Image
+            if self.is_captcha:
+                self.delete_captcha_images()
+            # Update the SA UI Downloader Parent doc status
+            if self.is_captcha and self.enable_captcha_api == 1:
+                self.update_settlement_advice_downloader_status()
+        except Exception as e:
+            self.update_status_and_log(status='Error',remarks=e)
+
+
 
     def convert_file_format(self,original_file,formated_file):
         #HTML
@@ -287,16 +323,18 @@ class SeleniumDownloader:
                 html_io = StringIO(html_content)
                 data = pd.read_html(html_io)
         except Exception as e:
-            # self.delete_backend_files(original_file)
             self.raise_exception(f"An error occurred while reading the file: {e}")
         if len(data) == 1 or self.extract_first_table == True:
             data[0].to_excel(formated_file, index=False)
             self.delete_backend_files(original_file)
         else:
-            # self.delete_backend_files(original_file)
             self.raise_exception("MORE THAN ONE TABLE FOUND WHILE CONVERTING HTML TO EXCEL")
 
     def download_with_date_range(self):
+        """
+        Usage : Downloads files from a web source within a specified date range, iterating through the range in defined periods.
+        Returns:None
+        """
         run = True
         temp_from_date = self.from_date
         period =  self.date_limit_period - 1
@@ -314,6 +352,7 @@ class SeleniumDownloader:
                 self.format_downloaded_file(temp_from_date, temp_to_date)
                 temp_from_date = temp_to_date + timedelta(days=1)
 
+
     def _download(self):
         if self.is_date_limit == 1 and self.date_limit_period != 0:
             self.download_with_date_range()
@@ -321,17 +360,30 @@ class SeleniumDownloader:
             self.download_from_web()
             if self.format_file_in_parent == True:
                 self.format_downloaded_file()
+
+
     def format_downloaded_file(self,temp_from_date=None,temp_to_date=None):
+        """
+        Usage : To check whether the file is downloaded ,format the downloaded file and move it to the Correct TPA Folder.
+
+        Parameter:
+        temp_from_date (str,optional): when the file downloaded with date rage limit it will be used .
+        temp_to_date (str,optional): when the file downloaded with date rage limit it will be used .
+        """
         downloaded_files_count = len(os.listdir(self.download_directory))
         from_date = self.from_date if temp_from_date is None else temp_from_date
         to_date = self.to_date if temp_to_date is None else temp_to_date
         if self.previous_files_count == downloaded_files_count:
-            self.insert_run_log({"doctype": "SA Downloader Run Log", "last_executed_time": self.last_executed_time,"document_reference": "Error Record Log", "reference_name": self.credential_doc.name,"status": "Info", 'message':f'NO FILE FOUND FOR {from_date} to {to_date}',"tpa_name": self.credential_doc.tpa})
+            self.file_not_found_remarks += f"\nFile Not Found for the Date Range Between {self.from_date} and {self.to_date},"
         else:
             self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,from_date,to_date)
             self.move_file(self.download_directory,self.formatted_file_name)
 
+
     def add_driver_argument(self):
+        """
+        Usage : To add the driver argument and extension used to download the file.
+        """
         self.options.add_argument('--log-level=3')
         if self.allow_insecure_file == True:
             self.options.add_argument('--disable-features=InsecureDownloadWarnings')
@@ -348,12 +400,47 @@ class SeleniumDownloader:
             for path in extension_path:
                 self.options.add_argument(f'--load-extension={path}')
 
-    def update_doc_status(self,status):
-        doc = frappe.get_doc("TPA Login Credentials", self.credential_doc.name)
-        doc.status = status
-        if status == "Valid":
-            doc.retry = 0
-        doc.save()
+
+    def update_status_and_log(self, status: str, retry: int = 0, remarks = None):
+        """
+        Usage : Update the status of the TPA Login Credentials document  and log the result .
+        Args:
+            status (str): The status to set on the document.
+            retry (int, optional): The retry count. Defaults to 0.
+            remarks (str, optional): Remarks for logging. Defaults to None.
+        """
+        try:
+            # Update TPA Login Credentials Status
+            doc = frappe.get_doc("TPA Login Credentials" , self.credential_doc.name)
+            doc.status,doc.retry  = status,retry
+            # Update Settlement Advice ui downloader if SA ui downloader enabled
+            if self.is_captcha and self.enable_captcha_api ==0:
+                if retry == 1:
+                    self.update_tpa_reference('Retry')
+                elif status == 'Valid':
+                    self.update_tpa_reference('Completed')
+                else:
+                    self.update_tpa_reference('Error')
+            # logging
+            log_data = {"doctype": "SA Downloader Run Log",
+                        "last_executed_time": self.last_executed_time,
+                        "document_reference": "TPA Login Credentials",
+                        "parent1": self.credential_doc.name,
+                        "tpa_name": self.credential_doc.tpa,
+                        "remarks": f"{self.file_not_found_remarks} \n {str(remarks) if remarks else ''}" or None
+                        }
+            if status == 'Error' and retry == 0:
+                error_log = self.log_error(doctype_name='TPA Login Credentials',error_message=remarks,reference_name=self.tpa)
+                log_data.update({"document_reference": "Error Record Log", "reference_name": error_log.name,"status": "Error"})
+            elif self.file_not_found_remarks or status == 'Info':
+                log_data.update({"status":"Info"})
+            else:
+                log_data.update({"status": "Warning","remarks": remarks}) if status == 'Invalid' or retry == 1 else log_data.update({"status": "Processed"})
+            log_doc = self.insert_run_log(log_data)
+            doc.last_run_log_id = log_doc.name
+            doc.save()
+        except Exception as e:
+            self.log_error(doctype_name='TPA Login Credentials',error_message=e,reference_name=self.tpa if self.tpa else None)
 
     def web_driver_init(self):
         self.options = webdriver.ChromeOptions()
@@ -361,7 +448,10 @@ class SeleniumDownloader:
         self.options.add_experimental_option("prefs", prefs)
         self.add_driver_argument()
         self.driver = webdriver.Chrome(options=self.options)
-        self.wait = WebDriverWait(self.driver, 45)
+        self.actions = ActionChains(self.driver)
+        self.wait = WebDriverWait(self.driver, self.webdriver_wait_time)
+        self.min_wait = WebDriverWait(self.driver,10)
+
 
     def load_credential_doc(self,tpa_doc,child,parent):
         self.credential_doc = tpa_doc
@@ -376,6 +466,7 @@ class SeleniumDownloader:
         else:
             self.raise_exception('TPA Credential Doc Not Found')
 
+
     def load_configuration(self):
         configuration_values = frappe.db.sql(
             f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",
@@ -383,11 +474,11 @@ class SeleniumDownloader:
         )
         if configuration_values:
             configuration_values = configuration_values[0]
+            self.url = configuration_values.website_url or self.raise_exception("Website URL Not Found,Please Check SA Downloader Configuration")
             self.is_captcha = configuration_values.is_captcha
             self.is_headless = configuration_values.is_headless
             self.incoming_file_type = configuration_values.incoming_file_type
             self.max_wait_time = configuration_values.captcha_entry_duration
-            self.url = configuration_values.website_url or self.raise_exception("Website URL Not Found,Please Check SA Downloader Configuration")
             self.to_date = configuration_values.to_date or frappe.utils.now_datetime().date()
             self.from_date = configuration_values.from_date or self.to_date - timedelta(days=29)
             self.sandbox_mode = configuration_values.sandbox_mode
@@ -397,12 +488,25 @@ class SeleniumDownloader:
             control_panel = frappe.get_doc('Control Panel')
             if control_panel:
                 self.enable_captcha_api = control_panel.enable_captcha_api
+                self.api_key = control_panel.captcha_api_key
             else:
-                self.raise_exception(" SA Downloader Configuration not found ")
+                self.raise_exception(" Control pannel Doc not found ")
         else:
             self.raise_exception(" SA Downloader Configuration not found ")
 
+
     def download(self, tpa_doc, chunk_doc=None, child=None, parent=None):
+        """
+        Usage : This method Manages the process of downloading settlement advice file by performing a series of steps including
+        credential loading, configuration setup, login,navigate to report page and download document.
+
+        Parameters:
+        tpa_doc (object): The document or data required for authentication and download.
+        chunk_doc (object, optional): document for the chunk being processed.
+        child (object, optional): child doc of the SA UI Downloader ,Only used of Captcha type TPA's.
+        parent (object, optional): Parent doc of the SA UI Downloader ,Only used of Captcha type TPA's.
+
+        """
         try:
             chunk.update_status(chunk_doc, "InProgress")
             self.load_credential_doc(tpa_doc,child,parent)
@@ -412,11 +516,21 @@ class SeleniumDownloader:
             self._login()
             self.navigate()
             self._download()
-            self._exit()
+            self.update_status_and_log('Valid')
             chunk.update_status(chunk_doc, "Processed")
-        except Exception as e:
+        except ValueError as e:
+            if str(e) in 'Invalid user name or password':
+                self.update_status_and_log(status='Invalid', remarks=e)
+            elif str(e) in 'Invalid Captcha':
+                self.update_status_and_log(status='Error',retry=1,remarks=e)
+            else:
+                self.update_status_and_log(status='Error')
             chunk.update_status(chunk_doc, "Error")
-            self._exit(e)
+        except Exception as e:
+            self.update_status_and_log('Error',remarks=e)
+            chunk.update_status(chunk_doc, "Error")
+        finally:
+            self._exit()
 
 
 

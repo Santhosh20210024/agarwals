@@ -1,468 +1,302 @@
 import frappe
 from agarwals.agarwals.doctype import file_records
-from frappe.utils.caching import redis_cache
-from frappe import utils
-from datetime import date
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
+from frappe.model.document import Document
+from datetime import date
+from agarwals.utils.reconciliation_utils import update_error, get_document_record, get_posting_date, get_entity_closing_date
+from agarwals.utils.accounting_utils import get_abbr
+
 
 class PaymentEntryCreator:
-    """ For Reconcilation Process """
+    def __init__(self, matcher_record: "Document", bt_doc: "Document", abbr: str):
+        self.matcher_record = matcher_record
+        self.settled_amount: float = round(float(matcher_record.settled_amount),
+                                           2) if matcher_record.settled_amount else 0
+        self.tds_amount: float = round(float(matcher_record.tds_amount), 2) if matcher_record.tds_amount else 0
+        self.disallowance_amount: float = round(float(matcher_record.disallowance_amount),
+                                                2) if matcher_record.disallowance_amount else 0
+        self.bank_account: str = self.matcher_record.company_bank_account
+        self.sa_status: str = 'Fully Processed'
+        self.sa_remark: str = ''
+        self.pe_doc = None
+        self.bt_doc = bt_doc
+        self.abbr = abbr
 
-    def add_log_error(self, doctype, record_name = None, error_msg = None):
-        error_log_record = frappe.new_doc('Payment Entry Error Log')
-        error_log_record.set('reference_doctype',doctype)
-        if record_name:
-            error_log_record.set('reference_record',record_name)
-        error_log_record.set('error_message',error_msg)
-        error_log_record.save()
+    def __validate(self) -> bool:
+        self.si_doc: "Document" = get_document_record('Sales Invoice', self.matcher_record.sales_invoice)
+        error = None
+        if self.si_doc.status == 'Cancelled':
+            error = 'Cancelled Bill'
+        elif self.si_doc.status == 'Paid':
+            error = 'Already Paid Bill'
+        if error:
+            update_error(self.matcher_record, error)
+            return False
+        return True
 
-    def update_trans_reference(self, bt_doc, pe_doc):
-        bt_doc = frappe.get_doc('Bank Transaction', bt_doc.name)
-        bt_doc.append('payment_entries',
-                      {'payment_document': 'Payment Entry'
-                      ,'payment_entry': pe_doc.name
-                      ,'allocated_amount': pe_doc.paid_amount
-                      ,'custom_bill_date':pe_doc.custom_due_date
-                      ,'custom_bill_region':pe_doc.region
-                      ,'custom_bill_branch':pe_doc.branch
-                      ,'custom_bill_branch_type':pe_doc.branch_type
-                      ,'custom_bill_entity':pe_doc.entity
-                      ,'custom_posting_date':pe_doc.posting_date
-                      ,'custom_creation_date':pe_doc.creation})
-        bt_doc.submit()
+    def __set_sa_vars(self, status: str = 'Partially Processed', remark: str = '') -> None:
+        self.sa_status = status
+        self.sa_remark = remark
 
-    def process_rounding_off(self, pe_doc, si_doc):
-        deductions = []
-        si_outstanding_amount = frappe.get_value('Sales Invoice', si_doc.name, 'outstanding_amount')
-        si_allocated_amount = pe_doc.references[0].allocated_amount
-        si_outstanding_amount = round(float(si_outstanding_amount - si_allocated_amount),2)
+    def __set_amount(self) -> None:
+        unallocated_amount: float = float(self.bt_doc.unallocated_amount)
+        si_outstanding: float = float(self.si_doc.outstanding_amount)
+        total_amount: float = self.settled_amount + self.tds_amount + self.disallowance_amount
+        if self.settled_amount > unallocated_amount:
+            self.settled_amount = unallocated_amount
+            self.__set_sa_vars(remark="Bank transaction unallocated is less than settled amount")
+        if si_outstanding < self.settled_amount:
+            self.settled_amount = si_outstanding
+            self.__set_sa_vars(remark="Sales Invoice Outstanding is less than settled amount")
+        if total_amount > si_outstanding:
+            if si_outstanding >= self.settled_amount + self.tds_amount:
+                self.disallowance_amount = 0
+                self.__set_sa_vars(remark='Disallowed amount is greater than Outstanding Amount')
+            elif si_outstanding >= self.settled_amount + self.disallowance_amount:
+                self.tds_amount = 0
+                self.__set_sa_vars(remark='TDS amount is greater than Outstanding Amount')
+            else:
+                self.tds_amount = 0
+                self.disallowance_amount = 0
+                self.__set_sa_vars(remark='Both Disallowed and TDS amount is greater than Outstanding Amount')
 
-        if si_outstanding_amount <= 9.9 and si_outstanding_amount != 0.00:
-            deductions.append(self.add_deduction('Write Off - A', si_doc, 'WriteOff', round(float(si_outstanding_amount),2)))
-
-        if deductions:
-            pe_doc.references[0].allocated_amount = round(float(pe_doc.references[0].allocated_amount),2) + round(float(si_outstanding_amount),2)
-            deductions = pe_doc.deductions + deductions
-            pe_doc.set("deductions", deductions)
-
-        return pe_doc
-
-    def add_deduction(self, account, si_doc, description, amount):
-        return {'account': account, 'cost_center': si_doc.cost_center,
-                'description': description, 'branch': si_doc.branch,
-                'entity': si_doc.entity,'region': si_doc.region,
-                'branch_type': si_doc.branch_type, 'amount': amount}
-
-    def create_payment_entry(self, name, si_doc,  bank_account, bt_doc, settled_amount):
-        pe_doc = frappe.new_doc('Payment Entry')
-        pe_doc.set('name',name)
-        pe_doc.set('custom_sales_invoice', si_doc.name)
-        pe_doc.set('payment_type', 'Receive')
-        pe_doc.set('mode_of_payment', 'Bank Draft')
-        pe_doc.set('party_type', 'Customer')
-        pe_doc.set('party', si_doc.customer)
-        pe_doc.set('bank_account', bt_doc.bank_account)
-        pe_doc.set('paid_to', bank_account)
-        pe_doc.set('paid_from', 'Debtors - A')
-        pe_doc.set('paid_amount', settled_amount)
-        pe_doc.set('received_amount', settled_amount)
-        pe_doc.set('reference_no', bt_doc.reference_number)
-        pe_doc.set('reference_date', bt_doc.date)
-        pe_doc.set('cost_center', si_doc.cost_center)
-        pe_doc.set('branch', si_doc.branch)
-        pe_doc.set('entity', si_doc.entity)
-        pe_doc.set('region', si_doc.region)
-        pe_doc.set('branch_type', si_doc.branch_type)
-        pe_doc.set('custom_due_date', si_doc.posting_date)
-        return pe_doc
-
-    def get_entry_name(self, si_doc):
+    def __get_entry_name(self) -> str:
         existing_payment_entries = frappe.get_list('Payment Entry'
-                                   ,filters={'custom_sales_invoice':si_doc.name})
-
-        name = si_doc.name + "-" + str(len(existing_payment_entries)) if existing_payment_entries else si_doc.name
+                                                   , filters={'custom_sales_invoice': self.si_doc.name})
+        name = self.si_doc.name + "-" + str(
+            len(existing_payment_entries)) if existing_payment_entries else self.si_doc.name
         return name
 
-    def get_posting_date(self, bt_doc, si_doc):
-        closing_date_list = frappe.get_list('Period Closure by Entity',
-                                            filters={'entity': si_doc.entity}
-                                            ,order_by = 'creation desc'
-                                            ,pluck = 'posting_date')
+    def __get_entity_posting_date(self) -> date:
+        entity_closing_date = get_entity_closing_date(self.matcher_record.si_entity)
+        posting_date = get_posting_date(self.bt_doc.date, entity_closing_date)
+        return posting_date
 
-        if closing_date_list:
-            closing_date = max(closing_date_list)
-            if bt_doc.date < closing_date:
-                return utils.today()
-            else:
-                return bt_doc.date
-        else:
-            return bt_doc.date
+    def __add_deduction(self, account: str, description: str, amount: float) -> dict:
+        return {'account': account, 'cost_center': self.si_doc.cost_center,
+                'description': description, 'branch': self.si_doc.branch,
+                'entity': self.si_doc.entity, 'region': self.si_doc.region,
+                'branch_type': self.si_doc.branch_type, 'amount': amount}
 
-    def process_payment_entry(self
-                              ,bt_doc
-                              ,si_doc
-                              ,bank_account
-                              ,settled_amount
-                              ,tds_amount = 0
-                              ,disallowed_amount = 0, ref_doc = None):
+    def __process_round_off(self, pe_dict: dict) -> dict:
+        deductions: list = []
+        si_outstanding_amount: float = float(self.si_doc.outstanding_amount)
+        si_allocated_amount: float = pe_dict["references"][0]["allocated_amount"]
+        si_outstanding_amount = round(float(si_outstanding_amount - si_allocated_amount), 2)
+        if 0.00 < si_outstanding_amount <= 9.9:
+            deductions.append(
+                self.__add_deduction('Rounded Off' + self.abbr, 'RoundedOff', round(float(si_outstanding_amount), 2)))
+            pe_dict["references"][0]["allocated_amount"] = round(float(pe_dict["references"][0]["allocated_amount"] + si_outstanding_amount), 2)
+            if "deductions" not in pe_dict.keys():
+                pe_dict["deductions"] = []
+            pe_dict["deductions"] = pe_dict["deductions"] + deductions
+        return pe_dict
+
+    def __create_payment_entry(self, pe_dict: dict) -> "Document":
+        pe_doc = frappe.get_doc(pe_dict)
+        pe_doc.insert()
+        pe_doc.submit()
+        return pe_doc
+
+    def __process_payment_entry(self) -> None:
         try:
+            party_and_bank_balance: dict = {'paid_to_account_balance': 0.01, 'paid_from_account_balance': 0.01,
+                                      'party_balance': 0.01}
+            # balance fields are set to default 1 as it is slowing down payment creation and these fields are not used in any ledgers
+            pe_dict: dict = {
+                "doctype": "Payment Entry",
+                'name': self.__get_entry_name(),
+                'custom_sales_invoice': self.si_doc.name,
+                'payment_type': 'Receive',
+                'mode_of_payment': 'Bank Draft',
+                'party_type': 'Customer',
+                'party': self.si_doc.customer,
+                'bank_account': self.bt_doc.bank_account,
+                'party_balance': party_and_bank_balance['party_balance'],
+                'paid_from': 'Debtors' + self.abbr,
+                'paid_from_account_currency': 'INR',
+                'paid_from_account_balance': party_and_bank_balance["paid_from_account_balance"],
+                'paid_to': self.bank_account,
+                'paid_to_account_currency': 'INR',
+                'paid_to_account_balance': party_and_bank_balance['paid_to_account_balance'],
+                'paid_amount': self.settled_amount,
+                'received_amount': self.settled_amount,
+                'reference_no': self.bt_doc.reference_number,
+                'reference_date': self.bt_doc.date,
+                'cost_center': self.si_doc.cost_center,
+                'branch': self.si_doc.branch,
+                'entity': self.si_doc.entity,
+                'region': self.si_doc.region,
+                'branch_type': self.si_doc.branch_type,
+                'custom_due_date': self.si_doc.posting_date,
+                'posting_date': self.__get_entity_posting_date(),
+                'references': [
+                    {
+                        'reference_doctype': 'Sales Invoice',
+                        'reference_name': self.si_doc.name,
+                        'allocated_amount': self.settled_amount + self.tds_amount + self.disallowance_amount
+                    }
+                ],
+                "custom_file_upload": self.matcher_record.file_upload,
+                "custom_transform": self.matcher_record.transform,
+                "custom_index": self.matcher_record.index,
+                "custom_parent_doc": self.matcher_record.settlement_advice if self.matcher_record.settlement_advice else self.matcher_record.claimbook
+            }
             deductions = []
-            name = self.get_entry_name(si_doc = si_doc)
-            pe_doc = self.create_payment_entry(name
-                                               ,si_doc
-                                               ,bank_account
-                                               ,bt_doc
-                                               ,settled_amount)
-
-            pe_doc.set('posting_date', self.get_posting_date(bt_doc, si_doc))
-            reference_item = [{
-                'reference_doctype': 'Sales Invoice',
-                'reference_name': si_doc.name,
-                'allocated_amount': settled_amount + tds_amount + disallowed_amount
-            }]
-            pe_doc.set('references', reference_item)
-
-            if tds_amount > 0:
-                deductions.append(self.add_deduction('TDS - A', si_doc, 'TDS', tds_amount))
-                pe_doc.set('custom_tds_amount', tds_amount)
-
-            if disallowed_amount > 0:
-                deductions.append(self.add_deduction('Disallowance - A', si_doc, 'Disallowance', disallowed_amount))
-                pe_doc.set('custom_disallowed_amount', disallowed_amount)
-
+            if self.tds_amount > 0:
+                deductions.append(self.__add_deduction('TDS' + self.abbr, 'TDS', self.tds_amount))
+                pe_dict["custom_tds_amount"] = self.tds_amount
+            if self.disallowance_amount > 0:
+                deductions.append(self.__add_deduction('Disallowance' + self.abbr, 'Disallowance', self.disallowance_amount))
+                pe_dict["custom_disallowed_amount"] = self.disallowance_amount
             if deductions:
-                pe_doc.set('deductions', deductions)
+                pe_dict["deductions"] = deductions
+            pe_dict = self.__process_round_off(pe_dict)
+            self.pe_doc = self.__create_payment_entry(pe_dict)
+            file_records.create(file_upload=self.pe_doc.custom_file_upload,
+                                transform=self.pe_doc.custom_transform, reference_doc=self.pe_doc.doctype,
+                                record=self.pe_doc.name, index=self.pe_doc.custom_index)
+        except Exception as e:
+            self.__set_sa_vars("Warning", 'Unable to Create Payment Entry')
+            raise Exception(e)
 
-            pe_doc = self.process_rounding_off(pe_doc, si_doc)
-            pe_doc.set('custom_file_upload', ref_doc.file_upload)
-            pe_doc.set('custom_transform', ref_doc.transform)
-            pe_doc.set('custom_index', ref_doc.index)
-            pe_doc.set('custom_parent_doc',ref_doc.name)
-            pe_doc.save()
-            pe_doc.submit()
-            frappe.db.commit()
+    def __update_trans_reference(self) -> None:
+        self.bt_doc.append('payment_entries',
+                           {'payment_document': self.pe_doc.doctype
+                               , 'payment_entry': self.pe_doc.name
+                               , 'allocated_amount': self.pe_doc.paid_amount
+                               , 'custom_bill_date': self.pe_doc.custom_due_date
+                               , 'custom_bill_region': self.pe_doc.region
+                               , 'custom_bill_branch': self.pe_doc.branch
+                               , 'custom_bill_branch_type': self.pe_doc.branch_type
+                               , 'custom_bill_entity': self.pe_doc.entity})
+        self.bt_doc.custom_advice_status = 'Found'
+        self.bt_doc.submit()
 
-            self.update_trans_reference(bt_doc, pe_doc)
-            frappe.db.commit()
-            file_records.create(file_upload=pe_doc.custom_file_upload,
-                                transform=pe_doc.custom_transform, reference_doc=pe_doc.doctype,
-                                record=pe_doc.name, index=pe_doc.custom_index)
-            return pe_doc
-
-        except Exception as err:
-            self.add_log_error('Payment Entry', si_doc.name, error_msg = err)
-            return ''
-
-    def get_document_record(self, doctype, name):
-        return frappe.get_doc(doctype,name)
-
-    def update_advice_log(self, advice, status, msg):
-        frappe.set_value('Settlement Advice', advice, 'status', status)
-        frappe.set_value('Settlement Advice', advice, 'remark', msg)
-        frappe.db.commit()
-
-    def update_matcher_log(self, name, status, msg):
-        frappe.set_value('Matcher', name, 'status', status)
-        frappe.set_value('Matcher', name, 'remarks', msg)
-        frappe.db.commit()
-
-    @redis_cache
-    def get_company_account(self, bank_account_name):
-        bank_account = frappe.get_doc('Bank Account', bank_account_name)
-        if not bank_account.account:
+    def __update_advice_reference(self) -> None:
+        if not self.matcher_record.settlement_advice:
             return None
-        return bank_account.account
+        settlement_advice: "Document" = get_document_record('Settlement Advice', self.matcher_record.settlement_advice)
+        sa_dict = {'tpa': self.si_doc.customer,
+                   'region': self.si_doc.region,
+                   'entity': self.si_doc.entity,
+                   'branch_type': self.si_doc.branch_type,
+                   'matched_bank_transaction': self.bt_doc.name,
+                   'matched_bill_record': self.si_doc.name,
+                   'status': self.sa_status,
+                   'remark': self.sa_remark
+                   }
+        if self.matcher_record.claimbook:
+            sa_dict['matched_claimbook_record'], sa_dict[
+                'insurance_company_name'] = self.matcher_record.claimbook, self.matcher_record.insurance_company_name
+        settlement_advice.update(sa_dict)
+        settlement_advice.save()
 
-    def update_invoice_reference(self, si_doc, payment_entry, record):
-        si_doc = self.get_document_record('Sales Invoice', si_doc)
-        bt_doc = frappe.get_list("Bank Transaction", filters={'name': payment_entry.reference_no}, fields=['bank_account', 'custom_region', 'custom_entity'])
-        created_date = date.today().strftime("%Y-%m-%d")
+    def __update_claim_reference(self) -> None:
+        frappe.db.sql(
+            f"""UPDATE `tabClaimBook` SET matched_status = 'Matched' WHERE name = \"{self.matcher_record.claimbook}\"""")
 
-        si_doc.append('custom_reference', {'entry_type': 'Payment Entry', 'entry_name': payment_entry.name,
-                                           'paid_amount': payment_entry.paid_amount,'tds_amount': payment_entry.custom_tds_amount,
-                                           'disallowance_amount': payment_entry.custom_disallowed_amount,'allocated_amount': payment_entry.total_allocated_amount,
-                                           'utr_number': payment_entry.reference_no, 'utr_date': payment_entry.reference_date,
-                                           'created_date': created_date, 'bank_region': bt_doc[0].custom_region,
-                                           'bank_entity': bt_doc[0].custom_entity, 'bank_account_number': payment_entry.bank_account,
-                                           'posting_date':payment_entry.posting_date})
+    def __update_references(self) -> None:
+        self.__update_trans_reference()
+        self.__update_advice_reference()
+        self.__update_claim_reference()
 
-        if record.settlement_advice:
-            si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'settlement_advice': record.settlement_advice})
-        else:
-            if record.claimbook:
-                si_doc.append('custom_matcher_reference', {'id' : record.name, 'match_logic' : record.match_logic, 'claim_book': record.claimbook})
-
-        frappe.db.set_value('Matcher', record.name, 'status', 'Processed')
-        si_doc.save()
-        frappe.db.commit()
-
-    def process(self, bt_doc_records, match_logic,  chunk_doc):
-        """Process: Create payment entry based on the matcher logic ( MA1-CN, MA3-CN, MA5-BN ) only
-           param1: bt_doc_records,
-           param2: match_logic,
-           Return: None
-        """
-        chunk.update_status(chunk_doc, "InProgress")
+    def process(self) -> str:
         try:
-            if not len(bt_doc_records):
-                chunk.update_status(chunk_doc, "Processed")
-                return
-
-            for transaction_record in bt_doc_records:
-                if not transaction_record['date']:
-                    self.add_log_error('Bank Transaction', transaction_record['name'], "Date is Null")
-                    continue
-
-                bank_account = self.get_company_account(transaction_record['bank_account'])
-                if not bank_account:
-                    self.add_log_error('Bank Transaction', transaction_record['name'], "No Company Account Found")
-                    continue
-
-                # Ordered By Payment Order
-                # Amount Wise Descending Order
-                matcher_records = frappe.db.sql("""
-                              SELECT * from `tabMatcher`
-                              where match_logic in %(logic)s
-                              AND bank_transaction = %(reference_number)s
-                              AND status = 'Open' 
-                              order by payment_order ASC, tds_amount DESC , disallowance_amount DESC
-                              """
-                              , values={'reference_number': transaction_record.name, 'logic': match_logic}
-                              , as_dict=True)
-
-                if matcher_records:
-                    frappe.db.set_value('Bank Transaction', transaction_record['name'], 'custom_advice_status', 'Found')
-
-                for record in matcher_records:
-                    try:
-                        if record.match_logic in ["MA3-CN", "MA3-BN","MA4-CN","MA4-BN"]:
-                            ref_doc = self.get_document_record('ClaimBook', record.claimbook)
-                        else:
-                            ref_doc = self.get_document_record('Settlement Advice', record.settlement_advice)
-                        bank_amount = 0
-                        settled_amount = round(float(record.settled_amount), 2) if record.settled_amount else 0
-                        tds_amount = round(float(record.tds_amount), 2) if record.tds_amount else 0
-                        disallowance_amount = round(float(record.disallowance_amount), 2) if record.disallowance_amount else 0
-
-                        if float(settled_amount) < 0 or float(tds_amount) < 0 or float(disallowance_amount) < 0:
-                            err_msg = 'Amount Should Not Be Negative'
-                            self.update_matcher_log(record.name, 'Error', err_msg)
-                            if record.settlement_advice:
-                                self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
-                            continue
-
-                        unallocated_amount = self.get_document_record('Bank Transaction',
-                                                                        record.bank_transaction).unallocated_amount
-                        if frappe.db.get_value('Bank Transaction', record.bank_transaction, 'status') == 'Reconciled':  # Already Reconciled
-                            err_msg = 'Already Reconciled'
-                            self.update_matcher_log(record.name, 'Error', err_msg)
-                            if record.settlement_advice:
-                                self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
-                            continue
-
-                        if not record.settled_amount:
-                            err_msg = 'Settled Amount Should Not Be Zero'
-                            self.update_matcher_log(record.name, 'Error', err_msg)
-                            if record.settlement_advice:
-                                self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
-                            continue
-
-                        si_doc = self.get_document_record('Sales Invoice', record.sales_invoice)
-
-                        if si_doc.total < (settled_amount + tds_amount + disallowance_amount):
-                            err_msg = 'Claim amount lesser than the cumulative of other amounts'
-                            self.update_matcher_log(record.name, 'Error', err_msg)
-                            if record.settlement_advice:
-                                self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
-                            continue
-
-                        if si_doc.status == 'Paid':
-                            err_msg = 'Already Paid Bill'
-                            self.update_matcher_log(record.name, 'Error', err_msg)
-                            if record.settlement_advice:
-                                self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
-                            continue
-
-                        if si_doc.status == 'Cancelled':
-                            err_msg = 'Cancelled Bill'
-                            self.update_matcher_log(record.name, 'Error', err_msg)
-                            if record.settlement_advice:
-                                self.update_advice_log(record.settlement_advice, 'Warning', err_msg)
-                            continue
-
-                        if record.settlement_advice:
-                            settlement_advice = self.get_document_record('Settlement Advice', record.settlement_advice)
-                            settlement_advice.set('tpa', si_doc.customer)
-                            settlement_advice.set('region', si_doc.region)
-                            settlement_advice.set('entity', si_doc.entity)
-                            settlement_advice.set('branch_type', si_doc.branch_type)
-
-                        if settled_amount > unallocated_amount:
-                            settled_amount = unallocated_amount
-                            bank_amount = unallocated_amount
-
-                        # Updating the corresponding fields in settlement advice and claimbook
-                        if record.claimbook:
-                            if record.settlement_advice:
-                                settlement_advice.set('insurance_company_name', record.insurance_company_name)
-                                settlement_advice.set('matched_bank_transaction', transaction_record['name'])
-                                settlement_advice.set('matched_claimbook_record', record.claimbook)
-                                settlement_advice.set('matched_bill_record', record.si_doc)
-                            frappe.db.set_value('ClaimBook', record.claimbook, 'matched_status', 'Matched')
-                            frappe.db.set_value('Sales Invoice', si_doc.name, 'custom_insurance_name',
-                                                record.insurance_company_name)
-                        else:
-                            if record.settlement_advice:
-                                settlement_advice.set('matched_bank_transaction', transaction_record['name'])
-                                settlement_advice.set('matched_bill_record', record.si_doc)
-
-                        if si_doc.outstanding_amount < settled_amount:
-                            settled_amount = si_doc.outstanding_amount
-
-                        if si_doc.outstanding_amount < settled_amount + tds_amount + disallowance_amount:
-
-                            if si_doc.outstanding_amount >= settled_amount + tds_amount:
-                                payment_entry = self.process_payment_entry(
-                                    transaction_record
-                                    , si_doc
-                                    , bank_account
-                                    , settled_amount
-                                    , tds_amount
-                                    , ref_doc = ref_doc)
-
-                                if record.settlement_advice:
-                                    settlement_advice.set('remark',
-                                                          'Disallowance amount is greater than Outstanding Amount')
-
-                            elif si_doc.outstanding_amount >= settled_amount + disallowance_amount:
-                                payment_entry = self.process_payment_entry(
-                                    transaction_record
-                                    , si_doc
-                                    , bank_account
-                                    , settled_amount
-                                    , disallowance_amount
-                                    , ref_doc = ref_doc)
-
-                                if record.settlement_advice:
-                                    settlement_advice.set('remark', 'TDS amount is greater than Outstanding Amount')
-
-                            else:
-                                payment_entry = self.process_payment_entry(
-                                    transaction_record
-                                    , si_doc
-                                    , bank_account
-                                    , settled_amount
-                                    , ref_doc = ref_doc)
-
-                                if record.settlement_advice:
-                                    settlement_advice.set('remark',
-                                                          'Both Disallowed and TDS amount is greater than Outstanding Amount')
-
-                            if payment_entry:
-                                self.update_invoice_reference(si_doc.name, payment_entry, record)
-                                if record.settlement_advice:
-                                    settlement_advice.set('status', 'Partially Processed')
-
-                            else:
-                                if record.settlement_advice:
-                                    settlement_advice.set('remark', 'Unable to Create Payment Entry')
-                                    settlement_advice.set('status', 'Warning')
-
-                            if record.settlement_advice:
-                                settlement_advice.save()
-
-                        else:
-                            payment_entry = self.process_payment_entry(
-                                transaction_record
-                                , si_doc
-                                , bank_account
-                                , settled_amount
-                                , tds_amount
-                                , disallowance_amount
-                                , ref_doc = ref_doc)
-
-                            if payment_entry:
-                                if bank_amount == 0:  # Added due to the validation ( settled_amount = allocated_amount )
-                                    if record.settlement_advice:
-                                        settlement_advice.set('status', 'Fully Processed')
-                                else:
-                                    if record.settlement_advice:
-                                        settlement_advice.set('status', 'Partially Processed')
-                                self.update_invoice_reference(si_doc.name, payment_entry, record)
-                            else:
-                                if record.settlement_advice:
-                                    settlement_advice.set('remark', 'Unable to Create Payment Entry')
-                                    settlement_advice.set('status', 'Warning')
-
-                            if record.settlement_advice:
-                                settlement_advice.save()
-                        frappe.db.commit()
-                    except Exception as e:
-                        frappe.db.set_value('Matcher', record.name, 'status', 'Error')
-                        frappe.db.set_value('Matcher', record.name, 'remarks', e)
-
+            if not self.__validate():
+                return "Error"
+            self.__set_amount()
+            self.__process_payment_entry()
+            self.__update_references()
+            self.matcher_record.status = 'Processed'
+            return "Processed"
+        except Exception as e:
+            frappe.db.rollback()
+            update_error(self.matcher_record, self.sa_remark, e)
+            return "Error"
+        finally:
+            self.matcher_record.save()
             frappe.db.commit()
-            chunk.update_status(chunk_doc, "Processed")
+
+class BankReconciliator:
+    def __init__(self):
+        self.bt_doc = None
+
+    def __validate(self, matcher_record: "Document") -> bool:
+        error = None
+        if self.bt_doc.status == 'Reconciled' or self.bt_doc.status == 'Settled':  # Already Reconciled
+            error = 'Already Reconciled'
+        elif self.bt_doc.status == 'Cancelled':
+            error = 'Bank transaction is Cancelled'
+        if error:
+            update_error(matcher_record, error)
+            return False
+        return True
+
+    def process(self, bt: dict, abbr:str) -> str:
+        try:
+            chunk_status: str = "Processed"
+            self.bt_doc: "Document" = get_document_record("Bank Transaction", bt.bank_transaction)
+            matcher_name_list: list[str] = eval(bt.matcher_names)
+            for matcher_name in matcher_name_list:
+                matcher_doc: "Document" = get_document_record("Matcher", matcher_name)
+                if not self.__validate(matcher_doc):
+                    chunk_status = "Error"
+                    continue
+                process_status = PaymentEntryCreator(matcher_doc, self.bt_doc, abbr).process()
+                chunk_status = chunk.get_status(chunk_status, process_status)
+                self.bt_doc.reload()
+            return chunk_status
         except Exception as e:
             log_error(e, 'Matcher')
-            chunk.update_status(chunk_doc, "Error")
+            return "Error"
 
-def update_reconciled_status():
-     frappe.db.sql("""update 
-                            `tabMatcher` tma
-                        join `tabBank Transaction` tbt on
-                            tma.bank_transaction = tbt.name
-                        JOIN `tabSettlement Advice` tsa on
-                            tsa.name = tma.settlement_advice
-                        set tma.status = 'Error', tma.remarks = 'Already Reconciled', tsa.status = 'Warning', tsa.remark = 'Already Reconciled'
-                        where
-                            tbt.status = 'Reconciled'
-                            and tma.match_logic in ('MA1-CN', 'MA5-BN')
-                            and tma.status = 'Open'""")
-
-     frappe.db.sql("""update `tabMatcher` tma join `tabBank Transaction` tbt on 
-                    tma.bank_transaction = tbt.name set tma.status = 'Error',
-                    tma.remarks = 'Already Reconciled' where tbt.status = 'Reconciled'
-                    and tma.match_logic = 'MA3-CN' and tma.status = 'Open'""")
-
-     frappe.db.commit()
-
+def reconcile_bank_transaction(bt_records: list[dict], chunk_doc: "Document") -> None:
+    chunk.update_status(chunk_doc, "InProgress")
+    chunk_status: str = "Processed"
+    try:
+        abbr: str = " - " + get_abbr()
+        for bt in bt_records:
+            process_status = BankReconciliator().process(bt, abbr)
+            chunk_status = chunk.get_status(chunk_status, process_status)
+    except Exception as e:
+        chunk_status = "Error"
+        log_error(e, 'Matcher')
+    finally:
+        chunk.update_status(chunk_doc, chunk_status)
 
 
 @frappe.whitelist()
 def process(args):
     try:
         args = cast_to_dic(args)
-        seq_no = 0
-        chunk_size = int(args["chunk_size"])
-        m_logic = tuple(frappe.get_single("Control Panel").payment_logic.split(","))
-        bt_doc_records = frappe.db.sql(
-            """SELECT name, bank_account, reference_number, date, custom_entity FROM `tabBank Transaction`
-                                   WHERE name in ( select bank_transaction from `tabMatcher` where match_logic in %(m_logic)s and status = 'Open' )
-                                   AND LENGTH(reference_number) > 4 AND status in ('Pending','Unreconciled') AND deposit > 8 ORDER BY unallocated_amount DESC""",
-            values={"m_logic": m_logic},
-            as_dict=True,
-        )
-        update_reconciled_status()
-        if bt_doc_records:
-            for record in range(0, len(bt_doc_records), chunk_size):
+        seq_no: int = 0
+        chunk_size: int = int(args["chunk_size"])
+        m_logic: tuple = tuple(frappe.get_single('Control Panel').match_logic.split(','))
+        bt_records = frappe.db.sql("""SELECT bank_transaction, JSON_ARRAYAGG(name) as matcher_names
+                                        FROM `tabMatcher`
+                                        where match_logic in  %(m_logic)s and status = 'Open'
+                                        GROUP BY bank_transaction ORDER BY sales_invoice, payment_order, unallocated DESC"""
+                                   , values={"m_logic": m_logic}
+                                   , as_dict=True)
+        if bt_records:
+            for record in range(0, len(bt_records), chunk_size):
                 chunk_doc = chunk.create_chunk(args["step_id"])
                 seq_no = seq_no + 1
-                # PaymentEntryCreator().process(bt_doc_records = bt_doc_records, match_logic = m_logic, chunk_doc = chunk_doc)
-                frappe.enqueue(PaymentEntryCreator().process
-                               , queue = 'long'
-                               , is_async = True
-                               , job_name = "Batch" + str(seq_no)
-                               , timeout = 25000
-                               , bt_doc_records = bt_doc_records[record:record + chunk_size]
-                               , match_logic = m_logic, chunk_doc = chunk_doc)
-
+                # reconcile_bank_transaction(bt_records=bt_records, chunk_doc=chunk_doc)
+                frappe.enqueue(reconcile_bank_transaction
+                               , queue=args.get('queue','long')
+                               , is_async=True
+                               , job_name="Batch" + str(seq_no)
+                               , timeout=25000
+                               , bt_records=bt_records[record:record + chunk_size]
+                               , chunk_doc=chunk_doc)
         else:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Processed")
     except Exception as e:
         chunk_doc = chunk.create_chunk(args["step_id"])
+        log_error(e, "Matcher")
         chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')

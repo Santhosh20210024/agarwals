@@ -6,27 +6,25 @@ from selenium.webdriver.common.by import By
 import time
 
 class SafewayDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
+
+    def check_login_status(self):
+        try:
+            error = self.min_wait.until(EC.visibility_of_element_located((By.ID,'ctl00_ContentPlaceHolder1_lblerr'))).text
+            if error == 'Invalid UserName or Password ..':
+                return False
+        except:
+            return True
 
     def login(self):
-        self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_ContentPlaceHolder1_txt_username")))
-        username = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_txt_username")
-        username.send_keys(self.user_name)  # input username
-        password = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_txt_pwd")
-        password.send_keys(self.password)  # input password
-        submit = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_ImageButton1").click()
+        self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_ContentPlaceHolder1_txt_username"))).send_keys(self.user_name) #username
+        self.wait.until(EC.visibility_of_element_located((By.ID, "ctl00_ContentPlaceHolder1_txt_pwd"))).send_keys(self.password) #password
+        self.wait.until(EC.element_to_be_clickable((By.ID, "ctl00_ContentPlaceHolder1_ImageButton1"))).click() #login button
 
     def navigate(self):
-        self.wait.until(EC.visibility_of_all_elements_located((By.LINK_TEXT, "Claim MIS")))
-        self.driver.find_element(By.LINK_TEXT, "Claim MIS").click()
-        from_date = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_DtpFrom_Date5")
-        formated_from_date=self.from_date.strftime("%d/%m/%Y")
-        formated_to_date = self.to_date.strftime("%d/%m/%Y")
-        from_date.send_keys(formated_from_date)  # input from date
-        to_date = self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_Dtpto_Date5")
-        to_date.send_keys(formated_to_date)  # input to date
-        self.driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_Button1").click() #submit
+        self.wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Claim MIS"))).click()
+        self.wait.until(EC.visibility_of_element_located((By.ID,"ctl00_ContentPlaceHolder1_DtpFrom_Date5"))).send_keys(self.from_date.strftime("%d/%m/%Y")) # From Date
+        self.wait.until(EC.visibility_of_element_located((By.ID,"ctl00_ContentPlaceHolder1_Dtpto_Date5"))).send_keys(self.to_date.strftime("%d/%m/%Y")) #To Date
+        self.wait.until(EC.element_to_be_clickable((By.ID, "ctl00_ContentPlaceHolder1_Button1"))).click() #Submit
 
     def download_from_web(self):
         self.wait.until(EC.visibility_of_element_located,((By.ID, "ctl00_ContentPlaceHolder1_lbltot")))

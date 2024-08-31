@@ -1,12 +1,12 @@
 import frappe
 from agarwals.agarwals.doctype import file_records
-from agarwals.utils.payment_entry_cancellator import PaymentEntryCancellator
-from agarwals.utils.journal_entry_cancellator import JournalEntryCancellator
-from agarwals.utils.Matcher_Reference_Cancellator import MatcherReferenceCancellator
+from agarwals.reconciliation.step.cancellator.cancellator import PaymentDocumentCancellator
+from agarwals.reconciliation.step.cancellator.utils.matcher_cancellator import MatcherCancellator
 from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.fiscal_year_update import update_fiscal_year
+
 
 class SalesInvoiceCreator:
     def cancel_sales_invoice(self, cancelled_bills):
@@ -18,25 +18,21 @@ class SalesInvoiceCreator:
                 sales_invoice_record.custom_transform = bill_record.transform
                 sales_invoice_record.custom_index = bill_record.index
                 sales_invoice_record.save(ignore_permissions=True)
-                journal_entry_doc = frappe.get_all('Journal Entry Account', filters={'reference_name': bill, 'reference_type':'Sales Invoice'}, pluck = 'parent')
+                PaymentDocumentCancellator().cancel_payment_documents(bill)
+                MatcherCancellator().delete_matcher(sales_invoice_record)  
+                sales_invoice_record.reload()
                 sales_invoice_record.cancel()
-                PaymentEntryCancellator().cancel_payment_entry(bill)
-                if journal_entry_doc:
-                    JournalEntryCancellator().cancel_journal_entry(journal_entry_doc)
-                MatcherReferenceCancellator().delete_matcher_reference(bill)
+                
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
-                self.delete_sales_invoice_reference(bill)
+                
                 frappe.db.commit()
                 file_records.create(file_upload=sales_invoice_record.custom_file_upload,
-                                    transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
+                                    transform=sales_invoice_record.custom_transform,
+                                    reference_doc=sales_invoice_record.doctype,
                                     record=bill, index=sales_invoice_record.custom_index)
             except Exception as e:
                 log_error(error=e, doc="Bill",doc_name=bill)
-
-    def delete_sales_invoice_reference(self, bill):
-        frappe.db.sql(f"DELETE FROM `tabSales Invoice Reference` WHERE parent = '{bill}'")
-        
-
+             
     def process(self, bill_numbers, chunk_doc):
         chunk.update_status(chunk_doc, "InProgress")
         try:
@@ -49,13 +45,15 @@ class SalesInvoiceCreator:
                     bill_record.save()
                     sales_invoice_record = frappe.new_doc('Sales Invoice')
                     sales_invoice_params = {'custom_bill_no': bill_record.bill_no, 'custom_mrn': bill_record.mrn,
-                                            'custom_patient_name': bill_record.patient_name, 'custom_ma_claim_id': bill_record.ma_claim_id,
+                                            'custom_patient_name': bill_record.patient_name,
+                                            'custom_ma_claim_id': bill_record.ma_claim_id,
                                             'custom_claim_id': bill_record.claim_id, 'customer': bill_record.customer,
                                             'entity': bill_record.entity, 'region': bill_record.region,
                                             'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
                                             'cost_center': bill_record.cost_center,
-                                            'custom_patient_age': bill_record.patient_age,
-                                            'items': [{'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
+                                            'custom_patient_age' : bill_record.patient_age,
+                                            'items': [
+                                                {'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
                                             'set_posting_time': 1, 'posting_date': bill_record.bill_date,
                                             'due_date': bill_record.bill_date,
                                             'custom_file_upload': bill_record.file_upload,
@@ -67,13 +65,15 @@ class SalesInvoiceCreator:
                     sales_invoice_record.submit()
                     if bill_record.status == 'CANCELLED':
                         sales_invoice_record.cancel()
-                    frappe.db.set_value('Bill', bill_number, {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
+                    frappe.db.set_value('Bill', bill_number,
+                                        {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
                     if sales_invoice_record.status != 'Cancelled':
-                       update_fiscal_year(sales_invoice_record,'Sales Invoice')
-                    
+                        update_fiscal_year(sales_invoice_record, 'Sales Invoice')
+
                     file_records.create(file_upload=sales_invoice_record.custom_file_upload,
-                                        transform=sales_invoice_record.custom_transform, reference_doc=sales_invoice_record.doctype,
+                                        transform=sales_invoice_record.custom_transform,
+                                        reference_doc=sales_invoice_record.doctype,
                                         record=bill_number, index=sales_invoice_record.custom_index)
                 except Exception as e:
                     log_error(error= 'Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
@@ -86,7 +86,8 @@ class SalesInvoiceCreator:
         for i in range(0, len(bill_number), no_of_invoice_per_queue):
             chunk_doc = chunk.create_chunk(args["step_id"])
             frappe.enqueue(self.process, queue=args["queue"], is_async=True, timeout=18000,
-                           bill_numbers=bill_number[i:i + no_of_invoice_per_queue],chunk_doc=chunk_doc)
+                           bill_numbers=bill_number[i:i + no_of_invoice_per_queue], chunk_doc=chunk_doc)
+
 
 @frappe.whitelist()
 def process(args):
@@ -104,7 +105,8 @@ def process(args):
                 cancellation_chunk_doc_status = "Error"
         else:
             cancellation_chunk_doc_status = "Processed"
-        new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=','CANCELLED AND DELETED']},pluck = 'name')
+        new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=', 'CANCELLED AND DELETED']},
+                                    pluck='name')
         if new_bills:
             SalesInvoiceCreator().enqueue_jobs(new_bills, args)
         else:

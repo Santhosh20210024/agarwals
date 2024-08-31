@@ -6,40 +6,30 @@ from selenium.webdriver.common.by import By
 import time
 
 class ParamountDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
 
+    def check_login_status(self):
+        try:
+            alter_message = self.min_wait.until(EC.alert_is_present()).text
+            if alter_message == 'Invalid User Name/ Password':
+                return False
+            elif alter_message == 'Invalid Captcha Code':
+                return self.captcha_alert
+        except:
+            return True
     def login(self):
-        username = self.wait.until(EC.visibility_of_element_located((By.ID,'txtUserName')))
-        username.send_keys(self.user_name)
-        pwd = self.wait.until((EC.visibility_of_element_located((By.ID,'txtPassword'))))
-        pwd.send_keys(self.password)
-        captcha_element = self.driver.find_element(By.ID,'ContentPlaceHolder1_lblStopSpam')
-        captcha_text = captcha_element.get_attribute('innerHTML')
-        captcha_answer = eval(captcha_text)
-        self.driver.find_element(By.ID,"ContentPlaceHolder1_txtCaptcha").send_keys(captcha_answer)
-        login_btn = self.driver.find_element(By.ID,"ContentPlaceHolder1_btnLogin")
-        login_btn.click()
+        self.wait.until(EC.visibility_of_element_located((By.ID,'txtUserName'))).send_keys(self.user_name)
+        self.wait.until(EC.visibility_of_element_located((By.ID,'txtPassword'))).send_keys(self.password)
+        captcha_text = self.wait.until((EC.visibility_of_element_located((By.ID,'ContentPlaceHolder1_lblStopSpam')))).get_attribute('innerHTML') # geting captcha as text
+        self.wait.until(EC.visibility_of_element_located((By.ID,"ContentPlaceHolder1_txtCaptcha"))).send_keys(eval(captcha_text))
+        self.wait.until(EC.element_to_be_clickable((By.ID,"ContentPlaceHolder1_btnLogin"))).click()
 
     def navigate(self):
         self.driver.get("https://provider.paramounttpa.com/PaidClaims.aspx")
 
-    def download_from_web(self,temp_from_date = None, temp_to_date=None):
-        formated_from_date=self.from_date.strftime("%d/%m/%Y") if temp_from_date is None else temp_from_date.strftime("%d/%m/%Y")
-        formated_to_date = self.to_date.strftime("%d/%m/%Y") if temp_to_date is None else temp_to_date.strftime("%d/%m/%Y")
-        from_date = self.wait.until(EC.visibility_of_element_located((By.ID,"dateFrom")))
-        from_date.click()
-        from_date.clear()
-        from_date.send_keys(formated_from_date)
-        to_date = self.wait.until(EC.visibility_of_element_located((By.ID,"dateTo")))
-        to_date.click()
-        to_date.clear()
-        to_date.send_keys(formated_to_date)
-        self.driver.find_element(By.ID,"ContentPlaceHolder1_btnSubmit").click()
+    def download_from_web(self):
+        self.wait.until(EC.visibility_of_element_located((By.ID,"dateFrom"))).send_keys(self.from_date.strftime("%d/%m/%Y"))
+        self.wait.until(EC.visibility_of_element_located((By.ID,"dateTo"))).send_keys(self.to_date.strftime("%d/%m/%Y"))
+        self.wait.until(EC.element_to_be_clickable((By.ID,"ContentPlaceHolder1_btnSubmit"))).click()
         time.sleep(5)
-        export_button = self.wait.until(EC.visibility_of_element_located((By.ID,"ContentPlaceHolder1_btnExport")))
-        export_button.click()
+        self.wait.until(EC.element_to_be_clickable((By.ID,"ContentPlaceHolder1_btnExport"))).click()
         time.sleep(10)
-
-    def download_from_web_with_date_range(self,temp_from_date, temp_to_date,logout):
-        self.download_from_web(temp_from_date,temp_to_date)
