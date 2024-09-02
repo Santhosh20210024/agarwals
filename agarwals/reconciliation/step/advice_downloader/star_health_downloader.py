@@ -9,9 +9,11 @@ class StarHealthDownloader(SeleniumDownloader):
 
     def check_login_status(self):
         try:
-            message = self.wait.until(EC.visibility_of_element_located((By.ID, 'loginMessage'))).text
+            message = self.min_wait.until(EC.visibility_of_element_located((By.ID, 'loginMessage'))).text
             if message in ['User not found','Wrong password']:
                 return False
+            else:
+                return message
         except:
             return True
     def login(self):
