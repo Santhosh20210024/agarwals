@@ -63,13 +63,13 @@ class ReportGenerator(SARecordCreator):
             <label style="font-weight: bold; margin-bottom: 10px;">File Upload Records</label>
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                         <thead>
-                            <tr style="background-color: #f2f2f2;">
-                                <th style="border: 1px solid #ddd; padding: 8px;">File Upload ID</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">File Name</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Inserted Records</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Updated Records</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Skipped Records</th>
+                            <tr style="background-color: #2490EF;">
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">File Upload ID</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">File Name</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Status</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Inserted Records</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Updated Records</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Skipped Records</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -95,11 +95,11 @@ class ReportGenerator(SARecordCreator):
             <label style="font-weight: bold; margin-bottom: 10px;">Settlement Advice Staging Records</label>
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                         <thead>
-                            <tr style="background-color: #f2f2f2;">
-                                <th style="border: 1px solid #ddd; padding: 8px;">File Upload ID</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Error Code</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Count</th>
+                            <tr style="background-color: #2490EF;">
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">File Upload ID</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Status</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Error Code</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Count</th>
                                 
                             </tr>
                         </thead>
@@ -122,13 +122,12 @@ class ReportGenerator(SARecordCreator):
     def generate_advice_report(self):
         advice_records_table_html = f"""
             <label style="font-weight: bold; margin-bottom: 10px;">Settlement Advice Records</label>
-                
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                         <thead>
-                            <tr style="background-color: #f2f2f2;">
-                                <th style="border: 1px solid #ddd; padding: 8px;">File Upload ID</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Count</th>
+                            <tr style="background-color: #2490EF;">
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">File Upload ID</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Status</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Count</th>
                                 
                             </tr>
                         </thead>
@@ -150,13 +149,12 @@ class ReportGenerator(SARecordCreator):
     def generate_matcher_report(self):
         matcher_records_table_html = f"""
             <label style="font-weight: bold; margin-bottom: 10px;">Matcher Records</label>
-                
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                         <thead>
-                            <tr style="background-color: #f2f2f2;">
-                                <th style="border: 1px solid #ddd; padding: 8px;">File Upload ID</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Count</th>
+                            <tr style="background-color: #2490EF;">
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">File Upload ID</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Status</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Count</th>
                                 
                             </tr>
                         </thead>
@@ -178,16 +176,15 @@ class ReportGenerator(SARecordCreator):
     def generate_payment_entry_report(self):
         payment_entry_records_table_html = f"""
             <label style="font-weight: bold; margin-bottom: 10px;">Payment Entry Records</label>
-                
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                         <thead>
-                            <tr style="background-color: #f2f2f2;">
-                                <th style="border: 1px solid #ddd; padding: 8px;">File Upload ID</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Count</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Settled Amount</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">TDS</th>
-                                <th style="border: 1px solid #ddd; padding: 8px;">Disallowance</th>
+                            <tr style="background-color: #2490EF;">
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">File Upload ID</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Status</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Count</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Settled Amount</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">TDS</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Disallowance</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -303,7 +300,6 @@ class MailLogUpdater(MailSender):
 
 @frappe.whitelist()
 def process():
-    print("Reached")
     try:
         controlpanel = frappe.get_single("Control Panel")
         if controlpanel.sa_report_email_group is None:
