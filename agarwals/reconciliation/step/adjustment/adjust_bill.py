@@ -1,5 +1,5 @@
 import frappe
-from tfs.orchestration import chunk, Orchestrator, update_chunk_status
+from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.reconciliation.step.adjustment.journal_entry_utils import (
@@ -54,7 +54,7 @@ class BillAdjustmentProcessor(JournalEntryUtils):
             return False
         return True
 
-    @update_chunk_status
+    @ChunkOrchestrator.update_chunk_status
     def process_bill_adjust(self, bill_adjustment_list):
         try:
             for bill_adjt in bill_adjustment_list:
@@ -124,16 +124,16 @@ class BillAdjustmentOrchestrator:
         args = cast_to_dic(args)
         chunk_size = int(args.get("chunk_size", 100))
         bill_adjustments = self.get_bill_adjustments()
-        Orchestrator().process(BillAdjustmentProcessor().process_bill_adjust, step_id=args["step_id"],
-                               is_enqueueable=True,
-                               chunk_size=chunk_size,
-                               data_var_name="bill_adjustment_list",
-                               set_job_name=True,
-                               queue=args.get("queue", "long"),
-                               is_async=True,
-                               job_name="BillAdjustment_Batch",
-                               timeout=25000,
-                               bill_adjustment_list=bill_adjustments)
+        ChunkOrchestrator().process(BillAdjustmentProcessor().process_bill_adjust, step_id=args["step_id"],
+                                    is_enqueueable=True,
+                                    chunk_size=chunk_size,
+                                    data_var_name="bill_adjustment_list",
+                                    set_job_name=True,
+                                    queue=args.get("queue", "long"),
+                                    is_async=True,
+                                    job_name="BillAdjustment_Batch",
+                                    timeout=25000,
+                                    bill_adjustment_list=bill_adjustments)
 
 
 @frappe.whitelist()
