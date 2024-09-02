@@ -15,21 +15,13 @@ def execute():
             # Create a new Mail log document
             mail_log_record = frappe.new_doc('Mail log')
             
-            # Define parameters
-            mail_log_params = {
+            mail_log_record.update({
                 'file_upload': file_record.get('name'),
                 'file_type': file_record.get('document_type'),
                 'status': "Open"
-            }
+                })
 
-            # Set the values for the new Mail log document
-            for key, value in mail_log_params.items():
-                mail_log_record.set(key, value)
-
-            # Save and submit the new Mail log document
-            mail_log_record.insert(ignore_permissions=True)
-            if hasattr(mail_log_record, 'submit'):
-                mail_log_record.submit()
+            mail_log_record.save()
 
         except Exception as error:
             # Log errors encountered during the process

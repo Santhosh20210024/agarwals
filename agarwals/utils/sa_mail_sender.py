@@ -1,7 +1,7 @@
 import frappe
 from agarwals.utils.error_handler import log_error
 
-class SARecordCreator:
+class MailRecordCreator:
     records = []
     file_upload_records = []
     staging_records = []
@@ -55,7 +55,7 @@ class SARecordCreator:
             log_error(e, "Mail log")
 
 
-class ReportGenerator(SARecordCreator):
+class ReportGenerator(MailRecordCreator):
     report_content = []
 
     def generate_fu_report(self):
@@ -289,7 +289,7 @@ class MailLogUpdater(MailSender):
                         for key,value in mail_log_params.items():
                             mail_log_record.set(key,value)
                         mail_log_record.insert(ignore_permissions=True)
-                        mail_log_record.submit()
+                        mail_log_record.save()
                     except Exception as e:
                         log_error("Error Ocuured while Update ",e,"Mail log",record)
 
@@ -305,6 +305,6 @@ def process():
         if controlpanel.sa_report_email_group is None:
             raise ValueError("Email Group Not Found in SA Report")
         mail_sender = MailLogUpdater()
-        mail_sender.process(controlpanel.sa_report_email_group)
+        frappe.enqueue(mail_sender.process, queue='long', job_name=f"sa mail sender - {frappe.utils.now_datetime()}",mail_group = controlpanel.sa_report_email_group)
     except Exception as e:
         log_error(e, "Mail log")
