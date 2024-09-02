@@ -1,8 +1,7 @@
 import frappe
 import traceback
-
 from agarwals.agarwals.doctype import file_records
-from tfs.orchestration import chunk
+from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.fiscal_year_update import update_fiscal_year
@@ -147,14 +146,15 @@ def create_bank_transaction(transaction_list):
             trans_doc.save()
             frappe.db.commit()
 
-def staging_batch_operation(records, chunk_doc):
-    chunk.update_status(chunk_doc, "InProgress")
+
+@ChunkOrchestrator.update_chunk_status
+def staging_batch_operation(records):
     try:
         create_bank_transaction(records)
-        chunk.update_status(chunk_doc, "Processed")
+        return "Processed"
     except Exception as e:
         log_error(e, 'Bank Transaction Staging')
-        chunk.update_status(chunk_doc, "Error")
+        return "Error"
 
 def tag_skipped():
     frappe.db.sql("""
@@ -163,37 +163,28 @@ def tag_skipped():
     frappe.db.commit()
 
 def bank_transaction_process(tag, args):
-    try:
-        args=cast_to_dic(args)
-        pending_transaction = [] 
-        for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'tag' : tag, 'staging_status' : ['!=', 'Processed']}, fields = "*" ):
-            if transaction.staging_status == "Warning":
-                if transaction.get('update_reference_number') != None and transaction.retry == 1:
-                    pending_transaction.append(transaction)
-                    continue
-            if transaction.staging_status == 'Error':
-                if transaction.retry == 1:
-                    pending_transaction.append(transaction)
-                    continue
-            if transaction.staging_status == 'Open': 
+    args=cast_to_dic(args)
+    pending_transaction = []
+    for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'tag' : tag, 'staging_status' : ['!=', 'Processed']}, fields = "*" ):
+        if transaction.staging_status == "Warning":
+            if transaction.get('update_reference_number') != None and transaction.retry == 1:
                 pending_transaction.append(transaction)
-            # if transaction.staging_status == 'Skipped':
-            #     pending_transaction.append(transaction)
-        # also Check if there is any change in the processed entrys retry
-        for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'staging_status' : ['=', 'Processed'], 'update_reference_number' : ['!=', None], 'retry': 1}):
+                continue
+        if transaction.staging_status == 'Error':
+            if transaction.retry == 1:
+                pending_transaction.append(transaction)
+                continue
+        if transaction.staging_status == 'Open':
             pending_transaction.append(transaction)
-        
-        if pending_transaction:
-            for i in range(0, len(pending_transaction), int(args["chunk_size"])):
-                chunk_doc = chunk.create_chunk(args["step_id"])
-                frappe.enqueue(staging_batch_operation, queue= args["queue"], is_async=True, timeout=18000, records = pending_transaction[i:i + int(args["chunk_size"])],chunk_doc=chunk_doc)
-        else:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
-    except Exception as e:
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')
+        # if transaction.staging_status == 'Skipped':
+        #     pending_transaction.append(transaction)
+    # also Check if there is any change in the processed entrys retry
+    for transaction in frappe.get_all( 'Bank Transaction Staging', filters = { 'staging_status' : ['=', 'Processed'], 'update_reference_number' : ['!=', None], 'retry': 1}):
+        pending_transaction.append(transaction)
+
+    ChunkOrchestrator().process(staging_batch_operation, args["step_id"], is_enqueueable=True,
+                                chunk_size=int(args["chunk_size"]), data_var_name="transaction_list", queue=args["queue"],
+                                is_async=True, timeout=18000, records=pending_transaction)
         
 def change_matched_items(ref_no):
     for item in frappe.get_list('Payment Entry', filters = {'reference_no':ref_no, 'status':['!=', 'Cancelled']}):
@@ -252,21 +243,25 @@ def is_document_naming_rule(doctype):
         return False
     return True
 
-@frappe.whitelist()
-def process(args):
+@ChunkOrchestrator.update_chunk_status
+def validate_balance_and_create_transaction(args: dict) -> str:
     try:
-        args = cast_to_dic(args)
         panel = frappe.get_doc('Control Panel')
         if panel.check_closing_balance == 1:
             ClosingBalance().validate_balance()
         tag = 'Credit Payment'
         if not is_document_naming_rule('Bank Transaction'):
             frappe.msgprint("Document Naming Rule is not set for the Bank Transaction")
-            return
-        check_withdrawn_je() # cancellation process
-        tag_skipped() # tag the skip status
-        bank_transaction_process(tag, args) # bank transaction process
+            return "Error"
+        check_withdrawn_je()  # cancellation process
+        tag_skipped()  # tag the skip status
+        bank_transaction_process(tag, args)  # bank transaction process
+        return "Processed"
     except Exception as e:
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "Error")
-        log_error(e, 'Step')
+        log_error(e, 'Bank Transaction Staging')
+        return "Error"
+
+@frappe.whitelist()
+def process(args):
+    args = cast_to_dic(args)
+    ChunkOrchestrator().process(validate_balance_and_create_transaction, args["step_id"], args=args)
