@@ -93,10 +93,10 @@ class SalesInvoiceCreator:
         frappe.db.commit()
         
     def find_skip_bills(self):
-        customer_list = frappe.get_all('Customer',filters = {'custom_skip_invoice_process':1},pluck = 'name')
+        customer_list = frappe.get_all('Customer',filters = {'custom_skip_invoice_creation':1},pluck = 'name')
         if not customer_list:
             return []
-        return frappe.get_all('Bill',filters={'customer':['in', customer_list],'status':'RAISED' },pluck='name')        
+        return frappe.get_all('Bill',filters={'customer':['in', customer_list],'status':['in',['RAISED','CANCELLED']] },pluck='name')        
 
 @frappe.whitelist()
 def process(args):
