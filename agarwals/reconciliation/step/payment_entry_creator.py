@@ -167,11 +167,13 @@ class PaymentEntryCreator:
                            {'payment_document': self.pe_doc.doctype
                                , 'payment_entry': self.pe_doc.name
                                , 'allocated_amount': self.pe_doc.paid_amount
+                               ,'custom_posting_date':self.pe_doc.posting_date
                                , 'custom_bill_date': self.pe_doc.custom_due_date
                                , 'custom_bill_region': self.pe_doc.region
                                , 'custom_bill_branch': self.pe_doc.branch
                                , 'custom_bill_branch_type': self.pe_doc.branch_type
-                               , 'custom_bill_entity': self.pe_doc.entity})
+                               , 'custom_bill_entity': self.pe_doc.entity
+                               ,'custom_match_logic':self.matcher_record.match_logic})
         self.bt_doc.custom_advice_status = 'Found'
         self.bt_doc.submit()
 

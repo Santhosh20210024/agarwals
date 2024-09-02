@@ -18,16 +18,14 @@
  "fields": [
   {
    "fieldname": "file_upload",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "File Upload",
-   "options": "File upload",
    "read_only": 1
   },
   {
    "fieldname": "transform",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Transform",
-   "options": "Transform",
    "read_only": 1
   },
   {
@@ -39,9 +37,8 @@
   },
   {
    "fieldname": "record",
-   "fieldtype": "Dynamic Link",
+   "fieldtype": "Data",
    "label": "Record",
-   "options": "reference_doc",
    "read_only": 1
   },
   {
@@ -60,7 +57,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-29 18:09:38.293569",
+ "modified": "2024-09-02 15:06:57.467359",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File Records",
