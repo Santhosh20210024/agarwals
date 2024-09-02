@@ -1,6 +1,6 @@
 import frappe
 from datetime import date
-from tfs.orchestration import chunk, Orchestrator, update_chunk_status
+from tfs.orchestration import chunk, ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error as error_handler
 
@@ -116,7 +116,8 @@ def clean_sa_data(staging_doc):
     staging_doc.disallowed_amount = convert_to_float(staging_doc.disallowed_amount)
     return staging_doc
 
-@update_chunk_status
+
+@ChunkOrchestrator.update_chunk_status
 def create_settlement_advices(advices):
     try:
         for advice in advices:
@@ -144,6 +145,6 @@ def process(args):
     args = cast_to_dic(args)
     advices_list = frappe.db.sql("SELECT name FROM `tabSettlement Advice Staging` tsas WHERE status = 'Open' OR (status = 'Error' AND retry=1);",as_list=True)
     n = int(args["chunk_size"])
-    Orchestrator().process(create_settlement_advices, step_id=args["step_id"], is_enqueueable=True, chunk_size=n,
-                           data_var_name="advices", queue=args["queue"],
-                           is_async=True, job_name="Advice Creation", timeout=25000, advices = advices_list)
+    ChunkOrchestrator().process(create_settlement_advices, step_id=args["step_id"], is_enqueueable=True, chunk_size=n,
+                                data_var_name="advices", queue=args["queue"],
+                                is_async=True, job_name="Advice Creation", timeout=25000, advices = advices_list)
