@@ -205,11 +205,13 @@ class ReportGenerator(MailRecordCreator):
         return payment_entry_records_table_html
 
     def generate_report(self):
-        self.generate_fu_report()
-        self.generate_staging_report()
-        self.generate_advice_report()
-        self.generate_matcher_report()
-        self.generate_payment_entry_report()
+        self.report_content = (
+            f"{self.generate_fu_report()}\n\n"
+            f"{self.generate_staging_report()}\n\n"
+            f"{self.generate_advice_report()}\n\n"
+            f"{self.generate_matcher_report()}\n\n"
+            f"{self.generate_payment_entry_report()}"
+        )
 
     def process(self):
         super().process()
@@ -259,14 +261,7 @@ class MailSender(ReportGenerator):
 
     def process(self,mail_group):
         super().process()
-        if self.records:
-            self.report_content = (
-                f"{self.generate_fu_report()}\n\n"
-                f"{self.generate_staging_report()}\n\n"
-                f"{self.generate_advice_report()}\n\n"
-                f"{self.generate_matcher_report()}\n\n"
-                f"{self.generate_payment_entry_report()}"
-            )        
+        if self.records:   
             self.send_email(report_content=self.report_content, mail_group=mail_group)
     
 class MailLogUpdater(MailSender):
@@ -279,16 +274,13 @@ class MailLogUpdater(MailSender):
                     try :
                         fu_record = frappe.db.sql(f"SELECT * from viewfile_upload_records vur WHERE vur.fu_name = '{record}'", as_dict=True)
                         mail_log_record = frappe.new_doc('Mail log')
-                        mail_log_params = {
+                        mail_log_record.update({
                         'file_upload': fu_record[0]['fu_name'],
                         'file_name' : fu_record[0]['file_name'], 
                         'file_type': 'Settlement Advice',
                         'is_sent' : 1,
                         'status' : "Processed"
-                        }
-                        for key,value in mail_log_params.items():
-                            mail_log_record.set(key,value)
-                        mail_log_record.insert(ignore_permissions=True)
+                        })
                         mail_log_record.save()
                     except Exception as e:
                         log_error("Error Ocuured while Update ",e,"Mail log",record)
