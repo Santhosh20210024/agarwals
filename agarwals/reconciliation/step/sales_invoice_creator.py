@@ -96,7 +96,7 @@ class SalesInvoiceCreator:
         customer_list = frappe.get_all('Customer',filters = {'custom_skip_invoice_process':1},pluck = 'name')
         if not customer_list:
             return []
-        return frappe.get_all('Bill',filters={'customer':['in', customer_list] },pluck='name')        
+        return frappe.get_all('Bill',filters={'customer':['in', customer_list],'status':'RAISED' },pluck='name')        
 
 @frappe.whitelist()
 def process(args):
