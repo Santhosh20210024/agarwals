@@ -24,6 +24,7 @@ class MDIndiaDownloader(SeleniumDownloader):
         claim_details =self.driver.find_element(By.XPATH, "//span[contains(@class, 'subnav-btn') and text()='Claim Details']")
         claim_details.click()
         self.wait.until(EC.element_to_be_clickable((By.LINK_TEXT,'Paid Claim Details'))).click()
+        time.sleep(5)
 
     def download_from_web(self):
         self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "btn-default"))).click()

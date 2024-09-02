@@ -55,7 +55,7 @@ class SABotUploader:
 
     def login(self):
         self.session = requests.Session()
-        login_url = self.url + "/api/method/login"
+        login_url = self.url + "api/method/login"
         payload = {
             'usr': self.user_id,
             'pwd': self.password
