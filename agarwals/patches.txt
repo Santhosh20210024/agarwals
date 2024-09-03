@@ -1,2 +1,4 @@
 agarwals.patches.v1_0.mail_log_patches
 agarwals.patches.v1_0.mail_log_view
+agarwals.patches.v1_1.customer_group_creation
+agarwals.patches.v1_1.customer_creation
