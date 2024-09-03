@@ -246,6 +246,7 @@ class BankReconciliator:
                 matcher_doc: "Document" = get_document_record("Matcher", matcher_name)
                 if not self.__validate(matcher_doc):
                     chunk_status = "Error"
+                    matcher_doc.save()
                     continue
                 process_status = PaymentEntryCreator(matcher_doc, self.bt_doc, abbr).process()
                 chunk_status = chunk.get_status(chunk_status, process_status)
