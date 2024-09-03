@@ -2,7 +2,7 @@ pandas
 selenium
 webdriver-manager
 2captcha-python
-openpyxl
+openpyxl==3.1.0
 beautifulsoup4
 pdfplumber
 

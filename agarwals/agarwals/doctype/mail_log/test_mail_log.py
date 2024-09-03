@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestPaymentEntryErrorLog(FrappeTestCase):
+class TestMaillog(FrappeTestCase):
 	pass

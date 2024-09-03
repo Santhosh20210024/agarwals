@@ -6,6 +6,7 @@ app_publisher = "Agarwals"
 app_description = "Agarwals"
 app_email = "tfs-agarwals@techfinite.com"
 app_license = "MIT"
+required_apps = ["frappe/tfs"]
 
 # Includes in <head>
 # ------------------
@@ -63,7 +64,7 @@ app_license = "MIT"
 # Installation
 # ------------
 
-# before_install = "agarwals.utils.create_folders.folder_structure_creation"
+# before_install = "agarwals.utils.create_folders.create_project_folders"
 # after_install = "agarwals.install.after_install"
 
 # Uninstallation
@@ -79,7 +80,7 @@ app_license = "MIT"
 
 
 # Agarwals  Integration Setup
-before_install = "agarwals.utils.create_folders.folder_structure_creation"
+before_install = "agarwals.utils.create_folders.create_project_folders"
 
 # Agarwals Deletion Setup
 # before_uninstall = "agarwals.utils.create_folders.folder_structure_deletion"

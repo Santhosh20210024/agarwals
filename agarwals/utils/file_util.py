@@ -1,8 +1,11 @@
 import frappe
+import os
 from agarwals.utils.error_handler import log_error
 
-PROJECT_FOLDER = "DrAgarwals"
-HOME_PATH = "Home/DrAgarwals"
+control_panel = frappe.get_single("Control Panel")
+PROJECT_FOLDER = control_panel.get("project_folder", None)
+HOME_PATH = f"Home/{PROJECT_FOLDER}"
+SITE_PATH = control_panel.get("site_path", None)
 SHELL_PATH = "private/files"
 SUB_DIR = [
     "Extract",
@@ -14,18 +17,13 @@ SUB_DIR = [
     "Zip",
 ]
 INNER_SUB_DIR = ["Error"]
-SITE_PATH = "/home/frappe/frappe-bench/sites/agarwals.claimgenie.ai"
-
 
 def construct_file_url(*args):
-    list_of_items = []
-    for arg in args:
-        list_of_items.append(arg)
-
-    formatted_url = "/".join(list_of_items)
+    """Construct a file URL from the given path components, handling None values."""
+    args = [str(arg) for arg in args if arg is not None]
+    formatted_url = "/".join(args)
     return formatted_url
-
-
+  
 @frappe.whitelist()
 def is_template_exist(attached_to_name, attached_to_doctype):
     """

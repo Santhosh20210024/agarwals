@@ -94,7 +94,7 @@ class RoundOffProcess(JournalEntryUtils):
                 if self.type == "Bank Transaction":
                     self.update_transaction_entry(round_off_doc.name, je)
             except Exception as e:
-                error_message += f"Error while processing {self.ENTRY_TYPE} entry in {self.type}: {e}"
+                error_message = f"Error while processing {self.ENTRY_TYPE} entry in {self.type}: {e}"
                 log_error(error_message, doc_name=round_off_item)
 
 

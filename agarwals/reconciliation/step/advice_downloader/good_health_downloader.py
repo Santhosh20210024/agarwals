@@ -6,16 +6,18 @@ from selenium.webdriver.common.by import By
 import time
 
 class GoodHealthDownloader(SeleniumDownloader):
-    def __init__(self):
-        SeleniumDownloader.__init__(self)
+
+    def check_login_status(self):
+        try:
+            self.min_wait.until(EC.visibility_of_element_located((By.XPATH, "//span[@id='lblMessage' and text()='Invalid login credentials.']")))
+            return False
+        except:
+            return True
 
     def login(self):
-        self.wait.until(EC.visibility_of_element_located((By.ID,'txtUsrName')))
-        username = self.driver.find_element(By.ID,'txtUsrName')
-        username.send_keys(self.user_name) # User name
-        password = self.driver.find_element(By.ID,'txtPassword')
-        password.send_keys(self.password) # Password 
-        self.driver.find_element(By.ID,'btnLogin').click() #login
+        self.wait.until(EC.visibility_of_element_located((By.ID,'txtUsrName'))).send_keys(self.user_name)
+        self.wait.until(EC.visibility_of_element_located((By.ID,'txtPassword'))).send_keys(self.password)
+        self.wait.until(EC.element_to_be_clickable((By.ID, 'btnLogin'))).click()
 
     def navigate(self):
         self.driver.get('https://webace.goodhealthtpa.in/Provider/ProviderDownloadMIS.aspx')

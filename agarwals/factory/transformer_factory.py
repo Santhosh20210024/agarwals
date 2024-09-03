@@ -6,7 +6,7 @@ from agarwals.reconciliation.step.transform.writeback_transformer import Writeba
 from agarwals.reconciliation.step.transform.writeoff_transformer import WriteoffTransformer
 from agarwals.reconciliation.step.transform.bank_transformer import BankBulkTransformer
 from agarwals.reconciliation.step.transform.advice_transformer import AdviceTransformer
-from agarwals.reconciliation.step.transform import settlement_advice
+from agarwals.reconciliation.step.transform.closing_balance_transformer import ClosingBalanceTransformer
 
 def get_transformer(type):
     try:

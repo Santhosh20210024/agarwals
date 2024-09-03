@@ -13,3 +13,4 @@ def log_error(error, doc=None, doc_name=None, status='Error'):
     })
     
     error_log.insert(ignore_permissions=True)
+    return error_log
