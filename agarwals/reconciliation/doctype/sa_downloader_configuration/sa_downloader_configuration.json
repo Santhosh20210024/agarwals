@@ -119,6 +119,7 @@
   },
   {
    "default": "29",
+   "description": "Setting the Period of Downloading in days",
    "fieldname": "days",
    "fieldtype": "Int",
    "label": "Days"
@@ -126,7 +127,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-03 15:25:49.045808",
+ "modified": "2024-09-03 19:01:06.112320",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
