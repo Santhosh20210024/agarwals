@@ -1,6 +1,6 @@
 import frappe
 
-def log_error(error, doc=None, doc_name=None, status='Error'):
+def log_error(error, doc=None, doc_name=None, status='ERROR'):
     if doc_name and len(doc_name) > 140:
         doc_name = doc_name[:139]
         
