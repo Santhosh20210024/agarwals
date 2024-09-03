@@ -348,7 +348,7 @@ class Transformer:
                     self.update_status('File upload', file['name'], 'In Process')
                     self.load_source_df(file, self.header)
                     if self.source_df.empty:
-                        self.log_error(self.document_type, file['name'], 'The File is Empty')
+                        self.log_error(doctype_name = self.document_type, reference_name = file['name'], error_message = 'The File is Empty')
                         self.update_status('File upload', file['name'], 'Error')
                         status = "Error"
                         continue
@@ -356,7 +356,7 @@ class Transformer:
                     if not transformed:
                         continue
                 except Exception as e:
-                    self.log_error(self.document_type, file['name'], e)
+                    self.log_error(doctype_name = self.document_type, reference_name = file['name'], error_message = e)
                     self.update_status('File upload', file['name'], 'Error')
                     status = "Error"
                     continue
@@ -367,5 +367,5 @@ class Transformer:
         except Exception as e:
             chunk_doc = chunk.create_chunk(args["step_id"])
             chunk.update_status(chunk_doc, "Error")
-            self.log_error(error_message=e,doctype_name='Settlement Advice Staging')
+            self.log_error(error_message=e,doctype_name='Transform')
 
