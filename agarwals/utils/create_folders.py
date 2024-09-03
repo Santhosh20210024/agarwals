@@ -108,8 +108,10 @@ def create_project_folders():
 def create_sa_folders():
     path = (
         frappe.get_single("Control Panel").site_path
-        + "/private/files/DrAgarwals/Settlement Advice"
+        + f"/{SHELL_PATH}/{PROJECT_FOLDER}/Settlement Advice"
+        
     )
+    
     already_exists = False
     try:
         if os.path.exists(path):
