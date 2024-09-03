@@ -479,10 +479,15 @@
    "fieldtype": "Check",
    "label": "Is Mail",
    "read_only": 1
+  },
+  {
+   "fieldname": "utr_key",
+   "fieldtype": "Data",
+   "label": "UTR Key"
   }
- ],
+ ], 
  "links": [],
- "modified": "2024-08-06 15:38:13.813171",
+ "modified": "2024-09-03 17:10:23.859015",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
