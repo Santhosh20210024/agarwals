@@ -16,8 +16,8 @@ class CustomerCreator:
                 try:
                     if not frappe.db.exists('Customer', {'customer_name': customer_id}):
                         customer_name = customer_id.strip().capitalize()
-                        payer_priority= " "
-                        payer_match = " "
+                        payer_priority= ""
+                        payer_match = ""
                         if row_data.get('Payer Match'):
                             payer_match= row_data.get('Payer Match') 
                         if row_data.get('Payer Priority'):
@@ -36,7 +36,6 @@ class CustomerCreator:
                         frappe.db.commit() 
 
                 except Exception as e:
-                    print(e)
                     log_error(e, "Customer", customer_id)
 
         except Exception as e:
@@ -45,7 +44,7 @@ class CustomerCreator:
 def execute():
     control_panel = frappe.get_single("Control Panel")
     if control_panel.site_path is None:
-        raise ValueError("Site Path Not Found in CustomerCreator")
+        raise ValueError("Site Path Not Found in Control Panel")
     site_path = f"{control_panel.site_path}/../../apps/agarwals/agarwals/master/"
     customer_instance = CustomerCreator()
     customer_instance.create_customer(site_path)
