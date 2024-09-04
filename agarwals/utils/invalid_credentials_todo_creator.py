@@ -7,9 +7,9 @@ from agarwals.utils.error_handler import log_error
 class TPACredentialTODOCreator:
 
     def __init__(self):
-        self.get_credential_data()
+        self.set_credential_data()
 
-    def get_credential_data(self) -> None:
+    def set_credential_data(self) -> None:
         """
             Usage : Retrieves credential data from the "Control Panel" document.
             Returns : None
@@ -22,12 +22,15 @@ class TPACredentialTODOCreator:
             self.allocated_user = control_panel.allocated_to
             self.is_api = int(control_panel.is_api)
 
-    def login(self) -> object:
+    def get_login_session(self) -> object:
         """
-            Usage :
-                This method is used when to login on production environment.
-            returns :
-                Returns the Session (object)
+           Usage:
+                Retrieves an authenticated session by logging into the portal.
+           Returns:
+                object: An authenticated session object if login is successful
+            Raises:
+                Exception: If the `login` function raises an exception due to authentication failure
+                           or any other issue.
         """
         login_status = login(username=self.user_id, password=self.password, url=self.url)
         if login_status:
@@ -43,7 +46,7 @@ class TPACredentialTODOCreator:
                 list: A list of dictionaries containing invalid TPA login credentials.
                 None : If no login credentials were found
         """
-        condition = "tlc.status = 'Invalid' AND (td.status = 'Closed'OR td.status = 'Cancelled' OR td.status IS NULL) "
+        condition = "tlc.status = 'Invalid' AND (td.status = 'Closed' OR td.status = 'Cancelled' OR td.status IS NULL) "
         invalid_credentials_query = f"""
                         SELECT tlc.* FROM `tabTPA Login Credentials` tlc
                         LEFT JOIN `tabToDo` td ON td.reference_name = tlc.name
@@ -96,7 +99,7 @@ class TPACredentialTODOCreator:
         """
         try:
             if self.is_api == 1:
-                self.login_session = self.login()
+                self.login_session = self.get_login_session()
                 self.create_todo()
             else:
                 self.create_todo()
