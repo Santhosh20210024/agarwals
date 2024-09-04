@@ -2,7 +2,7 @@ import frappe
 from agarwals.utils.error_handler import log_error
 import pandas as pd
 
-class CustomerCreation:
+class CustomerCreater:
     def create_customer(self):
         df = pd.read_csv("/home/frappe/frappe-bench/apps/agarwals/agarwals/master/Customer.csv")
         data_dict = df.to_dict(orient='records')  
@@ -33,5 +33,5 @@ class CustomerCreation:
             log_error("Error occurred while reading the file:", e, "Customer")
 
 def execute():
-    customer_instance = CustomerCreation()
+    customer_instance = CustomerCreater()
     customer_instance.create_customer()
