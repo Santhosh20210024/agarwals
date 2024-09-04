@@ -479,9 +479,8 @@ class SeleniumDownloader:
             self.is_headless = configuration_values.is_headless
             self.incoming_file_type = configuration_values.incoming_file_type
             self.max_wait_time = configuration_values.captcha_entry_duration
-            day_difference = 29 if (configuration_values.days) <= 0 else (configuration_values.days)
             self.to_date = configuration_values.to_date or frappe.utils.now_datetime().date()
-            self.from_date = configuration_values.from_date or self.to_date - timedelta(days = day_difference )
+            self.from_date = configuration_values.from_date or self.to_date - timedelta(days = configuration_values.days)
             self.sandbox_mode = configuration_values.sandbox_mode
             self.is_date_limit = configuration_values.is_date_limit
             self.date_limit_period = configuration_values.date_limit_period
