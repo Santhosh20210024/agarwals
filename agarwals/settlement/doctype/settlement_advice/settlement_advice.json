@@ -260,6 +260,11 @@
    "search_index": 1
   },
   {
+   "fieldname": "utr_key",
+   "fieldtype": "Data",
+   "label": "UTR Key"
+  },
+  {
    "fieldname": "cg_formatted_utr_number",
    "fieldtype": "Data",
    "in_preview": 1,
@@ -479,11 +484,6 @@
    "fieldtype": "Check",
    "label": "Is Mail",
    "read_only": 1
-  },
-  {
-   "fieldname": "utr_key",
-   "fieldtype": "Data",
-   "label": "UTR Key"
   }
  ], 
  "links": [],
