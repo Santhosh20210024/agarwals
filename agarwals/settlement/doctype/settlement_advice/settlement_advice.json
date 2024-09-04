@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "autoname": "prompt",
- "creation": "2023-12-23 12:12:27.383921",
+ "creation": "2024-09-04 12:15:00.283816",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -15,7 +15,6 @@
   "mrn",
   "utr_number",
   "final_utr_number",
-  "utr_key",
   "paid_date",
   "insurance_company",
   "column_break_ne4ar",
@@ -50,6 +49,7 @@
   "branch_type",
   "cg_formatted_bill_number",
   "claim_key",
+  "utr_key",
   "cg_utr_number",
   "cg_formatted_utr_number",
   "section_break_ivzji",
@@ -69,18 +69,41 @@
  ],
  "fields": [
   {
-   "fieldname": "claim_amount",
-   "fieldtype": "Currency",
+   "fieldname": "settlement_details_section",
+   "fieldtype": "Section Break",
+   "label": "Settlement Details"
+  },
+  {
+   "fieldname": "claim_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
    "in_preview": 1,
    "in_standard_filter": 1,
-   "label": "Claim Amount",
+   "label": "Claim ID",
    "read_only": 1
   },
   {
-   "fieldname": "tds_amount",
-   "fieldtype": "Currency",
+   "fieldname": "cl_number",
+   "fieldtype": "Data",
    "in_preview": 1,
-   "label": "TDS Amount",
+   "in_standard_filter": 1,
+   "label": "CL Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bill_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Bill No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "mrn",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "label": "MRN",
    "read_only": 1
   },
   {
@@ -93,74 +116,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "paid_date",
-   "fieldtype": "Date",
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Paid Date",
-   "read_only": 1
-  },
-  {
-   "fieldname": "bill_no",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Bill No",
-   "read_only": 1
-  },
-  {
-   "fieldname": "claim_id",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Claim ID",
-   "read_only": 1
-  },
-  {
-   "fieldname": "settled_amount",
-   "fieldtype": "Currency",
-   "in_preview": 1,
-   "label": "Settled Amount",
-   "read_only": 1
-  },
-  {
-   "fieldname": "remark",
-   "fieldtype": "Text",
-   "in_preview": 1,
-   "label": "Remark",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_ne4ar",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "hidden": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "\nError\nOpen\nNot Processed\nPartially Processed\nFully Processed\nWarning\nUnmatched",
-   "read_only": 1
-  },
-  {
-   "fieldname": "disallowed_amount",
-   "fieldtype": "Currency",
-   "in_preview": 1,
-   "label": "Disallowed Amount",
-   "read_only": 1
-  },
-  {
-   "fieldname": "payers_remark",
-   "fieldtype": "Text",
-   "in_preview": 1,
-   "label": "Payers Remark",
-   "read_only": 1
-  },
-  {
    "fieldname": "final_utr_number",
    "fieldtype": "Data",
    "in_preview": 1,
@@ -169,165 +124,11 @@
    "read_only": 1
   },
   {
-   "fieldname": "cg_utr_number",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "label": "CG UTR Number",
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "insurance_company_name",
-   "fieldtype": "Data",
+   "fieldname": "paid_date",
+   "fieldtype": "Date",
    "in_preview": 1,
    "in_standard_filter": 1,
-   "label": "Insurance Company Name",
-   "read_only": 1
-  },
-  {
-   "fieldname": "tpa",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "label": "TPA",
-   "read_only": 1
-  },
-  {
-   "fieldname": "region",
-   "fieldtype": "Link",
-   "in_preview": 1,
-   "label": "Region",
-   "options": "Region",
-   "read_only": 1
-  },
-  {
-   "fieldname": "entity",
-   "fieldtype": "Link",
-   "in_preview": 1,
-   "label": "Entity",
-   "options": "Entity",
-   "read_only": 1
-  },
-  {
-   "fieldname": "branch_type",
-   "fieldtype": "Link",
-   "in_preview": 1,
-   "label": "Branch Type",
-   "options": "Branch Type",
-   "read_only": 1
-  },
-  {
-   "fieldname": "matched_bank_transaction",
-   "fieldtype": "Link",
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Matched Bank Transaction",
-   "options": "Bank Transaction",
-   "read_only": 1
-  },
-  {
-   "fieldname": "matched_claimbook_record",
-   "fieldtype": "Link",
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Matched ClaimBook Record",
-   "options": "ClaimBook",
-   "read_only": 1
-  },
-  {
-   "fieldname": "matched_bill_record",
-   "fieldtype": "Link",
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Matched Bill Record",
-   "options": "Bill",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "file_upload.file",
-   "fieldname": "file_name",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "label": "File Name",
-   "read_only": 1
-  },
-  {
-   "fieldname": "claim_key",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Claim Key",
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "utr_key",
-   "fieldtype": "Data",
-   "label": "UTR Key"
-  },
-  {
-   "fieldname": "cg_formatted_utr_number",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "label": "CG Formatted UTR Number",
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "cg_formatted_bill_number",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "label": "CG Formatted Bill Number",
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "matcher_status",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Matcher Status",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "file_upload.payer_type",
-   "fieldname": "file_upload_payer",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "label": "File Upload Payer",
-   "read_only": 1
-  },
-  {
-   "fieldname": "matcher_id",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Matcher ID",
-   "read_only": 1
-  },
-  {
-   "fieldname": "transform",
-   "fieldtype": "Link",
-   "in_preview": 1,
-   "label": "Transform",
-   "options": "Transform",
-   "read_only": 1
-  },
-  {
-   "fieldname": "file_upload",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Source File",
-   "options": "File upload",
-   "read_only": 1
-  },
-  {
-   "fieldname": "index",
-   "fieldtype": "Int",
-   "in_preview": 1,
-   "label": "File Index",
+   "label": "Paid Date",
    "read_only": 1
   },
   {
@@ -339,11 +140,8 @@
    "read_only": 1
   },
   {
-   "fieldname": "mrn",
-   "fieldtype": "Data",
-   "in_preview": 1,
-   "label": "MRN",
-   "read_only": 1
+   "fieldname": "column_break_ne4ar",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "patient_name",
@@ -351,6 +149,11 @@
    "in_preview": 1,
    "label": "Patient Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "insurance_policy_number",
+   "fieldtype": "Data",
+   "label": "Insurance Policy Number"
   },
   {
    "fieldname": "date_of_admission",
@@ -397,13 +200,56 @@
    "read_only": 1
   },
   {
-   "fieldname": "file_upload_section",
+   "fieldname": "amount_section",
    "fieldtype": "Section Break",
-   "label": "File Upload"
+   "label": "Amount"
   },
   {
-   "fieldname": "column_break_fnp9x",
+   "fieldname": "claim_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Claim Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "settled_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "label": "Settled Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_l6yxy",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tds_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "label": "TDS Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "disallowed_amount",
+   "fieldtype": "Currency",
+   "in_preview": 1,
+   "label": "Disallowed Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_orox7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "payers_remark",
+   "fieldtype": "Text",
+   "in_preview": 1,
+   "label": "Payers Remark",
+   "read_only": 1
   },
   {
    "fieldname": "cg_section",
@@ -411,49 +257,202 @@
    "label": "CG"
   },
   {
+   "fieldname": "staging",
+   "fieldtype": "Link",
+   "label": "Staging",
+   "options": "Settlement Advice Staging",
+   "read_only": 1
+  },
+  {
+   "fieldname": "matcher_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Matcher ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "matched_bill_record",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Matched Bill Record",
+   "options": "Bill",
+   "read_only": 1
+  },
+  {
+   "fieldname": "matched_claimbook_record",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Matched ClaimBook Record",
+   "options": "ClaimBook",
+   "read_only": 1
+  },
+  {
+   "fieldname": "matched_bank_transaction",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Matched Bank Transaction",
+   "options": "Bank Transaction",
+   "read_only": 1
+  },
+  {
+   "fieldname": "matcher_status",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Matcher Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "insurance_company_name",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Insurance Company Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tpa",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "label": "TPA",
+   "read_only": 1
+  },
+  {
    "fieldname": "column_break_nv7z1",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "amount_section",
-   "fieldtype": "Section Break",
-   "label": "Amount"
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "label": "Region",
+   "options": "Region",
+   "read_only": 1
   },
   {
-   "fieldname": "section_break_orox7",
-   "fieldtype": "Section Break"
+   "fieldname": "entity",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "label": "Entity",
+   "options": "Entity",
+   "read_only": 1
   },
   {
-   "fieldname": "column_break_l6yxy",
-   "fieldtype": "Column Break"
+   "fieldname": "branch_type",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "label": "Branch Type",
+   "options": "Branch Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cg_formatted_bill_number",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "label": "CG Formatted Bill Number",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "claim_key",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Claim Key",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "cg_utr_number",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "label": "CG UTR Number",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "cg_formatted_utr_number",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "label": "CG Formatted UTR Number",
+   "read_only": 1,
+   "search_index": 1
   },
   {
    "fieldname": "section_break_ivzji",
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "cl_number",
-   "fieldtype": "Data",
+   "fieldname": "remark",
+   "fieldtype": "Text",
    "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "CL Number",
+   "label": "Remark",
    "read_only": 1
   },
   {
-   "fieldname": "settlement_details_section",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "\nError\nOpen\nNot Processed\nPartially Processed\nFully Processed\nWarning\nUnmatched",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_upload_section",
    "fieldtype": "Section Break",
-   "label": "Settlement Details"
+   "label": "File Upload"
   },
   {
-   "fieldname": "insurance_policy_number",
-   "fieldtype": "Data",
-   "label": "Insurance Policy Number"
-  },
-  {
-   "fieldname": "staging",
+   "fieldname": "file_upload",
    "fieldtype": "Link",
-   "label": "Staging",
-   "options": "Settlement Advice Staging",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Source File",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "label": "Transform",
+   "options": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Int",
+   "in_preview": 1,
+   "label": "File Index",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "file_upload.file",
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "label": "File Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_fnp9x",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "file_upload.payer_type",
+   "fieldname": "file_upload_payer",
+   "fieldtype": "Data",
+   "in_preview": 1,
+   "label": "File Upload Payer",
    "read_only": 1
   },
   {
@@ -484,29 +483,21 @@
    "fieldtype": "Check",
    "label": "Is Mail",
    "read_only": 1
+  },
+  {
+   "fieldname": "utr_key",
+   "fieldtype": "Data",
+   "label": "UTR Key"
   }
- ], 
+ ],
  "links": [],
- "modified": "2024-09-03 17:10:23.859015",
+ "modified": "2024-09-04 12:16:13.849330",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
  "naming_rule": "Set by user",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
