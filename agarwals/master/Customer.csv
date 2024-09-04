@@ -1,464 +1,464 @@
-"ID","Account Manager","Allow Sales Invoice Creation Without Delivery Note","Allow Sales Invoice Creation Without Sales Order","Billing Currency","Commission Rate","Customer Details","Customer Group","Customer Name","Customer POS id","Customer Primary Address","Customer Primary Contact","Customer Type","Default Company Bank Account","Default Payment Terms Template","Default Price List","Disabled","Email Id","From Lead","From Opportunity","Gender","Image","Industry","Is Frozen","Is Internal Customer","Loyalty Program","Loyalty Program Tier","Market Segment","Mobile No","Payer Match","Payer Priority","Primary Address","Print Language","Represents Company","Sales Partner","Salutation","Series","Skip Invoice Creation","Tax Category","Tax ID","Tax Withholding Category","Territory","Website","ID (Allowed To Transact With)","Company (Allowed To Transact With)","ID (Credit Limit)","Bypass Credit Limit Check at Sales Order (Credit Limit)","Company (Credit Limit)","Credit Limit (Credit Limit)","ID (Receivable Accounts)","Account (Receivable Accounts)","Company (Receivable Accounts)","ID (Sales Team)","Commission Rate (Sales Team)","Contact No. (Sales Team)","Contribution (%) (Sales Team)","Contribution to Net Total (Sales Team)","Incentives (Sales Team)","Sales Person (Sales Team)"
-"Satish Dhawan Space Centre(SDSC)","",0,0,"",0.0,"","Government","Satish Dhawan Space Centre(SDSC)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Regional Directorate of Skill Development and Entrepreneurship","",0,0,"",0.0,"","Government","Regional Directorate of Skill Development and Entrepreneurship","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Mahavir hospital","",0,0,"",0.0,"","Corporate","Mahavir hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IIT Tirupathi","",0,0,"",0.0,"","Government","IIT Tirupathi","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MADRAS REGIONAL PURCHASE UNIT","",0,0,"",0.0,"","Government"," MADRAS REGIONAL PURCHASE UNIT","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Early Salary Services Private Limited","",0,0,"",0.0,"","Corporate","Early Salary Services Private Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CHECKMED PRIVATE LIMITED","",0,0,"",0.0,"","Corporate","CHECKMED PRIVATE LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Dhiren Eye Care","",0,0,"",0.0,"","Corporate","Dhiren Eye Care","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Institute of Fashion Technology(NIFT)","",0,0,"",0.0,"","Government","National Institute of Fashion Technology(NIFT)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Research Centre Imarat (RCI)","",0,0,"",0.0,"","Government","Research Centre Imarat (RCI)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Indian Institute of Science Education and Research(IISER)","",0,0,"",0.0,"","Government","Indian Institute of Science Education and Research(IISER)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AYU Health","",0,0,"",0.0,"","Corporate","AYU Health","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ICMR - NIRT (National Institute for Research in Tuberculosis )","",0,0,"",0.0,"","Government","ICMR - NIRT (National Institute for Research in Tuberculosis )","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CENTRAL SERICULTURE RESEARCH AND TRAINING","",0,0,"",0.0,"","Government","CENTRAL SERICULTURE RESEARCH AND TRAINING","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IIT BHUBANESWAR","",0,0,"",0.0,"","Government","IIT BHUBANESWAR","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Guest","",0,0,"",0.0,"","Commercial","Guest","","","","Individual","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","All Territories","","","","","","","","","","","","","","","","",""
-"ENGINEERS INDIA LIMITED","",0,0,"",0.0,"","Government","ENGINEERS INDIA LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Institute of Hotel Management(IHM)","",0,0,"",0.0,"","Corporate","Institute of Hotel Management(IHM)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Healthindia Insurance TPA Services Pvt Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Healthindia Insurance TPA Services Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","7","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Safeway Insurance TPA Pvt Ltd","",0,0,"",0.0,"","All Customer Groups","Safeway Insurance TPA Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","All Territories","","","","","","","","","","","","","","","","",""
-"NIPER","",0,0,"",0.0,"","Government","NIPER","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Central Salt and Marine Chemicals Research Institute(CSMCRI)","",0,0,"",0.0,"","Government","Central Salt and Marine Chemicals Research Institute(CSMCRI)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bharat Earth Movers Limited","",0,0,"",0.0,"","Government","Bharat Earth Movers Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Connect and Heal Primary Care Pvt. Ltd","",0,0,"",0.0,"","Corporate","Connect and Heal Primary Care Pvt. Ltd ","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Small Industries Corporation (NSIC)","",0,0,"",0.0,"","Government","National Small Industries Corporation (NSIC)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TTK PRESTIGE LTD","",0,0,"",0.0,"","Corporate","TTK PRESTIGE LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Institute of Epidemiology","",0,0,"",0.0,"","Government","National Institute of Epidemiology","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KARNATAKA FIRE","",0,0,"",0.0,"","Government","KARNATAKA FIRE","","","","Company","","","",0,"","","","","","",0,0,"","","","","KAR FIRE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"POSTAL","",0,0,"",0.0,"","Government","POSTAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","DIR OF ACCTS POSTAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ITBP - Patna","",0,0,"",0.0,"","Government","ITBP - Patna","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"512 army base","",0,0,"",0.0,"","Government","512 army base","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CENSUS","",0,0,"",0.0,"","Government","CENSUS","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AAROGYASRI","",0,0,"",0.0,"","Government","AAROGYASRI","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Sashastra Seema Bal (SSB)","",0,0,"",0.0,"","Government","Sashastra Seema Bal (SSB)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SALARJUNG MUSEUM","",0,0,"",0.0,"","Government","SALARJUNG MUSEUM","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL INSTITUTE OF VIROLOGY","",0,0,"",0.0,"","Government","NATIONAL INSTITUTE OF VIROLOGY","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL INSTITUTE OF VIROLOGY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NWKRTC","",0,0,"",0.0,"","Government","NWKRTC","","","","Company","","","",0,"","","","","","",0,0,"","","","","NWKRTC","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KSRTC","",0,0,"",0.0,"","Government","KSRTC","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KAYNES TECHNOLOGIES","",0,0,"",0.0,"","Corporate","KAYNES TECHNOLOGIES","","","","Company","","","",0,"","","","","","",0,0,"","","","","KAYNES TECHNOLOGY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"LIFETIME WELLNESS","",0,0,"",0.0,"","Corporate","LIFETIME WELLNESS","","","","Company","","","",0,"","","","","","",0,0,"","","","","LIFETIME WELLNESS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KFES WELFARE TRUST","",0,0,"",0.0,"","Corporate","KFES WELFARE TRUST","","","","Company","","","",0,"","","","","","",0,0,"","","","","KFESWELFARETRUST","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HUMAN SPACE FLIGHT CENTRE","",0,0,"",0.0,"","Government","HUMAN SPACE FLIGHT CENTRE","","","","Company","","","",0,"","","","","","",0,0,"","","","","HUMAN SPACE FLIGHT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CENTRAL RICE RESEARCH INSTITUTE","",0,0,"",0.0,"","Government","CENTRAL RICE RESEARCH INSTITUTE","","","","Company","","","",0,"","","","","","",0,0,"","","","","CRRI","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Government(AG)","",0,0,"",0.0,"","Government","Government(AG)","","","","Company","","","",0,"","","","","","",0,0,"","","","","THE REGISTRAR R S VIDYAPEETHA,AMD BANGALORE,ZAO  CBDT,INDIA GOVERNMENT MINT,VENKAT LAXMAN RAO B S,AO GE UTILITY,BULK POSTING,MMNSSBYBLADA,CHEQUE DEPOSIT/HYDERABAD,SP  CBI  ACB  HYDERABAD,AGMOAD,DEPUTY DIRECTOR FINANCE,DISTRICT TREAS,EMPLOYEES PROVIDENT FUND,AAO ARMY VIZAGAAO ARMY,DEPUTY DIR,PUBLIC FUND OF,AG AANDE  ANDHRA PRADESH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Corporates","",0,0,"",0.0,"","Corporate","Corporate(AG)","","","","Company","","","",0,"","","","","","",0,0,"","","","","NODAL ACCOUNTMEDOPS, Curebay,MSDR","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Indian Institute of technology (IIT)","",0,0,"",0.0,"","Government","Indian Institute of technology (IIT)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Programme for Control of Blindness(NPCB)","",0,0,"",0.0,"","Government","National Programme for Control of Blindness(NPCB)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SWAZILAND PRINCESS","",0,0,"",0.0,"","Corporate","SWAZILAND PRINCESS","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IITM (INDIAN INSTITUTE OF TROPICAL METEOROLOGY)","",0,0,"",0.0,"","Government","IITM (INDIAN INSTITUTE OF TROPICAL METEOROLOGY)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CWL","",0,0,"",0.0,"","Government","CWL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Cordite Company","",0,0,"",0.0,"","Government","Cordite Company","","","","Company","","","",0,"","","","","","",0,0,"","","","","CF EMPLOYEES","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Manual","",0,0,"",0.0,"","All Customer Groups","Manual","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Saha Institute of Nuclear Physics(SINP)","",0,0,"",0.0,"","Government","Saha Institute of Nuclear Physics(SINP)","","","","Company","","","",0,"","","","","","",0,0,"","","","","saha institute","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Birla Eye Hospital","",0,0,"",0.0,"","Corporate","Birla Eye Hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Mumba Port Trust(MPT)","",0,0,"",0.0,"","Government","Mumba Port Trust(MPT)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ICMR(Indian Council of Medical Research)","",0,0,"",0.0,"","Government","ICMR(Indian Council of Medical Research)","","","","Company","","","",0,"","","","","","",0,0,"","","","","INDIAN INSTITUTE OF MILLETS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Svass Wellness Limited","",0,0,"",0.0,"","Corporate","Svass Wellness Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","SVAAS WELLNESS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Rainbow Childrens Hospital","",0,0,"",0.0,"","Corporate","Rainbow Childrens Hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Health India Insurance TPA Services Pvt Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Health India Insurance TPA Services Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","HEALTHINDI","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Nilkamal Limited","",0,0,"",0.0,"","Corporate","Nilkamal Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","Nilkamal Limited","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Germanten Hospital","",0,0,"",0.0,"","Corporate","Germanten Hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"EAST COAST RAILWAYS","",0,0,"",0.0,"","Government","EAST COAST RAILWAYS","","","","Company","","","",0,"","","","","","",0,0,"","","","","ECORMEDICA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BIRLA INDUSTRIAL & TECHNOLOGICAL MUSEUM","",0,0,"",0.0,"","Government","BIRLA INDUSTRIAL & TECHNOLOGICAL MUSEUM","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ZUNO GENERAL INSURANCE","",0,0,"",0.0,"","TPA/INSURANCE","ZUNO GENERAL INSURANCE","","","","Company","","","",0,"","","","","","",0,0,"","","","","ZUNO GENERAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"YESHASVINI","",0,0,"",0.0,"","Government","YESHASVINI","","","","Company","","","",0,"","","","","","",0,0,"","","","","YASHASVINI","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Working Journalist Health Scheme","",0,0,"",0.0,"","Government","Working Journalist Health Scheme","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"WABCO INDIA LIMITED","",0,0,"",0.0,"","Corporate","WABCO INDIA LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"VISAKHAPATNAM PORT TRUST - VPT","",0,0,"",0.0,"","Government","VISAKHAPATNAM PORT TRUST - VPT","","","","Company","","","",0,"","","","","","",0,0,"","","","","VSKP PORT,VISAKHAPATNAM PORT,VISAKHAPATNAM,AO VSP PARKIN,VSKP PORT,AO, VSP","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Visakha Steel Plant","",0,0,"",0.0,"","Government","Visakha Steel Plant","","","","Company","","","",0,"","","","","","",0,0,"","","","","RASHTRIYA ISPAT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Vipul Medcorp TPA P Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Vipul Medcorp TPA P Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","VIPULMEDCO","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"VIJAY SAI HEALTH","",0,0,"",0.0,"","Corporate","VIJAY SAI HEALTH","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"VIJAY HOSPITAL","",0,0,"",0.0,"","Corporate","VIJAY HOSPITAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"VIDAL HEALTH TPA PVT LTD","",0,0,"",0.0,"","TPA/INSURANCE","VIDAL HEALTH TPA PVT LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","VIDAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Victoria Memorial Hall","",0,0,"",0.0,"","Government","Victoria Memorial Hall","","","","Company","","","",0,"","","","","","",0,0,"","","","","VICTORIA MEMORIAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"VH MEDCARE","",0,0,"",0.0,"","Corporate","VH MEDCARE","","","","Company","","","",0,"","","","","","",0,0,"","","","","VH MEDCARE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"VAINAM HEALTH TECH","",0,0,"",0.0,"","Corporate","VAINAM HEALTH TECH","","","","Company","","","",0,"","","","","","",0,0,"","","","","VIANAMHEALTHTECH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"V.O.C CHIDAMARANAR PORT TRUST","",0,0,"",0.0,"","Government","V.O.C CHIDAMARANAR PORT TRUST","","","","Company","","","",0,"","","","","","",0,0,"","","","","V O  CHIDAMBARANAR PORT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"UPSBKS","",0,0,"",0.0,"","Government","UPSBKS","","","","Company","","","",0,"","","","","","",0,0,"","","","","UTTAR PRADESH SWASTHYA BIMA KALYAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Unofin Technologies","",0,0,"",0.0,"","Corporate","Unofin Technologies","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"UNIVERSAL SOMPO GENERAL INSURANCE","",0,0,"",0.0,"","TPA/INSURANCE","UNIVERSAL SOMPO GENERAL INSURANCE","","","","Company","","","",0,"","","","","","",0,0,"","","","","UNIVERSAL SOMPO","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"United Health Care- Parekh","",0,0,"",0.0,"","TPA/INSURANCE","United Health Care- Parekh","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"United India Insurance Company","",0,0,"",0.0,"","TPA/INSURANCE","United India Insurance Company","","","","Company","","","",0,"","","","","","",0,0,"","","","","UIIC,UNITED INDIA","19","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TVS","",0,0,"",0.0,"","Corporate","TVS","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TUBE PRODUCTS OF INDIA","",0,0,"",0.0,"","Corporate","TUBE PRODUCTS OF INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TUBE INVESTMENTS","",0,0,"",0.0,"","Corporate","TUBE INVESTMENTS","","","","Company","","","",0,"","","","","","",0,0,"","","","","TUBE INVESTMENTS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TTK Healthcare TPA Pvt Ltd","",0,0,"",0.0,"","TPA/INSURANCE","TTK Healthcare TPA Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TPA Receipts","",0,0,"",0.0,"","TPA/INSURANCE","TPA Receipts","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TNPL","",0,0,"",0.0,"","Government","Tamil Nadu Newsprint and Papers Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","TNPL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Titan Industries","",0,0,"",0.0,"","Corporate","Titan Industries","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TITAN ENGINEERING","",0,0,"",0.0,"","Corporate","TITAN ENGINEERING","","","","Company","","","",0,"","","","","","",0,0,"","","","","TITAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TITAN COMPANY","",0,0,"",0.0,"","Corporate","TITAN COMPANY","","","","Company","","","",0,"","","","","","",0,0,"","","","","TITAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TIDC INDIA","",0,0,"",0.0,"","Corporate","TIDC INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Thriveni Earth Movers Pvt Ltd","",0,0,"",0.0,"","Corporate","Thriveni Earth Movers Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TDK India Private Limited","",0,0,"",0.0,"","Corporate","TDK India Private Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TATA STEEL LTD","",0,0,"",0.0,"","Corporate","TATA STEEL LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","TATA STEEL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TATA MOTORS LTD","",0,0,"",0.0,"","Corporate","TATA MOTORS LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","TATA MOTORS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TATA COMMUNICATION LTD","",0,0,"",0.0,"","Corporate","TATA COMMUNICATION LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","TATA COMMUN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TATA AIG Health Insurance","",0,0,"",0.0,"","TPA/INSURANCE","TATA AIG Health Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","TATA AIG GEN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Tamil Nadu Newsprint and Papers Limited","",0,0,"",0.0,"","Government","Tamil Nadu Newsprint and Papers Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","TAMIL NADU NEWSPRINT AND PAPERS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"TAB INDIA GRANITES PVT.  Limited","",0,0,"",0.0,"","Corporate","TAB INDIA GRANITES PVT.  Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","TAB INDIA GRANITES","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"T.I. METAL FORMING","",0,0,"",0.0,"","Corporate","T.I. METAL FORMING","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Switching Technologies Gunther Limited","",0,0,"",0.0,"","Corporate","Switching Technologies Gunther Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SWASTHYA BIMA YOJNA","",0,0,"",0.0,"","Government","SWASTHYA BIMA YOJNA","","","","Company","","","",0,"","","","","","",0,0,"","","","","SWASTHYA BIMA YOJNA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SWASTHYA BIMA KALYAN","",0,0,"",0.0,"","Government","SWASTHYA BIMA KALYAN","","","","Company","","","",0,"","","","","","",0,0,"","","","","SWASTHYA BIMA KALYAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SUNDARAM GENERAL","",0,0,"",0.0,"","Corporate","SUNDARAM GENERAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SUNDARAM FASTENERS LTD","",0,0,"",0.0,"","Corporate","SUNDARAM FASTENERS LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","SUNDRAM FAST","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Sundaram Clayton","",0,0,"",0.0,"","Corporate","Sundaram Clayton","","","","Company","","","",0,"","","","","","",0,0,"","","","","Sundaram Clayton","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Sundaram Brake Linings Limited","",0,0,"",0.0,"","Corporate","Sundaram Brake Linings Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Sundaram Auto Components","",0,0,"",0.0,"","Corporate","Sundaram Auto Components","","","","Company","","","",0,"","","","","","",0,0,"","","","","SUNDARAM AUTO","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Suhana Masala","",0,0,"",0.0,"","Corporate","Suhana Masala","","","","Company","","","",0,"","","","","","",0,0,"","","","","PRAVIN MASAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"State Trading Corp Of India","",0,0,"",0.0,"","Government","State Trading Corp Of India","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"STATE POLICE","",0,0,"",0.0,"","Government","STATE POLICE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"STATE HEALTH AGENCY","",0,0,"",0.0,"","Government","STATE HEALTH AGENCY","","","","Company","","","",0,"","","","","","",0,0,"","","","","STATE HEALTH AGENCY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"State bank of Hyderabad","",0,0,"",0.0,"","Government","State bank of Hyderabad","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"STAR HOSPITAL","",0,0,"",0.0,"","Corporate","STAR HOSPITAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Star Health & Allied Insurance Co Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Star Health & Allied Insurance Co Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","STAR HEALTH AN,SHAICL","7","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SRL LIMITED","",0,0,"",0.0,"","Corporate","SRL LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Sri Gokulam Health Services TPA Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Sri Gokulam Health Services TPA Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SPORTS AUTHORITY","",0,0,"",0.0,"","Government","SPORTS AUTHORITY","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SPECIAL COMMISSIONER","",0,0,"",0.0,"","Government","SPECIAL COMMISSIONER","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SPACE APPLICATION","",0,0,"",0.0,"","Government","SPACE APPLICATION","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Southern Railways","",0,0,"",0.0,"","Government","Southern Railways","","","","Company","","","",0,"","","","","","",0,0,"","","","","BILLS,MON-STATE,MO-STATE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SOUTHERN PETRO CHEMICAL","",0,0,"",0.0,"","Government","SOUTHERN PETRO CHEMICAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","SOUTHERN PETROCHEMICAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"South Western Railways - SWR","",0,0,"",0.0,"","Government","South Western Railways - SWR","","","","Company","","","",0,"","","","","","",0,0,"","","","","UBL SWR","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Small Industries Development Bank of India (SIDBI)","",0,0,"",0.0,"","Government","Small Industries Development Bank of India (SIDBI)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Singareni Collieries Company Limited","",0,0,"",0.0,"","Government","Singareni Collieries Company Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","SINGARENI COLLIERIES","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SIDS Hospital & Research Centre","",0,0,"",0.0,"","Corporate","SIDS Hospital & Research Centre","","","","Company","","","",0,"","","","","","",0,0,"","","","","SIDSHOSPITAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SHUSHRUSHA NEONATAL","",0,0,"",0.0,"","Corporate","SHUSHRUSHA NEONATAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","SHUSHRUSHA NEONATAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Shree Khodiyar Mandir trust- Rajpara","",0,0,"",0.0,"","Corporate","Shree Khodiyar Mandir trust- Rajpara","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Shivam Eye Foundation","",0,0,"",0.0,"","Corporate","Shivam Eye Foundation","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SHIPPING CORPORATION OF INDIA","",0,0,"",0.0,"","Government","SHIPPING CORPORATION OF INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","SHIPPING CORPORATION OF INDIA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SHIP BUILDING CENTRE","",0,0,"",0.0,"","Government","SHIP BUILDING CENTRE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SHAR","",0,0,"",0.0,"","Government","SHAR","","","","Company","","","",0,"","","","","","",0,0,"","","","","SDSC  SHAR","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SECURITY PRINTING","",0,0,"",0.0,"","Government","SECURITY PRINTING","","","","Company","","","",0,"","","","","","",0,0,"","","","","SECURITY PRINTING PRESS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SCL","",0,0,"",0.0,"","Corporate","SCL","","","","Company","","","",0,"","","","","","",0,0,"","","","","SCL PAYMENT TRANSF","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SBI GENERAL INSURANCE CO LTD","",0,0,"",0.0,"","TPA/INSURANCE","SBI GENERAL INSURANCE CO LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","SBIGen, SBI GENERAL INSURANCE CO LTDSBI,SBI GENERAL INSURANCE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Sampoorna Suraksha and Arogya Raksha Health Insurance Scheme","",0,0,"",0.0,"","Government","Sampoorna Suraksha and Arogya Raksha Health Insurance Scheme","","","","Company","","","",0,"","","","","","",0,0,"","","","","DAVANAGERE NETRALAYA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Salar Jung Museum","",0,0,"",0.0,"","Government","Salar Jung Museum","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"SAIL","",0,0,"",0.0,"","Government","SAIL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Safeway TPA Services Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Safeway TPA Services Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"RSBY","",0,0,"",0.0,"","Government","RSBY","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Royal Enfield","",0,0,"",0.0,"","Corporate","Royal Enfield","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"RGHS (Rajasthan Govt Health Scheme)","",0,0,"",0.0,"","Government","RGHS (Rajasthan Govt Health Scheme)","","","","Company","","","",0,"","","","","","",0,0,"","","","","TREASURY OFFICE SECRETRIATE, RAJASTHAN GOVE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"RESERVE BANK OF INDIA","",0,0,"",0.0,"","Government","RESERVE BANK OF INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","RBI SAMADHAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"RENAULT NISSAN AUTOMOTIVE INDIA PRIVATE LIMITED","",0,0,"",0.0,"","Corporate","RENAULT NISSAN AUTOMOTIVE INDIA PRIVATE LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","RENAULT NISSAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Reliance Industries Ltd","",0,0,"",0.0,"","Corporate","Reliance Industries Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Reliance General Insurance Co. Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Reliance General Insurance Co. Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","RELIANCE GENER","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"REGIONAL PASSPORT","",0,0,"",0.0,"","Government","REGIONAL PASSPORT","","","","Company","","","",0,"","","","","","",0,0,"","","","","REGIONAL PASSPORT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Regional Meteorological Centre","",0,0,"",0.0,"","Government","Regional Meteorological Centre","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"RCF","",0,0,"",0.0,"","Government","Rashtriya Chemicals and Fertilizers Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","R C F  LTD","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Rashtriya Chemicals and Fertilizers Limited","",0,0,"",0.0,"","Government","Rashtriya Chemicals and Fertilizers Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Raksha Health Insurance TPA Pvt Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Raksha Health Insurance TPA Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","MSRAKSHAT","18","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Rajsriya Automotive Industries P Ltd.","",0,0,"",0.0,"","Corporate","Rajsriya Automotive Industries P Ltd.","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Rajendra ashram","",0,0,"",0.0,"","Corporate","Rajendra ashram","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Raja Ramanna Centre for Advanced Technology (RRCAT)","",0,0,"",0.0,"","Government","Raja Ramanna Centre for Advanced Technology (RRCAT)","","","","Company","","","",0,"","","","","","",0,0,"","","","","RRCAT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"RAIL WHEEL FACTORY","",0,0,"",0.0,"","Government","RAIL WHEEL FACTORY","","","","Company","","","",0,"","","","","","",0,0,"","","","","RWFOP BILL,-RWF","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"RAHEJA QBE GENERAL","",0,0,"",0.0,"","TPA/INSURANCE","RAHEJA QBE GENERAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","RAHEJA QBE GE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"QB Health Technologies Pvt. Ltd. (QUBE)","",0,0,"",0.0,"","Corporate","QB Health Technologies Pvt. Ltd. (QUBE)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PUNE PAYMENT","",0,0,"",0.0,"","Government","PUNE PAYMENT","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Pune Municipal Corporation(PMC)","",0,0,"",0.0,"","Government","Pune Municipal Corporation(PMC)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PSU-SBI","",0,0,"",0.0,"","Government","PSU-SBI","","","","Company","","","",0,"","","","","","",0,0,"","","","","SBI LHO,LHO BBSR","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Pradhan Mantri Jeevan Jyoti Bima Yojana(PMJJBY)","",0,0,"",0.0,"","Government","Pradhan Mantri Jeevan Jyoti Bima Yojana(PMJJBY)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Practo technologies Pvt Ltd","",0,0,"",0.0,"","Corporate","Practo technologies Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PPT","",0,0,"",0.0,"","Government","PPT","","","","Company","","","",0,"","","","","","",0,0,"","","","","PARADIP PORT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PPL","",0,0,"",0.0,"","Government","PPL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Powergrid Corporation of India Ltd","",0,0,"",0.0,"","Government","Powergrid Corporation of India Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","POWER GRID","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Post Office","",0,0,"",0.0,"","Government","Post Office","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PMJAY","",0,0,"",0.0,"","Government","PMJAY","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PLUS HEALTH TECH","",0,0,"",0.0,"","Corporate","PLUS HEALTH TECH","","","","Company","","","",0,"","","","","","",0,0,"","","","","PLUS HEALTH TECH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PHASORZ TECHNOLOGIES","",0,0,"",0.0,"","TPA/INSURANCE","PHASORZ TECHNOLOGIES","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Peerless Hospitex Hospital And Reserch Center Ltd.","",0,0,"",0.0,"","Corporate","Peerless Hospitex Hospital And Reserch Center Ltd.","","","","Company","","","",0,"","","","","","",0,0,"","","","","PEERLESS","","","en","","","","CUST-.YYYY.-",1,"","","","India","","","","","","","","","","","","","","","","",""
-"Pay & Accounts Office","",0,0,"",0.0,"","Government","Pay & Accounts Office","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"PARK MEDICLAIM INSURANCE TPA PVT LTD","",0,0,"",0.0,"","TPA/INSURANCE","PARK MEDICLAIM INSURANCE TPA PVT LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Paramount Health Services TPA Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Paramount Health Services TPA Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","PARAMOUNT","16","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Paradeep Phosphates Limited","",0,0,"",0.0,"","Government","Paradeep Phosphates Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","PARADEEP PHOSPHATES","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"P.G. CARE FOUNDATION","",0,0,"",0.0,"","Corporate","P.G. CARE FOUNDATION","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"OZONE INSTITUTE","",0,0,"",0.0,"","Government","OZONE INSTITUTE","","","","Company","","","",0,"","","","","","",0,0,"","","","","OZONE INSTITUTE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Oriental Insurance Company","",0,0,"INR",0.0,"","TPA/INSURANCE","Oriental Insurance Company","","","","Company","","","",0,"","","","","","",0,0,"","","","","ORIENTAL","3","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ONGC","",0,0,"",0.0,"","Government","ONGC","","","","Company","","","",0,"","","","","","",0,0,"","","","","OIL AND NATURAL,OIL  NATURAL GAS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"OFT","",0,0,"",0.0,"","Government","OFT","","","","Company","","","",0,"","","","","","",0,0,"","","","","ORDNANCE FACTORY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ODISHA STATE","",0,0,"",0.0,"","Government","ODISHA STATE","","","","Company","","","",0,"","","","","","",0,0,"","","","","ODISHA STATE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"OCF","",0,0,"",0.0,"","Government","OCF","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NTRVS","",0,0,"",0.0,"","Government","NTRVS","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NTPC LTD","",0,0,"",0.0,"","Government","NTPC LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NSTL","",0,0,"",0.0,"","Government","NSTL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NRRI","",0,0,"",0.0,"","Government","NRRI","","","","Company","","","",0,"","","","","","",0,0,"","","","","NRRI,NATIONAL RICE RESEARCH,CENTRAL RICE RESEARCH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NOVARTIS HEALTHCARE","",0,0,"",0.0,"","Corporate","NOVARTIS HEALTHCARE","","","","Company","","","",0,"","","","","","",0,0,"","","","","NOVARTISHEALTHCARE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NLC","",0,0,"",0.0,"","Government","NLC","","","","Company","","","",0,"","","","","","",0,0,"","","","","NLCINDIA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Niva Bupa Health Insurance","",0,0,"",0.0,"","TPA/INSURANCE","Niva Bupa Health Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","NIVABUPAHEALTH,BUPA HEALTH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Nirmal Hospital","",0,0,"",0.0,"","Corporate","Nirmal Hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NIRD (National institute of Rural Development)","",0,0,"",0.0,"","Government","NIRD (National institute of Rural Development)","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL INSTITUTE OF RURAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NIPH","",0,0,"",0.0,"","Government","NIPH","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NINL","",0,0,"",0.0,"","Government","NINL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NIMHANS","",0,0,"",0.0,"","Government","NIMHANS","","","","Company","","","",0,"","","","","","",0,0,"","","","","-NIMHANS-","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Nilachala Ispat Nigam Limited","",0,0,"",0.0,"","Government","Nilachala Ispat Nigam Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NIIST","",0,0,"",0.0,"","Government","NIIST","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NIFT","",0,0,"",0.0,"","Government","NIFT","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NICED","",0,0,"",0.0,"","Government","NICED","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"New India Assurance Company","",0,0,"",0.0,"","TPA/INSURANCE","New India Assurance Company","","","","Company","","","",0,"","","","","","",0,0,"","","","","THE NEW INDIA AS,THE NEW,NEW INDI","4","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NHA- CAPF","",0,0,"",0.0,"","Government","NHA- CAPF","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NGRI","",0,0,"",0.0,"","Government","NGRI","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Nethradhama Eye Hospital Davangere","",0,0,"",0.0,"","Corporate","Nethradhama Eye Hospital Davangere","","","","Company","","","",0,"","","","","","",0,0,"","","","","NETHRADHAMA HOSPITAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NEELACHAL ISPAT NIGAM","",0,0,"",0.0,"","Government","NEELACHAL ISPAT NIGAM","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NCL(National chemical laboratory)","",0,0,"",0.0,"","Government","NCL(National chemical laboratory)","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL CHEMICAL LABORATORY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NAVI GENERAL INSURANCE","",0,0,"",0.0,"","TPA/INSURANCE","NAVI GENERAL INSURANCE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Naval Science & Technological Laboratory (NSTL)","",0,0,"",0.0,"","Government","Naval Science & Technological Laboratory (NSTL)","","","","Company","","","",0,"","","","","","",0,0,"","","","","NSTL VIZAGAO RD","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Naval Dockyard","",0,0,"",0.0,"","Government","Naval Dockyard","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Silkworm Seed Organisation","",0,0,"",0.0,"","Government","National Silkworm Seed Organisation","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL SILKWORM SEED","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Sanskrit University(NSU)","",0,0,"",0.0,"","Government","National Sanskrit University(NSU)","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL SANSKRIT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL RICE RESEARCH","",0,0,"",0.0,"","Government","NATIONAL RICE RESEARCH","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Police Academy","",0,0,"",0.0,"","Government","National Police Academy","","","","Company","","","",0,"","","","","","",0,0,"","","","","AO  SVP NATIONAL  POLICE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Mineral Development Corporation Limited(NMDC)","",0,0,"",0.0,"","Government","National Mineral Development Corporation Limited(NMDC)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Mineral Development Corporation Limited","",0,0,"",0.0,"","Government","National Mineral Development Corporation Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Insurance Company Limited","",0,0,"",0.0,"","TPA/INSURANCE","National Insurance Company Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL INSURAN,NATIONAL INSURANCE CO,FROM NIC","2","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL INSTITUTE OF SCIENCE EDUCATION","",0,0,"",0.0,"","Government","NATIONAL INSTITUTE OF SCIENCE EDUCATION","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL INSTITUTE OF SCIENCE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL INSTITUTE OF OCEAN TECHNOLOGY","",0,0,"",0.0,"","Government","NATIONAL INSTITUTE OF OCEAN TECHNOLOGY","","","","Company","","","",0,"","","","","","",0,0,"","","","","OCEAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Institute of Nutrition","",0,0,"",0.0,"","Government","National Institute of Nutrition","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL INSTITUTE OF NUTRITION","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Institute of Mental Health and Neuro scie","",0,0,"",0.0,"","Government","National Institute of Mental Health and Neuro scie","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL INSTITUTE OF MENTAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Institute of Fashion Technology","",0,0,"",0.0,"","Government","National Institute of Fashion Technology","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Institute of Cholera and Enteric","",0,0,"",0.0,"","Government","National Institute of Cholera and Enteric","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL INSTITUTE CHOLERA AND ENTERIC","",0,0,"",0.0,"","Government","NATIONAL INSTITUTE CHOLERA AND ENTERIC","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL  INSTITUTE OF CHOLERA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL GEOPHYSICAL","",0,0,"",0.0,"","Government","NATIONAL GEOPHYSICAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL GEOPHYSICAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL FERTILIZERS","",0,0,"",0.0,"","Government","NATIONAL FERTILIZERS","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL FERTILIZERS, NFL NAYA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Council of Science Museums (NCSM)","",0,0,"",0.0,"","Government","National Council of Science Museums (NCSM)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Chemical Laboratory","",0,0,"",0.0,"","Government","National Chemical Laboratory","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Centre for Radio Astrophysics -Pune","",0,0,"",0.0,"","Government","National Centre for Radio Astrophysics -Pune","","","","Company","","","",0,"","","","","","",0,0,"","","","","TIFR-NATIONAL CENTRE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL CENTRE","",0,0,"",0.0,"","Government","NATIONAL CENTRE","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL CENTRE FOR","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL BOARD","",0,0,"",0.0,"","Government","NATIONAL BOARD","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL BOARD OF,-NBEMS-","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Atmospheric Research Laboratory(NARL)","",0,0,"",0.0,"","Government","National Atmospheric Research Laboratory(NARL)","","","","Company","","","",0,"","","","","","",0,0,"","","","","NARL PAYMENT, NATIONAL ATMOSPHERIC,-NARL-","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"National Aluminium Company Limited (NALCO)","",0,0,"",0.0,"","Government","National Aluminium Company Limited (NALCO)","","","","Company","","","",0,"","","","","","",0,0,"","","","","NATIONAL ALUMINIUM","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL ACADEMY OF AGRICULTURE RESEARCH MANAGEMEN","",0,0,"",0.0,"","Government","NATIONAL ACADEMY OF AGRICULTURE RESEARCH MANAGEMEN","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NATIONAL ACADEMY","",0,0,"",0.0,"","Government","NATIONAL ACADEMY","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NARI","",0,0,"",0.0,"","Government","NARI","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Narayana Health","",0,0,"",0.0,"","Corporate","Narayana Health","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NALCO","",0,0,"",0.0,"","Government","NALCO","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NAGARA YESHASVINI","",0,0,"",0.0,"","Government","NAGARA YESHASVINI","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"NABARD","",0,0,"",0.0,"","Government","NABARD","","","","Company","","","",0,"","","","","","",0,0,"","","","","NABARD","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Mysore District Treasury","",0,0,"",0.0,"","Government","Mysore District Treasury","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"My Healthskape Medicals Pvt Ltd","",0,0,"",0.0,"","Corporate","My Healthskape Medicals Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MUNITIONS INDIA","",0,0,"",0.0,"","Government","MUNITIONS INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","MUNITIONS INDIA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MRF Limited","",0,0,"",0.0,"","Corporate","MRF Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","MRF LIMITED","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MRD LTD","",0,0,"",0.0,"","Corporate","MRD LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MINT","",0,0,"",0.0,"","Government","MINT","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Ministry of Health and Family","",0,0,"",0.0,"","Government","Ministry of Health and Family","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MINISTRY OF HEALTH - OMAN","",0,0,"",0.0,"","Corporate","MINISTRY OF HEALTH - OMAN","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MINISTRY OF DEFENCE","",0,0,"",0.0,"","Government","MINISTRY OF DEFENCE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Minerals and Metals Trading Corporation Ltd","",0,0,"",0.0,"","Government","Minerals and Metals Trading Corporation Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","MMTC LTD, MMTC LIMITED","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Minda Industries  Limited","",0,0,"",0.0,"","Corporate","Minda Industries  Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","MINDA INDUSTRI","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"METROPOLIS HEALTH","",0,0,"",0.0,"","Corporate","METROPOLIS HEALTH","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Meh Healthcare","",0,0,"",0.0,"","Corporate","Meh Healthcare","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Meenakshi Hospital","",0,0,"",0.0,"","Corporate","Meenakshi Hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Medvantage Insurance TPA Private Limited","",0,0,"",0.0,"","TPA/INSURANCE","Medvantage Insurance TPA Private Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","MEDVANTAGE","17","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Medsave TPA Healthcare TPA Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Medsave TPA Healthcare TPA Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","MEDSA","15","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Medops Techology Pvt Ltd","",0,0,"",0.0,"","Corporate","Medops Techology Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Medisep","",0,0,"",0.0,"","Government","Medisep","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Medicare TPA Services P Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Medicare TPA Services P Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Medibuddy","",0,0,"",0.0,"","Corporate","Medibuddy","","","","Company","","","",0,"","","","","","",0,0,"","","","","PHASORZ","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Mediassist India TPA P Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Mediassist India TPA P Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","MEDIASSIST","14","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MD India Healthcare TPA Service Ltd","",0,0,"",0.0,"","TPA/INSURANCE","MD India Healthcare TPA Service Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","MDI-,MDINDIAHEA","1","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MCL","",0,0,"",0.0,"","Government","MCL","","","","Company","","","",0,"","","","","","",0,0,"","","","","-MCL-,MAHANADI COALFIELDS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Maulana Azad National Urdu University(MANUU)","",0,0,"",0.0,"","Government","Maulana Azad National Urdu University(MANUU)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ManipalCigna Health Insurance","",0,0,"",0.0,"","TPA/INSURANCE","ManipalCigna Health Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","MANIPALCIGNA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Mando Automotive India Private Limited","",0,0,"",0.0,"","Corporate","Mando Automotive India Private Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","HL MANDO ANAND","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Magnus Health Care and Research","",0,0,"",0.0,"","Corporate","Magnus Health Care and Research","","","","Company","","","",0,"","","","","","",0,0,"","","","","Magnus Health","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MAGMA HDI GENERAL","",0,0,"",0.0,"","TPA/INSURANCE","MAGMA HDI GENERAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","MAGMA HDI GENER, MAGMA HDI GE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MADURA COATS LTD","",0,0,"",0.0,"","Corporate","MADURA COATS LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","MADURA COATS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"MADRAS FERTILIZERS LTD","",0,0,"",0.0,"","Government","MADRAS FERTILIZERS LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","MADRAS FERTILISERS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"LOTUS FOOTWEAR","",0,0,"",0.0,"","Corporate","LOTUS FOOTWEAR","","","","Company","","","",0,"","","","","","",0,0,"","","","","LOTUS FOOTWEAR,LOTUS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Liberty General Insurance Limited","",0,0,"",0.0,"","TPA/INSURANCE","Liberty General Insurance Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","LIBERTY GENERAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"L & T","",0,0,"",0.0,"","Corporate","L & T","","","","Company","","","",0,"","","","","","",0,0,"","","","","LARSEN AND TOUBRO, LARSEN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KOTAK MAHINDRA","",0,0,"",0.0,"","TPA/INSURANCE","KOTAK MAHINDRA","","","","Company","","","",0,"","","","","","",0,0,"","","","","KOTAK MAHINDRA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Konkan Railway","",0,0,"",0.0,"","Government","Konkan Railway","","","","Company","","","",0,"","","","","","",0,0,"","","","","KRCL-DR,KIOCL LIMITED,KONKAN RAILWAY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KASP-PMJAY","",0,0,"",0.0,"","Government","KASP-PMJAY","","","","Company","","","",0,"","","","","","",0,0,"","","","","STATE HEALTH AGENCY KARUNYA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Karnataka Soaps and Detergents Limited","",0,0,"",0.0,"","Government","Karnataka Soaps and Detergents Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","KARNATAKA SOAP","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KARNATAKA ROAD TRANSPORT","",0,0,"",0.0,"","Government","KARNATAKA ROAD TRANSPORT","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KARNATAKA POLICE","",0,0,"",0.0,"","Government","KARNATAKA POLICE","","","","Company","","","",0,"","","","","","",0,0,"","","","","KARNATAKA STATE EX POLICE, KARNATAKA POLICE,
-SECRETARY KARNATAKA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Kamarajar Port limited","",0,0,"",0.0,"","Government","Kamarajar Port limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"KALEESWARI REFINARY","",0,0,"",0.0,"","Corporate","KALEESWARI REFINARY","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"JSW Steel Works","",0,0,"",0.0,"","Corporate","JSW Steel Works","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"JNPT Hindal co","",0,0,"",0.0,"","Government","JNPT Hindal co","","","","Company","","","",0,"","","","","","",0,0,"","","","","JAWAHARLAL NEHRU PORT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"JDS FOOD PRODUCTS","",0,0,"",0.0,"","Corporate","JDS FOOD PRODUCTS","","","","Company","","","",0,"","","","","","",0,0,"","","","","Food corporation","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Jain Asharya","",0,0,"",0.0,"","Corporate","Jain Asharya","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"J.K.FENNER INDIA","",0,0,"",0.0,"","Corporate","J.K.FENNER INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","J K FENNER  INDIA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IVRI","",0,0,"",0.0,"","Government","IVRI","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IUCAA","",0,0,"",0.0,"","Government","IUCAA","","","","Company","","","",0,"","","","","","",0,0,"","","","","INTER-UNIVERSITY CENTRE,INTER UNIVERSITY CENTRE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ITD CEMENTATION","",0,0,"",0.0,"","Corporate","ITD CEMENTATION","","","","Company","","","",0,"","","","","","",0,0,"","","","","ITD CEMENTATION","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Integral Coach Factory ( ICF )","",0,0,"",0.0,"","Government","Integral Coach Factory ( ICF )","","","","Company","","","",0,"","","","","","",0,0,"","","","","ICF","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Institute Of Physics","",0,0,"",0.0,"","Government","Institute Of Physics","","","","Company","","","",0,"","","","","","",0,0,"","","","","INSTITUTE OF PHYSICS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Institute of Mathematical Sciences","",0,0,"",0.0,"","Government","Institute of Mathematical Sciences","","","","Company","","","",0,"","","","","","",0,0,"","","","","INSTITUTE OF MATHEMATICAL SCIENCES","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"INS Rajali","",0,0,"",0.0,"","Government","INS Rajali","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Indian Space Research Organisation(ISRO)","",0,0,"",0.0,"","Government","Indian Space Research Organisation(ISRO)","","","","Company","","","",0,"","","","","","",0,0,"","","","","ISRO  PROPULSION, LIQUID PROPULSION, SPACE APPLICATIONS CENTRE,SPACE APPLICATIONS,U R RAO SATELLITE CENTRE,HARITA FEHRER,ISRO","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Indian Ordnance Factories","",0,0,"",0.0,"","Government","Indian Ordnance Factories","","","","Company","","","",0,"","","","","","",0,0,"","","","","ORDINANCE FACTORY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Indian Oil Corporation Ltd","",0,0,"",0.0,"","Government","Indian Oil Corporation Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","INDIAN OIL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"INDIAN JAPAN LIGHTING PVT LTD","",0,0,"",0.0,"","Corporate","INDIAN JAPAN LIGHTING PVT LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Indian Institute of Horticultural Research","",0,0,"",0.0,"","Government","Indian Institute of Horticultural Research","","","","Company","","","",0,"","","","","","",0,0,"","","","","INDIAN INSTITUTE OF HORTICULTURAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"INDIAN INSTITUTE OF CHEMICAL","",0,0,"",0.0,"","Government","INDIAN INSTITUTE OF CHEMICAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"INDIAN ADDITIVE LIMITED","",0,0,"",0.0,"","Government","INDIAN ADDITIVE LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"India Security Press(ISP)","",0,0,"",0.0,"","Government","India Security Press(ISP)","","","","Company","","","",0,"","","","","","",0,0,"","","","","INDIA SECURITY PRESS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IMSC","",0,0,"",0.0,"","Government","Institute of Mathematical Sciences","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IITM","",0,0,"",0.0,"","Government","IITM","","","","Company","","","",0,"","","","","","",0,0,"","","","","IIT MADRAS, IITM","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IIMR","",0,0,"",0.0,"","Government","IIMR","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IFFCO TOKIO GENERAL INSURANCE COMPANY","",0,0,"",0.0,"","TPA/INSURANCE","IFFCO TOKIO GENERAL INSURANCE COMPANY","","","","Company","","","",0,"","","","","","",0,0,"","","","","IFFCO-TOKIO,IFFCO TOK,IFFCO-TOK","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IFFCO PARADEEP","",0,0,"",0.0,"","Corporate","IFFCO PARADEEP","","","","Company","","","",0,"","","","","","",0,0,"","","","","IFFCO PARADEEP","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"IFFCO KISAN SEWA","",0,0,"",0.0,"","Corporate","IFFCO KISAN SEWA","","","","Company","","","",0,"","","","","","",0,0,"","","","","IFFCO KISAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ICMR- National Institute of Nutrition (NIN)","",0,0,"",0.0,"","Government","ICMR- National Institute of Nutrition (NIN)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ICICI Prudential General Insurance","",0,0,"",0.0,"","TPA/INSURANCE","ICICI Prudential General Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ICICI Lombard General Insurance","",0,0,"",0.0,"","TPA/INSURANCE","ICICI Lombard General Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","ICICI LOMBARD","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ICICI Lombard Camp","",0,0,"",0.0,"","Corporate","ICICI Lombard Camp","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ICAR","",0,0,"",0.0,"","Government","ICAR","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"I Care Health ManagementTPA Ltd","",0,0,"",0.0,"","TPA/INSURANCE","I Care Health ManagementTPA Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Hyundai","",0,0,"",0.0,"","Corporate","Hyundai","","","","Company","","","",0,"","","","","","",0,0,"","","","","HYUNDAI MOTOR INDIA LIMITED","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HVF / OCF","",0,0,"",0.0,"","Government","HVF / OCF","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HVF","",0,0,"",0.0,"","Government","HVF","","","","Company","","","",0,"","","","","","",0,0,"","","","","THE HVF EMP","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HUDCO","",0,0,"",0.0,"","Government","HUDCO","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HPO","",0,0,"",0.0,"","Government","HPO","","","","Company","","","",0,"","","","","","",0,0,"","","","","HPO-HEALTH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HPL (Hindustan Platinum LTD)","",0,0,"",0.0,"","Corporate","HPL (Hindustan Platinum LTD)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HPCL","",0,0,"",0.0,"","Government","HPCL","","","","Company","","","",0,"","","","","","",0,0,"","","","","HINDUSTAN PETROLEUM","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HORTICULTURAL RESEARCH","",0,0,"",0.0,"","Government","HORTICULTURAL RESEARCH","","","","Company","","","",0,"","","","","","",0,0,"","","","","HORTICULTURAL RESEARCH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HINDALCO","",0,0,"",0.0,"","Corporate","HINDALCO","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HIGH COURT","",0,0,"",0.0,"","Government","HIGH COURT","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HI TECH","",0,0,"",0.0,"","Corporate","HI TECH","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HESCOM","",0,0,"",0.0,"","Government","HESCOM","","","","Company","","","",0,"","","","","","",0,0,"","","","","HESCOM","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Hero MotoCorp Ltd","",0,0,"",0.0,"","Corporate","Hero MotoCorp Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","HERO MOTOCORP","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Heritage Health TPA P Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Heritage Health TPA P Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","HERITAGEHE","13","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HELYXON HEALTHCARE","",0,0,"",0.0,"","Corporate","HELYXON HEALTHCARE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Heavy Water Plant (Talcher RTI)","",0,0,"",0.0,"","Government","Heavy Water Plant (Talcher RTI)","","","","Company","","","",0,"","","","","","",0,0,"","","","","HEAVY WATER PLANT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Heavy Alloy Penetrator Project (HAPP)","",0,0,"",0.0,"","Government","Heavy Alloy Penetrator Project (HAPP)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Health Insurance TPA of India Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Health Insurance TPA of India Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Health India Insurance TPA","",0,0,"",0.0,"","TPA/INSURANCE","Health India Insurance TPA","","","","Company","","","",0,"","","","","","",0,0,"","","","","health insu","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Health Assure Private Limited","",0,0,"",0.0,"","Corporate","Health Assure Private Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","HEALTHASSURE PVT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"HDFC ERGO GENERAL INSURANCE CO LTD","",0,0,"",0.0,"","TPA/INSURANCE","HDFC ERGO GENERAL INSURANCE CO LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","HDFC ERGO GENE,ICICIPRUDENTIAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Harita Fehrer Limited","",0,0,"",0.0,"","Corporate","Harita Fehrer Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Grand Insurance TPA  Pvt Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Grand Insurance TPA  Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"GOOD HEALTH INSURANCE TPA LIMITED","",0,0,"",0.0,"","TPA/INSURANCE","GOOD HEALTH INSURANCE TPA LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","GOODHEALTH","11","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"GODIGIT GENERAL","",0,0,"",0.0,"","TPA/INSURANCE","GODIGIT GENERAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","GO DIGIT,22205593,GO DIGI","5","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Genins India TPA Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Genins India TPA Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"General Post Office","",0,0,"",0.0,"","Government","General Post Office","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"GAIL","",0,0,"",0.0,"","Government","GAIL","","","","Company","","","",0,"","","","","","",0,0,"","","","","GAIL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"GA INSURANCE","",0,0,"",0.0,"","TPA/INSURANCE","GA INSURANCE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Future Generali General Insurance","",0,0,"",0.0,"","TPA/INSURANCE","Future Generali General Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","FUTURE GENERALI","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Fritzmeier Motherson Cabin Engineering Private Lim","",0,0,"",0.0,"","Corporate","Fritzmeier Motherson Cabin Engineering Private Lim","","","","Company","","","",0,"","","","","","",0,0,"","","","","FRITZMEIER MOT,FRITZMEIER","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Fortis Hospital","",0,0,"",0.0,"","Corporate","Fortis Hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","FORTIS HOSPITALS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"FOOD CORPORATION OF INDIA","",0,0,"",0.0,"","Government","FOOD CORPORATION OF INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","FCI DO, FOOD CORPOR , FCI LIMITED","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Family Health Plan TPA Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Family Health Plan TPA Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","FAMILYHEAL","12","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"FA & CAO","",0,0,"",0.0,"","Government","FA & CAO","","","","Company","","","",0,"","","","","","",0,0,"","","","","FA AND CAO","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Exide General Insurance","",0,0,"",0.0,"","TPA/INSURANCE","Exide General Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Exide","",0,0,"",0.0,"","Corporate","Exide","","","","Company","","","",0,"","","","","","",0,0,"","","","","EXIDE INDUSTRIES","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ESSAR PORT LTD","",0,0,"",0.0,"","Corporate","ESSAR PORT LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ESSAR FOUNDATION","",0,0,"",0.0,"","Corporate","ESSAR FOUNDATION","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Essar Bulk Terminal Paradip Limited","",0,0,"",0.0,"","Corporate","Essar Bulk Terminal Paradip Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ESIC","",0,0,"",0.0,"","Govt - Specific","ESIC","","","","Company","","","",0,"","","","","","",0,0,"","","","","ESIC,ODISHA STATE TREASURY,HUBLI DIST TREASURY,MYSORE DISTRICT TREASURY,GOVT OF TAMILNADU,DIRECTORATE OF TREASURIES,MAHARASHTRA EMPLOYEES STATE,ESI,DIRECTOR OF TREASURIES,DISTRICT TREASURY OFFICE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Ericson Insurance TPA Pvt Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Ericson Insurance TPA Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","ERICSONINS","10","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"EPFO","",0,0,"",0.0,"","Government","EPFO","","","","Company","","","",0,"","","","","","",0,0,"","","","","-EPF","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"English and Foreign Languages University(EFLU)","",0,0,"",0.0,"","Government","English and Foreign Languages University(EFLU)","","","","Company","","","",0,"","","","","","",0,0,"","","","","THE ENGLISH AND FOREIGN,REGISTRAR EFLU","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Employees Health Scheme -EHS","",0,0,"",0.0,"","Govt - Specific","Employees Health Scheme -EHS","","","","Company","","","",0,"","","","","","",0,0,"","","","","ANDHRA PRADESH TREAS,DISTRICT TREASURY OFFICE,Treasury ePayment,YSRAHCARETRUST","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Empathy foundation","",0,0,"",0.0,"","Corporate","Empathy foundation","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Edelweiss General Insurance","",0,0,"",0.0,"","TPA/INSURANCE","Edelweiss General Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","EDELWEISS GENERAL,EGICL PAYMENTS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ECHS","",0,0,"",0.0,"","Govt - Specific","ECHS","","","","Company","","","",0,"","","","","","",0,0,"","","","","PCDA,SECUNDERABAD,SBIN0000TBU,Ministry of Defence,CDA CHENNAI,PAO COMM OF CUSTOMS,Ministry of MAHB,Min of Def,DGNPDGNP,WAGES SECTIO,INDIA GOVT M,SECTIO,MU//WAGES,NAVY MU,AAO KOLKATA,AO RD SBC VIZAGAO","9","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"EBTPL","",0,0,"",0.0,"","Government","EBTPL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Eastern Naval Command(ENC)","",0,0,"",0.0,"","Government","Eastern Naval Command(ENC)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"East Wind Foodwear","",0,0,"",0.0,"","Corporate","East Wind Foodwear","","","","Company","","","",0,"","","","","","",0,0,"","","","","EAST WIND FOOTWEAR","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Volo Health Insurance TPA Pvt Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Volo Health Insurance TPA Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"E Meditek TPA Services Ltd","",0,0,"",0.0,"","TPA/INSURANCE","E Meditek TPA Services Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Dredging Corporation of India(DCI)","",0,0,"",0.0,"","Government","Dredging Corporation of India(DCI)","","","","Company","","","",0,"","","","","","",0,0,"","","","","Dredging Corporation","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Dr. NTR VAIDYA SEVA SCHEME","",0,0,"",0.0,"","Government","Dr. NTR VAIDYA SEVA SCHEME","","","","Company","","","",0,"","","","","","",0,0,"","","","","NTR VAIDYA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Doordarshan Kendra","",0,0,"",0.0,"","Government","Doordarshan Kendra","","","","Company","","","",0,"","","","","","",0,0,"","","","","Doordarshan Kendra","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"District Blindness Control Society","",0,0,"",0.0,"","Government","District Blindness Control Society","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"DIGITOTECH","",0,0,"",0.0,"","Corporate","DIGITOTECH","","","","Company","","","",0,"","","","","","",0,0,"","","","","DIGIOTECH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"DHFL General Insurance Company Ltd","",0,0,"",0.0,"","TPA/INSURANCE","DHFL General Insurance Company Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"DEPT OF SPACE","",0,0,"",0.0,"","Government","DEPT OF SPACE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"DEPT OF ATOMIC ENERGY","",0,0,"",0.0,"","Government","DEPT OF ATOMIC ENERGY","","","","Company","","","",0,"","","","","","",0,0,"","","","","/gso/,gso-,ATOMIC ENERGY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Dedicated Healthcare Services","",0,0,"",0.0,"","TPA/INSURANCE","Dedicated Healthcare Services","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CYIENT DLM","",0,0,"",0.0,"","Corporate","CYIENT DLM","","","","Company","","","",0,"","","","","","",0,0,"","","","","CYIENT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CURRENCY NOTE PRESS","",0,0,"",0.0,"","Government","CURRENCY NOTE PRESS","","","","Company","","","",0,"","","","","","",0,0,"","","","","CURRENCY NOTE PRESS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CSRT","",0,0,"",0.0,"","Government","CSRT","","","","Company","","","",0,"","","","","","",0,0,"","","","","CENTRAL SERICULTURAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CSMA","",0,0,"",0.0,"","Government","CSMA","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CSIR - Central Food Technological Research Institute (CFTRI)","",0,0,"",0.0,"","Government","CSIR - Central Food Technological Research Institute (CFTRI)","","","","Company","","","",0,"","","","","","",0,0,"","","","","CENTRAL FOOD TECHNOLOGICAL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CSIR","",0,0,"",0.0,"","Government","CSIR","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CPCL","",0,0,"",0.0,"","Government","CPCL","","","","Company","","","",0,"","","","","","",0,0,"","","","","CHENNAI PETROLEUM","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"COAL INDIA LIMITED","",0,0,"",0.0,"","Government","COAL INDIA LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","COAL INDIA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CNP","",0,0,"",0.0,"","Government","CNP","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CNH Primary Healthcare Services Pvt Ltd.","",0,0,"",0.0,"","Corporate","CNH Primary Healthcare Services Pvt Ltd.","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CMRF","",0,0,"",0.0,"","Government","CMRF","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CLRI","",0,0,"",0.0,"","Government","CLRI","","","","Company","","","",0,"","","","","","",0,0,"","","","","CENTRAL LEATHER RESEARCH INSTITUTE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CIPET","",0,0,"",0.0,"","Government","CIPET","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Cholamandalam Insurance","",0,0,"",0.0,"","TPA/INSURANCE","Cholamandalam Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","CHOLAMANDALAM","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CHIEF MINISTERS COMPREHENSIVE HEALTH INS SCHEME","",0,0,"",0.0,"","Govt - Specific","CHIEF MINISTERS COMPREHENSIVE HEALTH INS SCHEME","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Chennai Port Trust","",0,0,"",0.0,"","Government","Chennai Port Trust","","","","Company","","","",0,"","","","","","",0,0,"","","","","Chennai Port Trust","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CHECK","",0,0,"",0.0,"","Government","CHECK","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CGWB","",0,0,"",0.0,"","Government","CGWB","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CGHS","",0,0,"",0.0,"","Govt - Specific","CGHS","","","","Company","","","",0,"","","","","","",0,0,"","","","","UTIITSL,NACH,PAY AND ACCO,MICR,PAY AND ACCOUNT,MHFW,MHFW PAYMENT AC,UTITSL,AND ACCO,RPAO CRPF,PAO CENSUS,ACCO/PAY AND,ACCO/PAYAND,RPAO CISF,ZPAO SSB,RPAO ITBP,PAY AND,S A ANSARI,DEVENDRA KUMAR","20","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CENTRE FOR DNA FINGERPRINTING AND DIAGNOSTICS (CDFD)","",0,0,"",0.0,"","Government","CENTRE FOR DNA FINGERPRINTING AND DIAGNOSTICS (CDFD)","","","","Company","","","",0,"","","","","","",0,0,"","","","","CENTRE FOR DNA,CDFD","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Central warehousing corporation Ltd","",0,0,"",0.0,"","Government","Central warehousing corporation Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","CENTRAL WAREHOUSING CORPORATION","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Central Silk Board","",0,0,"",0.0,"","Government","Central Silk Board","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Central Reserve Police Force (CRPF)","",0,0,"",0.0,"","Government","Central Reserve Police Force (CRPF)","","","","Company","","","",0,"","","","","","",0,0,"","","","","CRPF","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Central Institute of Plastics Engineering & Technology","",0,0,"",0.0,"","Government","Central Institute of Plastics Engineering & Technology","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Central Institute Of Freshwater Aquaculture(CIFA)","",0,0,"",0.0,"","Government","Central Institute Of Freshwater Aquaculture(CIFA)","","","","Company","","","",0,"","","","","","",0,0,"","","","","CENTRAL INSTITUTE OF FRESHWATER","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CENTRAL INDUSTRIAL SECURITY FORCE(CISF)","",0,0,"",0.0,"","Government","CENTRAL INDUSTRIAL SECURITY FORCE(CISF)","","","","Company","","","",0,"","","","","","",0,0,"","","","","CISF","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Central Armed Police Forces","",0,0,"",0.0,"","Government","Central Armed Police Forces","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CDFD","",0,0,"",0.0,"","Government","CDFD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CATERPILLAR INDIA PVT LTD","",0,0,"",0.0,"","Corporate","CATERPILLAR INDIA PVT LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Care Health Insurance Limited","",0,0,"",0.0,"","TPA/INSURANCE","Care Health Insurance Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","Care Health,Care Health INS, CARE HEALTH INSURANC,00030350015860","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BVY VSKP","",0,0,"",0.0,"","Government","BVY VSKP","","","","Company","","","",0,"","","","","","",0,0,"","","","","BVYVSKP","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BSNL","",0,0,"",0.0,"","Government","BSNL","","","","Company","","","",0,"","","","","","",0,0,"","","","","BSNL, BHARATSANCHARNIGAMLD, BHARATSANNIGLDTN, BHARAT SANCHAR NIGAM","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BRITANNIA","",0,0,"",0.0,"","Corporate","BRITANNIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BPCL","",0,0,"",0.0,"","Government","BPCL","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bosch","",0,0,"",0.0,"","Corporate","Bosch","","","","Company","","","",0,"","","","","","",0,0,"","","","","BOSCH LIMITED","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BMTC","",0,0,"",0.0,"","Government","BMTC","","","","Company","","","",0,"","","","","","",0,0,"","","","","BANGALORE METROPOLITAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Biju Swasthya Kalyan Yojana (BSKY)","",0,0,"",0.0,"","Government","Biju Swasthya Kalyan Yojana (BSKY)","","","","Company","","","",0,"","","","","","",0,0,"","","","","CPSMSBKID","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BIAL","",0,0,"",0.0,"","Government","BIAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","BIAL, BANGALORE INTERNATIONAL AIRPORT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bharti AXA Insurance","",0,0,"",0.0,"","TPA/INSURANCE","Bharti AXA Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","BHARTI AXA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bharath Heavy Electricals ltd","",0,0,"",0.0,"","Government","Bharath Heavy Electricals ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","bhel,BHARAT HEAVY","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bhabha Atomic Research Center(BARC)","",0,0,"",0.0,"","Government","Bhabha Atomic Research Center(BARC)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BGS Gleneagles Global Hospitals","",0,0,"",0.0,"","Corporate","BGS Gleneagles Global Hospitals","","","","Company","","","",0,"","","","","","",0,0,"","","","","RAVINDRANATH GE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BCG Vaccine Laboratory","",0,0,"",0.0,"","Government","BCG Vaccine Laboratory","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BBMP","",0,0,"",0.0,"","Government","BBMP","","","","Company","","","",0,"","","","","","",0,0,"","","","","bbmp","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"BATA India Limited","",0,0,"",0.0,"","Corporate","BATA India Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","bata","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bangalore Water Supply and Sewerage Board","",0,0,"",0.0,"","Government","Bangalore Water Supply and Sewerage Board","","","","Company","","","",0,"","","","","","",0,0,"","","","","BWSSB","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bajaj Finance Limited","",0,0,"",0.0,"","Corporate","Bajaj Finance Limited","","","","Company","","","",0,"","","","","","",0,0,"","","","","BAJAJ FINANCE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Bajaj Allianz General Insurance","",0,0,"",0.0,"","TPA/INSURANCE","Bajaj Allianz General Insurance","","","","Company","","","",0,"","","","","","",0,0,"","","","","bajaj allianz,BAJAJ ALLIAN","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AYUSHMAN CAPFS NHA","",0,0,"",0.0,"","Government","AYUSHMAN CAPFS NHA","","","","Company","","","",0,"","","","","","",0,0,"","","","","PAO AYUSHMAN CAPF,AYUSHMAN CAPFS NH","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AYUSHMAN BHARAT YOJANA","",0,0,"",0.0,"","Government","AYUSHMAN BHARAT YOJANA","","","","Company","","","",0,"","","","","","",0,0,"","","","","AYUSHMAN BHARAT, ABPMJAY, AYUSHMAN BH","8","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AYU health care hospital","",0,0,"",0.0,"","Corporate","AYU health care hospital","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AWP SERVICES (INDIA) PRIVATE LIMITED","",0,0,"",0.0,"","Corporate","AWP SERVICES (INDIA) PRIVATE LIMITED","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AV Tech","",0,0,"",0.0,"","Corporate","AV Tech","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Ashok Leyland","",0,0,"",0.0,"","Corporate","Ashok Leyland","","","","Company","","","",0,"","","","","","",0,0,"","","","","ASHOK LEYLAND","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ASCO NUMAICS","",0,0,"",0.0,"","Corporate","ASCO NUMAICS","","","","Company","","","",0,"","","","","","",0,0,"","","","","ASCO NUMATICS","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AROGYA SAHAYATHA SCHEME(ASS)","",0,0,"",0.0,"","Government","AROGYA SAHAYATHA SCHEME(ASS)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AROGYA BHAGYA YOJANE","",0,0,"",0.0,"","Government","AROGYA BHAGYA YOJANE","","","","Company","","","",0,"","","","","","",0,0,"","","","","AROGYA BHAGYA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AROGYA BHADRATHA SCHEME (ABS)","",0,0,"",0.0,"","Government","AROGYA BHADRATHA SCHEME (ABS)","","","","Company","","","",0,"","","","","","",0,0,"","","","","AROGYA BHADRATHA, BHADRATHA","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"APOLLO PRIME EYE HOSPITALS","",0,0,"",0.0,"","Corporate","APOLLO PRIME EYE HOSPITALS","","","","Company","","","",0,"","","","","","",0,0,"","","","","APOLLO PRIME","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Apollo Munich Health Insurance Co. Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Apollo Munich Health Insurance Co. Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","APOLLO Health","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AP TREASURY","",0,0,"",0.0,"","Government","AP TREASURY","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Anmol Medicare Insurance (TPA) Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Anmol Medicare Insurance (TPA) Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Anishi Andaman","",0,0,"",0.0,"","Corporate","Anishi Andaman","","","","Company","","","",0,"","","","","","",0,0,"","","","","DIRECTORATE OF HEALTH SERVICES","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Andhra Pradesh State Road Transport Corporation(APSRTC)","",0,0,"",0.0,"","Government","Andhra Pradesh State Road Transport Corporation(APSRTC)","","","","Company","","","",0,"","","","","","",0,0,"","","","","APSRTC","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ALINEA HEALTHCARE","",0,0,"",0.0,"","Corporate","ALINEA HEALTHCARE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Alankit Healthcare TPA Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Alankit Healthcare TPA Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AIRPORT AUTHORITY OF INDIA","",0,0,"",0.0,"","Government","AIRPORT AUTHORITY OF INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","AIRPORTS AUTHORITY OF INDIA,
-AIRPORTAUTHORITYOFINDIA,AAI PORT","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AIR INDIA","",0,0,"",0.0,"","Government","AIR INDIA","","","","Company","","","",0,"","","","","","",0,0,"","","","","AIR INDIA,AIAHL","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AIR FORCE","",0,0,"",0.0,"","Government","AIR FORCE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AIIPMR","",0,0,"",0.0,"","Government","AIIPMR","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Agroha Vikas Trust","",0,0,"",0.0,"","Corporate","Agroha Vikas Trust","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AGMOAD","",0,0,"",0.0,"","Corporate","AGMOAD","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AFK","",0,0,"",0.0,"","Corporate","AFK","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AFCONS","",0,0,"",0.0,"","Corporate","AFCONS","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Aditya Birla Health insurance Company Ltd","",0,0,"",0.0,"","TPA/INSURANCE","Aditya Birla Health insurance Company Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","ABHICL,Aditya Birla","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ACKO GENERAL","",0,0,"",0.0,"","TPA/INSURANCE","ACKO GENERAL","","","","Company","","","",0,"","","","","","",0,0,"","","","","ACKO GENER, ACKO, ACKOGENE","6","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AB SPF TS","",0,0,"",0.0,"","Government","AB SPF TS","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AAVIN","",0,0,"",0.0,"","Government","AAVIN","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AASANDHA COMPANY LTD","",0,0,"",0.0,"","Corporate","AASANDHA COMPANY LTD","","","","Company","","","",0,"","","","","","",0,0,"","","","","MINISTRY OF FINANCE","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Aarogyasri-Healthcare- Trust","",0,0,"",0.0,"","Government","Aarogyasri-Healthcare- Trust","","","","Company","","","",0,"","","","","","",0,0,"","","","","YSR AAROGYASRI, YSRAHCT,DRUSHTINAY,ACH C-","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"AAROGYA INDIA HEALTH","",0,0,"",0.0,"","Government","AAROGYA INDIA HEALTH","","","","Company","","","",0,"","","","","","",0,0,"","","","","aarogyaindiahealth","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"ROYAL SUNDARAM","",0,0,"",0.0,"","TPA/INSURANCE","ROYAL SUNDARAM","","","","Company","","","",0,"","","","","","",0,0,"","","","","ROYAL SUNDAR","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"GENERAL INSURANCE","",0,0,"",0.0,"","TPA/INSURANCE","GENERAL INSURANCE","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Institute of Minerals and Materials Technology(IMMT)","",0,0,"",0.0,"","Government","Institute of Minerals and Materials Technology(IMMT)","","","","Company","","","",0,"","","","","","",0,0,"","","","","instituteofminerals","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"CUMI","",0,0,"",0.0,"","Corporate","CUMI","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"High Explosive Factory Khadki (HEFK)","",0,0,"",0.0,"","Government","High Explosive Factory Khadki (HEFK)","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Company Due","",0,0,"",0.0,"","Government","Medisep","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Shri Ranchhodraiji Maharaj Mandir Gaushala Trust","",0,0,"",0.0,"","Corporate","Shri Ranchhodraiji Maharaj Mandir Gaushala Trust","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
-"Livonta Global Pvt Ltd","",0,0,"",0.0,"","Corporate","Livonta Global Pvt Ltd","","","","Company","","","",0,"","","","","","",0,0,"","","","","","","","en","","","","CUST-.YYYY.-",0,"","","","India","","","","","","","","","","","","","","","","",""
+ID,Customer Group,Customer Name,Customer Type,Payer Match,Payer Priority,Territory
+Satish Dhawan Space Centre(SDSC),Government,Satish Dhawan Space Centre(SDSC),Company,,,India
+Regional Directorate of Skill Development and Entrepreneurship,Government,Regional Directorate of Skill Development and Entrepreneurship,Company,,,India
+Mahavir hospital,Corporate,Mahavir hospital,Company,,,India
+IIT Tirupathi,Government,IIT Tirupathi,Company,,,India
+MADRAS REGIONAL PURCHASE UNIT,Government, MADRAS REGIONAL PURCHASE UNIT,Company,,,India
+Early Salary Services Private Limited,Corporate,Early Salary Services Private Limited,Company,,,India
+CHECKMED PRIVATE LIMITED,Corporate,CHECKMED PRIVATE LIMITED,Company,,,India
+Dhiren Eye Care,Corporate,Dhiren Eye Care,Company,,,India
+National Institute of Fashion Technology(NIFT),Government,National Institute of Fashion Technology(NIFT),Company,,,India
+Research Centre Imarat (RCI),Government,Research Centre Imarat (RCI),Company,,,India
+Indian Institute of Science Education and Research(IISER),Government,Indian Institute of Science Education and Research(IISER),Company,,,India
+AYU Health,Corporate,AYU Health,Company,,,India
+ICMR - NIRT (National Institute for Research in Tuberculosis ),Government,ICMR - NIRT (National Institute for Research in Tuberculosis ),Company,,,India
+CENTRAL SERICULTURE RESEARCH AND TRAINING,Government,CENTRAL SERICULTURE RESEARCH AND TRAINING,Company,,,India
+IIT BHUBANESWAR,Government,IIT BHUBANESWAR,Company,,,India
+Guest,Commercial,Guest,Individual,,,All Territories
+ENGINEERS INDIA LIMITED,Government,ENGINEERS INDIA LIMITED,Company,,,India
+Institute of Hotel Management(IHM),Corporate,Institute of Hotel Management(IHM),Company,,,India
+Healthindia Insurance TPA Services Pvt Ltd,TPA/INSURANCE,Healthindia Insurance TPA Services Pvt Ltd,Company,,7,India
+Safeway Insurance TPA Pvt Ltd,All Customer Groups,Safeway Insurance TPA Pvt Ltd,Company,,,All Territories
+NIPER,Government,NIPER,Company,,,India
+Central Salt and Marine Chemicals Research Institute(CSMCRI),Government,Central Salt and Marine Chemicals Research Institute(CSMCRI),Company,,,India
+Bharat Earth Movers Limited,Government,Bharat Earth Movers Limited,Company,,,India
+Connect and Heal Primary Care Pvt. Ltd,Corporate,Connect and Heal Primary Care Pvt. Ltd ,Company,,,India
+National Small Industries Corporation (NSIC),Government,National Small Industries Corporation (NSIC),Company,,,India
+TTK PRESTIGE LTD,Corporate,TTK PRESTIGE LTD,Company,,,India
+National Institute of Epidemiology,Government,National Institute of Epidemiology,Company,,,India
+KARNATAKA FIRE,Government,KARNATAKA FIRE,Company,KAR FIRE,,India
+POSTAL,Government,POSTAL,Company,DIR OF ACCTS POSTAL,,India
+ITBP - Patna,Government,ITBP - Patna,Company,,,India
+512 army base,Government,512 army base,Company,,,India
+CENSUS,Government,CENSUS,Company,,,India
+AAROGYASRI,Government,AAROGYASRI,Company,,,India
+Sashastra Seema Bal (SSB),Government,Sashastra Seema Bal (SSB),Company,,,India
+SALARJUNG MUSEUM,Government,SALARJUNG MUSEUM,Company,,,India
+NATIONAL INSTITUTE OF VIROLOGY,Government,NATIONAL INSTITUTE OF VIROLOGY,Company,NATIONAL INSTITUTE OF VIROLOGY,,India
+NWKRTC,Government,NWKRTC,Company,NWKRTC,,India
+KSRTC,Government,KSRTC,Company,,,India
+KAYNES TECHNOLOGIES,Corporate,KAYNES TECHNOLOGIES,Company,KAYNES TECHNOLOGY,,India
+LIFETIME WELLNESS,Corporate,LIFETIME WELLNESS,Company,LIFETIME WELLNESS,,India
+KFES WELFARE TRUST,Corporate,KFES WELFARE TRUST,Company,KFESWELFARETRUST,,India
+HUMAN SPACE FLIGHT CENTRE,Government,HUMAN SPACE FLIGHT CENTRE,Company,HUMAN SPACE FLIGHT,,India
+CENTRAL RICE RESEARCH INSTITUTE,Government,CENTRAL RICE RESEARCH INSTITUTE,Company,CRRI,,India
+Government(AG),Government,Government(AG),Company,"THE REGISTRAR R S VIDYAPEETHA,AMD BANGALORE,ZAO  CBDT,INDIA GOVERNMENT MINT,VENKAT LAXMAN RAO B S,AO GE UTILITY,BULK POSTING,MMNSSBYBLADA,CHEQUE DEPOSIT/HYDERABAD,SP  CBI  ACB  HYDERABAD,AGMOAD,DEPUTY DIRECTOR FINANCE,DISTRICT TREAS,EMPLOYEES PROVIDENT FUND,AAO ARMY VIZAGAAO ARMY,DEPUTY DIR,PUBLIC FUND OF,AG AANDE  ANDHRA PRADESH",,India
+Corporates,Corporate,Corporate(AG),Company,"NODAL ACCOUNTMEDOPS, Curebay,MSDR",,India
+Indian Institute of technology (IIT),Government,Indian Institute of technology (IIT),Company,,,India
+National Programme for Control of Blindness(NPCB),Government,National Programme for Control of Blindness(NPCB),Company,,,India
+SWAZILAND PRINCESS,Corporate,SWAZILAND PRINCESS,Company,,,India
+IITM (INDIAN INSTITUTE OF TROPICAL METEOROLOGY),Government,IITM (INDIAN INSTITUTE OF TROPICAL METEOROLOGY),Company,,,India
+CWL,Government,CWL,Company,,,India
+Cordite Company,Government,Cordite Company,Company,CF EMPLOYEES,,India
+Manual,All Customer Groups,Manual,Company,,,India
+Saha Institute of Nuclear Physics(SINP),Government,Saha Institute of Nuclear Physics(SINP),Company,saha institute,,India
+Birla Eye Hospital,Corporate,Birla Eye Hospital,Company,,,India
+Mumba Port Trust(MPT),Government,Mumba Port Trust(MPT),Company,,,India
+ICMR(Indian Council of Medical Research),Government,ICMR(Indian Council of Medical Research),Company,INDIAN INSTITUTE OF MILLETS,,India
+Svass Wellness Limited,Corporate,Svass Wellness Limited,Company,SVAAS WELLNESS,,India
+Rainbow Childrens Hospital,Corporate,Rainbow Childrens Hospital,Company,,,India
+Health India Insurance TPA Services Pvt Ltd,TPA/INSURANCE,Health India Insurance TPA Services Pvt Ltd,Company,HEALTHINDI,,India
+Nilkamal Limited,Corporate,Nilkamal Limited,Company,Nilkamal Limited,,India
+Germanten Hospital,Corporate,Germanten Hospital,Company,,,India
+EAST COAST RAILWAYS,Government,EAST COAST RAILWAYS,Company,ECORMEDICA,,India
+BIRLA INDUSTRIAL & TECHNOLOGICAL MUSEUM,Government,BIRLA INDUSTRIAL & TECHNOLOGICAL MUSEUM,Company,,,India
+ZUNO GENERAL INSURANCE,TPA/INSURANCE,ZUNO GENERAL INSURANCE,Company,ZUNO GENERAL,,India
+YESHASVINI,Government,YESHASVINI,Company,YASHASVINI,,India
+Working Journalist Health Scheme,Government,Working Journalist Health Scheme,Company,,,India
+WABCO INDIA LIMITED,Corporate,WABCO INDIA LIMITED,Company,,,India
+VISAKHAPATNAM PORT TRUST - VPT,Government,VISAKHAPATNAM PORT TRUST - VPT,Company,"VSKP PORT,VISAKHAPATNAM PORT,VISAKHAPATNAM,AO VSP PARKIN,VSKP PORT,AO, VSP",,India
+Visakha Steel Plant,Government,Visakha Steel Plant,Company,RASHTRIYA ISPAT,,India
+Vipul Medcorp TPA P Ltd,TPA/INSURANCE,Vipul Medcorp TPA P Ltd,Company,VIPULMEDCO,,India
+VIJAY SAI HEALTH,Corporate,VIJAY SAI HEALTH,Company,,,India
+VIJAY HOSPITAL,Corporate,VIJAY HOSPITAL,Company,,,India
+VIDAL HEALTH TPA PVT LTD,TPA/INSURANCE,VIDAL HEALTH TPA PVT LTD,Company,VIDAL,,India
+Victoria Memorial Hall,Government,Victoria Memorial Hall,Company,VICTORIA MEMORIAL,,India
+VH MEDCARE,Corporate,VH MEDCARE,Company,VH MEDCARE,,India
+VAINAM HEALTH TECH,Corporate,VAINAM HEALTH TECH,Company,VIANAMHEALTHTECH,,India
+V.O.C CHIDAMARANAR PORT TRUST,Government,V.O.C CHIDAMARANAR PORT TRUST,Company,V O  CHIDAMBARANAR PORT,,India
+UPSBKS,Government,UPSBKS,Company,UTTAR PRADESH SWASTHYA BIMA KALYAN,,India
+Unofin Technologies,Corporate,Unofin Technologies,Company,,,India
+UNIVERSAL SOMPO GENERAL INSURANCE,TPA/INSURANCE,UNIVERSAL SOMPO GENERAL INSURANCE,Company,UNIVERSAL SOMPO,,India
+United Health Care- Parekh,TPA/INSURANCE,United Health Care- Parekh,Company,,,India
+United India Insurance Company,TPA/INSURANCE,United India Insurance Company,Company,"UIIC,UNITED INDIA",19,India
+TVS,Corporate,TVS,Company,,,India
+TUBE PRODUCTS OF INDIA,Corporate,TUBE PRODUCTS OF INDIA,Company,,,India
+TUBE INVESTMENTS,Corporate,TUBE INVESTMENTS,Company,TUBE INVESTMENTS,,India
+TTK Healthcare TPA Pvt Ltd,TPA/INSURANCE,TTK Healthcare TPA Pvt Ltd,Company,,,India
+TPA Receipts,TPA/INSURANCE,TPA Receipts,Company,,,India
+TNPL,Government,Tamil Nadu Newsprint and Papers Limited,Company,TNPL,,India
+Titan Industries,Corporate,Titan Industries,Company,,,India
+TITAN ENGINEERING,Corporate,TITAN ENGINEERING,Company,TITAN,,India
+TITAN COMPANY,Corporate,TITAN COMPANY,Company,TITAN,,India
+TIDC INDIA,Corporate,TIDC INDIA,Company,,,India
+Thriveni Earth Movers Pvt Ltd,Corporate,Thriveni Earth Movers Pvt Ltd,Company,,,India
+TDK India Private Limited,Corporate,TDK India Private Limited,Company,,,India
+TATA STEEL LTD,Corporate,TATA STEEL LTD,Company,TATA STEEL,,India
+TATA MOTORS LTD,Corporate,TATA MOTORS LTD,Company,TATA MOTORS,,India
+TATA COMMUNICATION LTD,Corporate,TATA COMMUNICATION LTD,Company,TATA COMMUN,,India
+TATA AIG Health Insurance,TPA/INSURANCE,TATA AIG Health Insurance,Company,TATA AIG GEN,,India
+Tamil Nadu Newsprint and Papers Limited,Government,Tamil Nadu Newsprint and Papers Limited,Company,TAMIL NADU NEWSPRINT AND PAPERS,,India
+TAB INDIA GRANITES PVT.  Limited,Corporate,TAB INDIA GRANITES PVT.  Limited,Company,TAB INDIA GRANITES,,India
+T.I. METAL FORMING,Corporate,T.I. METAL FORMING,Company,,,India
+Switching Technologies Gunther Limited,Corporate,Switching Technologies Gunther Limited,Company,,,India
+SWASTHYA BIMA YOJNA,Government,SWASTHYA BIMA YOJNA,Company,SWASTHYA BIMA YOJNA,,India
+SWASTHYA BIMA KALYAN,Government,SWASTHYA BIMA KALYAN,Company,SWASTHYA BIMA KALYAN,,India
+SUNDARAM GENERAL,Corporate,SUNDARAM GENERAL,Company,,,India
+SUNDARAM FASTENERS LTD,Corporate,SUNDARAM FASTENERS LTD,Company,SUNDRAM FAST,,India
+Sundaram Clayton,Corporate,Sundaram Clayton,Company,Sundaram Clayton,,India
+Sundaram Brake Linings Limited,Corporate,Sundaram Brake Linings Limited,Company,,,India
+Sundaram Auto Components,Corporate,Sundaram Auto Components,Company,SUNDARAM AUTO,,India
+Suhana Masala,Corporate,Suhana Masala,Company,PRAVIN MASAL,,India
+State Trading Corp Of India,Government,State Trading Corp Of India,Company,,,India
+STATE POLICE,Government,STATE POLICE,Company,,,India
+STATE HEALTH AGENCY,Government,STATE HEALTH AGENCY,Company,STATE HEALTH AGENCY,,India
+State bank of Hyderabad,Government,State bank of Hyderabad,Company,,,India
+STAR HOSPITAL,Corporate,STAR HOSPITAL,Company,,,India
+Star Health & Allied Insurance Co Ltd,TPA/INSURANCE,Star Health & Allied Insurance Co Ltd,Company,"STAR HEALTH AN,SHAICL",7,India
+SRL LIMITED,Corporate,SRL LIMITED,Company,,,India
+Sri Gokulam Health Services TPA Ltd,TPA/INSURANCE,Sri Gokulam Health Services TPA Ltd,Company,,,India
+SPORTS AUTHORITY,Government,SPORTS AUTHORITY,Company,,,India
+SPECIAL COMMISSIONER,Government,SPECIAL COMMISSIONER,Company,,,India
+SPACE APPLICATION,Government,SPACE APPLICATION,Company,,,India
+Southern Railways,Government,Southern Railways,Company,"BILLS,MON-STATE,MO-STATE",,India
+SOUTHERN PETRO CHEMICAL,Government,SOUTHERN PETRO CHEMICAL,Company,SOUTHERN PETROCHEMICAL,,India
+South Western Railways - SWR,Government,South Western Railways - SWR,Company,UBL SWR,,India
+Small Industries Development Bank of India (SIDBI),Government,Small Industries Development Bank of India (SIDBI),Company,,,India
+Singareni Collieries Company Limited,Government,Singareni Collieries Company Limited,Company,SINGARENI COLLIERIES,,India
+SIDS Hospital & Research Centre,Corporate,SIDS Hospital & Research Centre,Company,SIDSHOSPITAL,,India
+SHUSHRUSHA NEONATAL,Corporate,SHUSHRUSHA NEONATAL,Company,SHUSHRUSHA NEONATAL,,India
+Shree Khodiyar Mandir trust- Rajpara,Corporate,Shree Khodiyar Mandir trust- Rajpara,Company,,,India
+Shivam Eye Foundation,Corporate,Shivam Eye Foundation,Company,,,India
+SHIPPING CORPORATION OF INDIA,Government,SHIPPING CORPORATION OF INDIA,Company,SHIPPING CORPORATION OF INDIA,,India
+SHIP BUILDING CENTRE,Government,SHIP BUILDING CENTRE,Company,,,India
+SHAR,Government,SHAR,Company,SDSC  SHAR,,India
+SECURITY PRINTING,Government,SECURITY PRINTING,Company,SECURITY PRINTING PRESS,,India
+SCL,Corporate,SCL,Company,SCL PAYMENT TRANSF,,India
+SBI GENERAL INSURANCE CO LTD,TPA/INSURANCE,SBI GENERAL INSURANCE CO LTD,Company,"SBIGen, SBI GENERAL INSURANCE CO LTDSBI,SBI GENERAL INSURANCE",,India
+Sampoorna Suraksha and Arogya Raksha Health Insurance Scheme,Government,Sampoorna Suraksha and Arogya Raksha Health Insurance Scheme,Company,DAVANAGERE NETRALAYA,,India
+Salar Jung Museum,Government,Salar Jung Museum,Company,,,India
+SAIL,Government,SAIL,Company,,,India
+Safeway TPA Services Ltd,TPA/INSURANCE,Safeway TPA Services Ltd,Company,,,India
+RSBY,Government,RSBY,Company,,,India
+Royal Enfield,Corporate,Royal Enfield,Company,,,India
+RGHS (Rajasthan Govt Health Scheme),Government,RGHS (Rajasthan Govt Health Scheme),Company,"TREASURY OFFICE SECRETRIATE, RAJASTHAN GOVE",,India
+RESERVE BANK OF INDIA,Government,RESERVE BANK OF INDIA,Company,RBI SAMADHAN,,India
+RENAULT NISSAN AUTOMOTIVE INDIA PRIVATE LIMITED,Corporate,RENAULT NISSAN AUTOMOTIVE INDIA PRIVATE LIMITED,Company,RENAULT NISSAN,,India
+Reliance Industries Ltd,Corporate,Reliance Industries Ltd,Company,,,India
+Reliance General Insurance Co. Ltd,TPA/INSURANCE,Reliance General Insurance Co. Ltd,Company,RELIANCE GENER,,India
+REGIONAL PASSPORT,Government,REGIONAL PASSPORT,Company,REGIONAL PASSPORT,,India
+Regional Meteorological Centre,Government,Regional Meteorological Centre,Company,,,India
+RCF,Government,Rashtriya Chemicals and Fertilizers Limited,Company,R C F  LTD,,India
+Rashtriya Chemicals and Fertilizers Limited,Government,Rashtriya Chemicals and Fertilizers Limited,Company,,,India
+Raksha Health Insurance TPA Pvt Ltd,TPA/INSURANCE,Raksha Health Insurance TPA Pvt Ltd,Company,MSRAKSHAT,18,India
+Rajsriya Automotive Industries P Ltd.,Corporate,Rajsriya Automotive Industries P Ltd.,Company,,,India
+Rajendra ashram,Corporate,Rajendra ashram,Company,,,India
+Raja Ramanna Centre for Advanced Technology (RRCAT),Government,Raja Ramanna Centre for Advanced Technology (RRCAT),Company,RRCAT,,India
+RAIL WHEEL FACTORY,Government,RAIL WHEEL FACTORY,Company,"RWFOP BILL,-RWF",,India
+RAHEJA QBE GENERAL,TPA/INSURANCE,RAHEJA QBE GENERAL,Company,RAHEJA QBE GE,,India
+QB Health Technologies Pvt. Ltd. (QUBE),Corporate,QB Health Technologies Pvt. Ltd. (QUBE),Company,,,India
+PUNE PAYMENT,Government,PUNE PAYMENT,Company,,,India
+Pune Municipal Corporation(PMC),Government,Pune Municipal Corporation(PMC),Company,,,India
+PSU-SBI,Government,PSU-SBI,Company,"SBI LHO,LHO BBSR",,India
+Pradhan Mantri Jeevan Jyoti Bima Yojana(PMJJBY),Government,Pradhan Mantri Jeevan Jyoti Bima Yojana(PMJJBY),Company,,,India
+Practo technologies Pvt Ltd,Corporate,Practo technologies Pvt Ltd,Company,,,India
+PPT,Government,PPT,Company,PARADIP PORT,,India
+PPL,Government,PPL,Company,,,India
+Powergrid Corporation of India Ltd,Government,Powergrid Corporation of India Ltd,Company,POWER GRID,,India
+Post Office,Government,Post Office,Company,,,India
+PMJAY,Government,PMJAY,Company,,,India
+PLUS HEALTH TECH,Corporate,PLUS HEALTH TECH,Company,PLUS HEALTH TECH,,India
+PHASORZ TECHNOLOGIES,TPA/INSURANCE,PHASORZ TECHNOLOGIES,Company,,,India
+Peerless Hospitex Hospital And Reserch Center Ltd.,Corporate,Peerless Hospitex Hospital And Reserch Center Ltd.,Company,PEERLESS,,India
+Pay & Accounts Office,Government,Pay & Accounts Office,Company,,,India
+PARK MEDICLAIM INSURANCE TPA PVT LTD,TPA/INSURANCE,PARK MEDICLAIM INSURANCE TPA PVT LTD,Company,,,India
+Paramount Health Services TPA Ltd,TPA/INSURANCE,Paramount Health Services TPA Ltd,Company,PARAMOUNT,16,India
+Paradeep Phosphates Limited,Government,Paradeep Phosphates Limited,Company,PARADEEP PHOSPHATES,,India
+P.G. CARE FOUNDATION,Corporate,P.G. CARE FOUNDATION,Company,,,India
+OZONE INSTITUTE,Government,OZONE INSTITUTE,Company,OZONE INSTITUTE,,India
+Oriental Insurance Company,TPA/INSURANCE,Oriental Insurance Company,Company,ORIENTAL,3,India
+ONGC,Government,ONGC,Company,"OIL AND NATURAL,OIL  NATURAL GAS",,India
+OFT,Government,OFT,Company,ORDNANCE FACTORY,,India
+ODISHA STATE,Government,ODISHA STATE,Company,ODISHA STATE,,India
+OCF,Government,OCF,Company,,,India
+NTRVS,Government,NTRVS,Company,,,India
+NTPC LTD,Government,NTPC LTD,Company,,,India
+NSTL,Government,NSTL,Company,,,India
+NRRI,Government,NRRI,Company,"NRRI,NATIONAL RICE RESEARCH,CENTRAL RICE RESEARCH",,India
+NOVARTIS HEALTHCARE,Corporate,NOVARTIS HEALTHCARE,Company,NOVARTISHEALTHCARE,,India
+NLC,Government,NLC,Company,NLCINDIA,,India
+Niva Bupa Health Insurance,TPA/INSURANCE,Niva Bupa Health Insurance,Company,"NIVABUPAHEALTH,BUPA HEALTH",,India
+Nirmal Hospital,Corporate,Nirmal Hospital,Company,,,India
+NIRD (National institute of Rural Development),Government,NIRD (National institute of Rural Development),Company,NATIONAL INSTITUTE OF RURAL,,India
+NIPH,Government,NIPH,Company,,,India
+NINL,Government,NINL,Company,,,India
+NIMHANS,Government,NIMHANS,Company,-NIMHANS-,,India
+Nilachala Ispat Nigam Limited,Government,Nilachala Ispat Nigam Limited,Company,,,India
+NIIST,Government,NIIST,Company,,,India
+NIFT,Government,NIFT,Company,,,India
+NICED,Government,NICED,Company,,,India
+New India Assurance Company,TPA/INSURANCE,New India Assurance Company,Company,"THE NEW INDIA AS,THE NEW,NEW INDI",4,India
+NHA- CAPF,Government,NHA- CAPF,Company,,,India
+NGRI,Government,NGRI,Company,,,India
+Nethradhama Eye Hospital Davangere,Corporate,Nethradhama Eye Hospital Davangere,Company,NETHRADHAMA HOSPITAL,,India
+NEELACHAL ISPAT NIGAM,Government,NEELACHAL ISPAT NIGAM,Company,,,India
+NCL(National chemical laboratory),Government,NCL(National chemical laboratory),Company,NATIONAL CHEMICAL LABORATORY,,India
+NAVI GENERAL INSURANCE,TPA/INSURANCE,NAVI GENERAL INSURANCE,Company,,,India
+Naval Science & Technological Laboratory (NSTL),Government,Naval Science & Technological Laboratory (NSTL),Company,NSTL VIZAGAO RD,,India
+Naval Dockyard,Government,Naval Dockyard,Company,,,India
+National Silkworm Seed Organisation,Government,National Silkworm Seed Organisation,Company,NATIONAL SILKWORM SEED,,India
+National Sanskrit University(NSU),Government,National Sanskrit University(NSU),Company,NATIONAL SANSKRIT,,India
+NATIONAL RICE RESEARCH,Government,NATIONAL RICE RESEARCH,Company,,,India
+National Police Academy,Government,National Police Academy,Company,AO  SVP NATIONAL  POLICE,,India
+National Mineral Development Corporation Limited(NMDC),Government,National Mineral Development Corporation Limited(NMDC),Company,,,India
+National Mineral Development Corporation Limited,Government,National Mineral Development Corporation Limited,Company,,,India
+National Insurance Company Limited,TPA/INSURANCE,National Insurance Company Limited,Company,"NATIONAL INSURAN,NATIONAL INSURANCE CO,FROM NIC",2,India
+NATIONAL INSTITUTE OF SCIENCE EDUCATION,Government,NATIONAL INSTITUTE OF SCIENCE EDUCATION,Company,NATIONAL INSTITUTE OF SCIENCE,,India
+NATIONAL INSTITUTE OF OCEAN TECHNOLOGY,Government,NATIONAL INSTITUTE OF OCEAN TECHNOLOGY,Company,OCEAN,,India
+National Institute of Nutrition,Government,National Institute of Nutrition,Company,NATIONAL INSTITUTE OF NUTRITION,,India
+National Institute of Mental Health and Neuro scie,Government,National Institute of Mental Health and Neuro scie,Company,NATIONAL INSTITUTE OF MENTAL,,India
+National Institute of Fashion Technology,Government,National Institute of Fashion Technology,Company,,,India
+National Institute of Cholera and Enteric,Government,National Institute of Cholera and Enteric,Company,,,India
+NATIONAL INSTITUTE CHOLERA AND ENTERIC,Government,NATIONAL INSTITUTE CHOLERA AND ENTERIC,Company,NATIONAL  INSTITUTE OF CHOLERA,,India
+NATIONAL GEOPHYSICAL,Government,NATIONAL GEOPHYSICAL,Company,NATIONAL GEOPHYSICAL,,India
+NATIONAL FERTILIZERS,Government,NATIONAL FERTILIZERS,Company,"NATIONAL FERTILIZERS, NFL NAYA",,India
+National Council of Science Museums (NCSM),Government,National Council of Science Museums (NCSM),Company,,,India
+National Chemical Laboratory,Government,National Chemical Laboratory,Company,,,India
+National Centre for Radio Astrophysics -Pune,Government,National Centre for Radio Astrophysics -Pune,Company,TIFR-NATIONAL CENTRE,,India
+NATIONAL CENTRE,Government,NATIONAL CENTRE,Company,NATIONAL CENTRE FOR,,India
+NATIONAL BOARD,Government,NATIONAL BOARD,Company,"NATIONAL BOARD OF,-NBEMS-",,India
+National Atmospheric Research Laboratory(NARL),Government,National Atmospheric Research Laboratory(NARL),Company,"NARL PAYMENT, NATIONAL ATMOSPHERIC,-NARL-",,India
+National Aluminium Company Limited (NALCO),Government,National Aluminium Company Limited (NALCO),Company,NATIONAL ALUMINIUM,,India
+NATIONAL ACADEMY OF AGRICULTURE RESEARCH MANAGEMEN,Government,NATIONAL ACADEMY OF AGRICULTURE RESEARCH MANAGEMEN,Company,,,India
+NATIONAL ACADEMY,Government,NATIONAL ACADEMY,Company,,,India
+NARI,Government,NARI,Company,,,India
+Narayana Health,Corporate,Narayana Health,Company,,,India
+NALCO,Government,NALCO,Company,,,India
+NAGARA YESHASVINI,Government,NAGARA YESHASVINI,Company,,,India
+NABARD,Government,NABARD,Company,NABARD,,India
+Mysore District Treasury,Government,Mysore District Treasury,Company,,,India
+My Healthskape Medicals Pvt Ltd,Corporate,My Healthskape Medicals Pvt Ltd,Company,,,India
+MUNITIONS INDIA,Government,MUNITIONS INDIA,Company,MUNITIONS INDIA,,India
+MRF Limited,Corporate,MRF Limited,Company,MRF LIMITED,,India
+MRD LTD,Corporate,MRD LTD,Company,,,India
+MINT,Government,MINT,Company,,,India
+Ministry of Health and Family,Government,Ministry of Health and Family,Company,,,India
+MINISTRY OF HEALTH - OMAN,Corporate,MINISTRY OF HEALTH - OMAN,Company,,,India
+MINISTRY OF DEFENCE,Government,MINISTRY OF DEFENCE,Company,,,India
+Minerals and Metals Trading Corporation Ltd,Government,Minerals and Metals Trading Corporation Ltd,Company,"MMTC LTD, MMTC LIMITED",,India
+Minda Industries  Limited,Corporate,Minda Industries  Limited,Company,MINDA INDUSTRI,,India
+METROPOLIS HEALTH,Corporate,METROPOLIS HEALTH,Company,,,India
+Meh Healthcare,Corporate,Meh Healthcare,Company,,,India
+Meenakshi Hospital,Corporate,Meenakshi Hospital,Company,,,India
+Medvantage Insurance TPA Private Limited,TPA/INSURANCE,Medvantage Insurance TPA Private Limited,Company,MEDVANTAGE,17,India
+Medsave TPA Healthcare TPA Ltd,TPA/INSURANCE,Medsave TPA Healthcare TPA Ltd,Company,MEDSA,15,India
+Medops Techology Pvt Ltd,Corporate,Medops Techology Pvt Ltd,Company,,,India
+Medisep,Government,Medisep,Company,,,India
+Medicare TPA Services P Ltd,TPA/INSURANCE,Medicare TPA Services P Ltd,Company,,,India
+Medibuddy,Corporate,Medibuddy,Company,PHASORZ,,India
+Mediassist India TPA P Ltd,TPA/INSURANCE,Mediassist India TPA P Ltd,Company,MEDIASSIST,14,India
+MD India Healthcare TPA Service Ltd,TPA/INSURANCE,MD India Healthcare TPA Service Ltd,Company,"MDI-,MDINDIAHEA",1,India
+MCL,Government,MCL,Company,"-MCL-,MAHANADI COALFIELDS",,India
+Maulana Azad National Urdu University(MANUU),Government,Maulana Azad National Urdu University(MANUU),Company,,,India
+ManipalCigna Health Insurance,TPA/INSURANCE,ManipalCigna Health Insurance,Company,MANIPALCIGNA,,India
+Mando Automotive India Private Limited,Corporate,Mando Automotive India Private Limited,Company,HL MANDO ANAND,,India
+Magnus Health Care and Research,Corporate,Magnus Health Care and Research,Company,Magnus Health,,India
+MAGMA HDI GENERAL,TPA/INSURANCE,MAGMA HDI GENERAL,Company,"MAGMA HDI GENER, MAGMA HDI GE",,India
+MADURA COATS LTD,Corporate,MADURA COATS LTD,Company,MADURA COATS,,India
+MADRAS FERTILIZERS LTD,Government,MADRAS FERTILIZERS LTD,Company,MADRAS FERTILISERS,,India
+LOTUS FOOTWEAR,Corporate,LOTUS FOOTWEAR,Company,"LOTUS FOOTWEAR,LOTUS",,India
+Liberty General Insurance Limited,TPA/INSURANCE,Liberty General Insurance Limited,Company,LIBERTY GENERAL,,India
+L & T,Corporate,L & T,Company,"LARSEN AND TOUBRO, LARSEN",,India
+KOTAK MAHINDRA,TPA/INSURANCE,KOTAK MAHINDRA,Company,KOTAK MAHINDRA,,India
+Konkan Railway,Government,Konkan Railway,Company,"KRCL-DR,KIOCL LIMITED,KONKAN RAILWAY",,India
+KASP-PMJAY,Government,KASP-PMJAY,Company,STATE HEALTH AGENCY KARUNYA,,India
+Karnataka Soaps and Detergents Limited,Government,Karnataka Soaps and Detergents Limited,Company,KARNATAKA SOAP,,India
+KARNATAKA ROAD TRANSPORT,Government,KARNATAKA ROAD TRANSPORT,Company,,,India
+KARNATAKA POLICE,Government,KARNATAKA POLICE,Company,"KARNATAKA STATE EX POLICE, KARNATAKA POLICE,
+SECRETARY KARNATAKA",,India
+Kamarajar Port limited,Government,Kamarajar Port limited,Company,,,India
+KALEESWARI REFINARY,Corporate,KALEESWARI REFINARY,Company,,,India
+JSW Steel Works,Corporate,JSW Steel Works,Company,,,India
+JNPT Hindal co,Government,JNPT Hindal co,Company,JAWAHARLAL NEHRU PORT,,India
+JDS FOOD PRODUCTS,Corporate,JDS FOOD PRODUCTS,Company,Food corporation,,India
+Jain Asharya,Corporate,Jain Asharya,Company,,,India
+J.K.FENNER INDIA,Corporate,J.K.FENNER INDIA,Company,J K FENNER  INDIA,,India
+IVRI,Government,IVRI,Company,,,India
+IUCAA,Government,IUCAA,Company,"INTER-UNIVERSITY CENTRE,INTER UNIVERSITY CENTRE",,India
+ITD CEMENTATION,Corporate,ITD CEMENTATION,Company,ITD CEMENTATION,,India
+Integral Coach Factory ( ICF ),Government,Integral Coach Factory ( ICF ),Company,ICF,,India
+Institute Of Physics,Government,Institute Of Physics,Company,INSTITUTE OF PHYSICS,,India
+Institute of Mathematical Sciences,Government,Institute of Mathematical Sciences,Company,INSTITUTE OF MATHEMATICAL SCIENCES,,India
+INS Rajali,Government,INS Rajali,Company,,,India
+Indian Space Research Organisation(ISRO),Government,Indian Space Research Organisation(ISRO),Company,"ISRO  PROPULSION, LIQUID PROPULSION, SPACE APPLICATIONS CENTRE,SPACE APPLICATIONS,U R RAO SATELLITE CENTRE,HARITA FEHRER,ISRO",,India
+Indian Ordnance Factories,Government,Indian Ordnance Factories,Company,ORDINANCE FACTORY,,India
+Indian Oil Corporation Ltd,Government,Indian Oil Corporation Ltd,Company,INDIAN OIL,,India
+INDIAN JAPAN LIGHTING PVT LTD,Corporate,INDIAN JAPAN LIGHTING PVT LTD,Company,,,India
+Indian Institute of Horticultural Research,Government,Indian Institute of Horticultural Research,Company,INDIAN INSTITUTE OF HORTICULTURAL,,India
+INDIAN INSTITUTE OF CHEMICAL,Government,INDIAN INSTITUTE OF CHEMICAL,Company,,,India
+INDIAN ADDITIVE LIMITED,Government,INDIAN ADDITIVE LIMITED,Company,,,India
+India Security Press(ISP),Government,India Security Press(ISP),Company,INDIA SECURITY PRESS,,India
+IMSC,Government,Institute of Mathematical Sciences,Company,,,India
+IITM,Government,IITM,Company,"IIT MADRAS, IITM",,India
+IIMR,Government,IIMR,Company,,,India
+IFFCO TOKIO GENERAL INSURANCE COMPANY,TPA/INSURANCE,IFFCO TOKIO GENERAL INSURANCE COMPANY,Company,"IFFCO-TOKIO,IFFCO TOK,IFFCO-TOK",,India
+IFFCO PARADEEP,Corporate,IFFCO PARADEEP,Company,IFFCO PARADEEP,,India
+IFFCO KISAN SEWA,Corporate,IFFCO KISAN SEWA,Company,IFFCO KISAN,,India
+ICMR- National Institute of Nutrition (NIN),Government,ICMR- National Institute of Nutrition (NIN),Company,,,India
+ICICI Prudential General Insurance,TPA/INSURANCE,ICICI Prudential General Insurance,Company,,,India
+ICICI Lombard General Insurance,TPA/INSURANCE,ICICI Lombard General Insurance,Company,ICICI LOMBARD,,India
+ICICI Lombard Camp,Corporate,ICICI Lombard Camp,Company,,,India
+ICAR,Government,ICAR,Company,,,India
+I Care Health ManagementTPA Ltd,TPA/INSURANCE,I Care Health ManagementTPA Ltd,Company,,,India
+Hyundai,Corporate,Hyundai,Company,HYUNDAI MOTOR INDIA LIMITED,,India
+HVF / OCF,Government,HVF / OCF,Company,,,India
+HVF,Government,HVF,Company,THE HVF EMP,,India
+HUDCO,Government,HUDCO,Company,,,India
+HPO,Government,HPO,Company,HPO-HEALTH,,India
+HPL (Hindustan Platinum LTD),Corporate,HPL (Hindustan Platinum LTD),Company,,,India
+HPCL,Government,HPCL,Company,HINDUSTAN PETROLEUM,,India
+HORTICULTURAL RESEARCH,Government,HORTICULTURAL RESEARCH,Company,HORTICULTURAL RESEARCH,,India
+HINDALCO,Corporate,HINDALCO,Company,,,India
+HIGH COURT,Government,HIGH COURT,Company,,,India
+HI TECH,Corporate,HI TECH,Company,,,India
+HESCOM,Government,HESCOM,Company,HESCOM,,India
+Hero MotoCorp Ltd,Corporate,Hero MotoCorp Ltd,Company,HERO MOTOCORP,,India
+Heritage Health TPA P Ltd,TPA/INSURANCE,Heritage Health TPA P Ltd,Company,HERITAGEHE,13,India
+HELYXON HEALTHCARE,Corporate,HELYXON HEALTHCARE,Company,,,India
+Heavy Water Plant (Talcher RTI),Government,Heavy Water Plant (Talcher RTI),Company,HEAVY WATER PLANT,,India
+Heavy Alloy Penetrator Project (HAPP),Government,Heavy Alloy Penetrator Project (HAPP),Company,,,India
+Health Insurance TPA of India Ltd,TPA/INSURANCE,Health Insurance TPA of India Ltd,Company,,,India
+Health India Insurance TPA,TPA/INSURANCE,Health India Insurance TPA,Company,health insu,,India
+Health Assure Private Limited,Corporate,Health Assure Private Limited,Company,HEALTHASSURE PVT,,India
+HDFC ERGO GENERAL INSURANCE CO LTD,TPA/INSURANCE,HDFC ERGO GENERAL INSURANCE CO LTD,Company,"HDFC ERGO GENE,ICICIPRUDENTIAL",,India
+Harita Fehrer Limited,Corporate,Harita Fehrer Limited,Company,,,India
+Grand Insurance TPA  Pvt Ltd,TPA/INSURANCE,Grand Insurance TPA  Pvt Ltd,Company,,,India
+GOOD HEALTH INSURANCE TPA LIMITED,TPA/INSURANCE,GOOD HEALTH INSURANCE TPA LIMITED,Company,GOODHEALTH,11,India
+GODIGIT GENERAL,TPA/INSURANCE,GODIGIT GENERAL,Company,"GO DIGIT,22205593,GO DIGI",5,India
+Genins India TPA Ltd,TPA/INSURANCE,Genins India TPA Ltd,Company,,,India
+General Post Office,Government,General Post Office,Company,,,India
+GAIL,Government,GAIL,Company,GAIL,,India
+GA INSURANCE,TPA/INSURANCE,GA INSURANCE,Company,,,India
+Future Generali General Insurance,TPA/INSURANCE,Future Generali General Insurance,Company,FUTURE GENERALI,,India
+Fritzmeier Motherson Cabin Engineering Private Lim,Corporate,Fritzmeier Motherson Cabin Engineering Private Lim,Company,"FRITZMEIER MOT,FRITZMEIER",,India
+Fortis Hospital,Corporate,Fortis Hospital,Company,FORTIS HOSPITALS,,India
+FOOD CORPORATION OF INDIA,Government,FOOD CORPORATION OF INDIA,Company,"FCI DO, FOOD CORPOR , FCI LIMITED",,India
+Family Health Plan TPA Ltd,TPA/INSURANCE,Family Health Plan TPA Ltd,Company,FAMILYHEAL,12,India
+FA & CAO,Government,FA & CAO,Company,FA AND CAO,,India
+Exide General Insurance,TPA/INSURANCE,Exide General Insurance,Company,,,India
+Exide,Corporate,Exide,Company,EXIDE INDUSTRIES,,India
+ESSAR PORT LTD,Corporate,ESSAR PORT LTD,Company,,,India
+ESSAR FOUNDATION,Corporate,ESSAR FOUNDATION,Company,,,India
+Essar Bulk Terminal Paradip Limited,Corporate,Essar Bulk Terminal Paradip Limited,Company,,,India
+ESIC,Govt - Specific,ESIC,Company,"ESIC,ODISHA STATE TREASURY,HUBLI DIST TREASURY,MYSORE DISTRICT TREASURY,GOVT OF TAMILNADU,DIRECTORATE OF TREASURIES,MAHARASHTRA EMPLOYEES STATE,ESI,DIRECTOR OF TREASURIES,DISTRICT TREASURY OFFICE",,India
+Ericson Insurance TPA Pvt Ltd,TPA/INSURANCE,Ericson Insurance TPA Pvt Ltd,Company,ERICSONINS,10,India
+EPFO,Government,EPFO,Company,#NAME?,,India
+English and Foreign Languages University(EFLU),Government,English and Foreign Languages University(EFLU),Company,"THE ENGLISH AND FOREIGN,REGISTRAR EFLU",,India
+Employees Health Scheme -EHS,Govt - Specific,Employees Health Scheme -EHS,Company,"ANDHRA PRADESH TREAS,DISTRICT TREASURY OFFICE,Treasury ePayment,YSRAHCARETRUST",,India
+Empathy foundation,Corporate,Empathy foundation,Company,,,India
+Edelweiss General Insurance,TPA/INSURANCE,Edelweiss General Insurance,Company,"EDELWEISS GENERAL,EGICL PAYMENTS",,India
+ECHS,Govt - Specific,ECHS,Company,"PCDA,SECUNDERABAD,SBIN0000TBU,Ministry of Defence,CDA CHENNAI,PAO COMM OF CUSTOMS,Ministry of MAHB,Min of Def,DGNPDGNP,WAGES SECTIO,INDIA GOVT M,SECTIO,MU//WAGES,NAVY MU,AAO KOLKATA,AO RD SBC VIZAGAO",9,India
+EBTPL,Government,EBTPL,Company,,,India
+Eastern Naval Command(ENC),Government,Eastern Naval Command(ENC),Company,,,India
+East Wind Foodwear,Corporate,East Wind Foodwear,Company,EAST WIND FOOTWEAR,,India
+Volo Health Insurance TPA Pvt Ltd,TPA/INSURANCE,Volo Health Insurance TPA Pvt Ltd,Company,,,India
+E Meditek TPA Services Ltd,TPA/INSURANCE,E Meditek TPA Services Ltd,Company,,,India
+Dredging Corporation of India(DCI),Government,Dredging Corporation of India(DCI),Company,Dredging Corporation,,India
+Dr. NTR VAIDYA SEVA SCHEME,Government,Dr. NTR VAIDYA SEVA SCHEME,Company,NTR VAIDYA,,India
+Doordarshan Kendra,Government,Doordarshan Kendra,Company,Doordarshan Kendra,,India
+District Blindness Control Society,Government,District Blindness Control Society,Company,,,India
+DIGITOTECH,Corporate,DIGITOTECH,Company,DIGIOTECH,,India
+DHFL General Insurance Company Ltd,TPA/INSURANCE,DHFL General Insurance Company Ltd,Company,,,India
+DEPT OF SPACE,Government,DEPT OF SPACE,Company,,,India
+DEPT OF ATOMIC ENERGY,Government,DEPT OF ATOMIC ENERGY,Company,"/gso/,gso-,ATOMIC ENERGY",,India
+Dedicated Healthcare Services,TPA/INSURANCE,Dedicated Healthcare Services,Company,,,India
+CYIENT DLM,Corporate,CYIENT DLM,Company,CYIENT,,India
+CURRENCY NOTE PRESS,Government,CURRENCY NOTE PRESS,Company,CURRENCY NOTE PRESS,,India
+CSRT,Government,CSRT,Company,CENTRAL SERICULTURAL,,India
+CSMA,Government,CSMA,Company,,,India
+CSIR - Central Food Technological Research Institute (CFTRI),Government,CSIR - Central Food Technological Research Institute (CFTRI),Company,CENTRAL FOOD TECHNOLOGICAL,,India
+CSIR,Government,CSIR,Company,,,India
+CPCL,Government,CPCL,Company,CHENNAI PETROLEUM,,India
+COAL INDIA LIMITED,Government,COAL INDIA LIMITED,Company,COAL INDIA,,India
+CNP,Government,CNP,Company,,,India
+CNH Primary Healthcare Services Pvt Ltd.,Corporate,CNH Primary Healthcare Services Pvt Ltd.,Company,,,India
+CMRF,Government,CMRF,Company,,,India
+CLRI,Government,CLRI,Company,CENTRAL LEATHER RESEARCH INSTITUTE,,India
+CIPET,Government,CIPET,Company,,,India
+Cholamandalam Insurance,TPA/INSURANCE,Cholamandalam Insurance,Company,CHOLAMANDALAM,,India
+CHIEF MINISTERS COMPREHENSIVE HEALTH INS SCHEME,Govt - Specific,CHIEF MINISTERS COMPREHENSIVE HEALTH INS SCHEME,Company,,,India
+Chennai Port Trust,Government,Chennai Port Trust,Company,Chennai Port Trust,,India
+CHECK,Government,CHECK,Company,,,India
+CGWB,Government,CGWB,Company,,,India
+CGHS,Govt - Specific,CGHS,Company,"UTIITSL,NACH,PAY AND ACCO,MICR,PAY AND ACCOUNT,MHFW,MHFW PAYMENT AC,UTITSL,AND ACCO,RPAO CRPF,PAO CENSUS,ACCO/PAY AND,ACCO/PAYAND,RPAO CISF,ZPAO SSB,RPAO ITBP,PAY AND,S A ANSARI,DEVENDRA KUMAR",20,India
+CENTRE FOR DNA FINGERPRINTING AND DIAGNOSTICS (CDFD),Government,CENTRE FOR DNA FINGERPRINTING AND DIAGNOSTICS (CDFD),Company,"CENTRE FOR DNA,CDFD",,India
+Central warehousing corporation Ltd,Government,Central warehousing corporation Ltd,Company,CENTRAL WAREHOUSING CORPORATION,,India
+Central Silk Board,Government,Central Silk Board,Company,,,India
+Central Reserve Police Force (CRPF),Government,Central Reserve Police Force (CRPF),Company,CRPF,,India
+Central Institute of Plastics Engineering & Technology,Government,Central Institute of Plastics Engineering & Technology,Company,,,India
+Central Institute Of Freshwater Aquaculture(CIFA),Government,Central Institute Of Freshwater Aquaculture(CIFA),Company,CENTRAL INSTITUTE OF FRESHWATER,,India
+CENTRAL INDUSTRIAL SECURITY FORCE(CISF),Government,CENTRAL INDUSTRIAL SECURITY FORCE(CISF),Company,CISF,,India
+Central Armed Police Forces,Government,Central Armed Police Forces,Company,,,India
+CDFD,Government,CDFD,Company,,,India
+CATERPILLAR INDIA PVT LTD,Corporate,CATERPILLAR INDIA PVT LTD,Company,,,India
+Care Health Insurance Limited,TPA/INSURANCE,Care Health Insurance Limited,Company,"Care Health,Care Health INS, CARE HEALTH INSURANC,00030350015860",,India
+BVY VSKP,Government,BVY VSKP,Company,BVYVSKP,,India
+BSNL,Government,BSNL,Company,"BSNL, BHARATSANCHARNIGAMLD, BHARATSANNIGLDTN, BHARAT SANCHAR NIGAM",,India
+BRITANNIA,Corporate,BRITANNIA,Company,,,India
+BPCL,Government,BPCL,Company,,,India
+Bosch,Corporate,Bosch,Company,BOSCH LIMITED,,India
+BMTC,Government,BMTC,Company,BANGALORE METROPOLITAN,,India
+Biju Swasthya Kalyan Yojana (BSKY),Government,Biju Swasthya Kalyan Yojana (BSKY),Company,CPSMSBKID,,India
+BIAL,Government,BIAL,Company,"BIAL, BANGALORE INTERNATIONAL AIRPORT",,India
+Bharti AXA Insurance,TPA/INSURANCE,Bharti AXA Insurance,Company,BHARTI AXA,,India
+Bharath Heavy Electricals ltd,Government,Bharath Heavy Electricals ltd,Company,"bhel,BHARAT HEAVY",,India
+Bhabha Atomic Research Center(BARC),Government,Bhabha Atomic Research Center(BARC),Company,,,India
+BGS Gleneagles Global Hospitals,Corporate,BGS Gleneagles Global Hospitals,Company,RAVINDRANATH GE,,India
+BCG Vaccine Laboratory,Government,BCG Vaccine Laboratory,Company,,,India
+BBMP,Government,BBMP,Company,bbmp,,India
+BATA India Limited,Corporate,BATA India Limited,Company,bata,,India
+Bangalore Water Supply and Sewerage Board,Government,Bangalore Water Supply and Sewerage Board,Company,BWSSB,,India
+Bajaj Finance Limited,Corporate,Bajaj Finance Limited,Company,BAJAJ FINANCE,,India
+Bajaj Allianz General Insurance,TPA/INSURANCE,Bajaj Allianz General Insurance,Company,"bajaj allianz,BAJAJ ALLIAN",,India
+AYUSHMAN CAPFS NHA,Government,AYUSHMAN CAPFS NHA,Company,"PAO AYUSHMAN CAPF,AYUSHMAN CAPFS NH",,India
+AYUSHMAN BHARAT YOJANA,Government,AYUSHMAN BHARAT YOJANA,Company,"AYUSHMAN BHARAT, ABPMJAY, AYUSHMAN BH",8,India
+AYU health care hospital,Corporate,AYU health care hospital,Company,,,India
+AWP SERVICES (INDIA) PRIVATE LIMITED,Corporate,AWP SERVICES (INDIA) PRIVATE LIMITED,Company,,,India
+AV Tech,Corporate,AV Tech,Company,,,India
+Ashok Leyland,Corporate,Ashok Leyland,Company,ASHOK LEYLAND,,India
+ASCO NUMAICS,Corporate,ASCO NUMAICS,Company,ASCO NUMATICS,,India
+AROGYA SAHAYATHA SCHEME(ASS),Government,AROGYA SAHAYATHA SCHEME(ASS),Company,,,India
+AROGYA BHAGYA YOJANE,Government,AROGYA BHAGYA YOJANE,Company,AROGYA BHAGYA,,India
+AROGYA BHADRATHA SCHEME (ABS),Government,AROGYA BHADRATHA SCHEME (ABS),Company,"AROGYA BHADRATHA, BHADRATHA",,India
+APOLLO PRIME EYE HOSPITALS,Corporate,APOLLO PRIME EYE HOSPITALS,Company,APOLLO PRIME,,India
+Apollo Munich Health Insurance Co. Ltd,TPA/INSURANCE,Apollo Munich Health Insurance Co. Ltd,Company,APOLLO Health,,India
+AP TREASURY,Government,AP TREASURY,Company,,,India
+Anmol Medicare Insurance (TPA) Ltd,TPA/INSURANCE,Anmol Medicare Insurance (TPA) Ltd,Company,,,India
+Anishi Andaman,Corporate,Anishi Andaman,Company,DIRECTORATE OF HEALTH SERVICES,,India
+Andhra Pradesh State Road Transport Corporation(APSRTC),Government,Andhra Pradesh State Road Transport Corporation(APSRTC),Company,APSRTC,,India
+ALINEA HEALTHCARE,Corporate,ALINEA HEALTHCARE,Company,,,India
+Alankit Healthcare TPA Ltd,TPA/INSURANCE,Alankit Healthcare TPA Ltd,Company,,,India
+AIRPORT AUTHORITY OF INDIA,Government,AIRPORT AUTHORITY OF INDIA,Company,"AIRPORTS AUTHORITY OF INDIA,
+AIRPORTAUTHORITYOFINDIA,AAI PORT",,India
+AIR INDIA,Government,AIR INDIA,Company,"AIR INDIA,AIAHL",,India
+AIR FORCE,Government,AIR FORCE,Company,,,India
+AIIPMR,Government,AIIPMR,Company,,,India
+Agroha Vikas Trust,Corporate,Agroha Vikas Trust,Company,,,India
+AGMOAD,Corporate,AGMOAD,Company,,,India
+AFK,Corporate,AFK,Company,,,India
+AFCONS,Corporate,AFCONS,Company,,,India
+Aditya Birla Health insurance Company Ltd,TPA/INSURANCE,Aditya Birla Health insurance Company Ltd,Company,"ABHICL,Aditya Birla",,India
+ACKO GENERAL,TPA/INSURANCE,ACKO GENERAL,Company,"ACKO GENER, ACKO, ACKOGENE",6,India
+AB SPF TS,Government,AB SPF TS,Company,,,India
+AAVIN,Government,AAVIN,Company,,,India
+AASANDHA COMPANY LTD,Corporate,AASANDHA COMPANY LTD,Company,MINISTRY OF FINANCE,,India
+Aarogyasri-Healthcare- Trust,Government,Aarogyasri-Healthcare- Trust,Company,"YSR AAROGYASRI, YSRAHCT,DRUSHTINAY,ACH C-",,India
+AAROGYA INDIA HEALTH,Government,AAROGYA INDIA HEALTH,Company,aarogyaindiahealth,,India
+ROYAL SUNDARAM,TPA/INSURANCE,ROYAL SUNDARAM,Company,ROYAL SUNDAR,,India
+GENERAL INSURANCE,TPA/INSURANCE,GENERAL INSURANCE,Company,,,India
+Institute of Minerals and Materials Technology(IMMT),Government,Institute of Minerals and Materials Technology(IMMT),Company,instituteofminerals,,India
+CUMI,Corporate,CUMI,Company,,,India
+High Explosive Factory Khadki (HEFK),Government,High Explosive Factory Khadki (HEFK),Company,,,India
+Company Due,Government,Medisep,Company,,,India
+Shri Ranchhodraiji Maharaj Mandir Gaushala Trust,Corporate,Shri Ranchhodraiji Maharaj Mandir Gaushala Trust,Company,,,India
+Livonta Global Pvt Ltd,Corporate,Livonta Global Pvt Ltd,Company,,,India

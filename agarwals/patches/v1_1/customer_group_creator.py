@@ -15,7 +15,7 @@ class CustomerGroupCreator :
                 })
                 customer_group_record.save()
             except Exception as e:
-                log_error(e,"Customer Group", group['name'])\
+                log_error(e,"Customer Group", group['name'])
                 
 def execute():
     customer_group_instance = CustomerGroupCreator()
