@@ -240,7 +240,7 @@ frappe.ui.form.on('File upload', {
       }
       else{
       frappe.call({
-          method: 'agarwals.utils.file_util.is_template_exist',
+          method: "agarwals.agarwals.doctype.file_upload.file_upload_utils.is_template_exist",
           args: {
             attached_to_name: template_name,
             attached_to_doctype: template_doctype
