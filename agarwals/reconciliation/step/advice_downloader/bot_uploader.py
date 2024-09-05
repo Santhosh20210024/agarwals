@@ -13,7 +13,13 @@ class SABotUploader:
     def raise_exception(self, exception):
         raise Exception(exception)
 
-    def set_configuration_values(self):
+    def set_configuration_values(self) -> None:
+        """
+        Usage:
+             Retrieve and set configuration values from the Control Panel.
+        Raises:
+             Raise exceptions if any required configuration values are missing.
+        """
         control_panel = frappe.get_single("Control Panel")
         if control_panel:
             self.user_id = control_panel.user_id or self.raise_exception(
@@ -39,7 +45,7 @@ class SABotUploader:
             self.file_upload_failed = False
 
 
-    def convert_folder_to_zip(self):
+    def convert_folder_to_zip(self) -> None:
         os.mkdir(self.zip_folder_path)
         for folder_name in self.folder_names:
             path = os.path.join(self.sa_download_path, folder_name)
@@ -56,11 +62,26 @@ class SABotUploader:
         if len(os.listdir(self.zip_folder_path)) == 0:
             self.raise_exception(f"File Upload Failed :{self.zip_folder_path} -Zip files not found ")
 
-    def get_login_session(self):
+    def get_login_session(self) -> None:
+        """
+       Usage:
+            Retrieves an authenticated session by logging into the portal.
+       Returns:
+            object: An authenticated session object if login is successful
+        Raises:
+            Exception: If the `login` function raises an exception due to authentication failure
+                       or any other issue.
+        """
         session = login(self.user_id, self.password, self.url)
         return session
 
-    def upload_zip_files(self):
+    def upload_zip_files(self) -> None:
+        """
+        Usage:
+            Upload zip files from the specified directory to the server.
+        Raises:
+            Raise exception if no zip files are found or an upload error occurs.
+        """
         zip_files = os.listdir(self.zip_folder_path)
         if zip_files:
             for zip_file in zip_files:
@@ -156,7 +177,14 @@ class SABotUploader:
             if os.path.exists(self.zip_folder_path):
                 shutil.rmtree(self.zip_folder_path)
 
-    def process(self):
+    def process(self) -> None:
+        """
+        Usage:
+            Execute the entire process of converting folders to zip files, uploading them,
+            generating notifications, and deleting backend files based on configuration.
+        Returns:
+            None
+        """
         try:
             self.convert_folder_to_zip()
             self.session = self.get_login_session()
