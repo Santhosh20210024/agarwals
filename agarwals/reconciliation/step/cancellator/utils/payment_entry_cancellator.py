@@ -37,3 +37,4 @@ class PaymentEntryCancellator:
             self.delete_payment_references(record)
             payment_entry_record = frappe.get_doc('Payment Entry', record)
             payment_entry_record.cancel()
+            bank = frappe.get_doc('Bank Transaction', payment_entry_record.reference_no).submit()

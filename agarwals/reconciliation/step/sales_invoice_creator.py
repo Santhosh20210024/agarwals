@@ -43,6 +43,12 @@ class SalesInvoiceCreator:
                     bill_record.set("customer", frappe.get_doc('Payer Alias', bill_record.payer).payer_final_name)
                     bill_record.set("branch_type", frappe.get_doc('Branch', bill_record.branch).custom_branch_type)
                     bill_record.save()
+                    skip_invoice_customer_list = self.get_skip_invoice_customer()
+                    if bill_record.customer in skip_invoice_customer_list:
+                        bill_record.set("status","CANCELLED AND DELETED")
+                        bill_record.save()
+                        frappe.db.commit()
+                        continue
                     sales_invoice_record = frappe.new_doc('Sales Invoice')
                     sales_invoice_params = {'custom_bill_no': bill_record.bill_no, 'custom_mrn': bill_record.mrn,
                                             'custom_patient_name': bill_record.patient_name,
@@ -87,16 +93,10 @@ class SalesInvoiceCreator:
             chunk_doc = chunk.create_chunk(args["step_id"])
             frappe.enqueue(self.process, queue=args["queue"], is_async=True, timeout=18000,
                            bill_numbers=bill_number[i:i + no_of_invoice_per_queue], chunk_doc=chunk_doc)
-    def skip_invoice_process(self,skip_bills):
-        for skip_bill in skip_bills:
-            frappe.db.set_value('Bill',skip_bill,'status','CANCELLED AND DELETED')
-        frappe.db.commit()
         
-    def find_skip_bills(self):
-        customer_list = frappe.get_all('Customer',filters = {'custom_skip_invoice_creation':1},pluck = 'name')
-        if not customer_list:
-            return []
-        return frappe.get_all('Bill',filters={'customer':['in', customer_list],'status':['in',['RAISED','CANCELLED']] },pluck='name')        
+    def get_skip_invoice_customer(self):
+        return frappe.get_all('Customer',filters = {'custom_skip_invoice_creation':1},pluck = 'name')
+             
 
 @frappe.whitelist()
 def process(args):
@@ -114,10 +114,6 @@ def process(args):
                 cancellation_chunk_doc_status = "Error"
         else:
             cancellation_chunk_doc_status = "Processed"
-            
-        skip_bills = SalesInvoiceCreator().find_skip_bills()   
-        if skip_bills:
-            SalesInvoiceCreator().skip_invoice_process(skip_bills)
         
         new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=', 'CANCELLED AND DELETED']},
                                     pluck='name')
