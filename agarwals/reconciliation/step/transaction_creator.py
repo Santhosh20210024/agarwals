@@ -136,7 +136,6 @@ def create_bank_transaction(transaction_list):
                 check_warning(trans_doc, transaction, bnk_trans_ref)
                 trans_doc.save()
                 frappe.db.commit()
-
         except Exception as e:
             trans_doc = frappe.get_doc('Bank Transaction Staging', transaction['name'] )
             trace_info = str(traceback.format_exc()).split(':')[-1]
@@ -183,9 +182,9 @@ def bank_transaction_process(tag, args):
         pending_transaction.append(transaction)
 
     ChunkOrchestrator().process(staging_batch_operation, args["step_id"], is_enqueueable=True,
-                                chunk_size=int(args["chunk_size"]), data_var_name="transaction_list", queue=args["queue"],
+                                chunk_size=int(getattr(args,"chunk_size", 100)), data_var_name="records", queue=args["queue"],
                                 is_async=True, timeout=18000, records=pending_transaction)
-        
+
 def change_matched_items(ref_no):
     for item in frappe.get_list('Payment Entry', filters = {'reference_no':ref_no, 'status':['!=', 'Cancelled']}):
         pe_doc = frappe.get_doc('Payment Entry', item['name'])
