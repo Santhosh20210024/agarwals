@@ -1,2 +1,14 @@
-agarwals.patches.v1_0.mail_log_patches
+[pre_model_sync]
 agarwals.patches.v1_0.mail_log_view
+agarwals.patches.v1_1.customer_group_creator
+agarwals.patches.v1_1.customer_creator
+agarwals.patches.v1_2.bank_transaction_patches
+agarwals.patches.v1_2.journal_entry_patches
+agarwals.patches.v1_2.payment_entry_patches
+agarwals.patches.v1_2.sales_invoice_patches
+agarwals.patches.v1_2.item_patches
+agarwals.patches.v1_2.account_patches
+
+
+[post_model_sync]
+agarwals.patches.v1_0.mail_log_patches

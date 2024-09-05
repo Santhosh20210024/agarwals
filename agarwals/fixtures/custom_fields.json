@@ -483,118 +483,46 @@
     "__last_sync_on": "2024-08-08T13:20:46.035Z"
   },
   {
-    "doctype": "Data Import Mapping",
-    "name": "Bill",
-    "mapping_columns": [
+    "name": "HOOK-0001",
+    "owner": "Administrator",
+    "creation": "2024-08-06 17:42:41.217099",
+    "modified": "2024-08-06 17:43:47.504307",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "naming_series": "HOOK-.####",
+    "webhook_doctype": "SA Downloader Run Log",
+    "webhook_docevent": "after_insert",
+    "enabled": 0,
+    "condition": "doc.status == \"Error\"",
+    "request_url": "https://techfinite.zulipchat.com/api/v1/external/slack_incoming?api_key=VUnQv9hLNRAPoNNaGBhWGOXgRVxepGHr&stream=445136&topic=SA+Bot",
+    "timeout": 10,
+    "request_method": "POST",
+    "request_structure": "JSON",
+    "enable_security": 0,
+    "webhook_json": "{\n \"text\": \"**Error** : {{doc.parent1}} ,Check Error Log **{{doc.reference_name}}**  for Dr.Agarwals.\"\n}\n",
+    "meets_condition": "Select a document to check if it meets conditions.",
+    "preview_request_body": "Select a document to preview request data",
+    "doctype": "Webhook",
+    "webhook_headers": [
       {
-        "column_index_in_import_file": "0",
-        "column_in_doctype": "entity"
-      },
-      {
-        "column_index_in_import_file": "1",
-        "column_in_doctype": "branch"
-      },
-      {
-        "column_index_in_import_file": "2",
-        "column_in_doctype": "bill_no"
-      },
-      {
-        "column_index_in_import_file": "3",
-        "column_in_doctype": "bedtype"
-      },
-      {
-        "column_index_in_import_file": "4",
-        "column_in_doctype": "bill_date"
-      },
-      {
-        "column_index_in_import_file": "5",
-        "column_in_doctype": "mrn"
-      },
-      {
-        "column_index_in_import_file": "6",
-        "column_in_doctype": "patient_name"
-      },
-      {
-        "column_index_in_import_file": "7",
-        "column_in_doctype": "patient_age"
-      },
-      {
-        "column_index_in_import_file": "8",
-        "column_in_doctype": "consultant"
-      },
-      {
-        "column_index_in_import_file": "9",
-        "column_in_doctype": "payer"
-      },
-      {
-        "column_index_in_import_file": "10",
-        "column_in_doctype": "bill_amount"
-      },
-      {
-        "column_index_in_import_file": "11",
-        "column_in_doctype": "discount"
-      },
-      {
-        "column_index_in_import_file": "12",
-        "column_in_doctype": "net_amount"
-      },
-      {
-        "column_index_in_import_file": "13",
-        "column_in_doctype": "paid_amount"
-      },
-      {
-        "column_index_in_import_file": "14",
-        "column_in_doctype": "due_amount"
-      },
-      {
-        "column_index_in_import_file": "15",
-        "column_in_doctype": "refund"
-      },
-      {
-        "column_index_in_import_file": "16",
-        "column_in_doctype": "claim_amount"
-      },
-      {
-        "column_index_in_import_file": "17",
-        "column_in_doctype": "claim_amount_due"
-      },
-      {
-        "column_index_in_import_file": "18",
-        "column_in_doctype": "claim_status"
-      },
-      {
-        "column_index_in_import_file": "19",
-        "column_in_doctype": "status"
-      },
-      {
-        "column_index_in_import_file": "20",
-        "column_in_doctype": "cancelled_date"
-      },
-      {
-        "column_index_in_import_file": "21",
-        "column_in_doctype": "claim_id"
-      },
-      {
-        "column_index_in_import_file": "22",
-        "column_in_doctype": "ma_claim_id"
-      },
-      {
-        "column_index_in_import_file": "23",
-        "column_in_doctype": "hash"
-      },
-      {
-        "column_index_in_import_file": "24",
-        "column_in_doctype": "file_upload"
-      },
-      {
-        "column_index_in_import_file": "25",
-        "column_in_doctype": "transform"
-      },
-      {
-        "column_index_in_import_file": "26",
-        "column_in_doctype": "index"
+        "name": "9g1scghi1b",
+        "owner": "Administrator",
+        "creation": "2024-08-06 17:42:41.217099",
+        "modified": "2024-08-06 17:43:47.504307",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 1,
+        "key": "Content-Type",
+        "value": "application/json",
+        "parent": "HOOK-0001",
+        "parentfield": "webhook_headers",
+        "parenttype": "Webhook",
+        "doctype": "Webhook Header"
       }
-    ]
+    ],
+    "webhook_data": [],
+    "__last_sync_on": "2024-08-08T13:20:46.035Z"
   },
   {
     "doctype": "Data Import Mapping",
@@ -864,228 +792,6 @@
   },
   {
     "doctype": "Data Import Mapping",
-    "name": "ClaimBook",
-    "mapping_columns": [
-      {
-        "column_index_in_import_file": "0",
-        "column_in_doctype": "hospital"
-      },
-      {
-        "column_index_in_import_file": "1",
-        "column_in_doctype": "preauth_claim_id"
-      },
-      {
-        "column_index_in_import_file": "2",
-        "column_in_doctype": "mrn"
-      },
-      {
-        "column_index_in_import_file": "3",
-        "column_in_doctype": "doctor"
-      },
-      {
-        "column_index_in_import_file": "4",
-        "column_in_doctype": "department"
-      },
-      {
-        "column_index_in_import_file": "5",
-        "column_in_doctype": "case_id"
-      },
-      {
-        "column_index_in_import_file": "6",
-        "column_in_doctype": "first_name"
-      },
-      {
-        "column_index_in_import_file": "26",
-        "column_in_doctype": "utr_number"
-      },
-      {
-        "column_index_in_import_file": "22",
-        "column_in_doctype": "current_workflow_state"
-      },
-      {
-        "column_index_in_import_file": "17",
-        "column_in_doctype": "final_bill_number"
-      },
-      {
-        "column_index_in_import_file": "45",
-        "column_in_doctype": "unique_id"
-      },
-      {
-        "column_index_in_import_file": "11",
-        "column_in_doctype": "is_bulk_closure"
-      },
-      {
-        "column_index_in_import_file": "7",
-        "column_in_doctype": "tpa_name"
-      },
-      {
-        "column_index_in_import_file": "8",
-        "column_in_doctype": "insurance_company_name"
-      },
-      {
-        "column_index_in_import_file": "9",
-        "column_in_doctype": "tpa_member_id"
-      },
-      {
-        "column_index_in_import_file": "10",
-        "column_in_doctype": "insurance_policy_number"
-      },
-      {
-        "column_index_in_import_file": "38",
-        "column_in_doctype": "tracking_number"
-      },
-      {
-        "column_index_in_import_file": "12",
-        "column_in_doctype": "al_number"
-      },
-      {
-        "column_index_in_import_file": "13",
-        "column_in_doctype": "cl_number"
-      },
-      {
-        "column_index_in_import_file": "25",
-        "column_in_doctype": "reconcilled_status"
-      },
-      {
-        "column_index_in_import_file": "16",
-        "column_in_doctype": "room_type"
-      },
-      {
-        "column_index_in_import_file": "43",
-        "column_in_doctype": "visit_type"
-      },
-      {
-        "column_index_in_import_file": "37",
-        "column_in_doctype": "courier_vendor"
-      },
-      {
-        "column_index_in_import_file": "21",
-        "column_in_doctype": "current_request_type"
-      },
-      {
-        "column_index_in_import_file": "14",
-        "column_in_doctype": "doa"
-      },
-      {
-        "column_index_in_import_file": "15",
-        "column_in_doctype": "dod"
-      },
-      {
-        "column_index_in_import_file": "39",
-        "column_in_doctype": "sent_date"
-      },
-      {
-        "column_index_in_import_file": "40",
-        "column_in_doctype": "received_date"
-      },
-      {
-        "column_index_in_import_file": "27",
-        "column_in_doctype": "paid_on_date"
-      },
-      {
-        "column_index_in_import_file": "24",
-        "column_in_doctype": "claim_submitted_date"
-      },
-      {
-        "column_index_in_import_file": "18",
-        "column_in_doctype": "final_bill_date"
-      },
-      {
-        "column_index_in_import_file": "42",
-        "column_in_doctype": "is_admitted"
-      },
-      {
-        "column_index_in_import_file": "44",
-        "column_in_doctype": "case_closed_in_preauth"
-      },
-      {
-        "column_index_in_import_file": "23",
-        "column_in_doctype": "current_state_time"
-      },
-      {
-        "column_index_in_import_file": "41",
-        "column_in_doctype": "preauth_submitted_date_time"
-      },
-      {
-        "column_index_in_import_file": "28",
-        "column_in_doctype": "requested_amount"
-      },
-      {
-        "column_index_in_import_file": "20",
-        "column_in_doctype": "claim_amount"
-      },
-      {
-        "column_index_in_import_file": "29",
-        "column_in_doctype": "approved_amount"
-      },
-      {
-        "column_index_in_import_file": "31",
-        "column_in_doctype": "settled_amount"
-      },
-      {
-        "column_index_in_import_file": "34",
-        "column_in_doctype": "tds_amount"
-      },
-      {
-        "column_index_in_import_file": "35",
-        "column_in_doctype": "tpa_shortfall_amount"
-      },
-      {
-        "column_index_in_import_file": "19",
-        "column_in_doctype": "final_bill_amount"
-      },
-      {
-        "column_index_in_import_file": "39",
-        "column_in_doctype": "forwarded_to_claims_date"
-      },
-      {
-        "column_index_in_import_file": "30",
-        "column_in_doctype": "provisional_bill_amount"
-      },
-      {
-        "column_index_in_import_file": "33",
-        "column_in_doctype": "patient_paid"
-      },
-      {
-        "column_index_in_import_file": "32",
-        "column_in_doctype": "patient_payable"
-      },
-      {
-        "column_index_in_import_file": "38",
-        "column_in_doctype": "tracking_number"
-      },
-      {
-        "column_index_in_import_file": "46",
-        "column_in_doctype": "sub_date"
-      },
-      {
-        "column_index_in_import_file": "47",
-        "column_in_doctype": "remarks"
-      },
-      {
-        "column_index_in_import_file": "48",
-        "column_in_doctype": "file_size"
-      },
-      {
-        "column_index_in_import_file": "50",
-        "column_in_doctype": "hash"
-      },
-      {
-        "column_index_in_import_file": "51",
-        "column_in_doctype": "file_upload"
-      },
-      {
-        "column_index_in_import_file": "52",
-        "column_in_doctype": "transform"
-      },
-      {
-        "column_index_in_import_file": "53",
-        "column_in_doctype": "index"
-      }
-    ]
-  },
-  {
-    "doctype": "Data Import Mapping",
     "name": "Bank Transaction Staging",
     "mapping_columns": [
       {
@@ -1318,7 +1024,53 @@
     "disabled": 0,
     "script": "def todo_data():\n    \n    invalid_credentials_query = \"\"\"\n     SELECT reference_name FROM tabToDo ttd WHERE status = 'Open' AND reference_type = 'TPA Login Credentials'\n    \"\"\"\n    invalid_credentials = frappe.db.sql(invalid_credentials_query , pluck = \"reference_name\")\n    return invalid_credentials if invalid_credentials else None\n    \nfrappe.response['message'] = todo_data()",
     "doctype": "Server Script"
-  }
-
+  },
+  {"name":"Reconciliation",
+  "doctype":"Server Script",
+  "owner":"sannamalai@techfinite.com",
+  "creation":"2024-05-31 17:57:39.611220",
+  "modified":"2024-06-13 16:27:52.069965",
+  "modified_by":"sannamalai@techfinite.com",
+  "docstatus":0,
+  "idx":0,
+  "script_type":"Scheduler Event",
+  "event_frequency":"Cron",
+  "cron_format":"0 5 * * *",
+  "doctype_event":"Before Insert",
+  "allow_guest":0,
+  "disabled":1,
+  "script":"frappe.call(\"agarwals.reconciliation.job.run\",job_config=\"reconciliation_cron\")"
+},
+{"name":"Download Settlement Advice",
+"doctype":"Server Script",
+"owner":"sannamalai@techfinite.com",
+"creation":"2024-05-31 06:19:05.479889",
+"modified":"2024-07-15 17:43:58.047633",
+"modified_by":"sannamalai@techfinite.com",
+"docstatus":0,
+"idx":0,
+"script_type":"Scheduler Event",
+"event_frequency":"Cron",
+"cron_format":"0 9 1,15 * *",
+"doctype_event":"Before Insert",
+"allow_guest":0,
+"disabled":1,
+"script":"frappe.call(\"agarwals.reconciliation.job.run\",job_config=\"download_settlement_advice_cron\")"
+},
+{"name":"File Upload Mail",
+"doctype":"Server Script",
+"owner":"claimgenie@techfinite.com",
+"creation":"2024-04-02 20:25:36.215799",
+"modified":"2024-04-04 19:24:33.319887",
+"modified_by":"claimgenie@techfinite.com",
+"docstatus":0,
+"idx":0,
+"script_type":"DocType Event",
+"reference_doctype":"File upload",
+"event_frequency":"All",
+"doctype_event":"After Save",
+"allow_guest":0,
+"disabled":1,
+"script":"def send_notification(doc):\n    group_mail = frappe.db.get_all('Email Group Member',{'email_group':'CGADMINS'},['email'])\n    file_hyper_link = f\"{frappe.utils.get_url()}/app/file-upload/{doc.name}\"\n    mail_message = f\"\"\"Team,\n                    <br><b>{doc.document_type}</b> file Has been uploaded.Please Check it.\n                    <br>Kindly <a href='{file_hyper_link}'>click here</a> to view the file.\n                    <br>\n                    <br>Thanks,\n                    <br>CG Alerts\"\"\"\n    \n    if group_mail:\n        mail_list = [mail for data in group_mail for mail in data.values()]\n        frappe.sendmail(recipients=mail_list, \n                        sender='claimgenie@techfinite.com',  \n                        subject=f'CG Alerts : File has been uploaded', \n                        message=mail_message,  \n                        reference_doctype=doc.doctype, \n                        reference_name=doc.name, \n                        now=True, \n                       )\n\n        \nif doc.document_type !=\"Settlement Advice\":\n    send_notification(doc)\n    "
+}
 ]
-
