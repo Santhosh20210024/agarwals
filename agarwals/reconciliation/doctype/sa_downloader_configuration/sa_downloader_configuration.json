@@ -16,6 +16,7 @@
   "allow_insecure_file",
   "column_break_wdivc",
   "website_url",
+  "days",
   "from_date",
   "to_date",
   "is_captcha",
@@ -115,11 +116,18 @@
    "fieldname": "allow_insecure_file",
    "fieldtype": "Check",
    "label": "Allow Insecure File"
+  },
+  {
+   "default": "29",
+   "description": "Setting the Period of Downloading in days",
+   "fieldname": "days",
+   "fieldtype": "Int",
+   "label": "Days"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-04 19:26:00.851036",
+ "modified": "2024-09-03 19:01:06.112320",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
