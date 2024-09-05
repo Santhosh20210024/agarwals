@@ -19,14 +19,13 @@ import openpyxl
 import glob
 from io import StringIO
 import random
-from agarwals.utils.file_util import PROJECT_FOLDER,HOME_PATH,SHELL_PATH,SUB_DIR,SITE_PATH,construct_file_url
+
 
 class SeleniumDownloader:
     def __init__(self):
         self.extract_first_table = False
         self.format_file_in_parent = True
-        self.SHELL_PATH = SHELL_PATH
-        self.SITE_PATH = SITE_PATH
+        self.SHELL_PATH = "private/files"
         self.last_executed_time = frappe.utils.now_datetime()
         self.public_path = "public/files"
         self.full_img_path = None
@@ -36,18 +35,25 @@ class SeleniumDownloader:
         self.captcha_alert = "Invalid Captcha"
         self.numbers = []
 
+    def construct_file_url(*args):
+        """Construct a file URL from the given path components, handling None values."""
+        args = [str(arg) for arg in args if arg is not None]
+        formatted_url = "/".join(args)
+        return formatted_url
 
     def get_captcha_value(self,captcha_type=None,sitekey= None):
         """
-        Usage:
-        To retrieves the value of a captcha  from SA UI Downloader
-        or by solving it using an external captcha solving API.
-        Args:
-        captcha_type (str, optional): The type of captcha to solve. Can be "Normal Captcha" or "ReCaptcha". Defaults to None.
-        sitekey (str, optional): The sitekey required for solving ReCaptcha. Defaults to None.
-        returns:
-        str : The value of a captcha if SA UI Downloader is used
-        union[list,dict] : solving it using an external captcha solving API.
+            Usage:
+            To retrieves the value of a captcha  from SA UI Downloader
+            or by solving it using an external captcha solving API.
+
+            Args:
+            captcha_type (str, optional): The type of captcha to solve. Can be "Normal Captcha" or "ReCaptcha". Defaults to None.
+            sitekey (str, optional): The sitekey required for solving ReCaptcha. Defaults to None.
+
+            returns:
+            str : The value of a captcha if SA UI Downloader is used
+            union[list,dict] : solving it using an external captcha solving API.
         """
         if self.enable_captcha_api == 0:
             captcha = None
@@ -104,7 +110,7 @@ class SeleniumDownloader:
         file_doc = frappe.new_doc("File")
         file_doc.file_name = f"{self.tpa}_{frappe.utils.now_datetime()}captcha.png"
         file_doc.is_private = 1
-        file_doc.file_url = "/" + construct_file_url(self.SHELL_PATH,f"{self.tpa}_captcha.png")
+        file_doc.file_url = "/" + self.construct_file_url(self.SHELL_PATH,f"{self.tpa}_captcha.png")
         file_doc.attached_to_doctype = "Settlement Advice Downloader UI"
         file_doc.attached_to_name = self.captcha_tpa_doc
         file_doc.attached_to_field = 'captcha_img'
@@ -128,8 +134,8 @@ class SeleniumDownloader:
 
 
     def get_captcha_image(self,captcha_identifier):
-        self.full_img_path = construct_file_url(self.SITE_PATH,self.SHELL_PATH, f"{self.tpa}full_img.png")
-        self.crop_img_path = construct_file_url(self.SITE_PATH,self.SHELL_PATH,f"{self.tpa}_captcha.png")
+        self.full_img_path = self.construct_file_url(self.SITE_PATH,self.SHELL_PATH, f"{self.tpa}full_img.png")
+        self.crop_img_path = self.construct_file_url(self.SITE_PATH,self.SHELL_PATH,f"{self.tpa}_captcha.png")
         self.driver.save_screenshot(self.full_img_path)
         location =  captcha_identifier.location
         size =  captcha_identifier.size
@@ -241,7 +247,7 @@ class SeleniumDownloader:
 
     def create_download_directory(self):
         self.get_file_name()
-        self.folder_path = os.path.join(SITE_PATH,SHELL_PATH,PROJECT_FOLDER,'Settlement Advice',self.credential_doc.tpa) + os.sep
+        self.folder_path = os.path.join(self.SITE_PATH,self.SHELL_PATH,self.PROJECT_FOLDER,'Settlement Advice',self.credential_doc.tpa) + os.sep
         if not os.path.exists(self.folder_path):
             self.raise_exception("Payer Based Download Directory Not Found To Download Settlement Advice")
         file_path =self.folder_path + self.file_name
@@ -487,6 +493,8 @@ class SeleniumDownloader:
             self.allow_insecure_file = configuration_values.allow_insecure_file
             control_panel = frappe.get_doc('Control Panel')
             if control_panel:
+                self.SITE_PATH = control_panel.site_path or self.raise_exception("Site Path Not Found")
+                self.PROJECT_FOLDER = control_panel.project_folder or self.raise_exception("Project Folder Not Found")
                 self.enable_captcha_api = control_panel.enable_captcha_api
                 self.api_key = control_panel.captcha_api_key
             else:
