@@ -274,7 +274,7 @@ class MailSender(ReportGenerator):
         if self.records:   
             self.send_email(report_content=self.report_content, mail_group=mail_group)
     
-class MailLogUpdater(MailSender):
+class FIleUploadUpdater(MailSender):
 
     def update_file_upload(self):
         file_records = self.records
@@ -301,7 +301,7 @@ def process():
         controlpanel = frappe.get_single("Control Panel")
         if controlpanel.sa_report_email_group is None:
             raise ValueError("Email Group Not Found in SA Report")
-        mail_sender = MailLogUpdater()
+        mail_sender = FIleUploadUpdater()
         frappe.enqueue(mail_sender.process, queue='long', job_name=f"sa mail sender - {frappe.utils.now_datetime()}",mail_group = controlpanel.sa_report_email_group)
     except Exception as e:
         log_error(e, "Mail log")
