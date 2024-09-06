@@ -2,18 +2,17 @@ import frappe
 
 def execute():
     # Create or replace view 'viewFile_Upload_Mail_log'
-    frappe.db.sql("""CREATE or REPLACE VIEW viewFile_Upload_Mail_log AS
+    frappe.db.sql("""CREATE or REPLACE VIEW viewFile_Upload_Mail_view AS
         SELECT
             tfu.name AS file_upload_name,
             tfu.document_type AS file_type,
             tfu.total_records AS fil_total_records
         FROM
             `tabFile upload` tfu
-        LEFT JOIN `tabMail log` tml ON tfu.name = tml.file_upload
         WHERE
             tfu.is_bot = 0
             AND tfu.document_type = 'Settlement Advice'
-            AND tml.file_upload IS NULL;
+            AND tfu.sa_mail_sent = 0;
     """)
 
     # Create or replace view 'viewfile_upload_records'
@@ -27,7 +26,7 @@ def execute():
             tfu.skipped_records AS fu_skipped_records
         FROM
             `tabFile upload` tfu
-        JOIN viewFile_Upload_Mail_log vfuml ON tfu.name = vfuml.file_upload_name;
+        JOIN viewFile_Upload_Mail_view vfumv ON tfu.name = vfumv.file_upload_name;
     """)
 
     # Create or replace view 'viewstaging_records'
@@ -39,12 +38,12 @@ def execute():
             SUM(tsas.settled_amount) AS staging_settled,
             SUM(tsas.tds_amount) AS staging_tds,
             SUM(tsas.disallowed_amount) AS staging_disallowance,
-            vfuml.file_upload_name 
+            vfumv.file_upload_name 
         FROM
             `tabSettlement Advice Staging` tsas
-        JOIN viewFile_Upload_Mail_log vfuml ON tsas.file_upload = vfuml.file_upload_name
+        JOIN viewFile_Upload_Mail_view vfumv ON tsas.file_upload = vfumv.file_upload_name
         GROUP BY
-            vfuml.file_upload_name,
+            vfumv.file_upload_name,
         tsas.error_code,
         tsas.status ;
         """)
@@ -57,12 +56,12 @@ def execute():
             SUM(tsa.settled_amount) AS advice_settled,
             SUM(tsa.tds_amount) AS advice_tds,
             SUM(tsa.disallowed_amount) AS advice_disallowance,
-            vfuml.file_upload_name 
+            vfumv.file_upload_name 
         FROM
             `tabSettlement Advice` tsa
-        JOIN viewFile_Upload_Mail_log vfuml ON tsa.file_upload = vfuml.file_upload_name
+        JOIN viewFile_Upload_Mail_view vfumv ON tsa.file_upload = vfumv.file_upload_name
         GROUP BY
-            vfuml.file_upload_name ,
+            vfumv.file_upload_name ,
             tsa.status;
             """)
 
@@ -71,13 +70,13 @@ def execute():
         SELECT
             tm.status AS matcher_status,
             COUNT(tm.name) AS matcher_count,
-            vfuml.file_upload_name 
+            vfumv.file_upload_name 
         FROM
             `tabMatcher` tm
         JOIN `tabSettlement Advice` tsa ON tm.settlement_advice = tsa.name
-        JOIN viewFile_Upload_Mail_log vfuml ON tsa.file_upload = vfuml.file_upload_name
+        JOIN viewFile_Upload_Mail_view vfumv ON tsa.file_upload = vfumv.file_upload_name
         GROUP BY 
-            vfuml.file_upload_name,
+            vfumv.file_upload_name,
             tm.status ;
             """)
 
@@ -89,13 +88,13 @@ def execute():
             SUM(tpe.paid_amount) AS pe_settled,
             SUM(tpe.custom_tds_amount) AS pe_tds,
             SUM(tpe.custom_disallowed_amount) AS pe_disallowance,
-            vfuml.file_upload_name 
+            vfumv.file_upload_name 
         FROM
             `tabPayment Entry` tpe
         JOIN `tabMatcher` tm ON tpe.custom_sales_invoice = tm.sales_invoice AND tpe.reference_no = tm.bank_transaction
         JOIN `tabSettlement Advice` tsa ON tm.settlement_advice = tsa.name
-        JOIN viewFile_Upload_Mail_log vfuml ON tsa.file_upload = vfuml.file_upload_name 
+        JOIN viewFile_Upload_Mail_view vfumv ON tsa.file_upload = vfumv.file_upload_name 
         GROUP BY 
-            vfuml.file_upload_name,
+            vfumv.file_upload_name,
             tpe.status;
             """)
