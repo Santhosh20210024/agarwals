@@ -2,7 +2,7 @@ import frappe
 from agarwals.utils.error_handler import log_error
 
 def execute():
-    frappe.reload_doc("agarwals", "doctype", "mail_log")
+    frappe.reload_doc("agarwals", "doctype", "File upload")
     
     # Fetch file upload records
     file_upload = frappe.db.sql(
@@ -12,21 +12,16 @@ def execute():
 
     for file_record in file_upload:
         try:
-            # Create a new Mail log document
-            mail_log_record = frappe.new_doc('Mail log')
-            
-            mail_log_record.update({
-                'file_upload': file_record.get('name'),
-                'file_type': file_record.get('document_type'),
-                'status': "Open"
-                })
-
-            mail_log_record.save()
+            file_upload_record = frappe.get_doc("File upload",file_record.get('name'))
+            file_upload_record.update({
+                'sa_mail_sent':1
+            })
+            file_upload_record.save()
 
         except Exception as error:
             # Log errors encountered during the process
             log_error(
-                error='Unable to Create Mail log for file record {file_name}. Error: {error}'.format(
+                error='Unable to check the file_upload record {file_name}. Error: {error}'.format(
                     file_name=file_record.get('name'),
                     error=str(error)
                 ),

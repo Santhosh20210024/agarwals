@@ -11,7 +11,7 @@ class MailRecordCreator:
 
     def get_records(self):
         try:
-            self.records = frappe.db.sql(f"select vfuml.file_upload_name from viewFile_Upload_Mail_log vfuml")
+            self.records = frappe.db.sql(f"select vfum.file_upload_name from viewFile_Upload_Mail vfum")
             # If no records are found, log the error and show message
             if not self.records:
                 log_error("No records found: The mail has been sent till inserted!","Mail log")
@@ -49,7 +49,7 @@ class MailRecordCreator:
                     self.get_matcher_records(fu_name[0])
                     self.get_payment_entry_records(fu_name[0])
                 except Exception as e:
-                    log_error(e, "File Upload", fu_name)
+                    log_error(e, "File upload", fu_name)
 
         except Exception as e:
             log_error(e, "Mail log")
@@ -100,7 +100,9 @@ class ReportGenerator(MailRecordCreator):
                                 <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Status</th>
                                 <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Error Code</th>
                                 <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Count</th>
-                                
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Settled Amount</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">TDS Amount</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Disallowance Amount</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -113,7 +115,9 @@ class ReportGenerator(MailRecordCreator):
                             <td style="border: 1px solid #ddd; padding: 8px;">{record.get('staging_status')}</td>
                             <td style="border: 1px solid #ddd; padding: 8px;">{record.get('staging_error_code')}</td>
                             <td style="border: 1px solid #ddd; padding: 8px;">{record.get('staging_count')}</td>
-                            
+                            <td style="border: 1px solid #ddd; padding: 8px;">{record.get('staging_settled')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">{record.get('staging_tds')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">{record.get('staging_disallowance')}</td>
                         </tr>
                     """
         staging_records_table_html += "</tbody></table>"
@@ -128,6 +132,9 @@ class ReportGenerator(MailRecordCreator):
                                 <th style="border: 1px solid #fff; padding: 8px; color : #fff;">File Upload ID</th>
                                 <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Status</th>
                                 <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Count</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Settled Amount</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">TDS Amount</th>
+                                <th style="border: 1px solid #fff; padding: 8px; color : #fff;">Disallowance Amount</th>
                                 
                             </tr>
                         </thead>
@@ -140,6 +147,9 @@ class ReportGenerator(MailRecordCreator):
                             <td style="border: 1px solid #ddd; padding: 8px;">{record.get('file_upload_name')}</td>
                             <td style="border: 1px solid #ddd; padding: 8px;">{record.get('advice_status')}</td>
                             <td style="border: 1px solid #ddd; padding: 8px;">{record.get('advice_count')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">{record.get('advice_settled')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">{record.get('advice_tds')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">{record.get('advice_disallowance')}</td>
                             
                         </tr>
                     """
@@ -264,31 +274,26 @@ class MailSender(ReportGenerator):
         if self.records:   
             self.send_email(report_content=self.report_content, mail_group=mail_group)
     
-class MailLogUpdater(MailSender):
+class FileUploadUpdater(MailSender):
 
-    def update_mail_log(self):
+    def update_file_upload(self):
         file_records = self.records
         if file_records:
             for file_record in file_records :
                 for record in file_record :
                     try :
-                        fu_record = frappe.db.sql(f"SELECT * from viewfile_upload_records vur WHERE vur.fu_name = '{record}'", as_dict=True)
-                        mail_log_record = frappe.new_doc('Mail log')
-                        mail_log_record.update({
-                        'file_upload': fu_record[0]['fu_name'],
-                        'file_name' : fu_record[0]['file_name'], 
-                        'file_type': 'Settlement Advice',
-                        'is_sent' : 1,
-                        'status' : "Processed"
+                        fu_record = frappe.get_doc("File upload", record)
+                        fu_record.update({
+                            'sa_mail_sent' :1
                         })
-                        mail_log_record.save()
+                        fu_record.save()
                     except Exception as e:
-                        log_error("Error Ocuured while Update ",e,"Mail log",record)
+                        log_error("Error Ocuured while Update :{e}","File upload",record)
 
     def process(self, mail_group):
         super().process(mail_group)
         if self.records:
-            self.update_mail_log()
+            self.update_file_upload()
 
 @frappe.whitelist()
 def process():
@@ -296,7 +301,7 @@ def process():
         controlpanel = frappe.get_single("Control Panel")
         if controlpanel.sa_report_email_group is None:
             raise ValueError("Email Group Not Found in SA Report")
-        mail_sender = MailLogUpdater()
+        mail_sender = FileUploadUpdater()
         frappe.enqueue(mail_sender.process, queue='long', job_name=f"sa mail sender - {frappe.utils.now_datetime()}",mail_group = controlpanel.sa_report_email_group)
     except Exception as e:
         log_error(e, "Mail log")
