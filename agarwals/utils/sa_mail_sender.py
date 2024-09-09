@@ -11,7 +11,7 @@ class MailRecordCreator:
 
     def get_records(self):
         try:
-            self.records = frappe.db.sql(f"select vfumv.file_upload_name from viewFile_Upload_Mail_view vfumv")
+            self.records = frappe.db.sql(f"select vfum.file_upload_name from viewFile_Upload_Mail vfum")
             # If no records are found, log the error and show message
             if not self.records:
                 log_error("No records found: The mail has been sent till inserted!","Mail log")
