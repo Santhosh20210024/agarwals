@@ -14,6 +14,7 @@ class ProviderIhxDownloader(SeleniumDownloader):
             error_message = self.min_wait.until(EC.visibility_of_element_located((By.XPATH, "//span[@class='message-text']"))).text
             if "Incorrect username" in error_message or "Incorrect password" in error_message:
                 return False
+            return True
         except :
             return True
 
@@ -26,6 +27,7 @@ class ProviderIhxDownloader(SeleniumDownloader):
         login_button.click()
 
     def navigate(self):
+        self.driver.refresh()
         try:
             skip = self.min_wait.until(EC.visibility_of_element_located((By.CLASS_NAME,'skip-verification')))
             skip.click()

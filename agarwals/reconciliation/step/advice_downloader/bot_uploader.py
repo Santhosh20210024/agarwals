@@ -2,112 +2,103 @@ import frappe
 import requests
 import shutil
 import os
+from tfs.api_utils import login, create_document, create_file
 from agarwals.utils.error_handler import log_error
+
 
 class SABotUploader:
     def __init__(self):
-        self.user_id = None
-        self.password = None
-        self.url = None
-        self.sa_download_path = None
-        self.zip_folder_name = None
-        self.zip_folder_path = None
-        self.session = None
-        self.folder_names = None
-        self.send_mail = None
-        self.mail_group = None
-        self.delete_folders_with_zip = None
-        self.delete_folders_without_zip = None
-        self.file_upload_failed = False
+        self.set_configuration_values()
 
-    def raise_exception(self,exception):
+    def raise_exception(self, exception):
         raise Exception(exception)
 
-    def set_self_variable(self):
+    def set_configuration_values(self) -> None:
+        """
+        Usage:
+             Retrieve and set configuration values from the Control Panel.
+        Raises:
+             Raise exceptions if any required configuration values are missing.
+        """
         control_panel = frappe.get_single("Control Panel")
         if control_panel:
-            self.user_id = control_panel.user_id
-            self.password = control_panel.password
-            self.url = control_panel.url if control_panel.url.endswith("/") else control_panel.url + "/"
-            self.sa_download_path = control_panel.sa_downloader_path if control_panel.sa_downloader_path.endswith("/") else control_panel.sa_downloader_path + "/"
+            self.user_id = control_panel.user_id or self.raise_exception(
+                "User ID cannot be empty; the bot requires it to upload settlement advice files.")
+            self.password = control_panel.password or self.raise_exception(
+                "Password cannot be empty; the bot requires it to upload settlement advice files.")
+            self.url = control_panel.url or self.raise_exception(
+                "Destination URL cannot be empty; the bot requires it to upload settlement advice files.")
+            site_path = control_panel.site_path or self.raise_exception(
+                "Site path cannot be empty; the bot requires it to upload settlement advice files.")
+            project_path = control_panel.project_folder or self.raise_exception(
+                "Project path cannot be empty; the bot requires it to upload settlement advice files.")
+            shell_path = "private/files"
+            self.sa_download_path = os.path.join(site_path, shell_path, project_path, "Settlement Advice")
             self.zip_folder_name = f"SA_Zip_{frappe.utils.now_datetime()}"
-            self.zip_folder_path = self.sa_download_path+self.zip_folder_name
-            self.folder_names = set(frappe.db.sql("SELECT tpa FROM `tabTPA Login Credentials` WHERE is_enable = 1",pluck ="tpa"))
-            self.send_mail = control_panel.send_mail if control_panel.send_mail else None
-            self.mail_group = control_panel.email_group if control_panel.email_group else None
-            self.delete_folders_with_zip = control_panel.delete_zip = 1 if control_panel.delete_zip else None
-            self.delete_folders_without_zip = control_panel.delete_folder = 1 if control_panel.delete_folder else None
+            self.zip_folder_path = os.path.join(self.sa_download_path, self.zip_folder_name)
+            self.folder_names = set(
+                frappe.db.sql("SELECT tpa FROM `tabTPA Login Credentials` WHERE is_enable = 1", pluck="tpa"))
+            self.send_mail = control_panel.send_mail
+            self.mail_group = control_panel.email_group or None
+            self.delete_folders_with_zip = control_panel.delete_zip
+            self.delete_folders_without_zip = control_panel.delete_folder
+            self.file_upload_failed = False
 
-    def convert_folder_to_zip(self):
+
+    def convert_folder_to_zip(self) -> None:
         os.mkdir(self.zip_folder_path)
         for folder_name in self.folder_names:
-            path = self.sa_download_path + folder_name
+            path = os.path.join(self.sa_download_path, folder_name)
             if not os.path.exists(path):
-                log_error(error=f"{path} - Path does not exist While converting folder to zip",doc_name="SA Bot Uploader")
+                log_error(error=f"{path} - Path does not exist While converting folder to zip",
+                          doc_name="SA Bot Uploader")
             elif len(os.listdir(path)) < 1:
-                log_error(error=f"{folder_name} Folder found empty - While converting folder to zip",doc_name="SA Bot Uploader")
+                log_error(error=f"{folder_name} Folder found empty - While converting folder to zip",
+                          doc_name="SA Bot Uploader")
             else:
-                zip_name = self.zip_folder_path +"/"+f"{folder_name}[{frappe.utils.now_datetime()}]"
-                convert_zip = shutil.make_archive(base_name=zip_name, format="zip", root_dir=path)
+                zip_name = self.zip_folder_path + "/" + f"{folder_name}[{frappe.utils.now_datetime()}]"
+                shutil.make_archive(base_name=zip_name, format="zip", root_dir=path)
 
         if len(os.listdir(self.zip_folder_path)) == 0:
             self.raise_exception(f"File Upload Failed :{self.zip_folder_path} -Zip files not found ")
 
-    def login(self):
-        self.session = requests.Session()
-        login_url = self.url + "api/method/login"
-        payload = {
-            'usr': self.user_id,
-            'pwd': self.password
-        }
-        headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-        response = self.session.post(login_url, json=payload, headers=headers)
-        if response.status_code != 200:
-            self.raise_exception(f"Login Failed : Error = {response.text} , Status Code = {response.status_code}")
+    def get_login_session(self) -> None:
+        """
+       Usage:
+            Retrieves an authenticated session by logging into the portal.
+       Returns:
+            object: An authenticated session object if login is successful
+        Raises:
+            Exception: If the `login` function raises an exception due to authentication failure
+                       or any other issue.
+        """
+        session = login(self.user_id, self.password, self.url)
+        return session
 
-    def change_status(self):
-        if self.file_upload_failed == False:
-            self.file_upload_failed = True
-    def upload_zip_files(self):
+    def upload_zip_files(self) -> None:
+        """
+        Usage:
+            Upload zip files from the specified directory to the server.
+        Raises:
+            Raise exception if no zip files are found or an upload error occurs.
+        """
         zip_files = os.listdir(self.zip_folder_path)
         if zip_files:
             for zip_file in zip_files:
                 try:
-                    file_upload_url = f'{self.url}api/method/upload_file'
-                    file_path = self.zip_folder_path+"/"+zip_file
-                    file_name = zip_file
-                    with open(file_path, 'rb') as file_obj:
-                        files = {
-                            'file': (file_name, file_obj)
-                        }
-                        data = {
-                            'is_private': 1,
-                            'folder': 'Home/Attachments'
-                        }
-                        upload_response = self.session.post(file_upload_url, files=files, data=data)
-                        if upload_response.status_code == 200:
-                            create_file_upload = f'{self.url}api/resource/File upload'
-                            payload = {
-                                'file_format': 'ZIP',
-                                'document_type': 'Settlement Advice',
-                                'is_bot': '1',
-                                "payer_type": file_name.split("[")[0],
-                                "upload": f"/private/files/{file_name}"
-                            }
-                            response = self.session.post(create_file_upload, json=payload)
-                            if response.status_code != 200:
-                                self.change_status()
-                                log_error(error=f"{file_name}file created but file upload filed ",doc_name="SA Bot Uploader")
-                        else:
-                            self.change_status()
-                            log_error(error = f"file creation failed for {file_name}",doc_name="SA Bot Uploader")
-
+                    content = {
+                        'file_format': 'ZIP',
+                        'document_type': 'Settlement Advice',
+                        'is_bot': '1',
+                        "payer_type": zip_file.split("[")[0],
+                        "upload": f"/private/files/{zip_file}"
+                    }
+                    file_path = self.zip_folder_path + "/" + zip_file
+                    create_file(session=self.session, url=self.url, file_path=file_path, file_name=zip_file)
+                    create_document(doctype='File upload', url=self.url, session=self.session, content=content)
                 except Exception as e:
-                    self.change_status()
-                    log_error(error=f"Failed to Upload  {file_name}  error = {e}",doc_name="SA Bot Uploader")
+                    self.file_upload_failed = True
+                    log_error(error=f"Failed to Upload  {zip_file}  error = {e}", doc_name="SA Bot Uploader")
         else:
             self.raise_exception("No Zip Files Found")
 
@@ -119,7 +110,7 @@ class SABotUploader:
         for tpa_name in tpa_names:
             path = self.sa_download_path + tpa_name
             total_files_downloaded.append(len(os.listdir(path)))
-            total_logins.append(frappe.db.count('TPA Login Credentials',{'is_enable':1,'tpa':tpa_name}))
+            total_logins.append(frappe.db.count('TPA Login Credentials', {'is_enable': 1, 'tpa': tpa_name}))
 
         html_table = """
         <table border="1" style="border-collapse: collapse; width: 100%;">
@@ -139,20 +130,21 @@ class SABotUploader:
             </tr>
             """
         html_table += "</table>"
-        return html_table,sum(total_files_downloaded),sum(total_logins)
+        return html_table, sum(total_files_downloaded), sum(total_logins)
 
-    def send_notification(self,message,subject,reciver_list):
-        frappe.sendmail(recipients=reciver_list,subject=subject,message=message)
+    def send_notification(self, message, subject, reciver_list):
+        frappe.sendmail(recipients=reciver_list, subject=subject, message=message)
 
     def generate_notification(self):
         if not self.mail_group:
             self.raise_exception("Mail Group Not Found")
 
-        reciver_list = frappe.db.sql(f" SELECT email FROM `tabEmail Group Member` WHERE email_group = '{self.mail_group}' ",pluck= 'email')
+        reciver_list = frappe.db.sql(
+            f" SELECT email FROM `tabEmail Group Member` WHERE email_group = '{self.mail_group}' ", pluck='email')
         if not reciver_list:
             self.raise_exception("Group Has No Recivers")
 
-        report_table,total_file_downloaded,total_logins = self.generate_report_table()
+        report_table, total_file_downloaded, total_logins = self.generate_report_table()
         subject = "Settlement Advice Downloader Report"
         message = f"""
         Hi All,<br>
@@ -166,13 +158,14 @@ class SABotUploader:
         <br>
         SA Downloader BOT
         """
-        frappe.enqueue(self.send_notification,queue='long',message=message,subject=subject,reciver_list=reciver_list)
+        frappe.enqueue(self.send_notification, queue='long', message=message, subject=subject,
+                       reciver_list=reciver_list)
 
     def delete_backend_file(self):
         folders = os.listdir(self.sa_download_path)
         for folder in folders:
             path = self.sa_download_path + folder
-            if folder not in ['Error',self.zip_folder_name]:
+            if folder not in ['Error', self.zip_folder_name]:
                 if os.path.exists(path):
                     if folder.endswith('zip'):
                         os.remove(path)
@@ -184,15 +177,21 @@ class SABotUploader:
             if os.path.exists(self.zip_folder_path):
                 shutil.rmtree(self.zip_folder_path)
 
-    def process(self):
+    def process(self) -> None:
+        """
+        Usage:
+            Execute the entire process of converting folders to zip files, uploading them,
+            generating notifications, and deleting backend files based on configuration.
+        Returns:
+            None
+        """
         try:
-            self.set_self_variable()
             self.convert_folder_to_zip()
-            self.login()
+            self.session = self.get_login_session()
             self.upload_zip_files()
             if self.send_mail == 1:
                 self.generate_notification()
             if self.delete_folders_without_zip == 1 or self.delete_folders_with_zip == 1:
                 self.delete_backend_file()
         except Exception as e:
-            log_error(error=e,doc_name="SA Bot Uploader")
+            log_error(error=e, doc_name="SA Bot Uploader")

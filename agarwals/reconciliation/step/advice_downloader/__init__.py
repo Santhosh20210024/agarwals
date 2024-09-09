@@ -42,7 +42,10 @@ def download_advice(tpa_doc, chunk_doc, args):
 def process(args):
     try:
         args = cast_to_dic(args)
-        tpa_login_doc = frappe.get_all("TPA Login Credentials",fields='*',filters={'executing_method':args["executing_method"]})
+        if args.get("retry"):
+            tpa_login_doc = frappe.db.sql("SELECT * FROM `tabTPA Login Credentials` WHERE retry = 1 ",as_dict=True)
+        else:
+            tpa_login_doc = frappe.db.sql(f"""SELECT * FROM `tabTPA Login Credentials` WHERE executing_method = '{args["executing_method"]}' AND status in ('New','Valid') """,as_dict=True)
         if tpa_login_doc:
             for tpa_login in tpa_login_doc:
                 if tpa_login.is_enable == 1:
