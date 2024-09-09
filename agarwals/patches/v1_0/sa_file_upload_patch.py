@@ -2,7 +2,7 @@ import frappe
 from agarwals.utils.error_handler import log_error
 
 def execute():
-    frappe.reload_doc("agarwals", "doctype", "File_upload")
+    frappe.reload_doc("agarwals", "doctype", "File upload")
     
     # Fetch file upload records
     file_upload = frappe.db.sql(

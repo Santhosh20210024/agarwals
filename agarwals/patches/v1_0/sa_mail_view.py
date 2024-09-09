@@ -1,7 +1,7 @@
 import frappe
 
 class ViewCreator:
-    def file_upload_mail_view(self):
+    def create_file_upload_mail_view(self):
         # Create or replace view 'viewFile_Upload_Mail_log'
         frappe.db.sql("""CREATE or REPLACE VIEW viewFile_Upload_Mail AS
             SELECT
@@ -16,7 +16,7 @@ class ViewCreator:
                 AND tfu.sa_mail_sent = 0;
         """)
 
-    def file_upload_view(self):
+    def create_file_upload_view(self):
         # Create or replace view 'viewfile_upload_records'
         frappe.db.sql("""CREATE or REPLACE VIEW viewfile_upload_records AS
             SELECT
@@ -31,7 +31,7 @@ class ViewCreator:
             JOIN viewFile_Upload_Mail vfum ON tfu.name = vfum.file_upload_name;
         """)
 
-    def staging_view(self):
+    def create_staging_view(self):
         # Create or replace view 'viewstaging_records'
         frappe.db.sql("""CREATE or REPLACE VIEW viewstaging_records AS
             SELECT
@@ -51,7 +51,7 @@ class ViewCreator:
             tsas.status ;
             """)
 
-    def advice_view(self):
+    def create_advice_view(self):
         # Create or replace view 'viewadvice_records'
         frappe.db.sql("""CREATE or REPLACE VIEW viewadvice_records AS
             SELECT
@@ -69,7 +69,7 @@ class ViewCreator:
                 tsa.status;
                 """)
 
-    def matcher_view(self):
+    def create_matcher_view(self):
         # Create or replace view 'viewmatcher_records'
         frappe.db.sql("""CREATE or REPLACE VIEW viewmatcher_records AS
             SELECT
@@ -85,7 +85,7 @@ class ViewCreator:
                 tm.status ;
                 """)
 
-    def payment_entry_view(self):
+    def create_payment_entry_view(self):
         # Create or replace view 'viewpayment_entry_records'
         frappe.db.sql("""CREATE or REPLACE VIEW viewpayment_entry_records AS
             SELECT
@@ -106,12 +106,12 @@ class ViewCreator:
                 """)
     
     def process(self):
-        self.file_upload_mail_view()
-        self.file_upload_view()
-        self.staging_view()
-        self.advice_view()
-        self.matcher_view()
-        self.payment_entry_view()
+        self.create_file_upload_mail_view()
+        self.create_file_upload_view()
+        self.create_staging_view()
+        self.create_advice_view()
+        self.create_matcher_view()
+        self.create_payment_entry_view()
         
 def execute():
     ViewInstance = ViewCreator()

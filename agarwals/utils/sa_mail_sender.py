@@ -49,7 +49,7 @@ class MailRecordCreator:
                     self.get_matcher_records(fu_name[0])
                     self.get_payment_entry_records(fu_name[0])
                 except Exception as e:
-                    log_error(e, "File Upload", fu_name)
+                    log_error(e, "File upload", fu_name)
 
         except Exception as e:
             log_error(e, "Mail log")
@@ -288,7 +288,7 @@ class FileUploadUpdater(MailSender):
                         })
                         fu_record.save()
                     except Exception as e:
-                        log_error("Error Ocuured while Update ",e,"File upload",record)
+                        log_error("Error Ocuured while Update :{e}","File upload",record)
 
     def process(self, mail_group):
         super().process(mail_group)
