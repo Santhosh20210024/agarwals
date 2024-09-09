@@ -46,7 +46,7 @@ class ViewCreator:
                 `tabSettlement Advice Staging` tsas
             JOIN viewFile_Upload_Mail vfum ON tsas.file_upload = vfum.file_upload_name
             GROUP BY
-                vfumv.file_upload_name,
+                vfum.file_upload_name,
             tsas.error_code,
             tsas.status ;
             """)
@@ -65,7 +65,7 @@ class ViewCreator:
                 `tabSettlement Advice` tsa
             JOIN viewFile_Upload_Mail vfum ON tsa.file_upload = vfum.file_upload_name
             GROUP BY
-                vfumv.file_upload_name ,
+                vfum.file_upload_name ,
                 tsa.status;
                 """)
 
