@@ -19,6 +19,7 @@
   "upload",
   "is_bot",
   "is_mail",
+  "sa_mail_sent",
   "column_break_ppbz4",
   "tpa_login_id",
   "tpa_branch",
@@ -300,11 +301,18 @@
    "fieldname": "tpa_branch",
    "fieldtype": "Data",
    "label": "TPA Branch"
+  },
+  {
+   "default": "0",
+   "fieldname": "sa_mail_sent",
+   "fieldtype": "Check",
+   "in_preview": 1,
+   "label": "SA Mail sent"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-06 16:01:12.414649",
+ "modified": "2024-09-06 15:48:51.615532",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
