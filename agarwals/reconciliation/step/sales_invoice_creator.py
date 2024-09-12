@@ -6,33 +6,122 @@ from agarwals.reconciliation import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.fiscal_year_update import update_fiscal_year
+from datetime import date
+
+class SalesInvoiceCancellator:
+    def get_bill_period(self, date):
+        bill_period = frappe.get_list("Accounting Period", filters={'start_date':['<=',date],'end_date':['>=',date]})
+        if not bill_period:
+            return "Current Year"
+        return "Not a Current Year"
+
+    def get_payment_entry_document(self, bill):
+        return frappe.get_list("Payment Entry", filters={'custom_sales_invoice':bill}, fields=['name','custom_sales_invoice','paid_amount','custom_tds_amount','custom_disallowed_amount','custom_round_off','paid_to','party','reference_no'])
+
+    def add_account_entry(self, je, account, entry_type, amount, reference_type = None, reference_name = None, si = None):
+        entry = {}
+        entry['account'] =  account
+
+        if entry_type == "credit":
+            entry['credit_in_account_currency'] = amount
+        else:
+            entry['debit_in_account_currency'] = amount
+
+        if si:
+            entry['region'] = si.region
+            entry['entity'] = si.entity
+            entry['branch'] = si.branch
+            entry['cost_center'] = si.cost_center
+            entry['branch_type'] = si.branch_type
+            entry['party_type'] = "Customer"
+            entry['party'] = si.customer
+
+        entry['reference_type'] = reference_type
+        entry['reference_name'] = reference_name
+
+        je.append('accounts', entry)
+        return je
 
 
-class SalesInvoiceCreator:
+
+    def make_reversal_entry_for_pe(self, payment_entry_documents):
+        for payment_entry in payment_entry_documents:
+            journal_entry = frappe.new_doc("Journal Entry")
+            journal_entry.name = payment_entry['name'] + " - Reverse"
+            journal_entry.voucher_type = "Debit Note"
+            journal_entry.posting_date = date.today()
+            sales_invoice = frappe.get_doc("Sales Invoice", payment_entry['custom_sales_invoice'])
+            if payment_entry['paid_amount'] != 0:
+                journal_entry = self.add_account_entry(je = journal_entry, account = payment_entry['paid_to'], entry_type = 'credit', amount = payment_entry['paid_amount'], reference_type = "Bank Transaction", reference_name = payment_entry['reference_no'])
+            if payment_entry['custom_tds_amount'] != 0:
+                journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
+                                                       account="TDS - A", entry_type='credit',
+                                                       amount=payment_entry['custom_tds_amount'])
+            if payment_entry['custom_disallowed_amount'] != 0:
+                journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
+                                                       account="Disallowance - A", entry_type='credit',
+                                                       amount=payment_entry['custom_disallowed_amount'])
+            if payment_entry['custom_round_off'] != 0:
+                journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
+                                                       account="Rounded Off - A", entry_type='credit',
+                                                       amount=payment_entry['custom_round_off'])
+
+            journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
+                                                   account="Debtors - A", entry_type='debit',
+                                                   amount=payment_entry['paid_amount'] + payment_entry['custom_tds_amount'] + payment_entry['custom_disallowed_amount'] + payment_entry['custom_round_off'])
+
+            journal_entry.save()
+            journal_entry.submit()
+            bank_transaction = frappe.get_doc("Bank Transaction", payment_entry['reference_no'])
+            bank_transaction.append('payment_entries',
+                           {'payment_document': "Journal Entyr"
+                               , 'payment_entry': journal_entry.name
+                               , 'allocated_amount': -payment_entry['paid_amount']
+                               , 'custom_posting_date':journal_entry.posting_date
+                               , 'custom_bill_date': sales_invoice.posting_date
+                               , 'custom_bill_region': sales_invoice.region
+                               , 'custom_bill_branch': sales_invoice.branch
+                               , 'custom_bill_branch_type': sales_invoice.branch_type
+                               , 'custom_bill_entity': sales_invoice.entity})
+            bank_transaction.submit()
+            frappe.db.commit()
+
+
+    def cancel_previous_period_bill(self, bill):
+        payment_entry_documents = self.get_payment_entry_document(bill)
+        if payment_entry_documents:
+            self.make_reversal_entry_for_pe(payment_entry_documents)
+
+
+
     def cancel_sales_invoice(self, cancelled_bills):
         for bill in cancelled_bills:
             try:
                 bill_record = frappe.get_doc('Bill', bill)
+                bill_period = self.get_bill_period(bill_record.bill_date)
+                if bill_period != "Current Year":
+                    self.cancel_pervious_period_bill(bill)
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
                 sales_invoice_record.custom_file_upload = bill_record.file_upload
                 sales_invoice_record.custom_transform = bill_record.transform
                 sales_invoice_record.custom_index = bill_record.index
                 sales_invoice_record.save(ignore_permissions=True)
                 PaymentDocumentCancellator().cancel_payment_documents(bill)
-                MatcherCancellator().delete_matcher(sales_invoice_record)  
+                MatcherCancellator().delete_matcher(sales_invoice_record)
                 sales_invoice_record.reload()
                 sales_invoice_record.cancel()
-                
+
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
-                
+
                 frappe.db.commit()
                 file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                     transform=sales_invoice_record.custom_transform,
                                     reference_doc=sales_invoice_record.doctype,
                                     record=bill, index=sales_invoice_record.custom_index)
             except Exception as e:
-                log_error(error=e, doc="Bill",doc_name=bill)
-             
+                log_error(error=e, doc="Bill", doc_name=bill)
+
+class SalesInvoiceCreator:
     def process(self, bill_numbers, chunk_doc):
         chunk.update_status(chunk_doc, "InProgress")
         try:
@@ -108,7 +197,7 @@ def process(args):
         if cancelled_bills:
             chunk.update_status(cancellation_chunk_doc, "InProgress")
             try:
-                SalesInvoiceCreator().cancel_sales_invoice(cancelled_bills)
+                SalesInvoiceCancellator().cancel_sales_invoice(cancelled_bills)
                 cancellation_chunk_doc_status = "Processed"
             except Exception as e:
                 cancellation_chunk_doc_status = "Error"
