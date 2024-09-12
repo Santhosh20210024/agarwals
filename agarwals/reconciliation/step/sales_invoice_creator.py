@@ -53,6 +53,13 @@ class SalesInvoiceCancellator:
             journal_entry.posting_date = date.today()
             sales_invoice = frappe.get_doc("Sales Invoice", payment_entry['custom_sales_invoice'])
             journal_entry.custom_sales_invoice = payment_entry['custom_sales_invoice']
+            journal_entry.custom_entity = sales_invoice.entity
+            journal_entry.custom_region = sales_invoice.region
+            journal_entry.custom_branch = sales_invoice.branch
+            journal_entry.custom_party = sales_invoice.customer
+            journal_entry.custom_party_group = sales_invoice.customer_group
+            journal_entry.custom_branch_type = sales_invoice.branch_type
+            journal_entry.custom_bill_date = sales_invoice.posting_date
             if payment_entry['paid_amount'] != 0:
                 journal_entry = self.add_account_entry(je = journal_entry, account = payment_entry['paid_to'], entry_type = 'credit', amount = payment_entry['paid_amount'], reference_type = "Bank Transaction", reference_name = payment_entry['reference_no'])
             if payment_entry['custom_tds_amount'] != 0:
@@ -99,6 +106,32 @@ class SalesInvoiceCancellator:
             reverse_entry.voucher_type = "Debit Note"
             reverse_entry.save()
             reverse_entry.submit()
+            frappe.db.commit()
+
+    def make_cancel_je(self, bill):
+        sales_invoice = frappe.get_doc("Sales Invoice", bill)
+        journal_entry = frappe.new_doc("Journal Entry")
+        journal_entry.name = si.name + " - Cancel"
+        journal_entry.voucher_type = "Credit Note"
+        journal_entry.posting_date = date.today()
+        journal_entry.custom_sales_invoice = sales_invoice.name
+        journal_entry.custom_entity = sales_invoice.entity
+        journal_entry.custom_region = sales_invoice.region
+        journal_entry.custom_branch = sales_invoice.branch
+        journal_entry.custom_party = sales_invoice.customer
+        journal_entry.custom_party_group = sales_invoice.customer_group
+        journal_entry.custom_branch_type = sales_invoice.branch_type
+        journal_entry.custom_bill_date = sales_invoice.posting_date
+        journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
+                                               account="Debtors - A", entry_type='credit',
+                                               amount=sales_invoice.outstanding_amount, reference_type="Sales Invoice", reference_name=sales_invoice.name)
+        journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
+                                               account="Sales - A", entry_type='debit',
+                                               amount=sales_invoice.outstanding_amount)
+        journal_entry.save()
+        journal_entry.submit()
+        frappe.db.commit()
+
 
     def cancel_previous_period_bill(self, bill):
         payment_entry_documents = self.get_payment_entry_documents(bill)
@@ -107,6 +140,7 @@ class SalesInvoiceCancellator:
         journal_entry_documents = self.get_journal_entry_documents(bill)
         if journal_entry_documents:
             self.make_reversal_entry_for_je(journal_entry_documents)
+        self.make_cancel_je(bill)
 
 
 
