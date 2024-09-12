@@ -7,6 +7,7 @@ from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.fiscal_year_update import update_fiscal_year
 from datetime import date
+from erpnext.accounts.doctype.journal_entry.journal_entry import make_reverse_journal_entry
 
 class SalesInvoiceCancellator:
     def get_bill_period(self, date):
@@ -15,8 +16,8 @@ class SalesInvoiceCancellator:
             return "Current Year"
         return "Not a Current Year"
 
-    def get_payment_entry_document(self, bill):
-        return frappe.get_list("Payment Entry", filters={'custom_sales_invoice':bill}, fields=['name','custom_sales_invoice','paid_amount','custom_tds_amount','custom_disallowed_amount','custom_round_off','paid_to','party','reference_no'])
+    def get_payment_entry_documents(self, bill):
+        return frappe.get_list("Payment Entry", filters={'custom_sales_invoice':bill,'status':['not in',('Draft','Cancelled')]}, fields=['name','custom_sales_invoice','paid_amount','custom_tds_amount','custom_disallowed_amount','custom_round_off','paid_to','party','reference_no'])
 
     def add_account_entry(self, je, account, entry_type, amount, reference_type = None, reference_name = None, si = None):
         entry = {}
@@ -51,6 +52,7 @@ class SalesInvoiceCancellator:
             journal_entry.voucher_type = "Debit Note"
             journal_entry.posting_date = date.today()
             sales_invoice = frappe.get_doc("Sales Invoice", payment_entry['custom_sales_invoice'])
+            journal_entry.custom_sales_invoice = payment_entry['custom_sales_invoice']
             if payment_entry['paid_amount'] != 0:
                 journal_entry = self.add_account_entry(je = journal_entry, account = payment_entry['paid_to'], entry_type = 'credit', amount = payment_entry['paid_amount'], reference_type = "Bank Transaction", reference_name = payment_entry['reference_no'])
             if payment_entry['custom_tds_amount'] != 0:
@@ -86,11 +88,26 @@ class SalesInvoiceCancellator:
             bank_transaction.submit()
             frappe.db.commit()
 
+    def get_journal_entry_documents(self, bill):
+        return frappe.get_list("Journal Entry",
+                               filters={'custom_sales_invoice': bill, 'status': ['not in', ('Draft', 'Cancelled')]},pluck = 'name')
+
+    def make_reversal_entry_for_je(self,journal_entries):
+        for jounal_entry in journal_entries:
+            reverse_entry = make_reverse_journal_entry(jounal_entry)
+            reverse_entry.name = jounal_entry + " - Reverse"
+            reverse_entry.voucher_type = "Debit Note"
+            reverse_entry.save()
+            reverse_entry.submit()
 
     def cancel_previous_period_bill(self, bill):
-        payment_entry_documents = self.get_payment_entry_document(bill)
+        payment_entry_documents = self.get_payment_entry_documents(bill)
         if payment_entry_documents:
             self.make_reversal_entry_for_pe(payment_entry_documents)
+        journal_entry_documents = self.get_journal_entry_documents(bill)
+        if journal_entry_documents:
+            self.make_reversal_entry_for_je(journal_entry_documents)
+
 
 
 
