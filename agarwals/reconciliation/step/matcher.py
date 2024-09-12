@@ -5,6 +5,8 @@ from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.index_update import update_index
 from agarwals.utils.matcher_query_list import get_matcher_query
+from agarwals.reconciliation.step.key_mapper.claim_key_mapper import query_mapper as claim_key_queries
+from agarwals.reconciliation.step.key_mapper.utr_key_mapper import query_mapper as utr_key_queries
 
 """
 'Open' -> New Records.
@@ -15,6 +17,40 @@ from agarwals.utils.matcher_query_list import get_matcher_query
 'Unmatched' -> Unmatched Records For Other Queries.
 """
 
+class DataIntegrityValidator:
+    
+    def __check_empty_key(self, _key_type, _doctype, _query):
+        """Run Query and Check if there is any empty key present in key_type doctype."""
+        query_result = frappe.db.sql(_query, as_dict=True)
+        if not query_result:
+            raise ValueError(f'{_key_type} should not be empty in {_doctype}')
+    
+    def __check_key(self, key_type, key_queries):
+        """Get corresponding queries and doctype from the key_queries."""
+        for doctype, query in key_queries.items():
+            self.__check_empty_key(key_type, doctype, query)
+    
+    def __check_claim_key(self):
+        """Wrapper for check_key (claim_key)."""
+        self.__check_key('Claim Key', claim_key_queries)
+    
+    def __check_utr_key(self):
+        """Wrapper for check_key (utr_key)."""
+        self.__check_key('UTR Key', utr_key_queries)
+    
+    def __is_match_logic_exist():
+        """Check if match logic is defined in the Control Panel."""
+        control_panel = frappe.get_single("Control Panel")
+        match_logics = control_panel.get('match_logic','').split(",") 
+
+        if not match_logics:
+            raise ValueError('Match Logic is not defined in control panel')
+    
+    def _validate(self):
+        """Check all the pre validation parts"""
+        self.__is_match_logic_exist()
+        self.__check_utr_key()
+        self.__check_claim_key()
 
 class MatcherValidation:
     """A class to validate matcher records before processing.
@@ -334,15 +370,6 @@ class MatcherOrchestrator(Matcher):
 
         self.postprocess_entries()
 
-def get_control_panel_conf():
-    control_panel = frappe.get_single("Control Panel")
-    match_logics = control_panel.get('match_logic','').split(",") 
-
-    if not match_logics:
-        frappe.throw('Match Logic is not defined in control panel')
-
-    return match_logics
-
 @frappe.whitelist()
 def process(args):
     try:
@@ -350,7 +377,8 @@ def process(args):
         step_id = args["step_id"]
         
         try:
-            match_logics = get_control_panel_conf()
+            DataIntegrityValidator()._validate()
+            match_logics = frappe.get_doc('Control Panel').get('match_logic','').split(",") 
             chunk_doc = chunk.create_chunk(step_id)
             
             matcher_orcestrator = MatcherOrchestrator(chunk_doc, match_logics)

@@ -1,7 +1,7 @@
 import frappe
 from agarwals.reconciliation.step.key_mapper.key_mapper import KeyMapper
 from agarwals.reconciliation.step.key_creator.utr_key_creator import UTRKeyCreator
-from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
+from agarwals.reconciliation.step.key_mapper.utils import process_records
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.reconciliation import chunk
@@ -70,18 +70,7 @@ class UTRKeyMapper(KeyMapper):
                 self.record_type,
             )
             frappe.throw(f"Unexpected error while processing UTR keys: {str(e)}")
- 
- 
-class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records, chunk_doc):
-        super().__init__(
-            records,
-            "Settlement Advice",
-            """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s""",
-            chunk_doc
-        )
- 
- 
+
 class BankTransactionUTRKeyMapper(UTRKeyMapper):
     def __init__(self, records, chunk_doc):
         super().__init__(
@@ -90,8 +79,7 @@ class BankTransactionUTRKeyMapper(UTRKeyMapper):
             """UPDATE `tabBank Transaction` SET custom_utr_key = %(key)s WHERE name = %(name)s""",
             chunk_doc
         )
- 
- 
+
 class ClaimBookUTRKeyMapper(UTRKeyMapper):
     def __init__(self, records, chunk_doc):
         super().__init__(
@@ -101,21 +89,30 @@ class ClaimBookUTRKeyMapper(UTRKeyMapper):
             chunk_doc
         )
  
+class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
+    def __init__(self, records, chunk_doc):
+        super().__init__(
+            records,
+            "Settlement Advice",
+            """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s""",
+            chunk_doc
+        )
+
+query_mapper = {
+                "Bank Transaction": """SELECT name, reference_number as key_id FROM `tabBank Transaction`
+                                    WHERE reference_number != '0' AND reference_number IS NOT NULL 
+                                    AND (custom_utr_key IS NULL or custom_utr_key = '') AND status != 'Cancelled'""",
+                "ClaimBook": """SELECT name, utr_number as key_id FROM `tabClaimBook` 
+                                WHERE utr_number != '0' AND utr_number IS NOT NULL AND utr_number != '' AND (utr_key IS NULL or utr_key = '')""",
+                "Settlement Advice": """SELECT name, utr_number as key_id FROM `tabSettlement Advice` 
+                                        WHERE utr_number != '0' AND utr_number IS NOT NULL AND utr_number != '' AND (utr_key IS NULL or utr_key = '')"""
+               }
+
 @frappe.whitelist()
 def process(args={"type":"utr_key","step_id":"","queue":"long"}):
     try:
         args = cast_to_dic(args)
         chunk_size = int(args.get("chunk_size"))
- 
-        queries = {
-            "Bank Transaction": """SELECT name, reference_number as key_id FROM `tabBank Transaction`
-                                   WHERE reference_number != '0' AND reference_number IS NOT NULL 
-                                   AND (custom_utr_key IS NULL or custom_utr_key = '') AND status != 'Cancelled'""",
-            "ClaimBook": """SELECT name, utr_number as key_id FROM `tabClaimBook` 
-                             WHERE utr_number != '0' AND utr_number IS NOT NULL AND utr_number != '' AND (utr_key IS NULL or utr_key = '')""",
-            "Settlement Advice": """SELECT name, utr_number as key_id FROM `tabSettlement Advice` 
-                                    WHERE utr_number != '0' AND utr_number IS NOT NULL AND utr_number != '' AND (utr_key IS NULL or utr_key = '')""",
-        }
  
         mappers = {
             "Bank Transaction": BankTransactionUTRKeyMapper,
@@ -123,17 +120,8 @@ def process(args={"type":"utr_key","step_id":"","queue":"long"}):
             "Settlement Advice": SettlementAdviceUTRKeyMapper
         }
  
-        for record_type, query in queries.items():
+        for record_type, query in query_mapper.items():
             process_records(query, mappers[record_type], chunk_size, args)
  
     except Exception as e:
         log_error("Error While Processing: " + str(e), doc = "UTR Key")
- 
- 
-def process_records(query, mapper_class, chunk_size, args):
-    records = frappe.db.sql(query, as_dict = True)
-    if records:
-        for index in range(0, len(records), chunk_size):
-            chunk_doc = chunk.create_chunk(args.get("step_id"))
-            records_chunk = records[index : index + chunk_size]
-            enqueue_record_processing(mapper_class, records_chunk, chunk_doc, args, job_name = "UTR key Creator")
