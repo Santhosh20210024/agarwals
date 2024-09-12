@@ -1,6 +1,6 @@
 import frappe
 from agarwals.utils.error_handler import log_error
-
+from agarwals.reconciliation.job import latest_job_name
 
 def create(**kwargs):
     doc_name = "File Records"
@@ -10,6 +10,7 @@ def create(**kwargs):
         doc = frappe.new_doc(doc_name)
         for key, value in kwargs.items():
             setattr(doc, key, value)
+        doc.job = latest_job_name()
         doc.insert(ignore_permissions=True)
         frappe.db.commit()
     except Exception as e:
