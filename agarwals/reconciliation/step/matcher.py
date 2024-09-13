@@ -38,7 +38,7 @@ class DataIntegrityValidator:
         """Wrapper for check_key (utr_key)."""
         self.__check_key('UTR Key', utr_key_queries)
     
-    def __is_match_logic_exist():
+    def __is_match_logic_exist(self):
         """Check if match logic is defined in the Control Panel."""
         control_panel = frappe.get_single("Control Panel")
         match_logics = control_panel.get('match_logic','').split(",") 
@@ -363,7 +363,8 @@ class MatcherOrchestrator(Matcher):
             for match_logic in self.match_logics:
                 records = self.get_records(match_logic)
                 self.create_matcher_record(records)
-                chunk.update_status(self.chunk_doc, "Processed")
+
+            chunk.update_status(self.chunk_doc, "Processed")
         except Exception as e:
             chunk.update_status(self.chunk_doc, "Error")
             self.add_log_error(f'{e}: start_process', 'Matcher')
@@ -375,15 +376,17 @@ def process(args):
     try:
         args = cast_to_dic(args)
         step_id = args["step_id"]
-        
+        chunk_doc = chunk.create_chunk(step_id) # create chunk
         try:
             DataIntegrityValidator()._validate()
-            match_logics = frappe.get_doc('Control Panel').get('match_logic','').split(",") 
-            chunk_doc = chunk.create_chunk(step_id)
-            
+            match_logics = frappe.get_doc('Control Panel').get('match_logic','')
+            if match_logics:
+                match_logics = match_logics.split(',')
+
             matcher_orcestrator = MatcherOrchestrator(chunk_doc, match_logics)
             matcher_orcestrator.start_process()
         except Exception as err:
+            chunk.update_status(chunk_doc, "Error")
             log_error(f'{err}: process', "Matcher")
     except Exception as err:
         chunk_doc = chunk.create_chunk(step_id)
