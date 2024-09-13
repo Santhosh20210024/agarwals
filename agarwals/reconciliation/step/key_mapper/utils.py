@@ -2,13 +2,11 @@ import frappe
 from agarwals.utils.error_handler import log_error
 from tfs.orchestration import ChunkOrchestrator
 from typing import Type
-from claim_key_mapper import BillClaimKeyMapper, ClaimBookClaimKeyMapper, SettlementAdviceClaimKeyMapper
-from utr_key_mapper import BankTransactionUTRKeyMapper, ClaimBookUTRKeyMapper, SettlementAdviceUTRKeyMapper
 
 
 @ChunkOrchestrator.update_chunk_status
 def create_keys(mapper_class: Type[
-    BillClaimKeyMapper | ClaimBookClaimKeyMapper | SettlementAdviceClaimKeyMapper | BankTransactionUTRKeyMapper | ClaimBookUTRKeyMapper | SettlementAdviceUTRKeyMapper],
+    "BillClaimKeyMapper" or "ClaimBookClaimKeyMapper" or "SettlementAdviceClaimKeyMapper" or "BankTransactionUTRKeyMapper" or "ClaimBookUTRKeyMapper" or "SettlementAdviceUTRKeyMapper"],
                 records: list) -> str:
     chunk_status = mapper_class(records).process()
     return chunk_status
