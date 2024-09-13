@@ -205,19 +205,17 @@ class PaymentEntryCreator:
         self.__update_advice_reference()
         self.__update_claim_reference()
 
-    def process(self) -> str:
+    def process(self) -> None:
         try:
             if not self.__validate():
-                return "Error"
+                return
             self.__set_amount()
             self.__process_payment_entry()
             self.__update_references()
             self.matcher_record.status = 'Processed'
-            return "Processed"
         except Exception as e:
             frappe.db.rollback()
             update_error(self.matcher_record, self.sa_remark, e)
-            return "Error"
         finally:
             self.matcher_record.save()
             frappe.db.commit()
@@ -237,7 +235,7 @@ class BankReconciliator:
             return False
         return True
 
-    def process(self, bt: dict, abbr:str) -> str:
+    def process(self, bt: dict, abbr: str) -> str:
         try:
             chunk_status: str = "Processed"
             self.bt_doc: "Document" = get_document_record("Bank Transaction", bt.bank_transaction)
@@ -245,11 +243,9 @@ class BankReconciliator:
             for matcher_name in matcher_name_list:
                 matcher_doc: "Document" = get_document_record("Matcher", matcher_name)
                 if not self.__validate(matcher_doc):
-                    chunk_status = "Error"
                     matcher_doc.save()
                     continue
-                process_status = PaymentEntryCreator(matcher_doc, self.bt_doc, abbr).process()
-                chunk_status = chunk.get_status(chunk_status, process_status)
+                PaymentEntryCreator(matcher_doc, self.bt_doc, abbr).process()
                 self.bt_doc.reload()
             return chunk_status
         except Exception as e:
