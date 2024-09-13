@@ -22,7 +22,7 @@ class DataIntegrityValidator:
     def __check_empty_key(self, _key_type, _doctype, _query):
         """Run Query and Check if there is any empty key present in key_type doctype."""
         query_result = frappe.db.sql(_query, as_dict=True)
-        if not query_result:
+        if query_result:
             raise ValueError(f'{_key_type} should not be empty in {_doctype}')
     
     def __check_key(self, key_type, key_queries):
