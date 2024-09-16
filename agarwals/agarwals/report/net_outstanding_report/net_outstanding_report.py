@@ -3,7 +3,7 @@ import frappe
 def execute(filters=None):
     
     if filters['region'] :
-         filters['region'] = tuple(filters.get('region'),'')
+         filters['region'] = tuple(filters.get('region'))
     else : 
          filters['region']=tuple(frappe.get_all('Region',pluck='name'))     
                    
