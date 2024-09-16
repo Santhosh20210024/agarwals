@@ -70,8 +70,8 @@ def rm_transactions():
             frappe.set_value('Bank Transaction Staging', trns_item.name, "staging_status", "Skipped" )
             frappe.db.commit()
         else:
-            bts = frappe.get_doc("Bank Transaction Staging", trns_item.name )
-            if 'E106:' not in bts.error:
+            bts = frappe.get_doc("Bank Transaction Staging", trns_item.name)
+            if bts.error and 'E106:' not in bts.error:
                 bts.staging_status = 'Error'
                 bts.error = 'E106: Insurance Tag is removed by user but the transaction is already reconciled'
                 bts.remarks = ''
