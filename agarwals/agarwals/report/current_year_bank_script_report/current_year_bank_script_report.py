@@ -1,6 +1,14 @@
 import frappe
 
 def execute(filters=None):
+    if filters['region'] :
+         filters['region'] = tuple(filters.get('region'))
+    else : 
+         filters['region']=tuple(frappe.get_all('Region',pluck='name'))  
+    if not filters.get('from_date'):   
+        filters['from_date'] = '2001-01-01'
+    if not filters.get('to_date'):
+        filters['to_date'] = frappe.utils.today()
     query = """
     SELECT 
         CASE WHEN row_count=1 THEN `Entity` ELSE NULL END AS `Entity`,
@@ -29,10 +37,11 @@ def execute(filters=None):
         `Bill_Entity(Payment_Entries)` AS `Bill_Entity(Payment_Entries)`,
         `Bill_Branch_Type(Payment_Entries)` AS `Bill_Branch_Type(Payment_Entries)`,
         `Payment_Entry(Payment_Entries)` AS `Payment_Entry(Payment_Entries)`
-    FROM `viewSorted Current Brank Transaction` vscbt;
+    FROM `viewSorted Current Brank Transaction` vscbt
+    WHERE vsir.`UTR_Date`>= %(from_date)s and vsir.`UTR_Date`<= %(to_date)s and vsir.`Region` IN %(region)s;
     """
 
-    data = frappe.db.sql(query, as_dict=True)
+    data = frappe.db.sql(query, filters,as_dict=True)
 
     columns = [
         {"label": "Entity", "fieldname": "Entity", "fieldtype": "Data"},
