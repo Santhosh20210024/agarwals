@@ -44,8 +44,7 @@
   {
    "fieldname": "job",
    "fieldtype": "Data",
-   "label": "Job",
-   "read_only": 1
+   "label": "Job"
   },
   {
    "fieldname": "index",
@@ -56,7 +55,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-10 19:46:20.643124",
+ "modified": "2024-09-13 12:08:35.120839",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File Records",
