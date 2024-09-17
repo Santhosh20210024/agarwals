@@ -21,7 +21,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Method",
-   "options": "\nagarwals.reconciliation.step.transform\nagarwals.reconciliation.step.sales_invoice_creator\nagarwals.reconciliation.step.insurance_tagger\nagarwals.reconciliation.step.payer_match\nagarwals.reconciliation.step.transcation_creator\nagarwals.reconciliation.step.advice_creator\nagarwals.reconciliation.step.claim_key_mapper\nagarwals.reconciliation.step.matcher\nagarwals.reconciliation.step.payment_entry_creator\nagarwals.reconciliation.step.adjust_bill\nagarwals.reconciliation.step.advice_downloader\nagarwals.reconciliation.step.key_mapper.claim_key_mapper\nagarwals.reconciliation.step.key_mapper.utr_key_mapper\nagarwals.utils.checklist.process",
+   "options": "\nagarwals.reconciliation.step.transform\nagarwals.reconciliation.step.sales_invoice_creator\nagarwals.reconciliation.step.insurance_tagger\nagarwals.reconciliation.step.payer_match\nagarwals.reconciliation.step.transcation_creator\nagarwals.reconciliation.step.advice_creator\nagarwals.reconciliation.step.claim_key_mapper\nagarwals.reconciliation.step.matcher\nagarwals.reconciliation.step.payment_entry_creator\nagarwals.reconciliation.step.adjust_bill\nagarwals.reconciliation.step.advice_downloader\nagarwals.reconciliation.step.key_mapper.claim_key_mapper\nagarwals.reconciliation.step.key_mapper.utr_key_mapper\nagarwals.utils.checklist",
    "reqd": 1
   },
   {
@@ -61,7 +61,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-09-11 10:48:25.865390",
+ "modified": "2024-09-17 19:59:10.939369",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "Step Configuration",
