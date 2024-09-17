@@ -238,7 +238,8 @@
     "fieldtype": "Link",
     "options": "Bill Submission Mode",
     "label": "Mode of Submission",
-    "insert_after": "custom_tab_break_fcomf"
+    "insert_after": "custom_tab_break_fcomf",
+    "allow_on_submit": 1
   },
   {
     "doctype": "Custom Field",
@@ -248,7 +249,8 @@
     "fieldtype": "Table",
     "options": "Bill Tracker",
     "label": "Bill Tracker",
-    "insert_after": "custom_mode_of_submission"
+    "insert_after": "custom_mode_of_submission",
+    "allow_on_submit": 1
   },
   {
     "doctype": "SA Downloader Configuration",
