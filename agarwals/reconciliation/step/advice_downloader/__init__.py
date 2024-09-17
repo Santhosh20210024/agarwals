@@ -48,8 +48,8 @@ def process(args):
         tpa_login_doc = frappe.db.sql("SELECT * FROM `tabTPA Login Credentials` WHERE retry = 1 AND is_enable = 1",as_dict=True)
     else:
         tpa_login_doc = frappe.db.sql(f"""SELECT * FROM `tabTPA Login Credentials` WHERE executing_method = '{args["executing_method"]}' AND status in ('New','Valid') AND is_enable = 1""",as_dict=True)
-    ChunkOrchestrator().process(download_advice, step_id=args["step_id"], is_enqueueable=True, chunk_size=1, data_var_name="tpa_doc_list", queue=args["queue"],
-                                is_async=True, timeout=3600, tpa_login_doc=tpa_doc_list)
+    ChunkOrchestrator().process(download_advice, step_id=args["step_id"], is_enqueueable=True, chunk_size=1, data_var_name="tpa_login_doc", queue=args["queue"],
+                                is_async=True, timeout=3600, tpa_login_doc=tpa_login_doc)
 
 
 @frappe.whitelist()
