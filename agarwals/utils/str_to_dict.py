@@ -1,9 +1,11 @@
 import json
-
-def cast_to_dic(variable_to_check):
-    if type(variable_to_check) != str:
-        return variable_to_check
-    variable_to_check=json.loads(variable_to_check)
-    return variable_to_check
-
+import frappe
+from typing import  Any
+def cast_to_dic(variable_to_check:Any) -> dict|Any:
+    """"
+    Converts String to dict
+    if the param not in [dict,string]:
+        returns the same value without converting
+    """
+    return frappe.parse_json(variable_to_check)
         
