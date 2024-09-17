@@ -222,6 +222,35 @@
     "insert_after": "outstanding_amount"
   },
   {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_tab_break_fcomf",
+    "fieldname": "custom_tab_break_fcomf",
+    "fieldtype": "Tab Break",
+    "label": "Bill Tracker",
+    "insert_after": "custom_ignore_for_ob"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_mode_of_submission",
+    "fieldname": "custom_mode_of_submission",
+    "fieldtype": "Link",
+    "options": "Bill Submission Mode",
+    "label": "Mode of Submission",
+    "insert_after": "custom_tab_break_fcomf"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_bill_tracker",
+    "fieldname": "custom_bill_tracker",
+    "fieldtype": "Table",
+    "options": "Bill Tracker",
+    "label": "Bill Tracker",
+    "insert_after": "custom_mode_of_submission"
+  },
+  {
     "doctype": "SA Downloader Configuration",
     "name": "VidalHealthDownloader",
     "website_url": "https://tips.vidalhealthtpa.com/hospitallogin/hospital/login/",
@@ -1039,5 +1068,67 @@
   "enabled": 1,
   "script": "frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_inner_button(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'agarwals.reconciliation.job.run',\r\n                args: {'job_config': 'reconciliation_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
   "doctype": "Client Script"
+},{
+  "name": "Bill Received",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "event": "Bill Received",
+  "doctype": "Bill Event"
+},
+  {
+  "name": "Bill Submitted",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "event": "Bill Submitted",
+  "doctype": "Bill Event"
+},
+  {
+  "name": "Returned to Branch for Query",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "event": "Returned to Branch for Query",
+  "doctype": "Bill Event"
+},
+  {
+  "name": "Document Requested from Branch",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "event": "Document Requested from Branch",
+  "doctype": "Bill Event"
+},
+  {
+  "name": "Document Received from Branch",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "event": "Document Received from Branch",
+  "doctype": "Bill Event"
+},
+  {
+  "name": "Received from Branch After Query",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "event": "Received from Branch After Query",
+  "doctype": "Bill Event"
+},
+  {
+  "name": "Portal Submission",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "mode": "Portal Submission",
+  "doctype": "Bill Submission Mode"
+},
+  {
+  "name": "Physical Submission",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "mode": "Physical Submission",
+  "doctype": "Bill Submission Mode"
+},
+  {
+  "name": "Courier Submission",
+  "owner": "Administrator",
+  "docstatus": 0,
+  "mode": "Courier Submission",
+  "doctype": "Bill Submission Mode"
 }
 ]
