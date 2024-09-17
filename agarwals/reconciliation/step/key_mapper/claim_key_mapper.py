@@ -1,18 +1,25 @@
 import frappe
 from agarwals.reconciliation.step.key_mapper.key_mapper import KeyMapper
 from agarwals.reconciliation.step.key_creator.claim_key_creator import ClaimKeyCreator
-from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
+from agarwals.reconciliation.step.key_mapper.utils import process_records
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.reconciliation import chunk
 
 
 class ClaimKeyMapper(KeyMapper):
+    """ 
+    ClaimKeyMapper is used as base class for various UTR related doctypes
+    Methods:
+        insert_claim_keys: return None
+        map_key : return None
+    """
     def __init__(self, records, record_type, query, chunk_doc):
         super().__init__(records, record_type, "Claim Key", chunk_doc)
         self.query = query
     
     def insert_claim_keys(self, name, claim_key):
+        """Used to insert into bill claim key and claimbook claim key"""
         if self.record_type == 'Bill':
             doctype = "Bill Claim Key"
             key_doc = frappe.new_doc(doctype)
@@ -115,22 +122,22 @@ class SettlementAdviceClaimKeyMapper(ClaimKeyMapper):
             chunk_doc
         )
 
+query_mapper = {
+                "Bill": """SELECT name, claim_id as claim_key_id, ma_claim_id as ma_key_id FROM tabBill 
+                        WHERE ( claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '') ) 
+                        or ( ma_claim_id != '0' AND ma_claim_id != ' ' AND ma_claim_id IS NOT NULL AND (ma_claim_key is NULL or ma_claim_key = '') )""",
+                "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
+                                WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
+                                or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
+                "Settlement Advice": """SELECT name, claim_id as claim_key_id FROM `tabSettlement Advice` 
+                                        WHERE claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')"""
+                }
+
 @frappe.whitelist()
 def process(args={"type":"claim_key", "step_id":"", "queue":"long"}): 
     try:
         args = cast_to_dic(args)
         chunk_size = int(args.get("chunk_size", 100))
-
-        queries = {
-            "Bill": """SELECT name, claim_id as claim_key_id, ma_claim_id as ma_key_id FROM tabBill 
-                       WHERE ( claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '') ) 
-                       or ( ma_claim_id != '0' AND ma_claim_id != ' ' AND ma_claim_id IS NOT NULL AND (ma_claim_key is NULL or ma_claim_key = '') )""",
-            "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
-                            WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
-                            or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
-            "Settlement Advice": """SELECT name, claim_id as claim_key_id FROM `tabSettlement Advice` 
-                                    WHERE claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')"""
-        }
 
         mappers = {
             "Bill": BillClaimKeyMapper,
@@ -138,17 +145,8 @@ def process(args={"type":"claim_key", "step_id":"", "queue":"long"}):
             "Settlement Advice": SettlementAdviceClaimKeyMapper
         }
 
-        for record_type, query in queries.items():
+        for record_type, query in query_mapper.items():
             process_records(query, mappers[record_type], chunk_size, args)
 
     except Exception as e:
         log_error("Error While Processing: " + str(e), doc="Claim Key")
-
-
-def process_records(query, mapper_class, chunk_size, args):
-    records = frappe.db.sql(query, as_dict=True)
-    if records:
-        for index in range(0, len(records), chunk_size):
-            chunk_doc = chunk.create_chunk(args.get("step_id"))
-            records_chunk = records[index : index + chunk_size]
-            enqueue_record_processing(mapper_class, records_chunk, chunk_doc, args, job_name = "Claim key Creator")

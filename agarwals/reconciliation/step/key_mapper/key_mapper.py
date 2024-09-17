@@ -4,8 +4,8 @@ from agarwals.reconciliation.step.key_creator.utr_key_creator import UTRKeyCreat
 from agarwals.reconciliation.step.key_creator.claim_key_creator import ClaimKeyCreator
 from agarwals.reconciliation import chunk
 
+
 class KeyMapper:
-    
     def __init__(self, records, record_type, key_type, chunk_doc):
         self.records = records
         self.record_type = record_type
@@ -58,18 +58,17 @@ class KeyMapper:
 
     def process(self):
         try:
+            chunk.update_status(self.chunk_doc, "InProgress")
             for record in self.records:
                 self.map_key(record)
             frappe.db.commit()
             chunk.update_status(self.chunk_doc, "Processed")
         except frappe.ValidationError as e:
-            chunk.update_status(self.chunk_doc, "Error")
             log_error(
                 f"Validation error in Key Processing: {str(e)}", doc=self.record_type
             )
             frappe.throw(f"Error while processing keys: {str(e)}")
         except Exception as e:
-            chunk.update_status(self.chunk_doc, "Error")
             log_error(
                 f"Unexpected error in Key Processing: {str(e)}", doc=self.record_type
             )
