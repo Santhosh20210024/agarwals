@@ -2,6 +2,7 @@ import frappe
 from agarwals.utils.error_handler import log_error
 
 
+
 class KeyMapper:
     
     def __init__(self, records, record_type, key_type):
@@ -57,6 +58,7 @@ class KeyMapper:
     def process(self) -> str:
         chunk_status: str = "Processed"
         try:
+            chunk.update_status(self.chunk_doc, "InProgress")
             for record in self.records:
                 self.map_key(record)
             frappe.db.commit()

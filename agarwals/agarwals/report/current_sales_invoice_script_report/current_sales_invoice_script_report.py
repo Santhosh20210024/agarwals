@@ -1,6 +1,15 @@
 import frappe
 
 def execute(filters=None):
+    if filters['region'] :
+         filters['region'] = tuple(filters.get('region'))
+    else : 
+         filters['region']=tuple(frappe.get_all('Region',pluck='name'))  
+    if not filters.get('from_date'):   
+        filters['from_date'] = '2001-01-01'
+    if not filters.get('to_date'):
+        filters['to_date'] = frappe.utils.today()
+                   
     query = """
     SELECT 
         CASE WHEN row_count=1 THEN vsir.`Bill Number` ELSE NULL END AS `Bill Number`,
@@ -41,10 +50,11 @@ def execute(filters=None):
         tbt.party as `Bank Payer`
     FROM `viewSales Invoice Report 24-25 with Row Number` vsir
     LEFT JOIN `tabBank Transaction` tbt ON vsir.`UTR Number` = tbt.name
-    LEFT JOIN `tabSettlement Advice` tsa on tsa.name = vsir.`Settlement Advice`;
+    LEFT JOIN `tabSettlement Advice` tsa on tsa.name = vsir.`Settlement Advice`
+    WHERE vsir.`Bill Date`>= %(from_date)s and vsir.`Bill Date`<= %(to_date)s and vsir.`Region` IN %(region)s;
     """
 
-    data = frappe.db.sql(query, as_dict=True)
+    data = frappe.db.sql(query, filters, as_dict=True)
 
     columns = [
         {"label": "Bill Number", "fieldname": "Bill Number", "fieldtype": "Data"},

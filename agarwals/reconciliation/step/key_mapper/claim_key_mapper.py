@@ -1,7 +1,7 @@
 import frappe
 from agarwals.reconciliation.step.key_mapper.key_mapper import KeyMapper
 from agarwals.reconciliation.step.key_creator.claim_key_creator import ClaimKeyCreator
-from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
+from agarwals.reconciliation.step.key_mapper.utils import process_records
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
 from tfs.orchestration import ChunkOrchestrator
@@ -10,9 +10,16 @@ from tfs.orchestration import ChunkOrchestrator
 class ClaimKeyMapper(KeyMapper):
     def __init__(self, records, record_type, query):
         super().__init__(records, record_type, "Claim Key")
+    """ 
+    ClaimKeyMapper is used as base class for various UTR related doctypes
+    Methods:
+        insert_claim_keys: return None
+        map_key : return None
+    """
         self.query = query
     
     def insert_claim_keys(self, name, claim_key):
+        """Used to insert into bill claim key and claimbook claim key"""
         if self.record_type == 'Bill':
             doctype = "Bill Claim Key"
             key_doc = frappe.new_doc(doctype)
@@ -112,24 +119,24 @@ class SettlementAdviceClaimKeyMapper(ClaimKeyMapper):
             {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""}
         )
 
+query_mapper = {
+                "Bill": """SELECT name, claim_id as claim_key_id, ma_claim_id as ma_key_id FROM tabBill 
+                        WHERE ( claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '') ) 
+                        or ( ma_claim_id != '0' AND ma_claim_id != ' ' AND ma_claim_id IS NOT NULL AND (ma_claim_key is NULL or ma_claim_key = '') )""",
+                "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
+                                WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
+                                or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
+                "Settlement Advice": """SELECT name, claim_id as claim_key_id FROM `tabSettlement Advice` 
+                                        WHERE claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')"""
+                }
+
 @frappe.whitelist()
 def process(args={"type": "claim_key", "step_id": "", "queue": "long"}):
     args = cast_to_dic(args)
-    queries = {
-        "Bill": """SELECT name, claim_id as claim_key_id, ma_claim_id as ma_key_id FROM tabBill 
-                    WHERE ( claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '') ) 
-                    or ( ma_claim_id != '0' AND ma_claim_id != ' ' AND ma_claim_id IS NOT NULL AND (ma_claim_key is NULL or ma_claim_key = '') )""",
-        "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
-                         WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
-                         or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
-        "Settlement Advice": """SELECT name, claim_id as claim_key_id FROM `tabSettlement Advice` 
-                                 WHERE claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')"""
-    }
-
     mappers = {
         "Bill": BillClaimKeyMapper,
         "ClaimBook": ClaimBookClaimKeyMapper,
         "Settlement Advice": SettlementAdviceClaimKeyMapper
     }
-    ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=queries,
+    ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
                                 mappers=mappers, args=args, job_name="ClaimKeyMapper")
