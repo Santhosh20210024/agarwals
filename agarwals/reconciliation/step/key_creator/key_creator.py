@@ -47,7 +47,7 @@ class KeyCreator:
             dict: The key configuration.
         """
         try:
-            result = frappe.get_list(
+            result = frappe.get_all(
                 "Key Creator Configuration",
                 filters={"doctype_name": doctype},
                 fields=["regex_conf"],
