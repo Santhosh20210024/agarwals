@@ -1,6 +1,6 @@
 import frappe
 from datetime import date
-from agarwals.reconciliation import chunk
+from tfs.orchestration import chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error as error_handler
 
@@ -149,7 +149,7 @@ def process(args):
         n = int(args["chunk_size"])
         if advices_list:
             for i in range(0, len(advices_list), n):
-                chunk_doc=chunk.create_chunk(args["step_id"])
+                chunk_doc= chunk.create_chunk(args["step_id"])
                 # create_settlement_advices(advices = advices_list[i:i + n], chunk_doc=chunk_doc)
                 frappe.enqueue(create_settlement_advices, queue=args["queue"], is_async=True, job_name="Advice Creation", timeout=25000,
                                advices = advices_list[i:i + n], chunk_doc=chunk_doc)
