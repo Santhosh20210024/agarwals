@@ -178,7 +178,7 @@ class CheckListView():
             `tfr`.`job`;
         """)
 
-    def current_year_bank_transaction_report_view(self):
+    def current_year_bank_transaction_report_views(self):
 
         # Created viewcumulative_bank_report_checklist to get the cumulative values in current year bank report
 
@@ -242,7 +242,7 @@ class CheckListView():
 
     def process(self):
         self.current_year_sales_invoice_report_views()
-        self.current_year_bank_transaction_report_view()
+        self.current_year_bank_transaction_report_views()
 def execute():
     obj = CheckListView()
     obj.process()
