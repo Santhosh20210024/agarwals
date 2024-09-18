@@ -1,6 +1,6 @@
 import frappe
 from agarwals.agarwals.doctype import file_records
-from agarwals.reconciliation import chunk
+from tfs.orchestration import chunk, ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from frappe.model.document import Document
@@ -205,19 +205,17 @@ class PaymentEntryCreator:
         self.__update_advice_reference()
         self.__update_claim_reference()
 
-    def process(self) -> str:
+    def process(self) -> None:
         try:
             if not self.__validate():
-                return "Error"
+                return
             self.__set_amount()
             self.__process_payment_entry()
             self.__update_references()
             self.matcher_record.status = 'Processed'
-            return "Processed"
         except Exception as e:
             frappe.db.rollback()
             update_error(self.matcher_record, self.sa_remark, e)
-            return "Error"
         finally:
             self.matcher_record.save()
             frappe.db.commit()
@@ -237,7 +235,7 @@ class BankReconciliator:
             return False
         return True
 
-    def process(self, bt: dict, abbr:str) -> str:
+    def process(self, bt: dict, abbr: str) -> str:
         try:
             chunk_status: str = "Processed"
             self.bt_doc: "Document" = get_document_record("Bank Transaction", bt.bank_transaction)
@@ -245,61 +243,42 @@ class BankReconciliator:
             for matcher_name in matcher_name_list:
                 matcher_doc: "Document" = get_document_record("Matcher", matcher_name)
                 if not self.__validate(matcher_doc):
-                    chunk_status = "Error"
                     matcher_doc.save()
                     continue
-                process_status = PaymentEntryCreator(matcher_doc, self.bt_doc, abbr).process()
-                chunk_status = chunk.get_status(chunk_status, process_status)
+                PaymentEntryCreator(matcher_doc, self.bt_doc, abbr).process()
                 self.bt_doc.reload()
             return chunk_status
         except Exception as e:
             log_error(e, 'Matcher')
             return "Error"
 
-def reconcile_bank_transaction(bt_records: list[dict], chunk_doc: "Document") -> None:
-    chunk.update_status(chunk_doc, "InProgress")
+@ChunkOrchestrator.update_chunk_status
+def reconcile_bank_transaction(bt_records: list[dict]) -> str:
     chunk_status: str = "Processed"
     try:
         abbr: str = " - " + get_abbr()
         for bt in bt_records:
             process_status = BankReconciliator().process(bt, abbr)
             chunk_status = chunk.get_status(chunk_status, process_status)
+        return chunk_status
     except Exception as e:
-        chunk_status = "Error"
         log_error(e, 'Matcher')
-    finally:
-        chunk.update_status(chunk_doc, chunk_status)
+        return "Error"
 
 
 @frappe.whitelist()
 def process(args):
-    try:
-        args = cast_to_dic(args)
-        seq_no: int = 0
-        chunk_size: int = int(args["chunk_size"])
-        m_logic: tuple = tuple(frappe.get_single('Control Panel').match_logic.split(','))
-        bt_records = frappe.db.sql("""SELECT bank_transaction, JSON_ARRAYAGG(name) as matcher_names
-                                        FROM `tabMatcher`
-                                        where match_logic in  %(m_logic)s and status = 'Open'
-                                        GROUP BY bank_transaction ORDER BY sales_invoice, payment_order, unallocated DESC"""
-                                   , values={"m_logic": m_logic}
-                                   , as_dict=True)
-        if bt_records:
-            for record in range(0, len(bt_records), chunk_size):
-                chunk_doc = chunk.create_chunk(args["step_id"])
-                seq_no = seq_no + 1
-                # reconcile_bank_transaction(bt_records=bt_records, chunk_doc=chunk_doc)
-                frappe.enqueue(reconcile_bank_transaction
-                               , queue=args.get('queue','long')
-                               , is_async=True
-                               , job_name="Batch" + str(seq_no)
-                               , timeout=25000
-                               , bt_records=bt_records[record:record + chunk_size]
-                               , chunk_doc=chunk_doc)
-        else:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
-    except Exception as e:
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        log_error(e, "Matcher")
-        chunk.update_status(chunk_doc, "Error")
+    args = cast_to_dic(args)
+    seq_no: int = 0
+    chunk_size: int = int(args["chunk_size"])
+    m_logic: tuple = tuple(frappe.get_single('Control Panel').match_logic.split(','))
+    bt_records = frappe.db.sql("""SELECT bank_transaction, JSON_ARRAYAGG(name) as matcher_names
+                                    FROM `tabMatcher`
+                                    where match_logic in  %(m_logic)s and status = 'Open'
+                                    GROUP BY bank_transaction ORDER BY sales_invoice, payment_order, unallocated DESC"""
+                               , values={"m_logic": m_logic}
+                               , as_dict=True)
+    ChunkOrchestrator().process(reconcile_bank_transaction, step_id=args["step_id"], is_enqueueable=True,
+                                chunk_size=chunk_size, data_var_name="bt_records", set_job_name=True,
+                                queue = args.get('queue', 'long'), is_async = True, job_name="Batch" + str(seq_no),
+                                timeout = 25000, bt_records = bt_records)
