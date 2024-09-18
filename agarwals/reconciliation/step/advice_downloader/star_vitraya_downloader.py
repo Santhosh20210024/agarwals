@@ -34,7 +34,7 @@ class StarVitrayaDownloader(SeleniumDownloader):
         button.click()
         dropdown = self.driver.find_element(By.CSS_SELECTOR, ".dspInBlk > select")
         time.sleep(5)
-        dropdown.find_element(By.XPATH, "//option[. = 'Dashboard Report']").click()
+        dropdown.find_element(By.XPATH, "//option[. = 'Dashboard Report ']").click()
         time.sleep(10)
         dropdown.find_element(By.XPATH, "//option[. = 'Download Reports']").click()
 
