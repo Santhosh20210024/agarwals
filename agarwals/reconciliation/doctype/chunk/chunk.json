@@ -1,0 +1,85 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format: CNK-{YY}-{MM}-{DD}-{##########}",
+ "creation": "2024-04-12 11:23:16.552603",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "step_id",
+  "job_id",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "step_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Step Id",
+   "options": "Step",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Open\nInProgress\nProcessed\nError",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "step_id.job_id",
+   "fieldname": "job_id",
+   "fieldtype": "Link",
+   "label": "Job ID",
+   "options": "Job",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-05-13 12:26:00.839309",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Chunk",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Open"
+  },
+  {
+   "color": "Yellow",
+   "title": "InProgress"
+  },
+  {
+   "color": "Green",
+   "title": "Processed"
+  },
+  {
+   "color": "Red",
+   "title": "Error"
+  }
+ ],
+ "track_changes": 1
+}
