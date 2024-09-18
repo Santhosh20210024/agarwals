@@ -1,51 +1,50 @@
 {
  "actions": [],
- "autoname": "field:scheduler",
- "creation": "2024-04-12 11:23:54.684296",
+ "allow_rename": 1,
+ "autoname": "field:job",
+ "creation": "2024-09-13 18:50:31.759874",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "scheduler",
-  "step_config",
+  "job",
   "job_type",
-  "check_list_created"
+  "date",
+  "check_list_reference"
  ],
  "fields": [
   {
-   "fieldname": "scheduler",
+   "fieldname": "job",
    "fieldtype": "Link",
-   "label": "Schedule Job",
-   "options": "Scheduled Job Type",
+   "label": "Job",
+   "options": "Job",
    "unique": 1
   },
   {
-   "fieldname": "step_config",
-   "fieldtype": "Table",
-   "label": "Step Config",
-   "options": "Step Configuration"
-  },
-  {
-   "default": "Reconciliation",
+   "fetch_from": "job.job_type",
    "fieldname": "job_type",
    "fieldtype": "Data",
    "label": "Job Type"
   },
   {
-   "default": "0",
-   "fieldname": "check_list_created",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Check List Created"
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "check_list_reference",
+   "fieldtype": "Table",
+   "label": "Check list reference",
+   "options": "Check list log reference"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-11 15:28:08.684800",
+ "modified": "2024-09-14 17:34:12.742834",
  "modified_by": "Administrator",
- "module": "Reconciliation",
- "name": "Job Configuration",
+ "module": "Agarwals",
+ "name": "Check List Log",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
@@ -64,6 +63,5 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "track_changes": 1
+ "states": []
 }
