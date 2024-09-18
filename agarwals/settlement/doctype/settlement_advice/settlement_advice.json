@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "autoname": "prompt",
- "creation": "2024-09-05 15:50:48.114363",
+ "creation": "2024-09-04 12:15:00.283816",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -368,11 +368,6 @@
    "search_index": 1
   },
   {
-   "fieldname": "utr_key",
-   "fieldtype": "Data",
-   "label": "UTR Key"
-  },
-  {
    "fieldname": "cg_utr_number",
    "fieldtype": "Data",
    "in_preview": 1,
@@ -488,29 +483,21 @@
    "fieldtype": "Check",
    "label": "Is Mail",
    "read_only": 1
+  },
+  {
+   "fieldname": "utr_key",
+   "fieldtype": "Data",
+   "label": "UTR Key"
   }
  ],
  "links": [],
- "modified": "2024-09-05 15:50:48.114363",
+ "modified": "2024-09-04 12:16:13.849330",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",
  "naming_rule": "Set by user",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
