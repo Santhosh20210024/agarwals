@@ -171,6 +171,7 @@ class PaymentEntryCreator:
                                , 'custom_bill_date': self.pe_doc.custom_due_date
                                , 'custom_bill_region': self.pe_doc.region
                                , 'custom_bill_branch': self.pe_doc.branch
+                               , 'custom_bill_customer': self.pe_doc.party
                                , 'custom_bill_branch_type': self.pe_doc.branch_type
                                , 'custom_bill_entity': self.pe_doc.entity
                                , 'custom_match_logic':self.matcher_record.match_logic})
