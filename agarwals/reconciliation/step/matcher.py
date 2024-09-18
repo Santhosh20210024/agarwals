@@ -1,6 +1,6 @@
 import frappe
 from agarwals.utils.matcher_utils import update_bill_no_separate_column
-from agarwals.reconciliation import chunk
+from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.index_update import update_index
@@ -31,34 +31,34 @@ WARNING_LOG = {
 
 
 class DataIntegrityValidator:
-    
+
     def __check_empty_key(self, _key_type, _doctype, _query):
         """Run Query and Check if there is any empty key present in key_type doctype."""
         query_result = frappe.db.sql(_query, as_dict=True)
         if query_result:
             raise ValueError(f'{_key_type} should not be empty in {_doctype}')
-    
+
     def __check_key(self, key_type, key_queries):
         """Get corresponding queries and doctype from the key_queries."""
         for doctype, query in key_queries.items():
             self.__check_empty_key(key_type, doctype, query)
-    
+
     def __check_claim_key(self):
         """Wrapper for check_key (claim_key)."""
         self.__check_key('Claim Key', claim_key_queries)
-    
+
     def __check_utr_key(self):
         """Wrapper for check_key (utr_key)."""
         self.__check_key('UTR Key', utr_key_queries)
-    
+
     def __is_match_logic_exist(self):
         """Check if match logic is defined in the Control Panel."""
         control_panel = frappe.get_single("Control Panel")
-        match_logics = control_panel.get('match_logic','').split(",") 
+        match_logics = control_panel.get('match_logic','').split(",")
 
         if not match_logics:
             raise ValueError('Match Logic is not defined in control panel')
-    
+
     def _validate(self):
         """Check all the pre validation parts"""
         self.__is_match_logic_exist()
@@ -210,8 +210,7 @@ class Matcher:
         create_matcher_record(matcher_records): Processes and saves matcher records.
     """
 
-    def __init__(self, chunk_doc, match_logics):
-        self.chunk_doc = chunk_doc
+    def __init__(self, match_logics):
         self.match_logics = match_logics
         self.matcher_delete_queury = (
             """Delete from `tabMatcher` where match_logic not in %(match_logics)s"""
@@ -353,8 +352,8 @@ class MatcherOrchestrator(Matcher):
         start_process(): The main function to trigger the processing of matcher records.
     """
 
-    def __init__(self, chunk_doc, match_logics):
-        super().__init__(chunk_doc, match_logics)
+    def __init__(self, match_logics):
+        super().__init__(match_logics)
 
     def preprocess_entries(self):
         """
@@ -391,52 +390,38 @@ class MatcherOrchestrator(Matcher):
             self.add_log_error(f"{e}: get_records", "Matcher")
             frappe.throw(f"{e}: get_records : Matcher")
 
+    @ChunkOrchestrator.update_chunk_status
     def start_process(self):
         """The main function to trigger the processing of matcher records in chunks."""
+        status = "Processed"
         try:
-            chunk.update_status(self.chunk_doc, "InProgress")
             self.preprocess_entries()
             update_index()
             for match_logic in self.match_logics:
                 records = self.get_records(match_logic)
                 self.create_matcher_record(records)
-            chunk.update_status(self.chunk_doc, "Processed")
         except Exception as e:
-            chunk.update_status(self.chunk_doc, "Error")
-            self.add_log_error(f"{e}: start_process", "Matcher")
-
+            status="Error"
+            self.add_log_error(f'{e}: start_process', 'Matcher')
         self.postprocess_entries()
+        return status
 
-def get_control_panel_conf():
+def get_match_logics():
     control_panel = frappe.get_single("Control Panel")
     match_logics = control_panel.get("match_logic", "").split(",")
-
-    if not match_logics:
-        frappe.throw("Match Logic is not defined in control panel")
-
     return match_logics
 
 @frappe.whitelist()
 def process(args):
+    args = cast_to_dic(args)
+    step_id = args["step_id"]
     try:
-        args = cast_to_dic(args)
-        step_id = args["step_id"]
-        try:
-            match_logics = get_control_panel_conf()
-            chunk_doc = chunk.create_chunk(step_id)
-        chunk_doc = chunk.create_chunk(step_id) # create chunk
-        try:
-            DataIntegrityValidator()._validate()
-            match_logics = frappe.get_doc('Control Panel').get('match_logic','')
-            if match_logics:
-                match_logics = match_logics.split(',')
-            matcher_orcestrator = MatcherOrchestrator(chunk_doc, match_logics)
-            matcher_orcestrator.start_process()
-        except Exception as err:
-            log_error(f"{err}: process", "Matcher")
-            chunk.update_status(chunk_doc, "Error")
-            log_error(f'{err}: process', "Matcher")
+        DataIntegrityValidator()._validate()
+        match_logics = get_match_logics()
+        if match_logics:
+            match_logics = match_logics.split(',')
+
+        matcher_orchestrator = MatcherOrchestrator(match_logics)
+        ChunkOrchestrator().process(matcher_orchestrator.start_process, step_id=step_id)
     except Exception as err:
-        chunk_doc = chunk.create_chunk(step_id)
-        chunk.update_status(chunk_doc, "Error")
-        log_error(f"{err}: process", "Step")
+        log_error(f'{err}: process', "Matcher")
