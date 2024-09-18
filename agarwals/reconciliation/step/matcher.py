@@ -18,7 +18,7 @@ from agarwals.reconciliation.step.key_mapper.utr_key_mapper import query_mapper 
 """
 
 WARNING_LOG = {
-	'W100' : 'Claim Amount should not be 0',
+    'W100' : 'Claim Amount should not be 0',
     'W101' : 'Settled Amount should not be 0',
     'W102' : 'Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount.',
     'W103' : 'Cancelled Bill',
