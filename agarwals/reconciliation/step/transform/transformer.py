@@ -5,7 +5,7 @@ import frappe
 from datetime import date
 import hashlib
 from agarwals.utils.loader import Loader
-from agarwals.reconciliation import chunk
+from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.error_handler import log_error as error_handler
 
 control_panel = frappe.get_single('Control Panel')
@@ -332,40 +332,32 @@ class Transformer:
     def extract(self):
         pass
 
-    def process(self, args):
-        try:
-            self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)
-            files = self.get_files_to_transform()
-            if not files:
-                chunk_doc = chunk.create_chunk(args["step_id"])
-                chunk.update_status(chunk_doc, "Processed")
-                return None
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "InProgress")
-            status = "Processed"
-            for file in files:
-                try:
-                    self.update_status('File upload', file['name'], 'In Process')
-                    self.load_source_df(file, self.header)
-                    if self.source_df.empty:
-                        self.log_error(doctype_name = self.document_type, reference_name = file['name'], error_message = 'The File is Empty')
-                        self.update_status('File upload', file['name'], 'Error')
-                        status = "Error"
-                        continue
-                    transformed = self.transform(file)
-                    if not transformed:
-                        continue
-                except Exception as e:
-                    self.log_error(doctype_name = self.document_type, reference_name = file['name'], error_message = e)
+    @ChunkOrchestrator.update_chunk_status
+    def process(self):
+        status = "Processed"
+        self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)
+        files = self.get_files_to_transform()
+        if not files:
+            return status
+        for file in files:
+            try:
+                self.update_status('File upload', file['name'], 'In Process')
+                self.load_source_df(file, self.header)
+                if self.source_df.empty:
+                    self.log_error(self.document_type, file['name'], 'The File is Empty')
                     self.update_status('File upload', file['name'], 'Error')
                     status = "Error"
                     continue
-                loader = Loader(self.document_type)
-                loader.process()
-                self.update_parent(file)
-            chunk.update_status(chunk_doc, status)
-        except Exception as e:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Error")
-            self.log_error(error_message=e,doctype_name='Transform')
+                transformed = self.transform(file)
+                if not transformed:
+                    continue
+            except Exception as e:
+                self.log_error(self.document_type, file['name'], e)
+                self.update_status('File upload', file['name'], 'Error')
+                status = "Error"
+                continue
+            loader = Loader(self.document_type)
+            loader.process()
+            self.update_parent(file)
+        return status
 
