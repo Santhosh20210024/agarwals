@@ -7,7 +7,7 @@ class CheckListView():
         # Updated viewSales Invoice Current Year - added total_claim_amount to get total_claim_amount in viewSales Invoice Current Year Breakup
         frappe.db.sql("""
         CREATE OR REPLACE
-            ALGORITHM = UNDEFINED VIEW `agarwal`.`viewSales Invoice Current Year` AS
+            ALGORITHM = UNDEFINED VIEW  `viewSales Invoice Current Year` AS
             select
                 `tsi`.`name` AS `bill_number`,
                 `tsi`.`posting_date` AS `posting_date`,
@@ -32,7 +32,7 @@ class CheckListView():
                 `tsi`.`custom_ma_claim_id` AS `ma_claim_id`,
                 `tsi`.`custom_mrn` AS `custom_mrn`
             from
-                `agarwal`.`tabSales Invoice` `tsi`
+                 `tabSales Invoice` `tsi`
             where
                 `tsi`.`posting_date` > '2024-03-31'
             union
@@ -60,7 +60,7 @@ class CheckListView():
                 `viewSales Invoice Summary`.`custom_ma_claim_id` AS `ma_claim_id`,
                 `viewSales Invoice Summary`.`custom_mrn` AS `custom_mrn`
             from
-                `agarwal`.`viewSales Invoice Summary`;   
+                 `viewSales Invoice Summary`;   
         """)
 
         # Updated Added Claim_amount in viewSales Invoice Current Year Breakup to get total_claim_amount in viewcurrent_year_si_checklist
@@ -89,15 +89,15 @@ class CheckListView():
                 `vsicy`.`ma_claim_id` AS `ma_claim_id`,
                 `vsicy`.`custom_mrn` AS `mrn`
             from
-                (`agarwal`.`viewSales Invoice Current Year` `vsicy`
-            left join `agarwal`.`viewSettlement Summary` `vss` on
+                (`viewSales Invoice Current Year` `vsicy`
+            left join `viewSettlement Summary` `vss` on
                 (`vsicy`.`bill_number` = `vss`.`bill_number`));
         """)
 
         # Created viewSales Invoice Current Year Breakup : Total Claim Amount - ( Total Settled + Total TDS + Total Disallowance ) < 9
         frappe.db.sql("""
             CREATE OR REPLACE
-            ALGORITHM = UNDEFINED VIEW `agarwal`.`viewcurrent_year_si_checklist` AS
+            ALGORITHM = UNDEFINED VIEW  `viewcurrent_year_si_checklist` AS
             select
                 `vsicyb`.`bill_number` AS `bill_number`,
                 `tfr`.`job` AS `job`,
@@ -108,14 +108,12 @@ class CheckListView():
                 `vsicyb`.`disallowed_amount` AS `disallowed_amount`,
                 `vsicyb`.`claim_amount` - (`vsicyb`.`settled_amount` + `vsicyb`.`tds_amount` + `vsicyb`.`disallowed_amount` + `vsicyb`.`outstanding_amount`) AS `diff`
             from
-                ((`agarwal`.`tabFile Records` `tfr`
-            join `agarwal`.`tabPayment Entry` `tpe` on
+                ((`tabFile Records` `tfr`
+            join `tabPayment Entry` `tpe` on
                 (`tpe`.`name` = `tfr`.`record`))
-            join `agarwal`.`viewSales Invoice Current Year Breakup` `vsicyb` on
+            join `viewSales Invoice Current Year Breakup` `vsicyb` on
                 (`vsicyb`.`bill_number` = `tpe`.`custom_sales_invoice`));
         """)
-
-
 
         # Created viewcumulative_current_year_sales_invoice
         # : Total TDS/Total Disallowance/Total Settled = Total of TDS/Disallowance/Settled
@@ -139,7 +137,7 @@ class CheckListView():
                     sum(`vsirwrn`.`Disallowed Amount`) AS `Sum Disallowance Amount`,
                     sum(`vsirwrn`.`TDS Amount`) AS `Sum TDS Amount`
                 from
-                    `agarwal`.`viewSales Invoice Report 24-25 with Row Number` `vsirwrn`
+                    `viewSales Invoice Report 24-25 with Row Number` `vsirwrn`
                 group by
                     `vsirwrn`.`Bill Number`) `t1`
             join (
@@ -152,7 +150,7 @@ class CheckListView():
                     `vsirwrn`.`Total TDS Amount` AS `Total TDS Amount`,
                     `vsirwrn`.`Total Disallowance Amount` AS `Total Disallowance Amount`
                 from
-                    `agarwal`.`viewSales Invoice Report 24-25 with Row Number` `vsirwrn`) `t2` on
+                   `viewSales Invoice Report 24-25 with Row Number` `vsirwrn`) `t2` on
                 (`t1`.`Bill Number` = `t2`.`Bill Number`));
         """)
 
@@ -169,17 +167,16 @@ class CheckListView():
             sum(`vcysi`.`Total TDS Amount`) AS `Total TDS Amount`,
             sum(`vcysi`.`Total Disallowance Amount`) AS `Total Disallowance Amount`
         from
-            ((`agarwal`.`tabFile Records` `tfr`
-        join `agarwal`.`tabPayment Entry` `tpe` on
+            ((`tabFile Records` `tfr`
+        join`tabPayment Entry` `tpe` on
             (`tpe`.`name` = `tfr`.`record`))
-        join `agarwal`.`viewcumulative_current_year_sales_invoice` `vcysi` on
+        join  `viewcumulative_current_year_sales_invoice` `vcysi` on
             (`tpe`.`custom_sales_invoice` = `vcysi`.`Bill Number`))
         group by
             `tfr`.`job`;
         """)
 
     def current_year_bank_transaction_report_views(self):
-
         # Created viewcumulative_bank_report_checklist to get the cumulative values in current year bank report
 
         frappe.db.sql("""
@@ -196,7 +193,7 @@ class CheckListView():
                     `viewSorted Current Brank Transaction`.`UTR_Number` AS `UTR_Number`,
                     sum(`viewSorted Current Brank Transaction`.`Allocated_Amount(Payment_Entries)`) AS `Total_Allocated`
                 from
-                    `agarwal`.`viewSorted Current Brank Transaction`
+                    `viewSorted Current Brank Transaction`
                 group by
                     `viewSorted Current Brank Transaction`.`UTR_Number`
                 having
@@ -209,18 +206,18 @@ class CheckListView():
                         else NULL
                     end AS `Current_Allocated_Amount`
                 from
-                    `agarwal`.`viewSorted Current Brank Transaction` `vscbt`
+                   `viewSorted Current Brank Transaction` `vscbt`
                 having
                     `Current_Allocated_Amount` is not null
                     and `Current_Allocated_Amount` <> 0) `t2` on
                 (`t1`.`UTR_Number` = `t2`.`UTR_Number`));
-        
+
         """)
 
         # Created viewcurrent_bank_report_checklist - to get the difference of Total Deposit - (Total Allocated + Total Un-allocated) < 9
         frappe.db.sql("""
             CREATE OR REPLACE
-            ALGORITHM = UNDEFINED VIEW `agarwal`.`viewcurrent_bank_report_checklist` AS
+            ALGORITHM = UNDEFINED VIEW  `viewcurrent_bank_report_checklist` AS
             select
                 `tfr`.`job` AS `job`,
                 case when `vscbt`.`row_count` = 1 then `vscbt`.`UTR_Number` else NULL end AS `UTR`,
@@ -229,10 +226,10 @@ class CheckListView():
                 case when `vscbt`.`row_count` = 1 then `vscbt`.`Current_Deposit` else NULL end AS `Deposit`,
                 case when `vscbt`.`row_count` = 1 then `vscbt`.`Current_Deposit` - (`vscbt`.`Current_Allocated_Amount` + `vscbt`.`Current_UnAllocated`) else NULL end AS `diff`
             from
-                ((`agarwal`.`tabFile Records` `tfr`
-            join `agarwal`.`tabPayment Entry` `tpe` on
+                ((`tabFile Records` `tfr`
+            join  `tabPayment Entry` `tpe` on
                 (`tpe`.`name` = `tfr`.`record`))
-            join `agarwal`.`viewSorted Current Brank Transaction` `vscbt` on
+            join  `viewSorted Current Brank Transaction` `vscbt` on
                 (`vscbt`.`UTR_Number` = `tpe`.`reference_no`))
             having
                 `UTR` is not null
@@ -243,6 +240,7 @@ class CheckListView():
     def process(self):
         self.current_year_sales_invoice_report_views()
         self.current_year_bank_transaction_report_views()
+
 def execute():
     obj = CheckListView()
     obj.process()
