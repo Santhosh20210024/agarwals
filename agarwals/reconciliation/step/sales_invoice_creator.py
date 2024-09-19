@@ -24,7 +24,7 @@ class SalesInvoiceCreator:
                 MatcherCancellator().delete_matcher(sales_invoice_record)
                 sales_invoice_record.reload()
                 sales_invoice_record.cancel()
-
+                frappe.db.set_value('Sales Invoice', bill , {'outstanding_amount' : 0})
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
 
                 frappe.db.commit()
