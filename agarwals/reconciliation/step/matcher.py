@@ -415,9 +415,6 @@ def validate_and_start_matcher() -> str:
         chunk_status = "Processed"
         DataIntegrityValidator()._validate()
         match_logics = get_match_logics()
-        if match_logics:
-            match_logics = match_logics.split(',')
-
         matcher_orchestrator = MatcherOrchestrator(match_logics)
         process_status = matcher_orchestrator.start_process()
         chunk_status = chunk.get_status(chunk_status, process_status)
