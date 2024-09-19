@@ -177,11 +177,11 @@ def execute(filters=None):
         {"label": "MRN", "fieldname": "MRN", "fieldtype": "Data"},
         {"label": "Status", "fieldname": "Status", "fieldtype": "Data"},
         {"label": "Insurance Name", "fieldname": "Insurance_Name", "fieldtype": "Data"},
-        {"label": "Claim Amount", "fieldname": "Claim_Amount", "fieldtype": "Currency"},
-        {"label": "Total Settled Amount", "fieldname": "Total_Settled_Amount", "fieldtype": "Currency"},
-        {"label": "Total TDS Amount", "fieldname": "Total_TDS_Amount", "fieldtype": "Currency"},
-        {"label": "Total Disallowance Amount", "fieldname": "Total_Disallowance_Amount", "fieldtype": "Currency"},
-        {"label": "Outstanding Amount", "fieldname": "Outstanding_Amount", "fieldtype": "Currency"},
+        {"label": "Claim Amount", "fieldname": "Claim_Amount", "fieldtype": "Data"},
+        {"label": "Total Settled Amount", "fieldname": "Total_Settled_Amount", "fieldtype": "Data"},
+        {"label": "Total TDS Amount", "fieldname": "Total_TDS_Amount", "fieldtype": "Data"},
+        {"label": "Total Disallowance Amount", "fieldname": "Total_Disallowance_Amount", "fieldtype": "Data"},
+        {"label": "Outstanding Amount", "fieldname": "Outstanding_Amount", "fieldtype": "Data"},
         {"label": "Type", "fieldname": "Type", "fieldtype": "Data"}
     ]
 
