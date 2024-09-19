@@ -1,5 +1,6 @@
 import frappe
 from agarwals.utils.error_handler import log_error
+from tfs.orchestration import ChunkOrchestrator, chunk
 
 class MailRecordCreator:
     records = []
@@ -290,18 +291,26 @@ class FileUploadUpdater(MailSender):
                     except Exception as e:
                         log_error("Error Ocuured while Update :{e}","File upload",record)
 
+    @ChunkOrchestrator.update_chunk_status
     def process(self, mail_group):
-        super().process(mail_group)
-        if self.records:
-            self.update_file_upload()
+        try:
+            super().process(mail_group)
+            if self.records:
+                self.update_file_upload()
+            return 'Processed'
+        except Exception as e:
+            log_error(error=e, doc="Mail log")
+            return 'Error'
+
 
 @frappe.whitelist()
-def process():
+def process(args):
     try:
         controlpanel = frappe.get_single("Control Panel")
         if controlpanel.sa_report_email_group is None:
             raise ValueError("Email Group Not Found in SA Report")
         mail_sender = FileUploadUpdater()
-        frappe.enqueue(mail_sender.process, queue='long', job_name=f"sa mail sender - {frappe.utils.now_datetime()}",mail_group = controlpanel.sa_report_email_group)
+        ChunkOrchestrator.process(mail_sender.process, job_name=f"sa mail sender - {frappe.utils.now_datetime()}",
+                                  step_id=args["step_id"], is_enqueueable=True, queue=args["queue"],mail_group = controlpanel.sa_report_email_group)
     except Exception as e:
         log_error(e, "Mail log")
