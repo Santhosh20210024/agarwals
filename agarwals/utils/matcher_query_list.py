@@ -36,7 +36,7 @@ def get_matcher_query(matcher_pattern):
                 ON CONCAT(bi.name, "-", bt.name) = mt.name
             WHERE
                 mt.name IS NULL
-                AND sa.status = 'Open' and bt.custom_utr_key != 'IGNORED'
+                AND sa.status = 'Open' and bt.custom_utr_key != 'IGNORED' and cb.status = 'Unmatched'
         """,
         "MA1-BN": """
             SELECT
@@ -170,7 +170,7 @@ def get_matcher_query(matcher_pattern):
                 `tabMatcher` mt
                 ON CONCAT(bi.name, "-", bt.name) = mt.name
             WHERE
-                mt.name IS NULL and bt.custom_utr_key != 'IGNORED'
+                mt.name IS NULL and bt.custom_utr_key != 'IGNORED' and cb.status = 'Unmatched'
         """,
         "MA3-BN": """
             SELECT

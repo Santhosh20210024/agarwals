@@ -199,7 +199,7 @@ class PaymentEntryCreator:
 
     def __update_claim_reference(self) -> None:
         frappe.db.sql(
-            f"""UPDATE `tabClaimBook` SET matched_status = 'Matched' WHERE name = \"{self.matcher_record.claimbook}\"""")
+            f"""UPDATE `tabClaimBook` SET status = 'Matched' WHERE name = \"{self.matcher_record.claimbook}\"""")
 
     def __update_references(self) -> None:
         self.__update_trans_reference()
