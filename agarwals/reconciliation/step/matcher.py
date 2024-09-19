@@ -404,7 +404,11 @@ class MatcherOrchestrator(Matcher):
             self.add_log_error(f'{e}: start_process', 'Matcher')
         self.postprocess_entries()
         return status
-
+def get_match_logics():
+    control_panel = frappe.get_single("Control Panel")
+    match_logics = control_panel.get("match_logic", "").split(",")
+    return match_logics
+    
 @ChunkOrchestrator.update_chunk_status
 def validate_and_start_matcher() -> str:
     try:
