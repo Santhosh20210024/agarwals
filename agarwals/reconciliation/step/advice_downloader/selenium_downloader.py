@@ -34,6 +34,7 @@ class SeleniumDownloader:
         self.captcha_alert = "Invalid Captcha"
         self.numbers = []
 
+    @staticmethod
     def construct_file_url(*args):
         """Construct a file URL from the given path components, handling None values."""
         args = [str(arg) for arg in args if arg is not None]
