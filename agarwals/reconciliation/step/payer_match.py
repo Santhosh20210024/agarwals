@@ -1,6 +1,6 @@
 import frappe
 from agarwals.reconciliation.step.insurance_tagger import compile_patterns, normalize_text
-from tfs.orchestration import chunk
+from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 
@@ -36,40 +36,35 @@ def update_tpa_receipts():
                     """, values = { 'payer' : 'TPA Receipts', 'payer_group' : 'TPA/INSURANCE'})
      frappe.db.commit()
 
+
+@ChunkOrchestrator.update_chunk_status
 def map_payer():
-    # Update the search field if not exist
-    update_search_field()    
+    try:
+        # Update the search field if not exist
+        update_search_field()
 
-    # Based On Priority
-    customer_list = frappe.get_list(
-    'Customer', fields=['name', 'custom_payer_match', 'customer_group'],
-    filters={'custom_payer_match': ["is", "set"],'custom_payer_priority': ["is", "set"]},
-    order_by='custom_payer_priority asc'
-    )
-    update_payer(customer_list)
+        # Based On Priority
+        customer_list = frappe.get_list(
+        'Customer', fields=['name', 'custom_payer_match', 'customer_group'],
+        filters={'custom_payer_match': ["is", "set"],'custom_payer_priority': ["is", "set"]},
+        order_by='custom_payer_priority asc'
+        )
+        update_payer(customer_list)
 
-    # Update without Priority
-    customer_list = frappe.get_list(
-    'Customer', fields=['name', 'custom_payer_match', 'customer_group'],
-    filters={'custom_payer_match': ["is", "set"],'custom_payer_priority': ["is", "not set"]},
-    )
-    update_payer(customer_list)
-    update_tpa_receipts()
+        # Update without Priority
+        customer_list = frappe.get_list(
+        'Customer', fields=['name', 'custom_payer_match', 'customer_group'],
+        filters={'custom_payer_match': ["is", "set"],'custom_payer_priority': ["is", "not set"]},
+        )
+        update_payer(customer_list)
+        update_tpa_receipts()
+        return "Processed"
+    except Exception as e:
+        log_error(e, 'Step')
+        return "Error"
     
 
 @frappe.whitelist()
 def process(args):
-    try:
-        args = cast_to_dic(args)
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "InProgress")
-        try:
-            map_payer()
-            chunk.update_status(chunk_doc, "Processed")
-        except Exception as e:
-            log_error(e, 'Step')
-            chunk.update_status(chunk_doc, "Error")
-    except Exception as e:
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')
+    args = cast_to_dic(args)
+    ChunkOrchestrator().process(map_payer, step_id=args["step_id"])

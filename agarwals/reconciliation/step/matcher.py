@@ -1,6 +1,6 @@
 import frappe
 from agarwals.utils.matcher_utils import update_bill_no_separate_column
-from tfs.orchestration import ChunkOrchestrator
+from tfs.orchestration import ChunkOrchestrator, chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.index_update import update_index
@@ -390,7 +390,6 @@ class MatcherOrchestrator(Matcher):
             self.add_log_error(f"{e}: get_records", "Matcher")
             frappe.throw(f"{e}: get_records : Matcher")
 
-    @ChunkOrchestrator.update_chunk_status
     def start_process(self):
         """The main function to trigger the processing of matcher records in chunks."""
         status = "Processed"
@@ -406,22 +405,27 @@ class MatcherOrchestrator(Matcher):
         self.postprocess_entries()
         return status
 
-def get_match_logics():
-    control_panel = frappe.get_single("Control Panel")
-    match_logics = control_panel.get("match_logic", "").split(",")
-    return match_logics
-
-@frappe.whitelist()
-def process(args):
-    args = cast_to_dic(args)
-    step_id = args["step_id"]
+@ChunkOrchestrator.update_chunk_status
+def validate_and_start_matcher() -> str:
     try:
+        chunk_status = "Processed"
         DataIntegrityValidator()._validate()
         match_logics = get_match_logics()
         if match_logics:
             match_logics = match_logics.split(',')
 
         matcher_orchestrator = MatcherOrchestrator(match_logics)
-        ChunkOrchestrator().process(matcher_orchestrator.start_process, step_id=step_id)
+        process_status = matcher_orchestrator.start_process()
+        chunk_status = chunk.get_status(chunk_status, process_status)
+        return chunk_status
     except Exception as err:
         log_error(f'{err}: process', "Matcher")
+        return "Error"
+
+@frappe.whitelist()
+def process(args):
+    args = cast_to_dic(args)
+    step_id = args["step_id"]
+    ChunkOrchestrator().process(validate_and_start_matcher, step_id=step_id)
+
+

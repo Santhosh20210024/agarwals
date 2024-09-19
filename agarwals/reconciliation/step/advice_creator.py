@@ -1,6 +1,6 @@
 import frappe
 from datetime import date
-from tfs.orchestration import chunk
+from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error as error_handler
 
@@ -116,9 +116,9 @@ def clean_sa_data(staging_doc):
     staging_doc.disallowed_amount = convert_to_float(staging_doc.disallowed_amount)
     return staging_doc
 
-def create_settlement_advices(advices, chunk_doc):
-    chunk.update_status(chunk_doc, "InProgress")
-    chunk_status = "Processed"
+
+@ChunkOrchestrator.update_chunk_status
+def create_settlement_advices(advices):
     try:
         for advice in advices:
             advice_staging_doc=frappe.get_doc(staging_doc,advice[0])
@@ -135,29 +135,16 @@ def create_settlement_advices(advices, chunk_doc):
             finally:
                 advice_staging_doc.save(ignore_permissions=True)
                 frappe.db.commit()
+        return "Processed"
     except Exception as e:
-        chunk_status = "Error"
         log_error(staging_doc, None, e)
-    finally:
-        chunk.update_status(chunk_doc, chunk_status)
+        return "Error"
 
 @frappe.whitelist()
 def process(args):
     args = cast_to_dic(args)
-    try:
-        advices_list = frappe.db.sql("SELECT name FROM `tabSettlement Advice Staging` tsas WHERE status = 'Open' OR (status = 'Error' AND retry=1);",as_list=True)
-        n = int(args["chunk_size"])
-        if advices_list:
-            for i in range(0, len(advices_list), n):
-                chunk_doc= chunk.create_chunk(args["step_id"])
-                # create_settlement_advices(advices = advices_list[i:i + n], chunk_doc=chunk_doc)
-                frappe.enqueue(create_settlement_advices, queue=args["queue"], is_async=True, job_name="Advice Creation", timeout=25000,
-                               advices = advices_list[i:i + n], chunk_doc=chunk_doc)
-        else:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
-    except Exception as e:
-        from agarwals.utils.error_handler import log_error
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')
+    advices_list = frappe.db.sql("SELECT name FROM `tabSettlement Advice Staging` tsas WHERE status = 'Open' OR (status = 'Error' AND retry=1);",as_list=True)
+    n = int(args["chunk_size"])
+    ChunkOrchestrator().process(create_settlement_advices, step_id=args["step_id"], is_enqueueable=True, chunk_size=n,
+                                data_var_name="advices", queue=args["queue"],
+                                is_async=True, job_name="Advice Creation", timeout=25000, advices = advices_list)

@@ -71,16 +71,6 @@ class UTRKeyMapper(KeyMapper):
             )
             frappe.throw(f"Unexpected error while processing UTR keys: {str(e)}")
 
-
-class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
-    def __init__(self, records):
-        super().__init__(
-            records,
-            "Settlement Advice",
-            """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s"""
-        )
-
-
 class BankTransactionUTRKeyMapper(UTRKeyMapper):
     def __init__(self, records):
         super().__init__(
@@ -97,6 +87,14 @@ class ClaimBookUTRKeyMapper(UTRKeyMapper):
             "ClaimBook",
             """UPDATE `tabClaimBook` SET utr_key = %(key)s WHERE name = %(name)s"""
         )
+ 
+class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
+    def __init__(self, records):
+        super().__init__(
+            records,
+            "Settlement Advice",
+            """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s"""
+        )
 
 
 query_mapper = {
@@ -109,9 +107,11 @@ query_mapper = {
                                         WHERE utr_number != '0' AND utr_number IS NOT NULL AND utr_number != '' AND (utr_key IS NULL or utr_key = '')"""
                }
 
+
 @frappe.whitelist()
 def process(args={"type": "utr_key", "step_id": "", "queue": "long"}):
     args = cast_to_dic(args)
+
     mappers = {
         "Bank Transaction": BankTransactionUTRKeyMapper,
         "ClaimBook": ClaimBookUTRKeyMapper,

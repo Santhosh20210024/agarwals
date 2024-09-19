@@ -3,6 +3,7 @@ from agarwals.utils.error_handler import log_error
 
 
 class KeyMapper:
+    
     def __init__(self, records, record_type, key_type):
         self.records = records
         self.record_type = record_type

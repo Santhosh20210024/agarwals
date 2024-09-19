@@ -3,5 +3,6 @@
 
 # import frappe
 from frappe.model.document import Document
-class FileRecords(Document):
+
+class Checklistlogreference(Document):
 	pass

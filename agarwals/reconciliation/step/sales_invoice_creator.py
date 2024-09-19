@@ -62,7 +62,6 @@ class SalesInvoiceCreator:
                                         'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
                                         'cost_center': bill_record.cost_center,
                                         'custom_patient_age' : bill_record.patient_age,
-                                        'custom_payer_name' : bill_record.payer,
                                         'items': [
                                             {'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
                                         'set_posting_time': 1, 'posting_date': bill_record.bill_date,
@@ -88,7 +87,7 @@ class SalesInvoiceCreator:
                                     record=bill_number, index=sales_invoice_record.custom_index)
             except Exception as e:
                 status = "Error"
-                log_error(error= 'Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
+                log_error(error='Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
         return status
 
     def get_skip_invoice_customer(self):
@@ -98,8 +97,8 @@ class SalesInvoiceCreator:
 @ChunkOrchestrator.update_chunk_status
 def create_and_cancel_sales_invoices(args: dict, new_bills: list, cancelled_bills: list) -> str:
     try:
-        ChunkOrchestrator.process(SalesInvoiceCreator().cancel_sales_invoice, step_id=args["step_id"],
-                                  cancelled_bills=cancelled_bills)
+        ChunkOrchestrator().process(SalesInvoiceCreator().cancel_sales_invoice, step_id=args["step_id"],
+                                    cancelled_bills=cancelled_bills)
         ChunkOrchestrator().process(SalesInvoiceCreator().process, step_id=args["step_id"], is_enqueueable=True,
                                     chunk_size=args["chunk_size"], data_var_name="bill_numbers", queue=args["queue"],
                                     is_async=True, timeout=18000, bill_numbers=new_bills)
@@ -108,6 +107,7 @@ def create_and_cancel_sales_invoices(args: dict, new_bills: list, cancelled_bill
         log_error(error=e, doc="Bill")
         return "Error"
 
+
 @frappe.whitelist()
 def process(args):
     args = cast_to_dic(args)
@@ -115,5 +115,6 @@ def process(args):
                                       pluck='name')
     new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=', 'CANCELLED AND DELETED']},
                                 pluck='name')
-    ChunkOrchestrator().process(create_and_cancel_sales_invoices, step_id=args["step_id"], new_bills=new_bills,
+    ChunkOrchestrator().process(create_and_cancel_sales_invoices, step_id=args["step_id"], args=args,
+                                new_bills=new_bills,
                                 cancelled_bills=cancelled_bills)
