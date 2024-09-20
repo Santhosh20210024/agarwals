@@ -314,7 +314,7 @@ def send_sa_mail(args: dict) -> str:
                                     mail_group=controlpanel.sa_report_email_group)
         return "Processed"
     except Exception as e:
-        log_error(e, "Mail log")
+        log_error(e, doc_name="Mail log")
         return "Error"
 
 
