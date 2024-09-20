@@ -89,6 +89,7 @@ def execute(filters=None):
     FROM
         `viewSales Invoice Report 24-25 with Row Number` vsir
     WHERE vsir.`Status` NOT IN ('Paid','Cancelled') and vsir.`Region` IN %(region)s 
+    GROUP BY vsir.`Bill Number`
     UNION ALL
     SELECT
         CASE
@@ -156,6 +157,7 @@ def execute(filters=None):
     FROM
         `viewSorted Current Brank Transaction` vscbt
     WHERE vscbt.`Status` NOT IN ('Reconciled','Cancelled') and vscbt.`Region`  in %(region)s
+    GROUP BY vscbt.`UTR_Number`
     """
 
     # Execute the query and fetch the data
