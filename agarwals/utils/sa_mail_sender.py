@@ -1,6 +1,5 @@
 import frappe
 from agarwals.utils.error_handler import log_error
-
 class MailRecordCreator:
     records = []
     file_upload_records = []
