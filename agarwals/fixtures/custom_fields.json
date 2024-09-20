@@ -1085,31 +1085,31 @@
   "doctype": "Bill Event"
 },
   {
-  "name": "Returned to Branch for Query",
+  "name": "Query Raised to Branch",
   "owner": "Administrator",
   "docstatus": 0,
-  "event": "Returned to Branch for Query",
+  "event": "Query Raised to Branch",
   "doctype": "Bill Event"
 },
   {
-  "name": "Document Requested from Branch",
+  "name": "Document(s) Requested from Branch",
   "owner": "Administrator",
   "docstatus": 0,
-  "event": "Document Requested from Branch",
+  "event": "Document(s) Requested from Branch",
   "doctype": "Bill Event"
 },
   {
-  "name": "Document Received from Branch",
+  "name": "Document(s) Received from Branch",
   "owner": "Administrator",
   "docstatus": 0,
-  "event": "Document Received from Branch",
+  "event": "Document(s) Received from Branch",
   "doctype": "Bill Event"
 },
   {
-  "name": "Received from Branch After Query",
+  "name": "Query Resolved by Branch",
   "owner": "Administrator",
   "docstatus": 0,
-  "event": "Received from Branch After Query",
+  "event": "Query Resolved by Branch",
   "doctype": "Bill Event"
 },
   {

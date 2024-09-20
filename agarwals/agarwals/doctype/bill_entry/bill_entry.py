@@ -19,12 +19,14 @@ class BillEntry(Document):
 	def delete_bill_event(self, bill):
 		bill_tracker_list = frappe.get_all("Bill Tracker",filters={'event':self.event,'date':self.date, 'parent':bill},pluck='name')
 		for bill_tracker in bill_tracker_list:
+			if self.mode_of_submission:
+				frappe.db.set_value("Sales Invoice",bill,"custom_mode_of_submission","")
 			bill_tracker = frappe.get_doc('Bill Tracker',bill_tracker)
 			bill_tracker.cancel()
 			bill_tracker.delete()
 			frappe.db.commit()
 
-	def before_save(self):
+	def after_save(self):
 		bills = self.bills
 		for bill in bills:
 			try:
@@ -46,6 +48,9 @@ def build_html_table(bills_info):
 	<div class="grid-heading-row">
 	<div class ="grid-row">
 	<div class ="data-row row">
+	<div class ="col grid-static-col col-xs-1" data-fieldname="s_no" title="S No.">
+	<div class ="static-area ellipsis" >S No.</div >
+	</div>
 	<div class ="col grid-static-col col-xs-1.5" data-fieldname="bill_no" title="Bill No.">
 	<div class ="static-area ellipsis" >Bill No.</div >
 	</div>
@@ -61,7 +66,7 @@ def build_html_table(bills_info):
 	<div class ="col grid-static-col col-xs-2" data-fieldname="claim_id" title="Claim ID">
 	<div class ="static-area ellipsis">Claim ID</div>
 	</div>
-	<div class ="col grid-static-col col-xs-2" data-fieldname="claim_amount" title="Claim Amount" >
+	<div class ="col grid-static-col col-xs-1" data-fieldname="claim_amount" title="Claim Amount" >
 	<div class ="static-area ellipsis" >Claim Amount</div>
 	</div>
 	<div class ="col grid-static-col col-xs-1" data-fieldname="bill_status" title="Bill Status">
@@ -73,10 +78,15 @@ def build_html_table(bills_info):
 	<div class ="grid-body">
 	<div class ="rows">
 	"""
+	count = 0
 	for bill in bills_info[::-1]:
+		count = count + 1
 		bills_info_table +=  f"""
 		<div class="grid-row">
         <div class="data-row row">
+        <div class="col grid-static-col col-xs-1 " data-fieldname="s_no">
+        <div class="static-area ellipsis">{count}</div>
+        </div>
         <div class="col grid-static-col col-xs-1.5 " data-fieldname="bill_no">
         <div class="static-area ellipsis">{bill.name}</div>
         </div>
@@ -92,7 +102,7 @@ def build_html_table(bills_info):
         <div class="col grid-static-col col-xs-2" data-fieldname="claim_id">
         <div class="static-area ellipsis">{bill.custom_claim_id}</div>
         </div>
-        <div class="col grid-static-col col-xs-2" data-fieldname="claim_amount">
+        <div class="col grid-static-col col-xs-1	" data-fieldname="claim_amount">
         <div class="static-area ellipsis">{bill.rounded_total}</div>
         </div>
     	<div class="col grid-static-col col-xs-1" data-fieldname="bill_status">
