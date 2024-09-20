@@ -1,11 +1,9 @@
 import frappe
 from agarwals.utils.error_handler import log_error
-from frappe.utils.html_utils import clean_html
-from datetime import datetime, timedelta
-import pandas as pd
 from agarwals.reconciliation import chunk
-import os
 from agarwals.utils.str_to_dict import cast_to_dic
+from tfs.orchestration.job import latest_job_name
+from tfs.orchestration import ChunkOrchestrator, chunk
 from typing import List,Any
 
 
@@ -27,11 +25,10 @@ class Checker:
         mail_group: str = self.control_panel.check_list_email_group or self.raise_exception("No mail group Found")
         self.recipients: List = frappe.get_list("Email Group Member",{"email_group":mail_group,"unsubscribed":0},"email",pluck = "email") or self.raise_exception("There is no members active in the mail group")
 
-    def __get_job_name(self,args:dict,chunk_doc:object | None = None):
+    def __get_job_name(self,args:dict):
         """
          Get the job name based on manual trigger or scheduler
         :param args: list of arguments(dict)
-        :param chunk_doc: chuck doc of Inprogress Checklist
         """
         self.job_id:str = None
         if args.get('is_manual'):
@@ -40,7 +37,8 @@ class Checker:
             self.control_panel.is_manual = 0
             self.control_panel.save()
         else:
-            self.job_id = chunk_doc.get('job_id')
+            step_doc = frappe.get_doc('Step',args.get('step_id'))
+            self.job_id = step_doc.job_id
 
         if not self.job_id:
             raise ValueError("Job Name not found")
@@ -290,8 +288,8 @@ class Checker:
     def __process_check_lists(self) -> None:
         self.check_reports()
 
-
-    def process(self, args) -> None:
+    @ChunkOrchestrator.update_chunk_status
+    def process(self, args) -> str:
         """
         Processes a job based Checklist
             This method performs the following steps:
@@ -302,24 +300,23 @@ class Checker:
             5. If reports are generated, sends an email with the reports.
         """
         try:
-            chunk_doc = chunk.create_chunk(args["step_id"])
             self.__load_configurations()
-            self.__get_job_name(args,chunk_doc)
+            self.__get_job_name(args)
             self.__process_check_lists()
             if self.reports:
                 self.__send_mail()
             self.__update_log()
-            chunk.update_status(chunk_doc, "Processed")
+            return 'Processed'
         except Exception as e:
             log_error(error=e,doc="Check List Log")
-            chunk.update_status(chunk_doc, "Error")
+            return 'Error'
 
 @frappe.whitelist()
 def process(args:str):
     args = cast_to_dic(args)
     try:
         checklist_instance = Checker()
-        frappe.enqueue(checklist_instance.process, queue='long', job_name=f"checklist - {frappe.utils.now_datetime()}",
-                       args=args)
+        ChunkOrchestrator().process(checklist_instance.process,step_id=args["step_id"], is_enqueueable=True, queue=args["queue"],
+                                is_async=True, timeout=3600 , args=args)
     except Exception as e:
         log_error(f"error While Processing checklist - {e}",doc="Check List Log")
