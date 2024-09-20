@@ -13,14 +13,18 @@
   "captcha_entry_duration",
   "is_date_limit",
   "date_limit_period",
-  "allow_insecure_file",
+  "is_captcha",
   "column_break_wdivc",
   "website_url",
+  "portal_pattern",
   "days",
   "from_date",
   "to_date",
-  "is_captcha",
+  "section_break_nzn1j",
   "is_headless",
+  "column_break_zcvtb",
+  "allow_insecure_file",
+  "column_break_y2lc2",
   "sandbox_mode",
   "section_break_xrzm5",
   "extension"
@@ -123,11 +127,28 @@
    "fieldname": "days",
    "fieldtype": "Int",
    "label": "Days"
+  },
+  {
+   "fieldname": "portal_pattern",
+   "fieldtype": "Data",
+   "label": "Portal Pattern"
+  },
+  {
+   "fieldname": "section_break_nzn1j",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_zcvtb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_y2lc2",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-03 19:01:06.112320",
+ "modified": "2024-09-20 20:10:44.872036",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
