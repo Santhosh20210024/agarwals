@@ -126,6 +126,16 @@
   },
   {
     "doctype": "Custom Field",
+    "dt": "Payment Entry",
+    "name": "Payment Entry-custom_matcher_id",
+    "fieldname": "custom_matcher_id",
+    "fieldtype": "Data",
+    "label": "Matcher ID",
+    "insert_after": "custom_parent_doc",
+    "allow_on_submit": 1
+  },
+  {
+    "doctype": "Custom Field",
     "dt": "Sales Invoice",
     "name": "Sales Invoice-yearly_due",
     "fieldname": "custom_yearly_due",
@@ -1037,7 +1047,7 @@
   "dt": "Job",
   "view": "List",
   "enabled": 1,
-  "script": "frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_inner_button(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'agarwals.reconciliation.job.run',\r\n                args: {'job_config': 'reconciliation_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
+  "script": "frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_inner_button(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'tfs.orchestration.job.run',\r\n                args: {'job_config': 'manual_process_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
   "doctype": "Client Script"
 },
   {
