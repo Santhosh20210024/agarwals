@@ -2,7 +2,7 @@ import frappe
 
 def execute(filters=None):
     filters = set_region_filter(filters)
-    filters = set_region_filter(filters)
+    filters = set_entity_filter(filters)
     query = """
     SELECT
         CASE
@@ -85,7 +85,6 @@ def execute(filters=None):
     FROM
         `viewSales Invoice Report 24-25 with Row Number` vsir
     WHERE vsir.`Status` NOT IN ('Paid','Cancelled') and vsir.`Region` IN %(region)s and vsir.`Entity` IN %(entity)s
-    GROUP BY vsir.`Bill Number`
     UNION ALL
     SELECT
         CASE
