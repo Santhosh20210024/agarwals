@@ -163,25 +163,25 @@ def execute(filters=None):
 
     # Define columns to be displayed in the report
     columns = [
-        {"label": "Bill Number", "fieldname": "Bill_Number", "fieldtype": "Data"},
+        {"label": "Bill Number/UTR Number", "fieldname": "Bill_Number", "fieldtype": "Data"},
         {"label": "Bill Date", "fieldname": "Bill_Date", "fieldtype": "Date"},
         {"label": "Entity", "fieldname": "Entity", "fieldtype": "Data"},
         {"label": "Region", "fieldname": "Region", "fieldtype": "Data"},
-        {"label": "Branch", "fieldname": "Branch", "fieldtype": "Data"},
+        {"label": "Bill Branch/Bank Account", "fieldname": "Branch", "fieldtype": "Data"},
         {"label": "Branch Type", "fieldname": "Branch_Type", "fieldtype": "Data"},
         {"label": "Customer", "fieldname": "Customer", "fieldtype": "Data"},
         {"label": "Customer Group", "fieldname": "Customer_Group", "fieldtype": "Data"},
-        {"label": "Claim ID", "fieldname": "Claim_ID", "fieldtype": "Data"},
-        {"label": "MA Claim ID", "fieldname": "MA_Claim_ID", "fieldtype": "Data"},
-        {"label": "Patient Name", "fieldname": "Patient_Name", "fieldtype": "Data"},
+        {"label": "Claim ID/Internal ID", "fieldname": "Claim_ID", "fieldtype": "Data"},
+        {"label": "MA Claim ID/Internal ID", "fieldname": "MA_Claim_ID", "fieldtype": "Data"},
+        {"label": "Patient Name/Description", "fieldname": "Patient_Name", "fieldtype": "Data"},
         {"label": "MRN", "fieldname": "MRN", "fieldtype": "Data"},
         {"label": "Status", "fieldname": "Status", "fieldtype": "Data"},
         {"label": "Insurance Name", "fieldname": "Insurance_Name", "fieldtype": "Data"},
-        {"label": "Claim Amount", "fieldname": "Claim_Amount", "fieldtype": "Currency"},
-        {"label": "Total Settled Amount", "fieldname": "Total_Settled_Amount", "fieldtype": "Currency"},
+        {"label": "Claim Amount/Current Deposit", "fieldname": "Claim_Amount", "fieldtype": "Currency"},
+        {"label": "Total Settled Amount/Total Allocated", "fieldname": "Total_Settled_Amount", "fieldtype": "Currency"},
         {"label": "Total TDS Amount", "fieldname": "Total_TDS_Amount", "fieldtype": "Currency"},
         {"label": "Total Disallowance Amount", "fieldname": "Total_Disallowance_Amount", "fieldtype": "Currency"},
-        {"label": "Outstanding Amount", "fieldname": "Outstanding_Amount", "fieldtype": "Currency"},
+        {"label": "Outstanding Amount/Total Unallocated", "fieldname": "Outstanding_Amount", "fieldtype": "Currency"},
         {"label": "Type", "fieldname": "Type", "fieldtype": "Data"}
     ]
 
