@@ -38,7 +38,7 @@ def execute(filters=None):
         `Bill_Branch_Type(Payment_Entries)` AS `Bill_Branch_Type(Payment_Entries)`,
         `Payment_Entry(Payment_Entries)` AS `Payment_Entry(Payment_Entries)`
     FROM `viewSorted Current Brank Transaction` vscbt
-    WHERE vsir.`UTR_Date`>= %(from_date)s and vsir.`UTR_Date`<= %(to_date)s and vsir.`Region` IN %(region)s;
+    WHERE vscbt.`UTR_Date`>= %(from_date)s and vscbt.`UTR_Date`<= %(to_date)s and vscbt.`Region` IN %(region)s;
     """
 
     data = frappe.db.sql(query, filters,as_dict=True)

@@ -4,6 +4,15 @@
 
 frappe.query_reports["Intercompany Collection Script Report"] = {
 	"filters": [
-
+        {
+            "fieldname": "from_date",
+            "label": __("From Posting Date"),
+            "fieldtype": "Date",	
+        },
+        {
+            "fieldname": "to_date",
+            "label": __("To Posting Date"),
+            "fieldtype": "Date",
+        }
 	]
 };
