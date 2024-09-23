@@ -8,6 +8,13 @@ def convert_to_lower(url_part:str):
     return url_part.lower() if url_part else ''
 
 def create_pattern(url:str) -> str:
+    """
+     Generate a pattern from a given URL by extracting its components.
+     Args:
+        url (str): The URL from which to extract the pattern.
+     Returns:
+        str: The constructed pattern
+    """
     url_parts: object = tldextract.extract(url)
     subdomain_exclusion: List = ['www']
     subdomain: str =  convert_to_lower(url_parts.subdomain)
@@ -23,6 +30,14 @@ def is_pattern_exists(pattern:str) -> bool:
 
 @frappe.whitelist()
 def update_downloader_patterns() -> str:
+    """
+    Update unique patterns for all SA Downloader Configuration documents.
+    Returns:
+        str: A status message indicating the result of the operation:
+             - 'Success' if all patterns were updated without issues,
+             - 'Error' if any exceptions occurred during processing,
+             - 'Doc Not Found' if no configuration documents were found.
+    """
     try:
         status: str = 'Success'
         sa_configuration_docs: List[dict] = frappe.get_all(doctype="SA Downloader Configuration",filters = {},fields="name,website_url")
