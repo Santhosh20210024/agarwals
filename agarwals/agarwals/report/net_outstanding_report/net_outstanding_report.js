@@ -12,6 +12,15 @@ frappe.query_reports["Net Outstanding Report"] = {
 			"get_data": function(txt) {
 				return frappe.db.get_link_options('Region', txt);
 			}
+		},
+		{
+			"fieldname": "entity",
+			"label": __("Entity"),
+			"fieldtype": "MultiSelectList",
+			"options": "Entity",
+			"get_data": function(txt) {
+				return frappe.db.get_link_options('Entity', txt);
+			}
 		}
 	]
 };

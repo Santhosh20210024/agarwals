@@ -1,12 +1,8 @@
 import frappe
 
 def execute(filters=None):
-    
-    if filters['region'] :
-         filters['region'] = tuple(filters.get('region'))
-    else : 
-         filters['region']=tuple(frappe.get_all('Region',pluck='name'))     
-                   
+    filters = set_region_filter(filters)
+    filters = set_entity_filter(filters)
     query = """
     SELECT
         CASE
@@ -88,7 +84,7 @@ def execute(filters=None):
         'OB' as Type
     FROM
         `viewSales Invoice Report 24-25 with Row Number` vsir
-    WHERE vsir.`Status` NOT IN ('Paid','Cancelled') and vsir.`Region` IN %(region)s
+    WHERE vsir.`Status` NOT IN ('Paid','Cancelled') and vsir.`Region` IN %(region)s and vsir.`Entity` IN %(entity)s
     UNION ALL
     SELECT
         CASE
@@ -131,7 +127,10 @@ def execute(filters=None):
             WHEN row_count = 1 THEN `Internal_Id`
             ELSE NULL
         END AS Internal_Id1,
-        NULL AS Unused1,
+        CASE
+		   WHEN row_count = 1 THEN `Description`
+		   ELSE NULL
+	    END AS `Description`,
         NULL AS Unused2,
         CASE
             WHEN row_count = 1 THEN `Status`
@@ -155,7 +154,7 @@ def execute(filters=None):
         'OR' AS Type
     FROM
         `viewSorted Current Brank Transaction` vscbt
-    WHERE vscbt.`Status` NOT IN ('Reconciled','Cancelled') and vscbt.`Region`  in %(region)s
+    WHERE vscbt.`Status` NOT IN ('Reconciled','Cancelled') and vscbt.`Region`  in %(region)s and vscbt.`Entity` in %(entity)s
     GROUP BY vscbt.`UTR_Number`
     """
 
@@ -174,7 +173,7 @@ def execute(filters=None):
         {"label": "Customer Group", "fieldname": "Customer_Group", "fieldtype": "Data"},
         {"label": "Claim ID/Internal ID", "fieldname": "Claim_ID", "fieldtype": "Data"},
         {"label": "MA Claim ID/Internal ID", "fieldname": "MA_Claim_ID", "fieldtype": "Data"},
-        {"label": "Patient Name", "fieldname": "Patient_Name", "fieldtype": "Data"},
+        {"label": "Patient Name/Description", "fieldname": "Patient_Name", "fieldtype": "Data"},
         {"label": "MRN", "fieldname": "MRN", "fieldtype": "Data"},
         {"label": "Status", "fieldname": "Status", "fieldtype": "Data"},
         {"label": "Insurance Name", "fieldname": "Insurance_Name", "fieldtype": "Data"},
@@ -187,3 +186,17 @@ def execute(filters=None):
     ]
 
     return columns, data
+
+def set_region_filter(filters): 
+    if filters['region'] :
+         filters['region'] = tuple(filters.get('region'))
+    else : 
+         filters['region']=tuple(frappe.get_all('Region',pluck='name'))   
+    return filters
+
+def set_entity_filter(filters):
+    if filters['entity'] :
+         filters['entity'] = tuple(filters.get('entity'))
+    else : 
+         filters['entity']=tuple(frappe.get_all('Entity',pluck='name'))   
+    return filters
