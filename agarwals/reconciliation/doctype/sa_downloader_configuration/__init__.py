@@ -6,7 +6,7 @@ from typing import List
 
 def create_pattern(url:str) -> str:
     url_parts: object = tldextract.extract(url)
-    pattern: str = url_parts.subdomain + url_parts.domain + url_parts.suffix
+    pattern: str = url_parts.subdomain.lower() if url_parts.subdomain.lower() not in ['www'] else '' + url_parts.domain.lower() + url_parts.suffix.lower()
     return pattern
 
 def is_pattern_exists(pattern:str) -> bool:
