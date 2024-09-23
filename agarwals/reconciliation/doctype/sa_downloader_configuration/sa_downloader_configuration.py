@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from agarwals.reconciliation.doctype.sa_downloader_configuration import get_patterns,is_pattern_exists
+from agarwals.reconciliation.doctype.sa_downloader_configuration import create_pattern,is_pattern_exists
 
 class SADownloaderConfiguration(Document):
 	def autoname(self)->None:
@@ -14,7 +14,7 @@ class SADownloaderConfiguration(Document):
 		if previous_url == self.website_url:
 			return
 		else:
-			new_pattern: str = get_patterns(self.website_url)
+			new_pattern: str = create_pattern(self.website_url)
 			if is_pattern_exists(new_pattern):
 				frappe.throw(f"Pattern already exists: {new_pattern}")
 			else:
