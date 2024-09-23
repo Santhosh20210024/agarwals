@@ -1153,6 +1153,14 @@
     "__last_sync_on": "2024-09-13T14:00:46.021Z"
   },
   {
+    "name": "agarwals.utils.sa_mail_sender",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.utils.sa_mail_sender",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T14:00:46.021Z"
+  },
+  {
     "name": "agarwals.utils.checklist",
     "docstatus": 0,
     "idx": 0,
