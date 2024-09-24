@@ -58,9 +58,10 @@ class Transformer:
         right_df_column = json.loads(self.loading_configuration.column_to_join.replace("'", '"'))["right"]
         return left_df_column, right_df_column
 
-    def left_join(self,file):
+    def left_join(self,file,left_on=None,right_on =None):
         try:
-            left_on, right_on = self.get_join_columns()
+            if not left_on and not right_on:
+                left_on, right_on = self.get_join_columns()
             merged_df = self.source_df.merge(self.target_df, left_on=left_on, right_on=right_on, how='left',
                                              indicator=True,
                                              suffixes=('', '_x'))
@@ -332,7 +333,7 @@ class Transformer:
     def extract(self):
         pass
 
-    @ChunkOrchestrator.update_chunk_status
+    # @ChunkOrchestrator.update_chunk_status
     def process(self):
         status = "Processed"
         self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)
@@ -352,7 +353,7 @@ class Transformer:
                 if not transformed:
                     continue
             except Exception as e:
-                self.log_error(self.document_type, file['name'], e)
+                self.log_error(doctype_name=self.document_type, reference_name=file['name'], error_message=e)
                 self.update_status('File upload', file['name'], 'Error')
                 status = "Error"
                 continue

@@ -60,15 +60,15 @@ class TpaCredentialsTransformer(Transformer):
 
     def __create_hash(self,df: pd.DataFrame,columns_to_hash:List[str]) -> pd.DataFrame:
         for column in columns_to_hash:
-            df['hash_column'] = df['hash_column'].astype(str) + df[column].astype(str)
-        df['hash'] = df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+            df['new_hash_column'] = df['new_hash_column'].astype(str) + df[column].astype(str)
+        df['new_hash'] = df['new_hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
         return df
 
 
-    def __split_update_and_unmodified_records(self,df:pd.DataFrame,file):
+    def __split_modified_and_unmodified_records(self,df:pd.DataFrame,file):
         self.source_df = self.__create_hash(df,['Password'].extend(self.get_columns_to_hash()))
         self.target_df = self.__create_hash(self.target_df,columns_to_hash=['user_name','password','executing_method'])
-        merged_df = self.left_join(file)
+        merged_df = self.left_join(file,left_on='new_hash',right_on='new_hash')
         self.unmodified_records = merged_df[merged_df['_merge'] == 'both']
         self.modified_records = merged_df[merged_df['_merge'] == 'left_only']
 
@@ -80,7 +80,7 @@ class TpaCredentialsTransformer(Transformer):
         self.new_records = merged_df[merged_df['_merge'] == 'left_only']
         both_matched = merged_df[merged_df['_merge'] == 'both']
         if both_matched:
-            self.__split_update_and_unmodified_records(both_matched,file)
+            self.__split_modified_and_unmodified_records(both_matched,file)
         return True
 
     def transform(self,file):
@@ -97,17 +97,17 @@ class TpaCredentialsTransformer(Transformer):
                     return True
                 split_data = self.__split_data(refined_prepared_data, file)
                 if not split_data:
-                    self.move_to_transform(file, self.error_records, 'Skip', 'Error', 'Error')
+                    self.move_to_transform(file,self.error_records,'Skip','Error',False,'Error')
                     return False
                 self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
                 self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', False, 'Skipped')
                 self.move_to_transform(file, self.modified_records, 'Update', 'Bin', False)
             else:
                 return False
-            self.move_to_transform(file,self.error_records,'Skip','Error','Error')
+            self.move_to_transform(file,self.error_records,'Skip','Error',False,'Error')
             return True
         else:
-            self.move_to_transform(file, self.error_records, 'Skip', 'Error', 'Error')
+            self.move_to_transform(file,self.error_records,'Skip','Error',False,'Error')
             return False
 
 
