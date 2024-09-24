@@ -102,9 +102,11 @@ class TpaCredentialsTransformer(Transformer):
                 self.move_to_transform(file, self.new_records, 'Insert', 'Transform', False)
                 self.move_to_transform(file, self.unmodified_records, 'Skip', 'Bin', False, 'Skipped')
                 self.move_to_transform(file, self.modified_records, 'Update', 'Bin', False)
+                self.move_to_transform(file, self.error_records, 'Skip', 'Error', False, 'Error')
             else:
+                self.move_to_transform(file, self.error_records, 'Skip', 'Error', False, 'Error')
                 return False
-            self.move_to_transform(file,self.error_records,'Skip','Error',False,'Error')
+
             return True
         else:
             self.move_to_transform(file,self.error_records,'Skip','Error',False,'Error')
