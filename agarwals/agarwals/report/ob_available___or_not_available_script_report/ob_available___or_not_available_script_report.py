@@ -44,17 +44,17 @@ def execute(filters=None):
 	data = frappe.db.sql(query , as_dict = True)
  
 	columns = [
-        {"label": "Bill", "fieldname": "bill", "fieldtype": "Data"},
-        {"label": "Bill Branch", "fieldname": "bill_branch", "fieldtype": "Data"},
-        {"label": "Bill Region", "fieldname": "bill_region", "fieldtype": "Data"},
-        {"label": "Bill Entity", "fieldname": "bill_entity", "fieldtype": "Data"},
-        {"label": "Claim ID", "fieldname": "claim_id", "fieldtype": "Data"},
-        {"label": "Claim Amount", "fieldname": "claim_amount", "fieldtype": "Currency"},
-        {"label": "UTR Number", "fieldname": "utr_number", "fieldtype": "Data"},
-        {"label": "Deposit Amount", "fieldname": "deposit_amount", "fieldtype": "Currency"},
-        {"label": "Bank Account", "fieldname": "bank_account", "fieldtype": "Data"},
-        {"label": "Bank Region", "fieldname": "bank_region", "fieldtype": "Data"},
-        {"label": "Bank Entity", "fieldname": "bank_entity", "fieldtype": "Data"}
+        {"label": "Bill", "fieldname": "Bill", "fieldtype": "Data"},
+        {"label": "Bill Branch", "fieldname": "Bill Branch", "fieldtype": "Data"},
+        {"label": "Bill Region", "fieldname": "Bill Region", "fieldtype": "Data"},
+        {"label": "Bill Entity", "fieldname": "Bill Entity", "fieldtype": "Data"},
+        {"label": "Claim ID", "fieldname": "Claim ID", "fieldtype": "Data"},
+        {"label": "Claim Amount", "fieldname": "Claim Amount", "fieldtype": "Currency"},
+        {"label": "UTR Number", "fieldname": "UTR number", "fieldtype": "Data"},
+        {"label": "Deposit Amount", "fieldname": "Deposit Amount", "fieldtype": "Currency"},
+        {"label": "Bank Account", "fieldname": "Bank Account", "fieldtype": "Data"},
+        {"label": "Bank Region", "fieldname": "Bank Region", "fieldtype": "Data"},
+        {"label": "Bank Entity", "fieldname": "Bank_Entity", "fieldtype": "Data"}
     ]
  
 	return columns, data

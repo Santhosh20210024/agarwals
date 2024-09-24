@@ -236,18 +236,18 @@ def execute(filters=None):
 	data = frappe.db.sql(query ,filters, as_dict = True)
  
 	columns = [
-        {"label": "UTR Number", "fieldname": "utr_number", "fieldtype": "Data"},
-        {"label": "UTR Date", "fieldname": "utr_date", "fieldtype": "Date"},
-        {"label": "Bank Entity", "fieldname": "bank_entity", "fieldtype": "Data"},
-        {"label": "Bank Region", "fieldname": "bank_region", "fieldtype": "Data"},
-        {"label": "SA Claim ID", "fieldname": "sa_claim_id", "fieldtype": "Data"},
-        {"label": "AL Number", "fieldname": "al_number", "fieldtype": "Data"},
-        {"label": "CL Number", "fieldname": "cl_number", "fieldtype": "Data"},
-        {"label": "CB Bill Number", "fieldname": "cb_bill_number", "fieldtype": "Data"},
-        {"label": "UTR Amount", "fieldname": "utr_amount", "fieldtype": "Currency"},
-        {"label": "Settled Amount", "fieldname": "settled_amount", "fieldtype": "Currency"},
-        {"label": "TDS Amount", "fieldname": "tds_amount", "fieldtype": "Currency"},
-        {"label": "Disallowed Amount", "fieldname": "disallowed_amount", "fieldtype": "Currency"}
+        {"label": "UTR Number", "fieldname": "UTR Number", "fieldtype": "Data"},
+        {"label": "UTR Date", "fieldname": "UTR Date", "fieldtype": "Date"},
+        {"label": "Bank Entity", "fieldname": "Bank Entity", "fieldtype": "Data"},
+        {"label": "Bank Region", "fieldname": "Bank Region", "fieldtype": "Data"},
+        {"label": "SA Claim ID", "fieldname": "SA Claim ID", "fieldtype": "Data"},
+        {"label": "AL Number", "fieldname": "AL Number", "fieldtype": "Data"},
+        {"label": "CL Number", "fieldname": "CL Number", "fieldtype": "Data"},
+        {"label": "CB Bill Number", "fieldname": "CB Bill Number", "fieldtype": "Data"},
+        {"label": "UTR Amount", "fieldname": "UTR Amount", "fieldtype": "Currency"},
+        {"label": "Settled Amount", "fieldname": "Settled Amount", "fieldtype": "Currency"},
+        {"label": "TDS Amount", "fieldname": "TDS Amount", "fieldtype": "Currency"},
+        {"label": "Disallowed Amount", "fieldname": "Disallowed Amount", "fieldtype": "Currency"}
     ]
  
 	return columns, data
