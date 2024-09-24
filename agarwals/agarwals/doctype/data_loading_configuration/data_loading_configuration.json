@@ -18,7 +18,8 @@
   "column_to_join",
   "column_to_convert_the_values_to_numeric",
   "column_to_convert_na_to_0",
-  "columns_to_get_from_file"
+  "columns_to_get_from_file",
+  "columns_for_validation"
  ],
  "fields": [
   {
@@ -74,11 +75,16 @@
    "fieldname": "columns_to_get_from_file",
    "fieldtype": "Code",
    "label": "Columns to get from file"
+  },
+  {
+   "fieldname": "columns_for_validation",
+   "fieldtype": "Code",
+   "label": "Columns for Validation"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-27 11:04:45.651858",
+ "modified": "2024-09-23 18:44:51.133501",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Data Loading Configuration",
