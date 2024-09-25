@@ -9,13 +9,8 @@ frappe.query_reports["Net Outstanding Report"] = {
 
 		report.page.add_inner_button("Remove Filters", function (){
 		  report.set_filter_value('execute', 1);
-		  report.set_filter_value('branch',[]);
+		  report.set_filter_value('region',[]);
 		  report.set_filter_value('entity',[]);
-		  report.set_filter_value('party_group',[]);
-		  report.set_filter_value('bank_account',[]);
-		  report.set_filter_value('status',[]);
-		  report.set_filter_value('from_utr_date',null);
-		  report.set_filter_value('to_utr_date',null);
 		});
 	},
 		 "filters": 
