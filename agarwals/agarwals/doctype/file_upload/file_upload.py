@@ -7,10 +7,7 @@ import re
 import pandas as pd
 import pip
 from frappe.model.document import Document
-from agarwals.agarwals.doctype.file_upload.file_upload_utils import (
-    is_configuration_doctype_exist,
-    construct_file_url,
-)
+from agarwals.agarwals.doctype.file_upload.file_upload_utils import construct_file_url
 from agarwals.utils.error_handler import log_error
 
 
@@ -286,7 +283,6 @@ class Fileupload(Document):
 
     def get_template_details(self):
         configuration_doctype = None
-    
         match self.document_type:
             case "Debtors Report":
                 configuration_doctype = "Bill"
@@ -329,13 +325,13 @@ class Fileupload(Document):
         
     def get_configuration_column(self, configuration_doctype):
         if configuration_doctype == "Settlement Advice Staging" and self.payer_type == "Manual":
-            sa_doc_configure = frappe.get_single("Settlement Advice Configuration")
-            sa_value = sa_doc_configure.column_for_validation.replace("'", '"')
-            return json.loads(sa_value)[self.payer_type]
+            sa_configure_doc = frappe.get_single("Settlement Advice Configuration")
+            sa_columns = sa_configure_doc.column_for_validation.replace("'", '"')
+            return json.loads(sa_columns)[self.payer_type]
     
-        doc = frappe.get_all("Data Loading Configuration", {"name": configuration_doctype}, ['columns_for_validation'])
-        column_string = doc[0].columns_for_validation[1:-1]
-        return [colname.strip()[1:-1] for colname in column_string.split(',')]
+        config_doc = frappe.get_all("Data Loading Configuration", {"name": configuration_doctype}, ['columns_for_validation'])
+        column_reference = config_doc[0].columns_for_validation[1:-1]
+        return [colname.strip()[1:-1] for colname in column_reference.split(',')]
 
     def validate_file_header(self, fname, fid):
         try:
