@@ -19,7 +19,7 @@
   "column_to_convert_the_values_to_numeric",
   "column_to_convert_na_to_0",
   "columns_to_get_from_file",
-  "columns_to_generate_id"
+  "columns_should_not_be_null"
  ],
  "fields": [
   {
@@ -77,14 +77,14 @@
    "label": "Columns to get from file"
   },
   {
-   "fieldname": "columns_to_generate_id",
+   "fieldname": "columns_should_not_be_null",
    "fieldtype": "Code",
-   "label": "Columns to generate ID"
+   "label": "Columns should not be Null"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-24 16:48:44.460776",
+ "modified": "2024-09-25 12:03:14.236751",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Data Loading Configuration",

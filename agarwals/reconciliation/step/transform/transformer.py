@@ -31,6 +31,7 @@ class Transformer:
         self.max_trim_length = 140
         self.loading_configuration = None
         self.skip_invalid_rows_in_csv = False
+        self.format_numbric = True
 
     def get_file_columns(self):
         return self.loading_configuration.columns_to_get_from_file
@@ -58,17 +59,17 @@ class Transformer:
         right_df_column = json.loads(self.loading_configuration.column_to_join.replace("'", '"'))["right"]
         return left_df_column, right_df_column
 
-    def left_join(self,file,left_on=None,right_on =None):
+
+    def left_join(self,file):
         try:
-            if not left_on and not right_on:
-                left_on, right_on = self.get_join_columns()
+            left_on, right_on = self.get_join_columns()
             merged_df = self.source_df.merge(self.target_df, left_on=left_on, right_on=right_on, how='left',
                                              indicator=True,
                                              suffixes=('', '_x'))
             return merged_df
         except Exception as e:
             self.update_status('File upload', file['name'], 'Error')
-            self.log_error('File upload',file['name'],e)
+            self.log_error(doctype_name='File upload',reference_name=file['name'],error_message=e)
             return pd.DataFrame()
 
     def prune_columns(self, df, columns_to_prune = None):
@@ -89,6 +90,9 @@ class Transformer:
 
     def get_columns_to_check(self):
         return eval(self.loading_configuration.column_to_check_the_difference)
+
+    def get_columns_should_not_be_null(self):
+        return eval(self.loading_configuration.columns_should_not_be_null)
 
     def split_modified_and_unmodified_records(self, df):
         columns_to_check = self.get_columns_to_check()
@@ -157,7 +161,8 @@ class Transformer:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
            df = self.format_utr(df ,self.utr_column_name)
-        df = self.format_numbers(df)
+        if self.format_numbric:
+            df = self.format_numbers(df)
         transform = self.create_transform_record(file['name'])
         df["file_upload"] = file['name']
         df["transform"] = transform.name
