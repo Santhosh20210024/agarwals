@@ -1,10 +1,13 @@
 import frappe
 
-
 def execute(filters=None):
-    filters = get_date(filters)
+    if filters.get("execute") != 1:
+        return [],[]
+    condition = get_condition(filters)
+    if not condition:
+        condition = "exists (SELECT 1)"
 
-    query = """
+    query = f"""
 		SELECT bill_branch as BRANCH,
 			bill_entity as ENTITY,
 			bank_entity as `BANK ENTITY`,
@@ -36,14 +39,14 @@ def execute(filters=None):
 				tpe.custom_sales_invoice as bill,
 				tpe.posting_date as payment_posting_date
 		FROM `tabPayment Entry` tpe 
-		JOIN `tabBank Transaction` tbt ON tbt.name = tpe.reference_no WHERE tpe.status != 'Cancelled' AND tpe.posting_date > '2024-03-31') t1 ORDER BY bill_entity, bill_branch, bill;
+		JOIN `tabBank Transaction` tbt ON tbt.name = tpe.reference_no WHERE tpe.status != 'Cancelled' AND {condition} )t1 ORDER BY bill_entity, bill_branch, bill;
     """
 
     data = frappe.db.sql(query, as_dict=True)
 
     columns = [
         {"label": "Branch", "fieldname": "BRANCH", "fieldtype": "Data"},
-        {"label": "Branch Entity", "fieldname": "BRANCH ENTITY", "fieldtype": "Data"},
+        {"label": "Branch Entity", "fieldname": "ENTITY", "fieldtype": "Data"},
         {"label": "Bank Entity", "fieldname": "BANK ENTITY", "fieldtype": "Data"},
         {"label": "Bill No", "fieldname": "BILL NO", "fieldtype": "Data"},
         {"label": "Bank Account", "fieldname": "BANK ACCOUNT", "fieldtype": "Data"},
@@ -64,10 +67,19 @@ def execute(filters=None):
 
     return columns, data
 
-
-def get_date(filters):
-    if not filters.get("from_date"):
-        filters["from_date"] = "2001-01-01"
-    if not filters.get("to_date"):
-        filters["to_date"] = frappe.utils.today()
-    return filters
+def get_condition(filters):
+    field_and_condition = {'from_posting_date':'tpe.posting_date >= ','to_posing_date':'tpe.posting_date <= ','bill_entity':'tpe.entity in ', 'bill_branch':'tpe.branch in ', 'bank_account':'tbt.bank_account in ','bank_entity':'tbt.custom_entity in ','from_utr_date':'tbt.`date` >= ','to_utr_date':'tbt.`date` <= '}
+    conditions = []
+    for filter in filters:
+        if filter == 'execute':
+            continue
+        if filters.get(filter):
+            value = filters.get(filter)
+            if not isinstance(value,list):
+                conditions.append(f"{field_and_condition[filter]} '{value}'")
+                continue
+            value = tuple(value)
+            if len(value) == 1:
+                value = "('" + value[0] + "')"
+            conditions.append(f"{field_and_condition[filter]} {value}")
+    return " and ".join(conditions)
