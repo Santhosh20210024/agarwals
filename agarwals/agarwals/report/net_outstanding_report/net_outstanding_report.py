@@ -1,9 +1,12 @@
 import frappe
 
 def execute(filters=None):
-    filters = set_region_filter(filters)
-    filters = set_entity_filter(filters)
-    query = """
+    if filters.get("execute") != 1:
+        return [],[]
+    condition = get_condition(filters)
+    if not condition:
+        condition = "exists (SELECT 1)"
+    query = f"""
     SELECT
         CASE
             WHEN row_count = 1 THEN vsir.`Bill Number`
@@ -84,7 +87,7 @@ def execute(filters=None):
         'OB' as Type
     FROM
         `viewSales Invoice Report 24-25 with Row Number` vsir
-    WHERE vsir.`Status` NOT IN ('Paid','Cancelled') and vsir.`Region` IN %(region)s and vsir.`Entity` IN %(entity)s
+    WHERE vsir.`Status` NOT IN ('Paid','Cancelled') and {condition}
     UNION ALL
     SELECT
         CASE
@@ -154,14 +157,12 @@ def execute(filters=None):
         'OR' AS Type
     FROM
         `viewSorted Current Brank Transaction` vscbt
-    WHERE vscbt.`Status` NOT IN ('Reconciled','Cancelled') and vscbt.`Region`  in %(region)s and vscbt.`Entity` in %(entity)s
-    GROUP BY vscbt.`UTR_Number`
+    WHERE vscbt.`Status` NOT IN ('Reconciled','Cancelled') and {condition}
+    GROUP BY vscbt.`UTR_Number` 
     """
 
-    # Execute the query and fetch the data
-    data = frappe.db.sql(query, filters, as_dict=True)
+    data = frappe.db.sql(query ,as_dict=True)
 
-    # Define columns to be displayed in the report
     columns = [
         {"label": "Bill Number/UTR Number", "fieldname": "Bill_Number", "fieldtype": "Data"},
         {"label": "Bill Date", "fieldname": "Bill_Date", "fieldtype": "Date"},
@@ -187,16 +188,19 @@ def execute(filters=None):
 
     return columns, data
 
-def set_region_filter(filters): 
-    if filters['region'] :
-         filters['region'] = tuple(filters.get('region'))
-    else : 
-         filters['region']=tuple(frappe.get_all('Region',pluck='name'))   
-    return filters
-
-def set_entity_filter(filters):
-    if filters['entity'] :
-         filters['entity'] = tuple(filters.get('entity'))
-    else : 
-         filters['entity']=tuple(frappe.get_all('Entity',pluck='name'))   
-    return filters
+def get_condition(filters):
+    field_and_condition = {'entity':'`Entity` in ', 'region':'`Region` in ' }
+    conditions = []
+    for filter in filters:
+        if filter == 'execute':
+            continue
+        if filters.get(filter):
+            value = filters.get(filter)
+            if not isinstance(value,list):
+                conditions.append(f"{field_and_condition[filter]} '{value}'")
+                continue
+            value = tuple(value)
+            if len(value) == 1:
+                value = "('" + value[0] + "')"
+            conditions.append(f"{field_and_condition[filter]} {value}")
+    return " and ".join(conditions)
