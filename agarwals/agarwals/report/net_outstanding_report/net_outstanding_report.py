@@ -202,5 +202,5 @@ def get_condition(filters):
             value = tuple(value)
             if len(value) == 1:
                 value = "('" + value[0] + "')"
-                conditions.append(f"{field_and_condition[filter]} {value}")
+            conditions.append(f"{field_and_condition[filter]} {value}")
     return " and ".join(conditions)
