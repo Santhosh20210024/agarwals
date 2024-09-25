@@ -31,18 +31,7 @@ frappe.query_reports["Current Year Bank Script Report"] = {
 				 "fieldname": "status", 
 					"label": __("Status"), 
 					"fieldtype": "MultiSelectList", 
-					"options": "['Reconciled','Unreconciled','Cancelled']",
-					"on_change": function (report) { report.set_filter_value('execute', 0) }
-				},
-			 
-				{
-					"fieldname": "party_group", 
-					"label": __("Part Group"), 
-					"fieldtype": "MultiSelectList", 
-					"options": "Customer Group",
-					"get_data": function(txt) {
-						return frappe.db.get_link_options('Customer Group', txt);
-					},
+					"options": [{'value':'Reconciled','description':''},{'value':'Unreconciled','description':''},{'value':'Cancelled','description':''},{'value':'Pending','description':''}],
 					"on_change": function (report) { report.set_filter_value('execute', 0) }
 				},
 				{
@@ -88,7 +77,17 @@ frappe.query_reports["Current Year Bank Script Report"] = {
 					"on_change": function (report) { report.set_filter_value('execute', 0) 
 	  
 					} 
-				  }
+				  },
+				  {
+					"fieldname": "party_group", 
+					"label": __("Part Group"), 
+					"fieldtype": "MultiSelectList", 
+					"options": "Customer Group",
+					"get_data": function(txt) {
+						return frappe.db.get_link_options('Customer Group', txt);
+					},
+					"on_change": function (report) { report.set_filter_value('execute', 0) }
+				}
 
 
 			] 
