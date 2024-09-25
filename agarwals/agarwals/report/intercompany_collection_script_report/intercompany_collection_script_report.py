@@ -1,8 +1,8 @@
 import frappe
-from datetime import date
-
 
 def execute(filters=None):
+    if filters.get("execute") != 1:
+        return [],[]
     condition = get_condition(filters)
     if not condition:
         condition = "exists (SELECT 1)"
@@ -42,12 +42,7 @@ def execute(filters=None):
 		JOIN `tabBank Transaction` tbt ON tbt.name = tpe.reference_no WHERE tpe.status != 'Cancelled' AND {condition} )t1 ORDER BY bill_entity, bill_branch, bill;
     """
 
-    if filters.get("execute") == 1:
-        print(query)
-        data = frappe.db.sql(query, as_dict=True)
-
-    else:
-        data = {}
+    data = frappe.db.sql(query, as_dict=True)
 
     columns = [
         {"label": "Branch", "fieldname": "BRANCH", "fieldtype": "Data"},
@@ -71,12 +66,6 @@ def execute(filters=None):
     ]
 
     return columns, data
-
-
-def datetime_converter(o):
-    if isinstance(o, date):
-        return o.isoformat()
-
 
 def get_condition(filters):
     field_and_condition = {'from_posting_date':'tpe.posting_date >= ','to_posing_date':'tpe.posting_date <= ','bill_entity':'tpe.entity in ', 'bill_branch':'tpe.branch in ', 'bank_account':'tbt.bank_account in ','bank_entity':'tbt.custom_entity in ','from_utr_date':'tbt.`date` >= ','to_utr_date':'tbt.`date` <= '}
