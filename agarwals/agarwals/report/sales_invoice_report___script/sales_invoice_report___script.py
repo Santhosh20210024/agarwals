@@ -167,7 +167,7 @@ def get_condition(filters):
         'bill_status': 'vsir.status IN ',
         'from_utr_date': 'vsir.utr_date <= ',
         'to_utr_date': 'vsir.utr_date >= ',
-        'match_logic': 'vsir.match_logic',
+        'match_logic': 'vsir.match_logic IN ',
         'bank_account': 'vsir.`Bank Account` IN ',
         'bank_entity': 'vsir.`Bank Entity` IN ',
         'bank_region': 'vsir.`Bank Region` IN ',
