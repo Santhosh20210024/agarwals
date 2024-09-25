@@ -1,5 +1,5 @@
 import frappe
-from datetime import date
+
 
 def execute(filters=None):
     if filters.get("execute") != 1:
