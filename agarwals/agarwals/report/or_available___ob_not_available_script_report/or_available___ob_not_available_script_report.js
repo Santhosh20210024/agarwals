@@ -3,6 +3,20 @@
 /* eslint-disable */
 
 frappe.query_reports["OR Available - OB Not Available Script Report"] = {
+    onload: function(report) {
+        report.page.add_inner_button("Apply Filters", function() {
+            report.set_filter_value('execute',1);
+        });
+        report.page.add_inner_button("Clear Filters", function() {
+            report.set_filter_value('execute',1)
+			report.set_filter_value('from_utr_date',null);
+			report.set_filter_value('to_utr_date',null);
+			report.set_filter_value('bank_account',[]);
+			report.set_filter_value('bank_entity',[]);
+			report.set_filter_value('bank_region',[]);
+        });
+
+    },
 	"filters": [{
             "fieldname": "from_utr_date",
             "label": __("From UTR Date"),
