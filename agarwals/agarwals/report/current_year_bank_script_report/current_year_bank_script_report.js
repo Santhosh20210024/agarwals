@@ -34,7 +34,7 @@ frappe.query_reports["Current Year Bank Script Report"] = {
 					"options": "['Reconciled','Unreconciled','Cancelled']",
 					"on_change": function (report) { report.set_filter_value('execute', 0) }
 				},
-			 }
+			 
 				{
 					"fieldname": "party_group", 
 					"label": __("Part Group"), 
