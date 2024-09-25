@@ -24,7 +24,7 @@ def execute(filters=None):
 		`tabSettlement Advice` AS tsa
 	ON bt.custom_utr_key = sa.utr_key
 	WHERE
-		status in ('Unreconciled','Pending') AND {condition} AND bt.name IS NULL"""
+		status in ('Unreconciled','Pending') AND {condition} AND tsa.name IS NULL"""
 
 	if filters.get('execute') == 1:
 		data = frappe.db.sql(query, as_dict=True)
