@@ -189,7 +189,7 @@ def execute(filters=None):
     return columns, data
 
 def get_condition(filters):
-    field_and_condition = {'entity':'`Entity` in ', '`Region`':'`Region` in ' }
+    field_and_condition = {'entity':'`Entity` in ', 'region':'`Region` in ' }
     conditions = []
     for filter in filters:
         if filter == 'execute':
