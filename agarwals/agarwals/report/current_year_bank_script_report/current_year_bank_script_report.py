@@ -1,15 +1,12 @@
 import frappe
+from datetime import date
 
 def execute(filters=None):
-    if filters['region'] :
-         filters['region'] = tuple(filters.get('region'))
-    else : 
-         filters['region']=tuple(frappe.get_all('Region',pluck='name'))  
-    if not filters.get('from_date'):   
-        filters['from_date'] = '2001-01-01'
-    if not filters.get('to_date'):
-        filters['to_date'] = frappe.utils.today()
-    query = """
+    condition = get_condition(filters)
+    if not condition:
+        condition = "exists (SELECT 1)"
+   
+    query = f"""
     SELECT 
         CASE WHEN row_count=1 THEN `Entity` ELSE NULL END AS `Entity`,
         CASE WHEN row_count=1 THEN `Region` ELSE NULL END AS `Region`,
@@ -38,10 +35,15 @@ def execute(filters=None):
         `Bill_Branch_Type(Payment_Entries)` AS `Bill_Branch_Type(Payment_Entries)`,
         `Payment_Entry(Payment_Entries)` AS `Payment_Entry(Payment_Entries)`
     FROM `viewSorted Current Brank Transaction` vscbt
-    WHERE vscbt.`UTR_Date`>= %(from_date)s and vscbt.`UTR_Date`<= %(to_date)s and vscbt.`Region` IN %(region)s;
+    WHERE {condition}
     """
 
-    data = frappe.db.sql(query, filters,as_dict=True)
+    if filters.get("execute") == 1:
+        print(query)
+        data = frappe.db.sql(query, as_dict=True)
+
+    else:
+        data = {}
 
     columns = [
         {"label": "Entity", "fieldname": "Entity", "fieldtype": "Data"},
@@ -73,3 +75,25 @@ def execute(filters=None):
     ]
 
     return columns, data
+
+def datetime_converter(o):
+    if isinstance(o, date):
+        return o.isoformat()
+
+
+def get_condition(filters):
+    field_and_condition = {'from_utr_date':'`UTR Date` >= ','to_utr_date':'`UTR Date <= ','entity':'`Entity` in ', '`Region`':'`Region` in ', 'bank_account':'`Bank Account` in ','status':'`Status` IN ','party_group':'`Party Group` IN '}
+    conditions = []
+    for filter in filters:
+        if filter == 'execute':
+            continue
+        if filters.get(filter):
+            value = filters.get(filter)
+            if not isinstance(value,list):
+                conditions.append(f"{field_and_condition[filter]} '{value}'")
+                continue
+            value = tuple(value)
+            if len(value) == 1:
+                value = "('" + value[0] + "')"
+                conditions.append(f"{field_and_condition[filter]} {value}")
+    return " and ".join(conditions)
