@@ -6,13 +6,12 @@ import frappe
 
 def execute(filters=None):
     if filters.get('execute') != 1:
-        return [],[]
+        return [], []
+    condition = get_condition(filters)
+    if not condition:
+        condition = "exists (SELECT 1)"
 
-	condition = get_condition(filters)
-	if not condition:
-		condition = "exists (SELECT 1)"
-
-	query = f"""SELECT
+    query = f"""SELECT
 				CASE
 					WHEN row_count = 1 THEN t.`bill_number`
 					ELSE NULL
@@ -113,55 +112,53 @@ def execute(filters=None):
 				ORDER BY
 				t.`bill_number`,
 				t.row_count"""
-
-	columns = [
-    {'fieldname': 'Bill Number', 'label': 'Bill Number', 'fieldtype': 'Data'},
-    {'fieldname': 'Bill Date', 'label': 'Bill Date', 'fieldtype': 'Date'},
-    {'fieldname': 'Entity', 'label': 'Entity', 'fieldtype': 'Data'},
-    {'fieldname': 'Region', 'label': 'Region', 'fieldtype': 'Data'},
-    {'fieldname': 'Branch', 'label': 'Branch', 'fieldtype': 'Data'},
-    {'fieldname': 'Branch Type', 'label': 'Branch Type', 'fieldtype': 'Data'},
-    {'fieldname': 'Customer', 'label': 'Customer', 'fieldtype': 'Data'},
-    {'fieldname': 'Customer Group', 'label': 'Customer Group', 'fieldtype': 'Data'},
-    {'fieldname': 'Claim ID', 'label': 'Claim ID', 'fieldtype': 'Data'},
-    {'fieldname': 'MA Claim ID', 'label': 'MA Claim ID', 'fieldtype': 'Data'},
-    {'fieldname': 'Patient Name', 'label': 'Patient Name', 'fieldtype': 'Data'},
-    {'fieldname': 'MRN', 'label': 'MRN', 'fieldtype': 'Data'},
-    {'fieldname': 'Status', 'label': 'Status', 'fieldtype': 'Data'},
-    {'fieldname': 'Insurance Name', 'label': 'Insurance Name', 'fieldtype': 'Data'},
-    {'fieldname': 'Claim Amount', 'label': 'Claim Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'Total Settled Amount', 'label': 'Total Settled Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'Total TDS Amount', 'label': 'Total TDS Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'Total Disallowance Amount', 'label': 'Total Disallowance Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'Outstanding Amount', 'label': 'Outstanding Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'Entry Type', 'label': 'Entry Type', 'fieldtype': 'Data'},
-    {'fieldname': 'Entry Name', 'label': 'Entry Name', 'fieldtype': 'Data'},
-    {'fieldname': 'Settled Amount', 'label': 'Settled Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'TDS Amount', 'label': 'TDS Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'Disallowed Amount', 'label': 'Disallowed Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'Allocated Amount', 'label': 'Allocated Amount', 'fieldtype': 'Currency'},
-    {'fieldname': 'UTR Date', 'label': 'UTR Date', 'fieldtype': 'Date'},
-    {'fieldname': 'UTR Number', 'label': 'UTR Number', 'fieldtype': 'Data'},
-    {'fieldname': 'Payment Posting Date', 'label': 'Payment Posting Date', 'fieldtype': 'Date'},
-    {'fieldname': 'Payment Created Date', 'label': 'Payment Created Date', 'fieldtype': 'Date'},
-    {'fieldname': 'Match Logic', 'label': 'Match Logic', 'fieldtype': 'Data'},
-    {'fieldname': 'Settlement Advice', 'label': 'Settlement Advice', 'fieldtype': 'Data'},
-    {'fieldname': "Payer's Remark", 'label': "Payer's Remark", 'fieldtype': 'Data'},
-    {'fieldname': 'Bank Account', 'label': 'Bank Account', 'fieldtype': 'Data'},
-    {'fieldname': 'Bank Entity', 'label': 'Bank Entity', 'fieldtype': 'Data'},
-    {'fieldname': 'Bank Region', 'label': 'Bank Region', 'fieldtype': 'Data'},
-    {'fieldname': 'Bank Payer', 'label': 'Bank Payer', 'fieldtype': 'Data'}
-]
-
     data = frappe.db.sql(query, as_dict=True)
+    columns = [
+        {'fieldname': 'Bill Number', 'label': 'Bill Number', 'fieldtype': 'Data'},
+        {'fieldname': 'Bill Date', 'label': 'Bill Date', 'fieldtype': 'Date'},
+        {'fieldname': 'Entity', 'label': 'Entity', 'fieldtype': 'Data'},
+        {'fieldname': 'Region', 'label': 'Region', 'fieldtype': 'Data'},
+        {'fieldname': 'Branch', 'label': 'Branch', 'fieldtype': 'Data'},
+        {'fieldname': 'Branch Type', 'label': 'Branch Type', 'fieldtype': 'Data'},
+        {'fieldname': 'Customer', 'label': 'Customer', 'fieldtype': 'Data'},
+        {'fieldname': 'Customer Group', 'label': 'Customer Group', 'fieldtype': 'Data'},
+        {'fieldname': 'Claim ID', 'label': 'Claim ID', 'fieldtype': 'Data'},
+        {'fieldname': 'MA Claim ID', 'label': 'MA Claim ID', 'fieldtype': 'Data'},
+        {'fieldname': 'Patient Name', 'label': 'Patient Name', 'fieldtype': 'Data'},
+        {'fieldname': 'MRN', 'label': 'MRN', 'fieldtype': 'Data'},
+        {'fieldname': 'Status', 'label': 'Status', 'fieldtype': 'Data'},
+        {'fieldname': 'Insurance Name', 'label': 'Insurance Name', 'fieldtype': 'Data'},
+        {'fieldname': 'Claim Amount', 'label': 'Claim Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'Total Settled Amount', 'label': 'Total Settled Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'Total TDS Amount', 'label': 'Total TDS Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'Total Disallowance Amount', 'label': 'Total Disallowance Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'Outstanding Amount', 'label': 'Outstanding Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'Entry Type', 'label': 'Entry Type', 'fieldtype': 'Data'},
+        {'fieldname': 'Entry Name', 'label': 'Entry Name', 'fieldtype': 'Data'},
+        {'fieldname': 'Settled Amount', 'label': 'Settled Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'TDS Amount', 'label': 'TDS Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'Disallowed Amount', 'label': 'Disallowed Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'Allocated Amount', 'label': 'Allocated Amount', 'fieldtype': 'Currency'},
+        {'fieldname': 'UTR Date', 'label': 'UTR Date', 'fieldtype': 'Date'},
+        {'fieldname': 'UTR Number', 'label': 'UTR Number', 'fieldtype': 'Data'},
+        {'fieldname': 'Payment Posting Date', 'label': 'Payment Posting Date', 'fieldtype': 'Date'},
+        {'fieldname': 'Payment Created Date', 'label': 'Payment Created Date', 'fieldtype': 'Date'},
+        {'fieldname': 'Match Logic', 'label': 'Match Logic', 'fieldtype': 'Data'},
+        {'fieldname': 'Settlement Advice', 'label': 'Settlement Advice', 'fieldtype': 'Data'},
+        {'fieldname': "Payer's Remark", 'label': "Payer's Remark", 'fieldtype': 'Data'},
+        {'fieldname': 'Bank Account', 'label': 'Bank Account', 'fieldtype': 'Data'},
+        {'fieldname': 'Bank Entity', 'label': 'Bank Entity', 'fieldtype': 'Data'},
+        {'fieldname': 'Bank Region', 'label': 'Bank Region', 'fieldtype': 'Data'},
+        {'fieldname': 'Bank Payer', 'label': 'Bank Payer', 'fieldtype': 'Data'}]
+
     return columns, data
 
 
 def get_condition(filters):
-	field_and_condition = {
+    field_and_condition = {
         'bill_entity': 'vsir.entity IN ',
         'bill_region': 'vsir.region IN ',
-    	'bill_branch': 'vsir.branch IN ',
+        'bill_branch': 'vsir.branch IN ',
         'bill_branch_type': 'vsir.branch_type IN ',
         'bill_customer': 'vsir.customer IN ',
         'bill_customer_group': 'vsir.customer_group IN ',
@@ -176,18 +173,17 @@ def get_condition(filters):
         'bank_region': 'vsir.`Bank Region` IN ',
         'bank_payer': 'vsir.`Bank Payer` IN'
     }
-
-	conditions = []
-	for filter in filters:
-		if filter == 'execute':
-			continue
-		if filters.get(filter):
-			value = filters.get(filter)
-			if not isinstance(value,list):
-				conditions.append(f"{field_and_condition[filter]} '{value}'")
-				continue
-			value = tuple(value)
-			if len(value) == 1:
-				value = "('" + value[0] + "')"
-			conditions.append(f"{field_and_condition[filter]} {value}")
-	return " and ".join(conditions)
+    conditions = []
+    for filter in filters:
+        if filter == 'execute':
+            continue
+        if filters.get(filter):
+            value = filters.get(filter)
+            if not isinstance(value, list):
+                conditions.append(f"{field_and_condition[filter]} '{value}'")
+                continue
+            value = tuple(value)
+            if len(value) == 1:
+                value = "('" + value[0] + "')"
+            conditions.append(f"{field_and_condition[filter]} {value}")
+    return " and ".join(conditions)

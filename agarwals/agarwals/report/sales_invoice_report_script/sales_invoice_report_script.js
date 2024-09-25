@@ -122,7 +122,10 @@ frappe.query_reports["Sales Invoice Report Script"] = {
             "fieldname": "bill_status",
             "label": __("Bill Status"),
             "fieldtype": "MultiSelectList",
-			"options": "Paid\nUnpaid\nPartly Paid\nCancelled",
+            "options": [{'value':'Paid','description':''},
+                {'value':'Unpaid','description':''},
+                {'value':'Partly Paid','description':''},
+                {'value':'Cancelled','description':''}],
             "on_change": function (report) {
                report.set_filter_value('execute',0)
            }
@@ -147,7 +150,9 @@ frappe.query_reports["Sales Invoice Report Script"] = {
             "fieldname": "match_logic",
             "label": __("Match Logic"),
             "fieldtype": "MultiSelectList",
-			"options": "MA1-CN\nMA5-BN\MA3-CN",
+			"options": [{'value':'MA5-BN','description':''},
+                {'value':'MA1-CN','description':''},
+                {'value':'MA3-CN','description':''}],
             "on_change": function (report) {
                report.set_filter_value('execute',0)
            }
