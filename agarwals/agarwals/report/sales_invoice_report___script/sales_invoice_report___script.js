@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Sales Invoice Report Script"] = {
+frappe.query_reports["Sales Invoice Report - Script"] = {
 	onload: function(report) {
         report.page.add_inner_button("Apply Filters", function() {
             report.set_filter_value('execute',1);

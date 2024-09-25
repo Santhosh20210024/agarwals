@@ -10,18 +10,21 @@ def execute(filters=None):
 		condition = "exists (SELECT 1)"
 
 	query = f"""SELECT
-    	custom_entity,
-		custom_region,
-		date,
-		name,
-		bank_account,
-		ROUND(allocated_amount,0) as allocated,
-		ROUND(unallocated_amount,0) as unallocated,
-		description
+    	bt.custom_entity as custom_entity,
+		bt.custom_region as custom_region,
+		bt.`date` as `date`,
+		bt.name as name,
+		bt.bank_account as bank_account,
+		ROUND(bt.allocated_amount,0) as allocated,
+		ROUND(bt.unallocated_amount,0) as unallocated,
+		bt.description as description
 	FROM
 		`tabBank Transaction` AS bt
+	LEFT JOIN
+		`tabSettlement Advice` AS tsa
+	ON bt.custom_utr_key = sa.utr_key
 	WHERE
-		status in ('Unreconciled','Pending') AND {condition}"""
+		status in ('Unreconciled','Pending') AND {condition} AND bt.name IS NULL"""
 
 	if filters.get('execute') == 1:
 		data = frappe.db.sql(query, as_dict=True)
