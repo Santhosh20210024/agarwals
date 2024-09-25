@@ -5,8 +5,13 @@ import frappe
 
 
 def execute(filters=None):
+    if filters.get("execute") != 1:
+        return [],[]
+    condition = get_condition(filters)
+    if not condition:
+        condition = "exists (SELECT 1)"
         
-	query = """SELECT
+    query = f"""SELECT
 		tb.name AS 'Bill',
 		tb.branch AS 'Bill Branch',
 		tb.region AS 'Bill Region',
@@ -39,11 +44,12 @@ def execute(filters=None):
 		AND (tbt1.status = 'Reconciled'
 			OR tbt2.status = 'Reconciled')
 		AND (tsa1.status IN ('Open','Error','Warning')
-			OR tsa2.status IN ('Open','Error','Warning'));
+			OR tsa2.status IN ('Open','Error','Warning'))
+        AND {condition};
 	    """
-	data = frappe.db.sql(query , as_dict = True)
+    data = frappe.db.sql(query , as_dict = True)
  
-	columns = [
+    columns = [
         {"label": "Bill", "fieldname": "Bill", "fieldtype": "Data"},
         {"label": "Bill Branch", "fieldname": "Bill Branch", "fieldtype": "Data"},
         {"label": "Bill Region", "fieldname": "Bill Region", "fieldtype": "Data"},
@@ -57,4 +63,21 @@ def execute(filters=None):
         {"label": "Bank Entity", "fieldname": "Bank_Entity", "fieldtype": "Data"}
     ]
  
-	return columns, data
+    return columns, data
+
+def get_condition(filters):
+    field_and_condition = {'bill_entity':'tb.entity in ', 'bill_region':'`tb.region in ','bill_branch':'tb.branch in ' ,'bank_entity':'tbt1.custom_entity in ','bank_region':'tbt1.custom_region in ','bank_account':'tbt1.bank_account in '}
+    conditions = []
+    for filter in filters:
+        if filter == 'execute':
+            continue
+        if filters.get(filter):
+            value = filters.get(filter)
+            if not isinstance(value,list):
+                conditions.append(f"{field_and_condition[filter]} '{value}'")
+                continue
+            value = tuple(value)
+            if len(value) == 1:
+                value = "('" + value[0] + "')"
+            conditions.append(f"{field_and_condition[filter]} {value}")
+    return " and ".join(conditions)
