@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:report_name",
+ "creation": "2024-09-25 19:17:17.917988",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "report_name",
+  "filters",
+  "query",
+  "columns",
+  "condition",
+  "apply_filter_parameter",
+  "remove_filter_parameter"
+ ],
+ "fields": [
+  {
+   "fieldname": "filters",
+   "fieldtype": "Code",
+   "label": "Filters"
+  },
+  {
+   "fieldname": "query",
+   "fieldtype": "Code",
+   "label": "Query"
+  },
+  {
+   "fieldname": "condition",
+   "fieldtype": "Code",
+   "label": "Condition"
+  },
+  {
+   "fieldname": "apply_filter_parameter",
+   "fieldtype": "Code",
+   "label": "Apply Filter Parameter"
+  },
+  {
+   "fieldname": "remove_filter_parameter",
+   "fieldtype": "Code",
+   "label": "Remove Filter Parameter"
+  },
+  {
+   "fieldname": "report_name",
+   "fieldtype": "Link",
+   "label": "Report Name",
+   "options": "Report",
+   "unique": 1
+  },
+  {
+   "fieldname": "columns",
+   "fieldtype": "Code",
+   "label": "Columns"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-09-26 11:31:00.648533",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Report Configuration",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
