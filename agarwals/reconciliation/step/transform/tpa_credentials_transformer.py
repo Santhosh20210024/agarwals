@@ -28,7 +28,7 @@ class TpaCredentialsTransformer(Transformer):
     def create_patterns(self,url: str|None) -> str:
         return create_pattern(url) if url else 'Url not found'
 
-    def match_downloader_patterns(self,pattern:str) -> str:
+    def get_downloader_name(self,pattern:str) -> str:
         """
             Matches the provided portal pattern to a downloader name.
             Args:
@@ -82,7 +82,7 @@ class TpaCredentialsTransformer(Transformer):
                            and executing classes.
         """
         cleaned_data['pattern'] = cleaned_data['Url'].apply(self.create_patterns)
-        cleaned_data['Executing Class'] = cleaned_data['pattern'].apply(self.match_downloader_patterns)
+        cleaned_data['Executing Class'] = cleaned_data['pattern'].apply(self.get_downloader_name)
         self.source_df = cleaned_data
         self.hashing_job()
         return cleaned_data
