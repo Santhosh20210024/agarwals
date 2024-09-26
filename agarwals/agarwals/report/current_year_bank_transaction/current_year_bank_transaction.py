@@ -5,4 +5,4 @@
 from agarwals.utils.report_data_and_column_getter import get_data_and_columns
 
 def execute(filters=None):
-	get_data_and_columns('Current Year Bank Transaction',filters)
+	return get_data_and_columns('Current Year Bank Transaction',filters)
