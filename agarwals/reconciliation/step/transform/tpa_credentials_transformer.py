@@ -74,8 +74,8 @@ class TpaCredentialsTransformer(Transformer):
     def __hashing_job(self) -> pd.DataFrame:
         columns_to_hash = self.get_columns_to_hash()
         columns_to_hash.append('Password')
-        hash_for_insert = self.hashing_job(return_df=True)
-        hash_for_update = self.hashing_job(return_df=True,df=hash_for_insert,columns_to_hash=columns_to_hash,concatenated_column_name='concatenated_for_update',hash_column_name='Hash For Update')
+        hash_for_insert = self.hashing_job(return_df=True,update_source_df=False)
+        hash_for_update = self.hashing_job(update_source_df=False,return_df=True,df=hash_for_insert,columns_to_hash=columns_to_hash,concatenated_column_name='concatenated_for_update',hash_column_name='Hash For Update')
         return hash_for_update
 
     def __process_feature_extraction(self,cleaned_data: pd.DataFrame) -> pd.DataFrame:

@@ -193,6 +193,7 @@ class Transformer:
 
     def hashing_job(
             self,
+            update_source_df: bool = True,
             return_df: bool = False,
             df: Union[pd.DataFrame, None] = None,
             columns_to_hash: Union[List[str], None] = None,
@@ -213,6 +214,8 @@ class Transformer:
             source_df[concatenated_column] = source_df[concatenated_column].astype(str) + source_df[column].astype(str)
         source_df[hash_column_name] = source_df[concatenated_column].apply(
             lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+        if update_source_df:
+            self.source_df = source_df
         if return_df:
             return source_df
 
