@@ -338,7 +338,7 @@ class Transformer:
     def extract(self):
         pass
 
-    # @ChunkOrchestrator.update_chunk_status
+    @ChunkOrchestrator.update_chunk_status
     def process(self):
         status = "Processed"
         self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)
