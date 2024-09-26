@@ -29,6 +29,13 @@ class TpaCredentialsTransformer(Transformer):
         return create_pattern(url) if url else 'Url not found'
 
     def match_downloader_patterns(self,pattern:str) -> str:
+        """
+            Matches the provided portal pattern to a downloader name.
+            Args:
+                pattern (str): The portal pattern to match against the downloader patterns.
+            Returns:
+                str: The name of the matching downloader if found; otherwise, an empty string.
+        """
         downloader_name = [downloader_pattern['name'] for downloader_pattern in self.downloader_patterns if downloader_pattern.get('portal_pattern') == pattern]
         if downloader_name:
             return downloader_name[0]
@@ -36,11 +43,27 @@ class TpaCredentialsTransformer(Transformer):
             return ''
 
     def check_pattern_exists(self):
+        """
+        Checks for the existence of downloader patterns .
+        Raises:
+            ValueError: If one or more downloader patterns have a None  pattern,
+                        indicating that the patterns are incomplete or invalid.
+        """
         none_patterns = [downloader_pattern.get('name') for downloader_pattern in self.downloader_patterns if downloader_pattern.get('portal_pattern') is None]
         if none_patterns:
             raise ValueError(f"Downloader Pattern Not Found for {''.join(none_patterns)}")
 
     def __clean_data(self, df: pd.DataFrame, null_check_columns: List[str]) -> pd.DataFrame :
+        """
+        Cleans the input DataFrame by removing rows with null or empty values
+        Args:
+            df (pd.DataFrame): The input DataFrame to clean.
+            null_check_columns (List[str]): The list of column names to check for
+                                             null or empty values.
+        Returns:
+            pd.DataFrame: A cleaned DataFrame with rows containing null or empty
+                           values in the specified columns removed.
+        """
         null_check_mask = df[null_check_columns].isnull().any(axis=1) | (df[null_check_columns] == '').any(axis=1)
         error_record = df[null_check_mask]
         if not error_record.empty:
@@ -48,14 +71,21 @@ class TpaCredentialsTransformer(Transformer):
         cleaned_data = df if null_check_mask.empty else df[~null_check_mask]
         return cleaned_data
 
-
     def __process_feature_extraction(self,cleaned_data: pd.DataFrame) -> pd.DataFrame:
+        """"
+         Extracts features from the cleaned DataFrame
+        Args:
+            cleaned_data (pd.DataFrame): The cleaned DataFrame with the necessary
+                                          data for feature extraction.
+        Returns:
+            pd.DataFrame: The updated DataFrame with new columns for patterns
+                           and executing classes.
+        """
         cleaned_data['pattern'] = cleaned_data['Url'].apply(self.create_patterns)
         cleaned_data['Executing Class'] = cleaned_data['pattern'].apply(self.match_downloader_patterns)
         self.source_df = cleaned_data
         self.hashing_job()
         return cleaned_data
-
 
     def __create_hash(self,df: pd.DataFrame,columns_to_hash:List[str]) -> pd.DataFrame:
         df['new_hash_column'] = ''
@@ -69,8 +99,6 @@ class TpaCredentialsTransformer(Transformer):
         if existing_columns:
             df = df.drop(columns=existing_columns)
         return df
-
-
 
     def __split_modified_and_unmodified_records(self,df:pd.DataFrame):
         updated_source_hash_columns: List[str] = self.get_columns_to_hash()
@@ -86,6 +114,9 @@ class TpaCredentialsTransformer(Transformer):
             self.modified_records['Retry'] = 1
 
     def __split_data(self,df: pd.DataFrame,file) -> bool:
+        """
+        Splits the new records , unmodified_records and modified_records
+        """
         self.source_df = df
         merged_df = self.left_join(file)
         if merged_df.empty:
@@ -97,6 +128,15 @@ class TpaCredentialsTransformer(Transformer):
         return True
 
     def transform(self,file):
+        """
+        Transforms the source DataFrame of the TPA Credentails and processes it for loading into a target system.
+        Args:
+            file: The file associated with the transformation process, which may be used for logging or storage.
+        Returns:
+            bool: True if the transformation process was successful; False otherwise.
+        Raises:
+            Exception: Raises an exception if an error occurs during the transformation process.
+        """
         try:
             self.check_pattern_exists()
             cleaned_data = self.__clean_data(self.source_df,null_check_columns= self.get_columns_should_not_be_null())
