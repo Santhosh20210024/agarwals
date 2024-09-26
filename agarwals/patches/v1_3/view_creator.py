@@ -1242,6 +1242,7 @@ class ViewCreator:
                 """)
         
     def create_sales_invoice_current_year_view(self):
+        # Updated viewSales Invoice Current Year - added total_claim_amount to get total_claim_amount in viewSales Invoice Current Year Breakup
         frappe.db.sql("""
             CREATE OR REPLACE VIEW `viewSales Invoice Current Year` AS
             select
@@ -1300,6 +1301,7 @@ class ViewCreator:
             """)
         
     def create_sales_invoice_current_year_breakup_view(self):
+         # Updated Added Claim_amount in viewSales Invoice Current Year Breakup to get total_claim_amount in viewcurrent_year_si_checklist
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewSales Invoice Current Year Breakup` AS
             select
                 `vsicy`.`bill_number` AS `bill_number`,
@@ -2127,6 +2129,7 @@ class ViewCreator:
             """)
         
     def create_cumulative_bank_report_chacklist_view(self):
+        # Created viewcumulative_bank_report_checklist to get the cumulative values in current year bank report
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewcumulative_bank_report_checklist` AS
             select
                 `t1`.`UTR_Number` AS `UTR_Number`,
@@ -2160,6 +2163,10 @@ class ViewCreator:
             """)
         
     def create_cumulative_current_year_sales_invoice_view(self):
+        
+        # Created viewcumulative_current_year_sales_invoice
+        # : Total TDS/Total Disallowance/Total Settled = Total of TDS/Disallowance/Settled
+
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewcumulative_current_year_sales_invoice` AS
             select
                 `t1`.`Bill Number` AS `Bill Number`,
@@ -2195,6 +2202,7 @@ class ViewCreator:
             """)
         
     def create_cumulative_current_year_sales_invoice_with_job_view(self):
+        # Created viewcumulative_current_year_sales_invoice_with_job view it contains cumulative values with job ID
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewcumulative_current_year_sales_invoice_with_job` AS
             select
                 `tfr`.`job` AS `job`,
@@ -2215,6 +2223,7 @@ class ViewCreator:
             """)
         
     def create_current_bank_report_checklist_view(self):
+        # Created viewcurrent_bank_report_checklist - to get the difference of Total Deposit - (Total Allocated + Total Un-allocated) < 9
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewcurrent_bank_report_checklist` AS
             select
                 `tfr`.`job` AS `job`,
@@ -2251,6 +2260,7 @@ class ViewCreator:
             """)
         
     def create_current_year_si_checklist_view(self):
+        # Created viewSales Invoice Current Year Breakup : Total Claim Amount - ( Total Settled + Total TDS + Total Disallowance ) < 9
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewcurrent_year_si_checklist` AS
             select
                 `vsicyb`.`bill_number` AS `bill_number`,
