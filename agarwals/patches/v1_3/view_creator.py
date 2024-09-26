@@ -1807,7 +1807,7 @@ class ViewCreator:
                 (`vsicy`.`name` = `vss`.`bill_number`));
                 """)
         
-    def create_salse_invoice_with_reference_view(self):
+    def create_sales_invoice_with_reference_view(self):
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewSales Invoice With Reference` AS
             select
                 `vsirwrn`.`Bill Number` AS `Bill Number`,
@@ -2320,7 +2320,7 @@ class ViewCreator:
         self.create_cumulative_current_year_sales_invoice_with_job_view()
         self.create_current_bank_report_checklist_view()
         self.create_current_year_si_checklist_view()
-        self.create_salse_invoice_with_reference_view()
+        self.create_sales_invoice_with_reference_view()
         
 def execute():
     ViewInstance = ViewCreator()
