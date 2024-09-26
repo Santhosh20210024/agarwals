@@ -7,12 +7,13 @@ import hashlib
 from agarwals.utils.loader import Loader
 from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.error_handler import log_error as error_handler
-from typing import List,Union
+from typing import List, Union
 
 control_panel = frappe.get_single('Control Panel')
 SITE_PATH = control_panel.site_path
 FOLDER = f'Home/{control_panel.project_folder}'
 IS_PRIVATE = 1
+
 
 class Transformer:
     def __init__(self):
@@ -60,30 +61,30 @@ class Transformer:
         right_df_column = json.loads(self.loading_configuration.column_to_join.replace("'", '"'))["right"]
         return left_df_column, right_df_column
 
-
-    def left_join(self,file,left_on = None,right_on = None,source_df= None,target_df = None):
+    def left_join(self, file, left_on=None, right_on=None, source_df=None, target_df=None):
         try:
             if not left_on and not right_on:
                 left_on, right_on = self.get_join_columns()
             source_df = source_df if source_df is not None and isinstance(source_df, pd.DataFrame) else self.source_df
             target_df = target_df if target_df is not None and isinstance(target_df, pd.DataFrame) else self.target_df
             merged_df = source_df.merge(target_df, left_on=left_on, right_on=right_on, how='left',
-                                             indicator=True,
-                                             suffixes=('', '_x'))
+                                        indicator=True,
+                                        suffixes=('', '_x'))
             return merged_df
         except Exception as e:
             self.update_status('File upload', file['name'], 'Error')
-            self.log_error(doctype_name='File upload',reference_name=file['name'],error_message=e)
+            self.log_error(doctype_name='File upload', reference_name=file['name'], error_message=e)
             return pd.DataFrame()
 
-    def prune_columns(self, df, columns_to_prune:Union[List[str],None] = None):
+    def prune_columns(self, df, columns_to_prune: Union[List[str], None] = None):
         if columns_to_prune is None:
             columns_to_prune = []
             columns = self.get_columns_to_prune()
             for column in columns:
                 if column in df.columns:
                     columns_to_prune.append(column)
-        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if 'unnamed' in column or 'nan' in column]
+        unnamed_columns = [self.trim_and_lower(column) for column in df.columns if
+                           'unnamed' in column or 'nan' in column]
         if unnamed_columns:
             columns_to_prune.extend(unnamed_columns)
         df = df.drop(columns=columns_to_prune, errors='ignore')
@@ -106,35 +107,35 @@ class Transformer:
             df = df[df[left_column] == df[right_column]]
         return modified_records, df
 
-    def log_error(self, doctype_name, error_message , reference_name = None):
+    def log_error(self, doctype_name, error_message, reference_name=None):
         error_handler(error=error_message, doc=doctype_name, doc_name=reference_name)
 
     def get_column_needed(self):
         return eval(self.loading_configuration.column_needed)
 
-    def reorder_columns(self,column_orders,df):
-        df = self.convert_into_common_format(df,column_orders)
+    def reorder_columns(self, column_orders, df):
+        df = self.convert_into_common_format(df, column_orders)
         return df[column_orders]
 
     def write_excel(self, df, file_path, type, target_folder):
         column_orders = self.get_column_needed()
         if column_orders:
-            df = self.reorder_columns(column_orders,df)
-        excel_file_path = file_path.replace(file_path.split('.')[-1],'xlsx')
-        file_path = excel_file_path.replace('Extract', target_folder).replace('.xlsx','_' + type + '.xlsx')
+            df = self.reorder_columns(column_orders, df)
+        excel_file_path = file_path.replace(file_path.split('.')[-1], 'xlsx')
+        file_path = excel_file_path.replace('Extract', target_folder).replace('.xlsx', '_' + type + '.xlsx')
         file_path_to_write = SITE_PATH + file_path
         df.to_excel(file_path_to_write, index=False)
         return file_path
 
-    def create_file_record(self, file_url,folder):
+    def create_file_record(self, file_url, folder):
         file_name = file_url.split('/')[-1]
         file = frappe.new_doc('File')
         file.set('file_name', file_name)
         file.set('is_private', IS_PRIVATE)
-        file.set('folder', os.path.join(FOLDER,folder))
+        file.set('folder', os.path.join(FOLDER, folder))
         file.set('file_url', file_url)
         file.save()
-        frappe.db.set_value('File',file.name,'file_url',file_url)
+        frappe.db.set_value('File', file.name, 'file_url', file_url)
 
     def insert_in_file_upload(self, file_url, file_upload_name, type, status, transform_child):
         file_upload = frappe.get_doc('File upload', file_upload_name)
@@ -156,34 +157,35 @@ class Transformer:
         file_upload.save(ignore_permissions=True)
         return transform
 
-    def move_to_transform(self, file, df, type, folder, prune = True, status = 'Open'):
+    def move_to_transform(self, file, df, type, folder, prune=True, status='Open'):
         if df.empty:
             return None
         if self.is_truncate_excess_char == True:
-            df = df.applymap(lambda x:str(x)[:self.max_trim_length] if len(str(x)) > self.max_trim_length else x)
+            df = df.applymap(lambda x: str(x)[:self.max_trim_length] if len(str(x)) > self.max_trim_length else x)
         if prune:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
-           df = self.format_utr(df ,self.utr_column_name)
+            df = self.format_utr(df, self.utr_column_name)
         if self.format_numeric:
             df = self.format_numbers(df)
         transform = self.create_transform_record(file['name'])
         df["file_upload"] = file['name']
         df["transform"] = transform.name
-        file_path = self.write_excel(df, file['upload'], type,folder)
-        self.create_file_record(file_path,folder)
+        file_path = self.write_excel(df, file['upload'], type, folder)
+        self.create_file_record(file_path, folder)
         self.insert_in_file_upload(file_path, file['name'], type, status, transform)
-
 
     def load_source_df(self, file, header):
         try:
             if file['upload'].lower().endswith('.csv'):
-                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header , on_bad_lines='skip') if self.skip_invalid_rows_in_csv else pd.read_csv(SITE_PATH + file['upload'], header=header)
+                self.source_df = pd.read_csv(SITE_PATH + file['upload'], header=header,
+                                             on_bad_lines='skip') if self.skip_invalid_rows_in_csv else pd.read_csv(
+                    SITE_PATH + file['upload'], header=header)
             else:
-                 self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
+                self.source_df = pd.read_excel(SITE_PATH + file['upload'], header=header)
             self.source_df["index"] = [i for i in range(2, len(self.source_df) + 2)]
         except Exception as e:
-            self.log_error(doctype_name=self.document_type, reference_name=file['name'],error_message=e)
+            self.log_error(doctype_name=self.document_type, reference_name=file['name'], error_message=e)
             self.update_status('File upload', file['name'], 'Error')
 
     def get_columns_to_hash(self):
@@ -191,7 +193,7 @@ class Transformer:
 
     def hashing_job(
             self,
-            return_df:bool = False,
+            return_df: bool = False,
             df: Union[pd.DataFrame, None] = None,
             columns_to_hash: Union[List[str], None] = None,
             concatenated_column_name: Union[str, None] = None,
@@ -209,18 +211,19 @@ class Transformer:
         # Creating Hash
         for column in columns_to_hash:
             source_df[concatenated_column] = source_df[concatenated_column].astype(str) + source_df[column].astype(str)
-        source_df[hash_column_name] = source_df[concatenated_column].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+        source_df[hash_column_name] = source_df[concatenated_column].apply(
+            lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
         if return_df:
             return source_df
 
     def update_status(self, doctype, name, status):
         if doctype == 'File upload':
-            doc = frappe.get_doc('File upload',name)
+            doc = frappe.get_doc('File upload', name)
             doc.status = status
             doc.save(ignore_permissions=True)
             frappe.db.commit()
         else:
-            frappe.db.set_value(doctype,name,'status',status)
+            frappe.db.set_value(doctype, name, 'status', status)
             frappe.db.commit()
 
     def update_count(self, doctype, name):
@@ -233,13 +236,13 @@ class Transformer:
         frappe.db.commit()
 
     def update_parent(self, file):
-        file_record = frappe.get_doc('File upload',file['name'])
+        file_record = frappe.get_doc('File upload', file['name'])
         transform_records = file_record.transform
         transform_record_status = []
         for transform_record in transform_records:
             transform_record_status.append(transform_record.status)
         if "Error" in transform_record_status:
-            self.update_status('File upload',file['name'],'Error')
+            self.update_status('File upload', file['name'], 'Error')
         elif "Partial Success" in transform_record_status:
             self.update_status('File upload', file['name'], 'Partial Success')
         else:
@@ -253,13 +256,13 @@ class Transformer:
             return item.replace("XX", '')
         return item
 
-    def format_utr(self,df,utr_column):
+    def format_utr(self, df, utr_column):
         utr_list = df[utr_column].fillna(0).to_list()
         new_utr_list = []
         for item in utr_list:
             item = str(item).replace('UIIC_', 'CITIN')
             item = str(item).replace('UIC_', 'CITIN')
-            if str(item).startswith(('23','24','25','26','27','28','29','30')) and len(str(item)) == 11:
+            if str(item).startswith(('23', '24', '25', '26', '27', '28', '29', '30')) and len(str(item)) == 11:
                 item = "CITIN" + str(item)
                 new_utr_list.append(item)
             elif len(str(item)) == 9:
@@ -300,16 +303,17 @@ class Transformer:
                     header_row_index = index
                     break
             if header_row_index is not None:
-                key, header_row_index, identified_header_row = self.validate_header(header_row_index,source_column_list)
+                key, header_row_index, identified_header_row = self.validate_header(header_row_index,
+                                                                                    source_column_list)
                 return key, header_row_index, identified_header_row
         return 'Not Identified', 0, []
 
-    def rename_columns(self,df,columns):
+    def rename_columns(self, df, columns):
         df = df.rename(columns=columns)
         df = df.loc[:, ~self.source_df.columns.duplicated()]
         return df
 
-    def convert_into_common_format(self,df,columns_to_select):
+    def convert_into_common_format(self, df, columns_to_select):
         columns = []
         for column in columns_to_select:
             if column in df.columns:
@@ -327,21 +331,22 @@ class Transformer:
             if column in self.source_df.columns:
                 self.source_df[column] = pd.to_numeric(self.source_df[column], errors='coerce')
 
-    def format_date(self,df,date_formats,date_column):
-        df['original_date'] = df[date_column].astype(str).apply(lambda x: x.strip() if isinstance(x,str) else x)
+    def format_date(self, df, date_formats, date_column):
+        df['original_date'] = df[date_column].astype(str).apply(lambda x: x.strip() if isinstance(x, str) else x)
         df['formatted_date'] = pd.NaT
         for fmt in date_formats:
-            new_column = 'date_' + fmt.replace('%','').replace('/','_').replace(':','').replace(' ','_')
-            df[new_column] = pd.to_datetime(df['original_date'],format = fmt, errors='coerce')
+            new_column = 'date_' + fmt.replace('%', '').replace('/', '_').replace(':', '').replace(' ', '_')
+            df[new_column] = pd.to_datetime(df['original_date'], format=fmt, errors='coerce')
             df['formatted_date'] = df['formatted_date'].combine_first(df[new_column])
         df[date_column] = df['formatted_date']
-        df = self.prune_columns(df,[col for col in df.columns if 'date_' in col or col == 'formatted_date' or col == 'original_date'])
+        df = self.prune_columns(df, [col for col in df.columns if
+                                     'date_' in col or col == 'formatted_date' or col == 'original_date'])
         return df
 
     def get_columns_to_fill_na_as_0(self):
         return eval(self.loading_configuration.column_to_convert_na_to_0)
 
-    def fill_na_as_0(self,df):
+    def fill_na_as_0(self, df):
         columns = self.get_columns_to_fill_na_as_0()
         for column in columns:
             if column in df.columns:
@@ -387,4 +392,3 @@ class Transformer:
             loader.process()
             self.update_parent(file)
         return status
-
