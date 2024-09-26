@@ -31,7 +31,7 @@ class Transformer:
         self.max_trim_length = 140
         self.loading_configuration = None
         self.skip_invalid_rows_in_csv = False
-        self.format_numbric = True
+        self.format_numeric = True
 
     def get_file_columns(self):
         return self.loading_configuration.columns_to_get_from_file
@@ -161,7 +161,7 @@ class Transformer:
             df = self.prune_columns(df)
         if self.clean_utr == 1:
            df = self.format_utr(df ,self.utr_column_name)
-        if self.format_numbric:
+        if self.format_numeric:
             df = self.format_numbers(df)
         transform = self.create_transform_record(file['name'])
         df["file_upload"] = file['name']

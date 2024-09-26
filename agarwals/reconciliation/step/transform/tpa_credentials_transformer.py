@@ -13,7 +13,7 @@ class TpaCredentialsTransformer(Transformer):
         self.document_type: str = 'TPA Login Credentials'
         self.downloader_patterns: List[dict] =  frappe.get_all(doctype="SA Downloader Configuration",filters = {},fields="name,portal_pattern")
         self.error_records = pd.DataFrame()
-        self.format_numbric = False
+        self.format_numeric = False
 
     def load_target_df(self):
         query = f"""
