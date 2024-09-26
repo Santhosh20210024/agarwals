@@ -7,6 +7,7 @@ import hashlib
 from agarwals.utils.loader import Loader
 from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.error_handler import log_error as error_handler
+from typing import List,Union
 
 control_panel = frappe.get_single('Control Panel')
 SITE_PATH = control_panel.site_path
@@ -60,10 +61,13 @@ class Transformer:
         return left_df_column, right_df_column
 
 
-    def left_join(self,file):
+    def left_join(self,file,left_on = None,right_on = None,source_df= None,target_df = None):
         try:
-            left_on, right_on = self.get_join_columns()
-            merged_df = self.source_df.merge(self.target_df, left_on=left_on, right_on=right_on, how='left',
+            if not left_on and not right_on:
+                left_on, right_on = self.get_join_columns()
+            source_df = source_df if source_df is not None and isinstance(source_df, pd.DataFrame) else self.source_df
+            target_df = target_df if target_df is not None and isinstance(target_df, pd.DataFrame) else self.target_df
+            merged_df = source_df.merge(target_df, left_on=left_on, right_on=right_on, how='left',
                                              indicator=True,
                                              suffixes=('', '_x'))
             return merged_df
@@ -72,7 +76,7 @@ class Transformer:
             self.log_error(doctype_name='File upload',reference_name=file['name'],error_message=e)
             return pd.DataFrame()
 
-    def prune_columns(self, df, columns_to_prune = None):
+    def prune_columns(self, df, columns_to_prune:Union[List[str],None] = None):
         if columns_to_prune is None:
             columns_to_prune = []
             columns = self.get_columns_to_prune()
@@ -185,12 +189,29 @@ class Transformer:
     def get_columns_to_hash(self):
         return eval(self.loading_configuration.column_to_hash)
 
-    def hashing_job(self):
-        self.source_df['hash_column'] = ''
-        columns_to_hash = self.get_columns_to_hash()
+    def hashing_job(
+            self,
+            return_df:bool = False,
+            df: Union[pd.DataFrame, None] = None,
+            columns_to_hash: Union[List[str], None] = None,
+            concatenated_column_name: Union[str, None] = None,
+            hash_column_name: Union[str, None] = None
+    ):
+        # Set the prerequisite to create a hash.
+        if df is not None and isinstance(df, pd.DataFrame):
+            source_df = df
+        else:
+            source_df = self.source_df
+        concatenated_column = concatenated_column_name if concatenated_column_name else 'hash_column'
+        columns_to_hash = columns_to_hash if columns_to_hash else self.get_columns_to_hash()
+        hash_column_name = hash_column_name if hash_column_name else 'hash'
+        source_df[concatenated_column] = ''
+        # Creating Hash
         for column in columns_to_hash:
-            self.source_df['hash_column'] = self.source_df['hash_column'].astype(str) + self.source_df[column].astype(str)
-        self.source_df['hash'] = self.source_df['hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+            source_df[concatenated_column] = source_df[concatenated_column].astype(str) + source_df[column].astype(str)
+        source_df[hash_column_name] = source_df[concatenated_column].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+        if return_df:
+            return source_df
 
     def update_status(self, doctype, name, status):
         if doctype == 'File upload':

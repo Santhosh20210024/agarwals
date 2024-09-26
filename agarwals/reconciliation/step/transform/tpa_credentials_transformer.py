@@ -18,23 +18,23 @@ class TpaCredentialsTransformer(Transformer):
     def load_target_df(self):
         query = f"""
                      SELECT 
-                         name, hash ,user_name,password,executing_method
+                         name,hash_for_insert,hash_for_update,user_name,password,executing_method
                      FROM 
                          `tab{self.document_type}`
                      """
         records = frappe.db.sql(query, as_list=True)
-        self.target_df = pd.DataFrame(records, columns=['name', 'hash','user_name','password','executing_method'])
+        self.target_df = pd.DataFrame(records, columns=['name','hash_for_insert','hash_for_update','user_name','password','executing_method'])
 
     def create_patterns(self,url: str|None) -> str:
-        return create_pattern(url) if url else 'Url not found'
+        return create_pattern(url)
 
     def get_downloader_name(self,pattern:str) -> str:
         """
-            Matches the provided portal pattern to a downloader name.
-            Args:
-                pattern (str): The portal pattern to match against the downloader patterns.
-            Returns:
-                str: The name of the matching downloader if found; otherwise, an empty string.
+        Matches the provided portal pattern to a downloader name.
+        Args:
+            pattern (str): The portal pattern to match against the downloader patterns.
+        Returns:
+            str: The name of the matching downloader if found; otherwise, an empty string.
         """
         downloader_name = [downloader_pattern['name'] for downloader_pattern in self.downloader_patterns if downloader_pattern.get('portal_pattern') == pattern]
         if downloader_name:
@@ -71,6 +71,13 @@ class TpaCredentialsTransformer(Transformer):
         cleaned_data = df if null_check_mask.empty else df[~null_check_mask]
         return cleaned_data
 
+    def __hashing_job(self) -> pd.DataFrame:
+        columns_to_hash = self.get_columns_to_hash()
+        columns_to_hash.append('Password')
+        hash_for_insert = self.hashing_job(return_df=True)
+        hash_for_update = self.hashing_job(return_df=True,df=hash_for_insert,columns_to_hash=columns_to_hash,concatenated_column_name='concatenated_for_update',hash_column_name='Hash For Update')
+        return hash_for_update
+
     def __process_feature_extraction(self,cleaned_data: pd.DataFrame) -> pd.DataFrame:
         """"
          Extracts features from the cleaned DataFrame
@@ -84,32 +91,11 @@ class TpaCredentialsTransformer(Transformer):
         cleaned_data['pattern'] = cleaned_data['Url'].apply(self.create_patterns)
         cleaned_data['Executing Class'] = cleaned_data['pattern'].apply(self.get_downloader_name)
         self.source_df = cleaned_data
-        self.hashing_job()
-        return cleaned_data
-
-    def __create_hash(self,df: pd.DataFrame,columns_to_hash:List[str]) -> pd.DataFrame:
-        df['new_hash_column'] = ''
-        for column in columns_to_hash:
-            df['new_hash_column'] = df['new_hash_column'].astype(str) + df[column].astype(str)
-        df['new_hash'] = df['new_hash_column'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
-        return df
-
-    def drop_columns(self,df,columns_to_drop:List[str]) -> pd.DataFrame:
-        existing_columns: List[str] = [column for column in columns_to_drop if column in df.columns]
-        if existing_columns:
-            df = df.drop(columns=existing_columns)
-        return df
+        prepared_data = self.__hashing_job()
+        return prepared_data
 
     def __split_modified_and_unmodified_records(self,df:pd.DataFrame):
-        updated_source_hash_columns: List[str] = self.get_columns_to_hash()
-        updated_source_hash_columns.append('Password')
-        source_df = self.__create_hash(df,columns_to_hash=updated_source_hash_columns)
-        target_df = self.__create_hash(self.target_df,columns_to_hash=['user_name','executing_method','password'])
-        source_df = self.drop_columns(source_df,['_merge'])
-        target_df = self.drop_columns(target_df,['_merge'])
-        _merged_df = source_df.merge(target_df, left_on='new_hash',right_on='new_hash', how='left',indicator=True,suffixes=('', '_x'))
-        self.unmodified_records = _merged_df[_merged_df['_merge'] == 'both']
-        self.modified_records = _merged_df[_merged_df['_merge'] == 'left_only']
+        self.modified_records,self.unmodified_records = self.split_modified_and_unmodified_records(df)
         if not self.modified_records.empty:
             self.modified_records['Retry'] = 1
 
