@@ -1,13 +1,14 @@
-import json
 import frappe
 import shutil
 import zipfile
 import os
 import re
 import pandas as pd
-import pip
 from frappe.model.document import Document
-from agarwals.agarwals.doctype.file_upload.file_upload_utils import construct_file_url
+from agarwals.agarwals.doctype.file_upload.file_upload_utils import (
+    is_template_exist,
+    construct_file_url,
+)
 from agarwals.utils.error_handler import log_error
 
 
@@ -282,28 +283,29 @@ class Fileupload(Document):
             return pd.DataFrame()
 
     def get_template_details(self):
-        configuration_doctype = None
+        attached_name = None
+        attached_doctype = None
+
         match self.document_type:
             case "Debtors Report":
-                configuration_doctype = "Bill"
+                attached_name = "Bill"
             case "Claim Book":
-                configuration_doctype = "ClaimBook"
+                attached_name = "ClaimBook"
             case "Settlement Advice":
-                configuration_doctype = "Settlement Advice Staging"
+                attached_doctype = "Customer"
+                attached_name = self.payer_type
             case "Bank Statement Bulk":
-                configuration_doctype = "Bank Transaction Staging"
-            case "Bank Statement":
-                configuration_doctype = "Bank Statement"
+                attached_name = "Bank Transaction"
             case "Bill Adjustment":
-                configuration_doctype = "Bill Adjustment"
+                attached_name = "Bill Adjustment"
             case "Write Back":
-                configuration_doctype = "Write Back"
+                attached_name = "Write Back"
             case "Write Off":
-                configuration_doctype = "Write Off"
+                attached_name = "Write Off"
             case _:
-                configuration_doctype = None
+                attached_name = None
 
-        return  configuration_doctype
+        return attached_name, attached_doctype
 
     def compress(self, column_list):
         compressed_list = []
@@ -322,35 +324,25 @@ class Fileupload(Document):
             return f"Columns are missing in the uploaded file: {missing_in_upload}"
         else:
             return None
-        
-    def get_configuration_column(self, configuration_doctype):
-        if configuration_doctype == "Settlement Advice Staging" and self.payer_type == "Manual":
-            sa_configure_doc = frappe.get_single("Settlement Advice Configuration")
-            sa_columns = sa_configure_doc.column_for_validation.replace("'", '"')
-            return json.loads(sa_columns)[self.payer_type]
-    
-        config_doc = frappe.get_all("Data Loading Configuration", {"name": configuration_doctype}, ['columns_for_validation'])
-        column_reference = config_doc[0].columns_for_validation[1:-1]
-        return [colname.strip()[1:-1] for colname in column_reference.split(',')]
 
     def validate_file_header(self, fname, fid):
         try:
             if self.upload and self.file_format != "ZIP":
-                configuration_doctype= self.get_template_details()
-                if configuration_doctype == "Settlement Advice Staging" and self.payer_type != "Manual":
-                   return 
-                elif configuration_doctype == "Bank Statement" :
-                    return
-                upload_columns = self.read_file(
-                    self.site_path + self.upload, columns=True
+                attached_name, attached_doctype = self.get_template_details()
+                template_columns = self.read_file(
+                    self.site_path + is_template_exist(attached_name, attached_doctype),
+                    columns=True,
                 )
-                column_list = self.get_configuration_column(configuration_doctype)
-                if upload_columns:
-                    is_different = self.compare_header(
-                        column_list, upload_columns
+                if template_columns:
+                    upload_columns = self.read_file(
+                        self.site_path + self.upload, columns=True
                     )
-                    if is_different:
-                        frappe.throw(is_different)
+                    if upload_columns:
+                        is_different = self.compare_header(
+                            template_columns, upload_columns
+                        )
+                        if is_different:
+                            frappe.throw(is_different)
         except Exception as e:
             self.del_file_record(fid, fname, str(e))
 
@@ -493,7 +485,7 @@ class Fileupload(Document):
                 if flist:
                     flist = [file for file in flist if not file.endswith("/")]
                     self.update_mapping_entries(flist, ffield)
-                    # self.upload_file_record(flist)
+                    self.upload_file_record(flist)
 
             except Exception as e:
                 frappe.throw("Error!:" + str(e))
