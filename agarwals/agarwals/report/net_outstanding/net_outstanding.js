@@ -2,4 +2,4 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-build_report('Inconsistent TDS Report (Settlement Advice)');
+build_report('Net Outstanding');
