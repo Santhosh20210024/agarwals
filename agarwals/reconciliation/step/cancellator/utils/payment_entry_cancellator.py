@@ -12,9 +12,9 @@ class PaymentEntryCancellator:
 
     def get_child_records(self, doctype, parent, name):
         if parent == 'Bank Transaction':
-            return frappe.get_list(doctype, filters={'parenttype': parent, 'payment_entry': name}, pluck='name')
+            return frappe.get_all(doctype, filters={'parenttype': parent, 'payment_entry': name}, pluck='name')
         elif parent == 'Sales Invoice' and doctype == 'Sales Invoice Reference':
-            return frappe.get_list(doctype, filters={'parenttype': parent, 'entry_name': name}, pluck='name')
+            return frappe.get_all(doctype, filters={'parenttype': parent, 'entry_name': name}, pluck='name')
 
     def delete_payment_references(self, payment_entry):
         payment_reference_doctype_and_parent = self.get_payment_reference_doctypes()

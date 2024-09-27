@@ -126,6 +126,16 @@
   },
   {
     "doctype": "Custom Field",
+    "dt": "Payment Entry",
+    "name": "Payment Entry-custom_matcher_id",
+    "fieldname": "custom_matcher_id",
+    "fieldtype": "Data",
+    "label": "Matcher ID",
+    "insert_after": "custom_parent_doc",
+    "allow_on_submit": 1
+  },
+  {
+    "doctype": "Custom Field",
     "dt": "Sales Invoice",
     "name": "Sales Invoice-yearly_due",
     "fieldname": "custom_yearly_due",
@@ -913,7 +923,7 @@
     "doctype": "Settlement Advice Configuration",
     "name": "Settlement Advice Configuration",
     "header_row_patterns": "[\"alnumber\", \"preauthnumber\", \"pano\", \"preauthid\", \"alcashlessauthorisationno\", \"ccn\", \"ccnno\", \"fileno\", \"paclaimid\", \"incidentno\", \"refid\", \"uhid\", \"casenumber\", \"fir\", \"insurerclaimnumber\", \"ccnnumber\", \"insuranceclaimno\", \"caseid\", \"intimationnum\", \"refno\",\"claimnumber\", \"claimid\", \"claimno\", \"insurerclaimno\", \"tpaclaimno\", \"refccn\", \"insurerclaimid\", \"memberidtpa\"]",
-    "target_columns": "{\r\n\"cl_number\": [\"claimnumber\", \"claimid\", \"claimno\", \"insurerclaimno\", \"refccn\", \"insurerclaimid\", \"memberidtpa\"],\r\n\r\n\"claim_id\": [[\"alnumber\", \"preauthnumber\", \"pano\", \"preauthid\", \"alcashlessauthorisationno\", \"ccn\", \"ccnno\", \"fileno\", \"paclaimid\", \"incidentno\", \"refid\", \"uhid\", \"casenumber\",\"fir\", \"insurerclaimnumber\", \"ccnnumber\", \"tpaclaimno\", \"insuranceclaimno\", \"caseid\"],[\"insuranceclaimno\", \"caseid\", \"claimnumber\", \"claimid\",\"claimno\", \"insurerclaimno\", \"insurerclaimid\", \"refccn\"]],\r\n\r\n\"bill_number\": [\"billno\", \"billnumber\", \"bill\", \"finalbillnumber\"],\r\n\r\n\"mrn\": [\"patientidnumber\", \"patientipnumber\", \"inpatientnumber\", \"branchmrnno\", \"ipnumber\"],\r\n\r\n\"utr_number\": [\"utr\", \"claimchequenumber\", \"instrumentneftno\", \"chequeneftutrno\", \"utrno\", \"chequeno\", \"chequenumber\", \"etransactionnochequeno\", \"mapchequeneftnumber\", \"utrnumber\", \"trasactionno\", \"paymentreferencenumber\", \"fundtransferno\", \"nefttransactionnumber\", \"utrchqno\", \"ddchequeecsrefno\", \"paymenttransactionidutr\", \"instrumentno\", \"bankeftrefid\", \"paymentutr\", \"claimutrnumber\", \"chequeneftno\", \"chequeneftnumber\", \"chqno\", \"chequenum\", \"chqutrno\", \"rumentno\", \"cdsdsa\", \"neftchqddrefno\"],\r\n\r\n\"claim_status\": [\"statusname\", \"status\", \"claimstatus\", \"finalstatus\", \"interimstatus\", \"portalstatus\", \"newstatus\", \"claimstatusnm\"],\r\n\r\n\"paid_date\": [\"settlementdate\", \"chequeneftutrdate\", \"dtofpayment\", \"utrdt\", \"chequedate\", \"transferdate\", \"chequeneftno\", \"claimchequedate\", \"etransactiondatechequedate\", \"mapchequeneftdate\", \"utrdate\", \"paymenttransactiondate\", \"dateofpayment\", \"dateoftransaction\", \"neftrtgsdate\", \"utrdatechqdate\", \"chequeddecsdate\", \"paiddate\", \"paymentdate\", \"paymentconfirmationtime\", \"claimpaiddate\", \"instrumentneftdate\", \"paidondate\", \"chequeneftdate\", \"chqdate\", \"chequedt\", \"eftcreationtime\",  \"chqutrdate\", \"utrnoupdatedate\", \"dateneftchqdd\"],\r\n\r\n\"insurance_company\": [\"insurancecompany\", \"insurancecompanyname\", \"nameofinsuranceco\", \"icname\", \"inscompname\", \"insurername\", \"insurancename\", \"insurer\", \"payorname\", \"tpaname\", \"tpabranchname\"],\r\n\r\n\"patient_name\": [\"patientname\", \"name\", \"claimantname\", \"nameoftheinsured\", \"insuredname\", \"nameofpatient\", \"patient\"],\r\n\r\n\"insurance_policy_number\": [\"policynumber\"],\r\n\r\n\"doa\": [\"dateofadmission\", \"doa\", \"claimdateofadmission\", \"dtofadmission\", \"cddoa\", \"admissiondate\", \"admdate\", \"doaopdtreatmentfrom\", \"hospfrom\"],\r\n\r\n\"dod\": [\"dateofdischarge\", \"dod\", \"dtofdischarge\", \"cddod\", \"disdate\", \"claimdateofdischarge\", \"dodopdtreatmentto\", \"hospto\", \"dischargedate\"],\r\n\r\n\"hospital_name\": [\"providername\", \"hospitalname\", \"hospname\", \"claimhospitalname\", \"nameofthehospital\", \"nameofthepayee\", \"payeename\"],\r\n\r\n\"bank_account_no\": [\"bankacno\", \"bankaccountno\", \"payeebankaccount\", \"accountno\", \"accountnumber\", \"accno\", \"payeeaccount\", \"payeebankaccno\"],\r\n\r\n\"bank_name\": [\"bankname\", \"bank\", \"payeebankname\"],\r\n\r\n\"bank_branch\": [\"bankbranchname\", \"payebankbranchname\", \"branch\", \"accountbranch\"],\r\n\r\n\"claim_amount\": [\"claimamount\", \"sumofclaimedamount\", \"alamount\", \"lodgeamount\", \"grossamount\", \"claimamt\", \"claimedamt\", \"claimamountclaimed\", \"claimedamounta\", \"requestamount\", \"payeramount\", \"totalamountclaimed\", \"amountclaimed\", \"claimapprovalamount\", \"approvedamount\", \"claimedamount\", \"appamt\", \"amountintim\", \"claiminitiationamount\", \"billamt\", \"appamtinr\", \"grossamt\"],\r\n\r\n\"settled_amount\": [[\"claimnetpayamount\",\"netpaidamount\", \"amountpaid\", \"paidamount\", \"chequeamount\", \"netamountpaid\", \"claimtransferredamt\", \"netpaybleamountjgi\", \"totalamountpaid\", \"totalamountclaimpaid\", \"netpayable\", \"netpayble\", \"paidamountaftertax\", \"amtcredited\", \"amountpaidtohospital\", \"finalpayment\", \"transferedamount\", \"netclaimpayableaftertds\",\"netamountpaidincludinggstaftertds\", \"passedamount\", \"ecsamount\", \"ecsamt\", \"finalpayableamount\", \"passedamt\"], [\"netapprovedamt\", \"netamount\",\"approvedamt\", \"settledamount\", \"sumofsettledamount\", \"approvedamount\", \"claimamount\", \"claimapprovedamount\"]],\r\n\r\n\"tds_amount\": [\"tds\", \"tdsamount\", \"sumoftdsamount\", \"tdsamt\", \"claimtdsamt\", \"tdsamountigh\", \"tdsrs\", \"taxdeducted\", \"tdstds\", \"tdsforcashlessclaim\"],\r\n\r\n\"disallowed_amount\": [\"shortfallamount\", \"deductableamount\", \"totaldeductions\", \"deduction\", \"totaldisallowances\", \"deductionamt\", \"disallowedamount\", \"claimdisallowedamount\", \"finaldisallowedamt\", \"deductionamountb\", \"amountdeducted\", \"totaldisallowance\", \"disallowance\", \"discamt\"],\r\n\r\n\"payers_remark\": [\"deductablereason\", \"deduction\", \"disallowencereason1\", \"claimdisallowedreasons\", \"deductionreason\", \"deductiondetails\", \"reasonfordisallowance\", \"deductedremarks\", \"payersremark\", \"reasons\", \"remarksoftpa\"],\r\n\r\n\"tds_percentage\": [\"tdsdeduction\"]\r\n}",
+    "target_columns": "{\r\n\"cl_number\": [\"claimnumber\", \"claimid\", \"claimno\", \"insurerclaimno\", \"refccn\", \"insurerclaimid\", \"memberidtpa\"],\r\n\r\n\"claim_id\": [[\"alnumber\", \"preauthnumber\", \"pano\", \"preauthid\", \"alcashlessauthorisationno\", \"ccn\", \"ccnno\", \"fileno\", \"paclaimid\", \"incidentno\", \"refid\", \"uhid\", \"casenumber\",\"fir\", \"insurerclaimnumber\", \"ccnnumber\", \"tpaclaimno\", \"insuranceclaimno\", \"caseid\"],[\"insuranceclaimno\", \"caseid\", \"claimnumber\", \"claimid\",\"claimno\", \"insurerclaimno\", \"insurerclaimid\", \"refccn\"]],\r\n\r\n\"bill_number\": [\"billno\", \"billnumber\", \"bill\", \"finalbillnumber\"],\r\n\r\n\"mrn\": [\"patientidnumber\", \"patientipnumber\", \"inpatientnumber\", \"branchmrnno\", \"ipnumber\"],\r\n\r\n\"utr_number\": [\"utr\", \"claimchequenumber\", \"instrumentneftno\", \"chequeneftutrno\", \"utrno\", \"chequeno\", \"chequenumber\", \"etransactionnochequeno\", \"mapchequeneftnumber\", \"utrnumber\", \"trasactionno\", \"paymentreferencenumber\", \"fundtransferno\", \"nefttransactionnumber\", \"utrchqno\", \"ddchequeecsrefno\", \"paymenttransactionidutr\", \"instrumentno\", \"bankeftrefid\", \"paymentutr\", \"claimutrnumber\", \"chequeneftno\", \"chequeneftnumber\", \"chqno\", \"chequenum\", \"chqutrno\", \"rumentno\", \"cdsdsa\", \"neftchqddrefno\"],\r\n\r\n\"claim_status\": [\"statusname\", \"status\", \"claimstatus\", \"finalstatus\", \"interimstatus\", \"portalstatus\", \"newstatus\", \"claimstatusnm\"],\r\n\r\n\"paid_date\": [\"settlementdate\", \"chequeneftutrdate\", \"dtofpayment\", \"utrdt\", \"chequedate\", \"transferdate\", \"chequeneftno\", \"claimchequedate\", \"etransactiondatechequedate\", \"mapchequeneftdate\", \"utrdate\", \"paymenttransactiondate\", \"dateofpayment\", \"dateoftransaction\", \"neftrtgsdate\", \"utrdatechqdate\", \"chequeddecsdate\", \"paiddate\", \"paymentdate\", \"paymentconfirmationtime\", \"claimpaiddate\", \"instrumentneftdate\", \"paidondate\", \"chequeneftdate\", \"chqdate\", \"chequedt\", \"eftcreationtime\",  \"chqutrdate\", \"utrnoupdatedate\", \"dateneftchqdd\"],\r\n\r\n\"insurance_company\": [\"insurancecompany\", \"insurancecompanyname\", \"nameofinsuranceco\", \"icname\", \"inscompname\", \"insurername\", \"insurancename\", \"insurer\", \"payorname\", \"tpaname\", \"tpabranchname\"],\r\n\r\n\"patient_name\": [\"patientname\", \"name\", \"claimantname\", \"nameoftheinsured\", \"insuredname\", \"nameofpatient\", \"patient\"],\r\n\r\n\"insurance_policy_number\": [\"policynumber\"],\r\n\r\n\"doa\": [\"dateofadmission\", \"doa\", \"claimdateofadmission\", \"dtofadmission\", \"cddoa\", \"admissiondate\", \"admdate\", \"doaopdtreatmentfrom\", \"hospfrom\"],\r\n\r\n\"dod\": [\"dateofdischarge\", \"dod\", \"dtofdischarge\", \"cddod\", \"disdate\", \"claimdateofdischarge\", \"dodopdtreatmentto\", \"hospto\", \"dischargedate\"],\r\n\r\n\"hospital_name\": [\"providername\", \"hospitalname\", \"hospname\", \"claimhospitalname\", \"nameofthehospital\", \"nameofthepayee\", \"payeename\"],\r\n\r\n\"bank_account_no\": [\"bankacno\", \"bankaccountno\", \"payeebankaccount\", \"accountno\", \"accountnumber\", \"accno\", \"payeeaccount\", \"payeebankaccno\"],\r\n\r\n\"bank_name\": [\"bankname\", \"bank\", \"payeebankname\"],\r\n\r\n\"bank_branch\": [\"bankbranchname\", \"payebankbranchname\", \"branch\", \"accountbranch\"],\r\n\r\n\"claim_amount\": [\"claimamount\", \"sumofclaimedamount\", \"alamount\", \"lodgeamount\", \"grossamount\", \"claimamt\", \"claimedamt\", \"claimamountclaimed\", \"claimedamounta\", \"requestamount\", \"payeramount\", \"totalamountclaimed\", \"amountclaimed\", \"claimapprovalamount\", \"approvedamount\", \"claimedamount\", \"appamt\", \"amountintim\", \"claiminitiationamount\", \"billamt\", \"appamtinr\", \"grossamt\"],\r\n\r\n\"settled_amount\": [[\"claimnetpayamount\",\"netpaidamount\", \"amountpaid\", \"paidamount\", \"chequeamount\", \"netamountpaid\", \"claimtransferredamt\", \"netpaybleamountjgi\", \"totalamountpaid\", \"totalamountclaimpaid\", \"netpayable\", \"netpayble\", \"paidamountaftertax\", \"amtcredited\", \"amountpaidtohospital\", \"finalpayment\", \"transferedamount\", \"netclaimpayableaftertds\",\"netamountpaidincludinggstaftertds\", \"passedamount\", \"ecsamount\", \"ecsamt\", \"finalpayableamount\", \"passedamt\"], [\"netapprovedamt\", \"netamount\",\"approvedamt\", \"settledamount\", \"sumofsettledamount\", \"approvedamount\", \"claimamount\", \"claimapprovedamount\"]],\r\n\r\n\"tds_amount\": [\"tds\", \"tdsamount\", \"sumoftdsamount\", \"tdsamt\", \"claimtdsamt\", \"tdsamountigh\", \"tdsrs\", \"taxdeducted\", \"tdstds\", \"tdsforcashlessclaim\"],\r\n\r\n\"disallowed_amount\": [\"shortfallamount\", \"deductableamount\", \"deduction\", \"totaldisallowances\", \"deductionamt\", \"disallowedamount\", \"claimdisallowedamount\", \"finaldisallowedamt\", \"deductionamountb\", \"amountdeducted\", \"totaldisallowance\", \"disallowance\", \"discamt\"],\r\n\r\n\"payers_remark\": [\"deductablereason\", \"deduction\", \"disallowencereason1\", \"claimdisallowedreasons\", \"deductionreason\", \"deductiondetails\", \"reasonfordisallowance\", \"deductedremarks\", \"payersremark\", \"reasons\", \"remarksoftpa\"],\r\n\r\n\"tds_percentage\": [\"tdsdeduction\"]\r\n}",
     "char_to_replace_in_header": "[\" \",\"-\",\"/\",\"_\",\"\\'\",\"\\\"\",\".\",\"(\",\")\",\"₹\",\"`\",\"<\",\">\",\"?\",\":\",\";\",\"[\",\"]\",\"{\",\"}\",\"|\",\"+\",\"=\",\"*\",\"&\",\"^\",\"%\",\"$\",\"#\",\"@\",\"!\",\"~\"]",
     "tpa": [
       {
@@ -1055,22 +1065,22 @@
     "disabled": 0,
     "script": "def todo_data():\n    \n    invalid_credentials_query = \"\"\"\n     SELECT reference_name FROM tabToDo ttd WHERE status = 'Open' AND reference_type = 'TPA Login Credentials'\n    \"\"\"\n    invalid_credentials = frappe.db.sql(invalid_credentials_query , pluck = \"reference_name\")\n    return invalid_credentials if invalid_credentials else None\n    \nfrappe.response['message'] = todo_data()",
     "doctype": "Server Script"
-
- },
-{
-  "name": "Reconciliation Job Executor",
-  "owner": "Administrator",
-  "creation": "2024-09-09 17:25:29.609226",
-  "modified": "2024-09-09 18:45:23.686943",
-  "modified_by": "Administrator",
-  "docstatus": 0,
-  "idx": 0,
-  "dt": "Job",
-  "view": "List",
-  "enabled": 1,
-  "script": "frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_inner_button(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'agarwals.reconciliation.job.run',\r\n                args: {'job_config': 'reconciliation_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
-  "doctype": "Client Script"
-},{
+  },
+  {
+    "name": "Reconciliation Job Executor",
+    "owner": "Administrator",
+    "creation": "2024-09-09 17:25:29.609226",
+    "modified": "2024-09-09 18:45:23.686943",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "dt": "Job",
+    "view": "List",
+    "enabled": 1,
+    "script": "frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_inner_button(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'agarwals.reconciliation.job.run',\r\n                args: {'job_config': 'reconciliation_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
+    "doctype": "Client Script"
+  },
+  {
   "name": "Bill Received",
   "owner": "Administrator",
   "docstatus": 0,
@@ -1132,5 +1142,353 @@
   "docstatus": 0,
   "mode": "Courier Submission",
   "doctype": "Bill Submission Mode"
-}
+},
+  {
+    "name": "Reconciliation",
+    "docstatus": 0,
+    "idx": 0,
+    "job_type": "Reconciliation",
+    "doctype": "Configuration Types",
+    "__last_sync_on": "2024-09-13T13:46:14.216Z"
+  },
+  {
+    "name": "Advice Downloader",
+    "docstatus": 0,
+    "idx": 0,
+    "job_type": "Advice Downloader",
+    "doctype": "Configuration Types",
+    "__last_sync_on": "2024-09-13T13:46:06.344Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.adjust_bill",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.adjust_bill",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:54:12.957Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.advice_creator",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.advice_creator",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:54:46.475Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.advice_downloader",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.advice_downloader",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:56:57.741Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.insurance_tagger",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.insurance_tagger",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:57:13.017Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.key_mapper.claim_key_mapper",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.key_mapper.claim_key_mapper",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:57:34.556Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.key_mapper.utr_key_mapper",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.key_mapper.utr_key_mapper",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:58:12.524Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.matcher",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.matcher",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:58:29.863Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.payer_match",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.payer_match",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:58:42.167Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.payment_entry_creator",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.payment_entry_creator",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:58:59.462Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.sales_invoice_creator",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.sales_invoice_creator",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:59:11.169Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.transaction_creator",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.transaction_creator",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T14:00:31.086Z"
+  },
+  {
+    "name": "agarwals.reconciliation.step.transform",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.reconciliation.step.transform",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T14:00:46.021Z"
+  },
+  {
+    "name": "agarwals.utils.sa_mail_sender",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.utils.sa_mail_sender",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T14:00:46.021Z"
+  },
+  {
+    "name": "agarwals.utils.checklist",
+    "docstatus": 0,
+    "idx": 0,
+    "method_path": "agarwals.utils.checklist",
+    "doctype": "Orchestrator Method",
+    "__last_sync_on": "2024-09-13T13:54:12.957Z"
+  },
+  {
+    "name": "TPA Login Credentials",
+    "owner": "Administrator",
+    "creation": "2024-09-25 14:58:17.476998",
+    "modified": "2024-09-26 13:51:00.316138",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "mapping_doctype": "TPA Login Credentials",
+    "template": "{\"column_to_field_map\": {\"2\": \"user_name\", \"3\": \"password\", \"1\": \"tpa\", \"5\": \"executing_method\", \"6\": \"branch_code\", \"4\": \"url\", \"8\": \"retry\", \"7\": \"hash_for_insert\", \"0\": \"ID\", \"9\": \"hash_for_update\"}}",
+    "doctype": "Data Import Mapping",
+    "mapping_columns": [
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 1,
+        "column_in_doctype": "user_name",
+        "column_index_in_import_file": "2",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 2,
+        "column_in_doctype": "password",
+        "column_index_in_import_file": "3",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 3,
+        "column_in_doctype": "tpa",
+        "column_index_in_import_file": "1",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 4,
+        "column_in_doctype": "hospital_branch",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 5,
+        "column_in_doctype": "executing_method",
+        "column_index_in_import_file": "5",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 6,
+        "column_in_doctype": "branch_code",
+        "column_index_in_import_file": "6",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 7,
+        "column_in_doctype": "region",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 8,
+        "column_in_doctype": "url",
+        "column_index_in_import_file": "4",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 9,
+        "column_in_doctype": "last_run_log_id",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 10,
+        "column_in_doctype": "retry",
+        "column_index_in_import_file": "8",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 11,
+        "column_in_doctype": "is_enable",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 12,
+        "column_in_doctype": "status",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 13,
+        "column_in_doctype": "hash_for_insert",
+        "column_index_in_import_file": "7",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 14,
+        "column_in_doctype": "ID",
+        "column_index_in_import_file": "0",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "doctype": "Mapping Columns"
+      },
+      {
+        "docstatus": 0,
+        "doctype": "Mapping Columns",
+        "__unsaved": 1,
+        "owner": "Administrator",
+        "parent": "TPA Login Credentials",
+        "parentfield": "mapping_columns",
+        "parenttype": "Data Import Mapping",
+        "idx": 15,
+        "column_in_doctype": "hash_for_update",
+        "column_index_in_import_file": "9",
+        "creation": "2024-09-25 14:58:17.476998",
+        "modified": "2024-09-26 13:51:00.316138",
+        "modified_by": "Administrator"
+      }
+    ]
+  }
 ]
