@@ -371,14 +371,6 @@
   },
   {
     "doctype": "SA Downloader Configuration",
-    "name": "CholasDownloader",
-    "website_url": "https://cashless.cholainsurance.com",
-    "class_name": "CholasDownloader",
-    "incoming_file_type": "Excel",
-    "is_headless": 1
-  },
-  {
-    "doctype": "SA Downloader Configuration",
     "name": "StarHealthDownloader",
     "website_url": "https://spp.starhealth.in/#/",
     "class_name": "StarHealthDownloader",
@@ -432,7 +424,6 @@
     "doctype": "Webhook",
     "webhook_headers": [
       {
-        "name": "aq9onub167",
         "owner": "Administrator",
         "creation": "2024-08-06 18:54:47.196113",
         "modified": "2024-08-06 19:05:18.100354",
@@ -474,49 +465,6 @@
     "doctype": "Webhook",
     "webhook_headers": [
       {
-        "name": "9g1scghi1b",
-        "owner": "Administrator",
-        "creation": "2024-08-06 17:42:41.217099",
-        "modified": "2024-08-06 17:43:47.504307",
-        "modified_by": "Administrator",
-        "docstatus": 0,
-        "idx": 1,
-        "key": "Content-Type",
-        "value": "application/json",
-        "parent": "HOOK-0001",
-        "parentfield": "webhook_headers",
-        "parenttype": "Webhook",
-        "doctype": "Webhook Header"
-      }
-    ],
-    "webhook_data": [],
-    "__last_sync_on": "2024-08-08T13:20:46.035Z"
-  },
-  {
-    "name": "HOOK-0001",
-    "owner": "Administrator",
-    "creation": "2024-08-06 17:42:41.217099",
-    "modified": "2024-08-06 17:43:47.504307",
-    "modified_by": "Administrator",
-    "docstatus": 0,
-    "idx": 0,
-    "naming_series": "HOOK-.####",
-    "webhook_doctype": "SA Downloader Run Log",
-    "webhook_docevent": "after_insert",
-    "enabled": 0,
-    "condition": "doc.status == \"Error\"",
-    "request_url": "https://techfinite.zulipchat.com/api/v1/external/slack_incoming?api_key=VUnQv9hLNRAPoNNaGBhWGOXgRVxepGHr&stream=445136&topic=SA+Bot",
-    "timeout": 10,
-    "request_method": "POST",
-    "request_structure": "JSON",
-    "enable_security": 0,
-    "webhook_json": "{\n \"text\": \"**Error** : {{doc.parent1}} ,Check Error Log **{{doc.reference_name}}**  for Dr.Agarwals.\"\n}\n",
-    "meets_condition": "Select a document to check if it meets conditions.",
-    "preview_request_body": "Select a document to preview request data",
-    "doctype": "Webhook",
-    "webhook_headers": [
-      {
-        "name": "9g1scghi1b",
         "owner": "Administrator",
         "creation": "2024-08-06 17:42:41.217099",
         "modified": "2024-08-06 17:43:47.504307",
@@ -1396,5 +1344,47 @@
         "modified_by": "Administrator"
       }
     ]
+  },
+  {
+    "name": "HOOK-0005",
+    "owner": "Administrator",
+    "creation": "2024-09-27 12:09:24.771105",
+    "modified": "2024-09-27 12:30:06.779581",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": 0,
+    "naming_series": "HOOK-.####",
+    "webhook_doctype": "Job",
+    "webhook_docevent": "on_update",
+    "enabled": 1,
+    "condition": "doc.status == \"Error\"",
+    "request_url": "https://techfinite.zulipchat.com/api/v1/external/slack_incoming?api_key=CLcgDDizJCkhTJRIbfYM8XgTC08ln7nD&stream=445136&topic=DrAgarwals",
+    "timeout": 5,
+    "request_method": "POST",
+    "request_structure": "JSON",
+    "enable_security": 0,
+    "webhook_json": "{\n \"text\": \"🛑 Action Required: The {{doc.job_type}} job [{{doc.name}}]({{'https:' + frappe.utils.get_url().split(':')[1] + '/app/job' + doc.name}}) for {{ frappe.get_doc(\"Global Defaults\").default_company}} has **failed**.\"\n \n}",
+    "meets_condition": "Select a document to check if it meets conditions.",
+    "preview_request_body": "Select a document to preview request data",
+    "doctype": "Webhook",
+    "webhook_data": [],
+    "webhook_headers": [
+      {
+        "owner": "Administrator",
+        "creation": "2024-09-27 12:09:24.771105",
+        "modified": "2024-09-27 12:30:06.779581",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 1,
+        "key": "Content-Type",
+        "value": "application/json",
+        "parent": "HOOK-0001",
+        "parentfield": "webhook_headers",
+        "parenttype": "Webhook",
+        "doctype": "Webhook Header"
+      }
+    ],
+    "__unsaved": 1,
+    "preview_document": ""
   }
 ]
