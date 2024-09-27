@@ -15,13 +15,16 @@ def create_pattern(url:str) -> str:
      Returns:
         str: The constructed pattern
     """
-    url_parts: object = tldextract.extract(url)
-    subdomain_exclusion: List = ['www']
-    subdomain: str =  convert_to_lower(url_parts.subdomain)
-    domain: str =  convert_to_lower(url_parts.domain)
-    suffix: str = convert_to_lower(url_parts.suffix)
-    pattern: str = subdomain + domain + suffix if subdomain not in subdomain_exclusion else '' + domain + suffix
-    return pattern
+    if url:
+        url_parts: object = tldextract.extract(url)
+        subdomain_exclusion: List = ['www']
+        subdomain: str =  convert_to_lower(url_parts.subdomain)
+        domain: str =  convert_to_lower(url_parts.domain)
+        suffix: str = convert_to_lower(url_parts.suffix)
+        pattern: str = subdomain + domain + suffix if subdomain not in subdomain_exclusion else '' + domain + suffix
+        return pattern
+    else:
+        raise ValueError('URL cannot be None')
 
 def is_pattern_exists(pattern:str) -> bool:
     if frappe.db.exists('SA Downloader Configuration',{'portal_pattern':pattern}):
