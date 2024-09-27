@@ -126,6 +126,16 @@
   },
   {
     "doctype": "Custom Field",
+    "dt": "Payment Entry",
+    "name": "Payment Entry-custom_matcher_id",
+    "fieldname": "custom_matcher_id",
+    "fieldtype": "Data",
+    "label": "Matcher ID",
+    "insert_after": "custom_parent_doc",
+    "allow_on_submit": 1
+  },
+  {
+    "doctype": "Custom Field",
     "dt": "Sales Invoice",
     "name": "Sales Invoice-yearly_due",
     "fieldname": "custom_yearly_due",

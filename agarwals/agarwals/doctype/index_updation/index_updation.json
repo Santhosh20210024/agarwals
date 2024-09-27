@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:doctype_name",
  "creation": "2024-05-21 15:20:02.725990",
  "default_view": "List",
  "doctype": "DocType",
@@ -15,7 +16,8 @@
    "fieldname": "doctype_name",
    "fieldtype": "Link",
    "label": "Doctype Name",
-   "options": "DocType"
+   "options": "DocType",
+   "unique": 1
   },
   {
    "fieldname": "indexing_columns",
@@ -25,10 +27,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-24 16:05:13.236831",
+ "modified": "2024-09-21 12:19:38.050810",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Index Updation",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

@@ -2,8 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-
-frappe.query_reports["Current Sales Invoice Script Report"] = {
+frappe.query_reports["Sales Invoice Report - Script"] = {
 	onload: function(report) {
         report.page.add_inner_button("Apply Filters", function() {
             report.set_filter_value('execute',1);
@@ -22,6 +21,10 @@ frappe.query_reports["Current Sales Invoice Script Report"] = {
 			report.set_filter_value('from_utr_date',null);
 			report.set_filter_value('to_utr_date',null);
 			report.set_filter_value('match_logic',[]);
+			report.set_filter_value('bank_account',[]);
+			report.set_filter_value('bank_entity',[]);
+			report.set_filter_value('bank_region',[]);
+			report.set_filter_value('bank_payer',[]);
         });
 
     },
@@ -155,6 +158,54 @@ frappe.query_reports["Current Sales Invoice Script Report"] = {
            }
         },
 		{
+            "fieldname": "bank_account",
+            "label": __("Bank Account"),
+            "fieldtype": "MultiSelectList",
+			"options": "Bank Account",
+			"get_data": function (txt){
+                return frappe.db.get_link_options('Bank Account',txt)
+            },
+            "on_change": function (report) {
+               report.set_filter_value('execute',0)
+           }
+        },
+		{
+            "fieldname": "bank_entity",
+            "label": __("Bank Entity"),
+            "fieldtype": "MultiSelectList",
+			"options": "Entity",
+			"get_data": function (txt){
+                return frappe.db.get_link_options('Entity',txt)
+            },
+            "on_change": function (report) {
+               report.set_filter_value('execute',0)
+           }
+        },
+		{
+            "fieldname": "bank_region",
+            "label": __("Bank Region"),
+            "fieldtype": "MultiSelectList",
+			"options": "Region",
+			"get_data": function (txt){
+                return frappe.db.get_link_options('Region',txt)
+            },
+            "on_change": function (report) {
+               report.set_filter_value('execute',0)
+           }
+        },
+		{
+            "fieldname": "bank_payer",
+            "label": __("Bank Payer"),
+            "fieldtype": "MultiSelectList",
+			"options": "Customer",
+			"get_data": function (txt){
+                return frappe.db.get_link_options('Customer',txt)
+            },
+            "on_change": function (report) {
+               report.set_filter_value('execute',0)
+           }
+        },
+		{
             "fieldname":"execute",
             "label":__("Execute"),
             "fieldtype":"Check",
@@ -163,4 +214,3 @@ frappe.query_reports["Current Sales Invoice Script Report"] = {
         }
 	]
 };
-
