@@ -75,7 +75,10 @@ class UTRKeyCreator(KeyCreator):
 
         if UTRKeyCreator.compiled_citin_pattern.match(utr):
             variants.add("citin" + utr)
-
+            
+        if utr.startswith("s") and utr[1:].isdigit():
+            variants.add(utr[1:])
+            
         if len(utr) == 9:
             variants.add("aiscn0" + utr)
 

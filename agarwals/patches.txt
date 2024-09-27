@@ -11,7 +11,6 @@ agarwals.patches.v1_2.account_patches
 
 
 [post_model_sync]
-agarwals.patches.v1_0.sa_mail_view
-agarwals.patches.v1_3.check_list_view
+agarwals.patches.v1_3.view_creator
 agarwals.patches.v1_2.job_configuration_patches
 

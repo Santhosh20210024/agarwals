@@ -142,6 +142,7 @@ class PaymentEntryCreator:
                 "custom_file_upload": self.matcher_record.file_upload,
                 "custom_transform": self.matcher_record.transform,
                 "custom_index": self.matcher_record.index,
+                "custom_matcher_id" : self.matcher_record.name,
                 "custom_parent_doc": self.matcher_record.settlement_advice if self.matcher_record.settlement_advice else self.matcher_record.claimbook
             }
             deductions = []
