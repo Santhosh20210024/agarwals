@@ -1180,7 +1180,6 @@
     "doctype": "Data Import Mapping",
     "mapping_columns": [
       {
-        "name": "cr7fa2qt1o",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1195,7 +1194,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fbev4vd",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1210,7 +1208,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fpqsacj",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1225,7 +1222,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fk9h2kh",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1239,7 +1235,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fkqnn52",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1254,7 +1249,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fpkab1d",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1269,7 +1263,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fueqkli",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1283,7 +1276,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fpqcvpg",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1298,7 +1290,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fjadcb5",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1312,7 +1303,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7ftulp69",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1327,7 +1317,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fq9jiah",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1341,7 +1330,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7fu2jqnu",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1355,7 +1343,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "cr7ftrvk0c",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1370,7 +1357,6 @@
         "doctype": "Mapping Columns"
       },
       {
-        "name": "crsl0ehjel",
         "owner": "Administrator",
         "creation": "2024-09-25 14:58:17.476998",
         "modified": "2024-09-26 13:51:00.316138",
@@ -1387,7 +1373,6 @@
       {
         "docstatus": 0,
         "doctype": "Mapping Columns",
-        "name": "5vhrv2vauc",
         "__unsaved": 1,
         "owner": "Administrator",
         "parent": "TPA Login Credentials",
