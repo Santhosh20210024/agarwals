@@ -232,7 +232,7 @@ class SeleniumDownloader:
         if login_status == True:
             return None
         elif login_status == self.captcha_alert:
-            if self.captcha_retry_limit > 2:
+            if self.captcha_retry_limit > 1:
                 self.reattempt_captcha_entry()
             else:
                 raise ValueError("Invalid Captcha")
