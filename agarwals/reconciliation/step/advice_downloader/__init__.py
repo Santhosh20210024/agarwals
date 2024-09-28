@@ -32,11 +32,11 @@ from agarwals.reconciliation.step.advice_downloader.heritage_downloder import He
 
 
 @ChunkOrchestrator.update_chunk_status
-def download_advice(tpa_login_doc):
+def download_advice(tpa_login_doc,args):
     chunk_status = "Processed"
     for tpa_doc in tpa_login_doc:
         class_name=eval(tpa_doc.executing_method)
-        process_status = class_name().download(tpa_doc)
+        process_status = class_name().download(tpa_doc,args)
         chunk_status = chunk.get_status(chunk_status, process_status)
     return chunk_status
 
@@ -48,7 +48,7 @@ def process(args):
     else:
         tpa_login_doc = frappe.db.sql(f"""SELECT * FROM `tabTPA Login Credentials` WHERE executing_method = '{args["executing_method"]}' AND status in ('New','Valid') AND is_enable = 1""",as_dict=True)
     ChunkOrchestrator().process(download_advice, step_id=args["step_id"], is_enqueueable=True, chunk_size=1, data_var_name="tpa_login_doc", queue=args["queue"],
-                                is_async=True, timeout=3600, tpa_login_doc=tpa_login_doc)
+                                is_async=True, timeout=3600, tpa_login_doc=tpa_login_doc,args=args)
 
 
 @frappe.whitelist()

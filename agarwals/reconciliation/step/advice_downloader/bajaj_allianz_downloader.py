@@ -56,6 +56,7 @@ class BajajAllianzDownloader(SeleniumDownloader):
     def navigate(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, 'payments'))).click()
         self.wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT,"BAJAJ"))).click()
+        time.sleep(5)
 
     def download_from_web(self):
         download_button = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="app"]/div[2]/div[1]/div/div/div/div/div/div/div[2]/div/button/button')))

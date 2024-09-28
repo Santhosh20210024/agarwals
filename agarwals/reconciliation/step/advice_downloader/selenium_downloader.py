@@ -220,7 +220,7 @@ class SeleniumDownloader:
 
     def __check_login_status(self)->None:
         """
-            Usage : Checks the current login status of the user.
+            Usage : Checks the current login status of the user and it attempts to re-enter the Captcha if retries are available.
             It calls an method `check_login_status()` to determine if the user is logged in.
             Raises:
                 ValueError: If the login status indicates either an invalid username or password,
@@ -232,7 +232,7 @@ class SeleniumDownloader:
         if login_status == True:
             return None
         elif login_status == self.captcha_alert:
-            if self.captcha_retry_limit > 1:
+            if self.captcha_retry_limit > 2:
                 self.reattempt_captcha_entry()
             else:
                 raise ValueError("Invalid Captcha")
@@ -489,7 +489,7 @@ class SeleniumDownloader:
             self.raise_exception('TPA Credential Doc Not Found')
 
 
-    def load_configuration(self):
+    def load_configuration(self,args):
         configuration_values = frappe.db.sql(
             f"SELECT * FROM `tabSA Downloader Configuration` WHERE `name`='{self.executing_child_class}'",
             as_dict=True
@@ -507,7 +507,9 @@ class SeleniumDownloader:
             self.is_date_limit = configuration_values.is_date_limit
             self.date_limit_period = configuration_values.date_limit_period
             self.allow_insecure_file = configuration_values.allow_insecure_file
-            self.captcha_retry_limit = configuration_values.captcha_retry_limit
+            self.captcha_retry_limit = 0
+            if args:
+                self.captcha_retry_limit = 0 if args.get('retry',None) else configuration_values.captcha_retry_limit
             control_panel = frappe.get_doc('Control Panel')
             if control_panel:
                 self.SITE_PATH = control_panel.site_path or self.raise_exception("Site Path Not Found")
@@ -520,7 +522,7 @@ class SeleniumDownloader:
             self.raise_exception(" SA Downloader Configuration not found ")
 
 
-    def download(self, tpa_doc, child=None, parent=None):
+    def download(self, tpa_doc, args=None, child=None, parent=None):
         """
         Usage : This method Manages the process of downloading settlement advice file by performing a series of steps including
         credential loading, configuration setup, login,navigate to report page and download document.
@@ -529,11 +531,10 @@ class SeleniumDownloader:
         tpa_doc (object): The document or data required for authentication and download.
         child (object, optional): child doc of the SA UI Downloader ,Only used of Captcha type TPA's.
         parent (object, optional): Parent doc of the SA UI Downloader ,Only used of Captcha type TPA's.
-
         """
         try:
             self.load_credential_doc(tpa_doc,child,parent)
-            self.load_configuration()
+            self.load_configuration(args)
             self.create_download_directory()
             self.web_driver_init()
             self._login()
