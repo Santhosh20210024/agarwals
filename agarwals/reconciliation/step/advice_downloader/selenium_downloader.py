@@ -234,8 +234,8 @@ class SeleniumDownloader:
         elif login_status == self.captcha_alert:
             if self.captcha_retry_limit > 1:
                 self.reattempt_captcha_entry()
-            raise ValueError("Invalid Captcha")
-
+            else:
+                raise ValueError("Invalid Captcha")
         elif login_status == False:
             raise ValueError("Invalid user name or password")
         else:
@@ -396,7 +396,7 @@ class SeleniumDownloader:
         from_date = self.from_date if temp_from_date is None else temp_from_date
         to_date = self.to_date if temp_to_date is None else temp_to_date
         if self.previous_files_count == downloaded_files_count:
-            self.file_not_found_remarks += f"\nFile Not Found for the Date Range Between {self.from_date} and {self.to_date},"
+            self.file_not_found_remarks += f"\nFile Not Found for the Date Range Between {from_date} and {to_date},"
         else:
             self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,from_date,to_date)
             self.move_file(self.download_directory,self.formatted_file_name)
