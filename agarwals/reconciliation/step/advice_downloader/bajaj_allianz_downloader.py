@@ -15,7 +15,7 @@ class BajajAllianzDownloader(SeleniumDownloader):
     def is_invalid_captcha(self):
         try:
             alert = self.min_wait.until(EC.alert_is_present())
-            if alert.text == "enter valid captcha code":
+            if alert.text.strip() == "enter valid captcha code":
                 if self.enable_captcha_api == 1:
                     solver = TwoCaptcha(self.captcha_api[1])
                     solver.report(self.captcha_api[0]['captchaId'], False)

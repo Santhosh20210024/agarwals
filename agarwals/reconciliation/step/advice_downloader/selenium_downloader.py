@@ -18,6 +18,7 @@ import openpyxl
 import glob
 from io import StringIO
 import random
+from selenium.common.exceptions import NoAlertPresentException, TimeoutException
 
 
 class SeleniumDownloader:
@@ -96,7 +97,6 @@ class SeleniumDownloader:
         table_html = table_element.get_attribute('outerHTML')
         with open(f'{self.download_directory}/{self.tpa}.html', 'w') as file:
             file.write(table_html)
-
 
     def attach_captcha_img(self,file_url=None):
         captcha_reference_doc = frappe.get_doc('Settlement Advice Downloader UI',self.captcha_tpa_doc)
@@ -205,6 +205,19 @@ class SeleniumDownloader:
     def login(self) -> None:
         return None
 
+    def reattempt_captcha_entry(self):
+        try:
+            alert = self.driver.switch_to.alert
+            alert.accept()
+        except NoAlertPresentException:
+            self.driver.refresh()
+        self.driver.execute_script("window.open('');")
+        self.driver.switch_to.window(self.driver.window_handles[0])
+        self.driver.close()
+        self.driver.switch_to.window(self.driver.window_handles[0])
+        self.captcha_retry_limit = self.captcha_retry_limit - 1
+        return self._login()
+
     def __check_login_status(self)->None:
         """
             Usage : Checks the current login status of the user.
@@ -219,7 +232,10 @@ class SeleniumDownloader:
         if login_status == True:
             return None
         elif login_status == self.captcha_alert:
+            if self.captcha_retry_limit > 1:
+                self.reattempt_captcha_entry()
             raise ValueError("Invalid Captcha")
+
         elif login_status == False:
             raise ValueError("Invalid user name or password")
         else:
@@ -314,7 +330,7 @@ class SeleniumDownloader:
             if self.is_captcha:
                 self.delete_captcha_images()
             # Update the SA UI Downloader Parent doc status
-            if self.is_captcha and self.enable_captcha_api == 1:
+            if self.is_captcha and self.enable_captcha_api == 0:
                 self.update_settlement_advice_downloader_status()
         except Exception as e:
             self.update_status_and_log(status='Error',remarks=e)
@@ -491,6 +507,7 @@ class SeleniumDownloader:
             self.is_date_limit = configuration_values.is_date_limit
             self.date_limit_period = configuration_values.date_limit_period
             self.allow_insecure_file = configuration_values.allow_insecure_file
+            self.captcha_retry_limit = configuration_values.captcha_retry_limit
             control_panel = frappe.get_doc('Control Panel')
             if control_panel:
                 self.SITE_PATH = control_panel.site_path or self.raise_exception("Site Path Not Found")
