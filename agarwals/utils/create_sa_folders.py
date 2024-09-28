@@ -40,7 +40,6 @@ def create_sa_folders():
 @frappe.whitelist()
 def process(args):
     try:
-        log_error(error="started")
         args = cast_to_dic(args)
         ChunkOrchestrator().process(create_sa_folders,step_id=args["step_id"],is_enqueueable=True,
                                     queue=args["queue"])
