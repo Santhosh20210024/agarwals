@@ -132,21 +132,20 @@ query_mapper = {
                 "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
                                 WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
                                 or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
-                "Settlement Advice": """SELECT name, cl_number as cl_key_id FROM `tabSettlement Advice` 
-                                        WHERE  ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') )"""
+                "Settlement Advice": """SELECT name, claim_id as claim_key_id ,cl_number as cl_key_id FROM `tabSettlement Advice` 
+                                        WHERE  (claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')) or
+                                        ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = ''))"""
                 }
-#(claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')) or
                                         
 @frappe.whitelist()
 def process(args={"type": "claim_key", "step_id": "", "queue": "long"}):
     args = cast_to_dic(args)
 
     mappers = {
-        # "Bill": BillClaimKeyMapper,
-        # "ClaimBook": ClaimBookClaimKeyMapper,
+        "Bill": BillClaimKeyMapper,
+        "ClaimBook": ClaimBookClaimKeyMapper,
         "Settlement Advice": SettlementAdviceClaimKeyMapper
     }
-    # ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
-    #                             mappers=mappers, args=args, job_name="ClaimKeyMapper")
-    records = frappe.db.sql(query_mapper['Settlement Advice'],as_dict = True)
-    SettlementAdviceClaimKeyMapper(records).process()
+    ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
+                                mappers=mappers, args=args, job_name="ClaimKeyMapper")
+  
