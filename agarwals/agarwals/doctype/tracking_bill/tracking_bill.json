@@ -1,28 +1,30 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2023-11-30 12:36:33.335335",
+ "creation": "2024-09-18 10:53:58.810582",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "bill_no"
+  "bill"
  ],
  "fields": [
   {
-   "fieldname": "bill_no",
+   "fieldname": "bill",
    "fieldtype": "Link",
-   "label": "Bill No",
-   "options": "Bill"
+   "in_list_view": 1,
+   "label": "Bill",
+   "options": "Sales Invoice",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-12-06 14:26:56.619886",
+ "modified": "2024-09-18 10:57:29.660253",
  "modified_by": "Administrator",
- "module": "Claim",
- "name": "Claim Submission Bill",
+ "module": "Agarwals",
+ "name": "Tracking Bill",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

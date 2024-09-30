@@ -1,0 +1,130 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2024-09-18 10:55:05.879003",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "column_break_bpjgb",
+  "section_break_scdp7",
+  "bulk_bills",
+  "column_break_ufmdq",
+  "bills",
+  "section_break_nejmk",
+  "event",
+  "mode_of_submission",
+  "column_break_ukm0s",
+  "date",
+  "section_break_54cqi",
+  "remarks",
+  "bill_list",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Event Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bills",
+   "fieldtype": "Table MultiSelect",
+   "label": "Bills",
+   "options": "Tracking Bill",
+   "reqd": 1
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Event",
+   "options": "Bill Event",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bill_list",
+   "fieldtype": "HTML",
+   "label": "Bill List"
+  },
+  {
+   "default": "BE.-",
+   "fieldname": "naming_series",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "naming_series",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.event === \"Bill Submitted\"",
+   "fieldname": "mode_of_submission",
+   "fieldtype": "Link",
+   "label": "Mode of Submission",
+   "mandatory_depends_on": "eval: doc.event === \"Bill Submitted\"",
+   "options": "Bill Submission Mode"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "bulk_bills",
+   "fieldtype": "Text",
+   "label": "Bills"
+  },
+  {
+   "fieldname": "section_break_scdp7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ufmdq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_nejmk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_bpjgb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ukm0s",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_54cqi",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-09-19 16:32:10.306910",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Bill Entry",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
