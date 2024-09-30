@@ -984,18 +984,18 @@
     "doctype": "Server Script"
   },
   {
-    "name": "Reconciliation Job Executor",
-    "owner": "Administrator",
-    "creation": "2024-09-09 17:25:29.609226",
-    "modified": "2024-09-09 18:45:23.686943",
-    "modified_by": "Administrator",
-    "docstatus": 0,
-    "idx": 0,
-    "dt": "Job",
-    "view": "List",
-    "enabled": 1,
-    "script": "frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_inner_button(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'agarwals.reconciliation.job.run',\r\n                args: {'job_config': 'reconciliation_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
-    "doctype": "Client Script"
+  "name":"Reconciliation Job Executor",
+  "owner":"Administrator",
+  "creation":"2024-09-09 17:25:29.609226",
+  "modified":"2024-09-26 16:46:43.243028",
+  "modified_by":"Administrator",
+  "docstatus":0,
+  "idx":0,
+  "dt":"Job",
+  "view":"List",
+  "enabled":1,
+  "script":"frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_action_item(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'tfs.orchestration.job.run',\r\n                args: {'job_config': 'manual_process_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n        \r\n        listview.page.add_action_item(__('Adjust Bills'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'tfs.orchestration.job.run',\r\n                args: {'job_config': 'adjustment_process_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
+  "doctype":"Client Script"
   },
   {
     "name": "Reconciliation",
