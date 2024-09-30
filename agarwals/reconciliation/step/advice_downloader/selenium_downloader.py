@@ -154,7 +154,7 @@ class SeleniumDownloader:
         status_count_query = frappe.db.sql(f"SELECT count(name) AS total FROM `tabSettlement Advice Downloader UI Logins` WHERE status = '{status}' and parent ='{self.captcha_tpa_doc}' ",as_dict = True)[0]
         return status_count_query.total
 
-    def update_settlement_advice_downloader_status(self):
+    def update_sa_ui_downloader_status(self):
          try:
              doc = frappe.get_doc('Settlement Advice Downloader UI', self.captcha_tpa_doc)
              total_logins = len(frappe.db.sql(f"SELECT name FROM `tabSettlement Advice Downloader UI Logins` WHERE parent = '{self.captcha_tpa_doc}'"))
@@ -331,7 +331,7 @@ class SeleniumDownloader:
                 self.delete_captcha_images()
             # Update the SA UI Downloader Parent doc status
             if self.is_captcha and self.enable_captcha_api == 0:
-                self.update_settlement_advice_downloader_status()
+                self.update_sa_ui_downloader_status()
         except Exception as e:
             self.update_status_and_log(status='Error',remarks=e)
 
