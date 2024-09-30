@@ -48,7 +48,7 @@ class ICICLombardDownloader(SeleniumDownloader):
         except TimeoutException:
             captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
         except Exception as e:
-            raise NoSuchElementException("Captcha element not found: "+e)
+            raise Exception(e)
         if captcha:
             if is_captcha_required:
                 self.get_captcha_image(captcha)
