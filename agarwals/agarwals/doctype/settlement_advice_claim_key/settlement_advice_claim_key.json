@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-09-26 11:32:44.034249",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "settlement_advice",
+  "claim_key"
+ ],
+ "fields": [
+  {
+   "fieldname": "settlement_advice",
+   "fieldtype": "Link",
+   "label": "Settlement Advice",
+   "options": "Settlement Advice"
+  },
+  {
+   "fieldname": "claim_key",
+   "fieldtype": "Data",
+   "label": "Claim Key"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-09-30 11:10:13.820291",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Settlement Advice Claim Key",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
