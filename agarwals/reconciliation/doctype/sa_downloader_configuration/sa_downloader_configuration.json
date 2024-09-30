@@ -76,7 +76,7 @@
    "fieldtype": "Autocomplete",
    "in_list_view": 1,
    "label": "Class",
-   "options": "\nProviderIhx\nTnnhisMdIndia\nHeritageDownloader\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nVidalHealthDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader\nProviderIhxDownloader\nCMCEyeFoundationDownloader\nCMCNethajiEyeFoundationDownloader\nHeritageDownloader\nCholasPdfDownloader",
+   "options": "\nProviderIhx\nTnnhisMdIndia\nHeritageDownloader\nTipsVidalHealthTpa\nStarHealthDownloader\nSafewayDownloader\nVidalHealthDownloader\nHealthIndiaDownloader\nGoodHealthDownloader\nMDIndiaDownloader\nICICLombardDownloader\nStarVitrayaDownloader\nBajajAllianzDownloader\nParamountDownloader\nCarehealthDownloader\nFHPLDownloader\nNivaBupaDownloader\nRelianceGeneralDownloader\nProviderIhxDownloader\nCMCEyeFoundationDownloader\nCMCNethajiEyeFoundationDownloader\nHeritageDownloader\nCholasPdfDownloader\nMdIndiaOnlineDownloader",
    "reqd": 1
   },
   {
@@ -138,7 +138,8 @@
   {
    "fieldname": "portal_pattern",
    "fieldtype": "Data",
-   "label": "Portal Pattern"
+   "label": "Portal Pattern",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_nzn1j",
@@ -163,7 +164,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-27 16:30:11.231823",
+ "modified": "2024-09-30 16:16:41.685373",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
