@@ -23,7 +23,7 @@ class BillEntry(Document):
 				frappe.db.set_value("Sales Invoice",bill,"custom_mode_of_submission","")
 			bill_tracker = frappe.get_doc('Bill Tracker',bill_tracker)
 			bill_tracker.cancel()
-			bill_tracker.delete()
+			bill_tracker.delete(ignore_permissions=True)
 			frappe.db.commit()
 
 	def after_save(self):
@@ -32,14 +32,14 @@ class BillEntry(Document):
 			try:
 				self.update_bill_event(bill.bill)
 			except Exception as e:
-				log_error(error=e,doctype="Bill Tracker",doc_name= self.name)
+				log_error(error=e,doc="Bill Tracker",doc_name= self.name)
 
 	def on_trash(self):
 		for bill in self.bills:
 			try:
 				self.delete_bill_event(bill.bill)
 			except Exception as e:
-				log_error(error=e, doctype="Bill Tracker", doc_name=self.name)
+				log_error(error=e, doc="Bill Tracker", doc_name=self.name)
 
 def build_html_table(bills_info):
 	bills_info_table = """
