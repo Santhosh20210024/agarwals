@@ -10,6 +10,7 @@
   "tpa_name",
   "class_name",
   "incoming_file_type",
+  "captcha_retry_limit",
   "captcha_entry_duration",
   "is_date_limit",
   "date_limit_period",
@@ -150,11 +151,19 @@
   {
    "fieldname": "column_break_y2lc2",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.is_captcha == 1;",
+   "description": "captcha fails after the first attempt, how many times should it be retried",
+   "fieldname": "captcha_retry_limit",
+   "fieldtype": "Int",
+   "label": "Captcha Retry Limit"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-23 14:36:47.419061",
+ "modified": "2024-09-27 16:30:11.231823",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
