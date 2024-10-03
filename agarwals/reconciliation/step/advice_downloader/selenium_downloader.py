@@ -11,7 +11,6 @@ import os
 import shutil
 import pandas as pd
 import openpyxl
-from webdriver_manager.chrome import ChromeDriverManager
 import glob
 from io import StringIO
 import random
