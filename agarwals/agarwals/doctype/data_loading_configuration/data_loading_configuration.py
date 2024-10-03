@@ -21,7 +21,7 @@ class DataLoadingConfiguration(Document):
 
     def get_config_file(self,columns_for_validation):
         try:
-            columns = eval(columns_for_validation)  # Consider using json.loads if it's in JSON format
+            columns = eval(columns_for_validation)  # Convert the String to lilst using eval
             return columns
         except Exception as e:
             log_error("Error parsing columns for validation: {e}","Data Loading Configuration")
