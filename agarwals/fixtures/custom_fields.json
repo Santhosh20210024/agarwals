@@ -268,6 +268,8 @@
     "website_url": "https://tips.vidalhealthtpa.com/hospitallogin/hospital/login/",
     "class_name": "VidalHealthDownloader",
     "is_date_limit": 1,
+    "is_captcha": 1,
+    "captcha_retry_limit": 3,
     "date_limit_period": 29,
     "incoming_file_type": "Excel",
     "is_headless": 1
@@ -293,6 +295,8 @@
     "name": "CarehealthDownloader",
     "website_url": "https://healthconnect.careinsurance.com",
     "class_name": "CarehealthDownloader",
+    "is_captcha": 1,
+    "captcha_retry_limit": 2,
     "incoming_file_type": "HTML",
     "is_headless": 1
   },
@@ -381,6 +385,8 @@
     "website_url": "https://ecare.bajajallianz.com",
     "class_name": "BajajAllianzDownloader",
     "is_date_limit": 1,
+    "is_captcha": 1,
+    "captcha_retry_limit": 5,
     "date_limit_period": 85,
     "incoming_file_type": "Excel",
     "is_headless": 1
