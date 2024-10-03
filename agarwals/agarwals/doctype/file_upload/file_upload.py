@@ -495,7 +495,7 @@ class Fileupload(Document):
                 if flist:
                     flist = [file for file in flist if not file.endswith("/")]
                     self.update_mapping_entries(flist, ffield)
-                    # self.upload_file_record(flist)
+                    self.upload_file_record(flist)
 
             except Exception as e:
                 frappe.throw("Error!:" + str(e))
