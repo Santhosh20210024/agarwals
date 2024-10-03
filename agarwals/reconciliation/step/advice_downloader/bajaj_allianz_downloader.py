@@ -15,7 +15,7 @@ class BajajAllianzDownloader(SeleniumDownloader):
     def is_invalid_captcha(self):
         try:
             alert = self.min_wait.until(EC.alert_is_present())
-            if alert.text == "enter valid captcha code":
+            if alert.text.strip() == "enter valid captcha code":
                 if self.enable_captcha_api == 1:
                     solver = TwoCaptcha(self.captcha_api[1])
                     solver.report(self.captcha_api[0]['captchaId'], False)
@@ -56,6 +56,7 @@ class BajajAllianzDownloader(SeleniumDownloader):
     def navigate(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, 'payments'))).click()
         self.wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT,"BAJAJ"))).click()
+        time.sleep(5)
 
     def download_from_web(self):
         download_button = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="app"]/div[2]/div[1]/div/div/div/div/div/div/div[2]/div/button/button')))

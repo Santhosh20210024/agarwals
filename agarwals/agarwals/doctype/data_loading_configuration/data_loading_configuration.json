@@ -20,7 +20,8 @@
   "column_to_convert_na_to_0",
   "columns_to_get_from_file",
   "columns_for_validation",
-  "file_name"
+  "file_name",
+  "columns_should_not_be_null"
  ],
  "fields": [
   {
@@ -78,6 +79,7 @@
    "label": "Columns to get from file"
   },
   {
+
    "fieldname": "columns_for_validation",
    "fieldtype": "Code",
    "label": "Columns for Validation"
@@ -86,6 +88,11 @@
    "fieldname": "file_name",
    "fieldtype": "Data",
    "label": "File Name"
+  },
+   {
+   "fieldname": "columns_should_not_be_null",
+   "fieldtype": "Code",
+   "label": "Columns should not be Null"
   }
  ],
  "index_web_pages_for_search": 1,

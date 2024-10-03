@@ -56,7 +56,8 @@ class BankTransformer(StagingTransformer):
 
         for delimiter in delimiters:
             for token in map(str.strip, narration.split(delimiter)):
-                if len(token) == length and len(token.strip()) == length:
+                for token in  map(str.strip,token.split(' ')):
+                 if len(token) == length and len(token.strip()) == length:
                     if self.utr_validation(pattern, token):
                         if not token.startswith("CX"):
                             return token
@@ -69,7 +70,7 @@ class BankTransformer(StagingTransformer):
         if "IMPS" in narration:
             length = 12
             pattern = numeric
-        elif "NEFT" in narration or narration.startswith('N/'):
+        elif "NEFT" in narration or narration.startswith('N/') or narration.startswith('N-'):
             pattern = alphanumeric_pattern
             utr_13 = None
             utr_16 = None
@@ -88,6 +89,9 @@ class BankTransformer(StagingTransformer):
             pattern = numeric
         elif "INFT" in narration:
             length = 12
+            pattern = numeric
+        elif "NACH" in narration:
+            length = 10
             pattern = numeric
         else:
             if bank_account == 'BELGAUM - 32628850028 - STATE BANK OF INDIA' :
