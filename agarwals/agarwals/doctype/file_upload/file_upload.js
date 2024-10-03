@@ -206,51 +206,44 @@ frappe.ui.form.on('File upload', {
 
       switch (frm.doc.document_type) {
         case 'Debtors Report':
-          template_name = 'Bill';
+          template_doctype = 'Bill File';
           break;
         case 'Claim Book':
-          template_name = 'ClaimBook';
+          template_doctype = 'ClaimBook File';
           break;
         case 'Settlement Advice':
-          template_doctype = 'Customer';
+          template_doctype = 'Settlement Advice File';
           template_name = frm.doc.payer_type;
           break;
-        case 'Bank Statement':
-          template_name = 'Bank Transaction'
-          break;
         case 'Bill Adjustment':
-          template_name = 'Bill Adjustment';
+          template_doctype = 'Bill Adjustment File';
           break;
         case 'Write Back':
-          template_name = 'Write Back';
+          template_doctype = 'Write Back File';
           break;
         case 'Write Off':
-          template_name = 'Write Off';
+          template_doctype = 'Write Off File';
           break;
         case 'Bank Statement Bulk':
-          template_name = 'Bank Transaction';
-          break;
-        default:
-          template_name = null;
-          template_doctype = null
+          template_doctype = 'Bank Transaction File';
           break;
       }
-      if(template_name === null){
+      if(template_doctype === null){
         frappe.msgprint('Template Not Available')
       }
       else{
       frappe.call({
           method: "agarwals.agarwals.doctype.file_upload.file_upload_utils.is_template_exist",
           args: {
-            attached_to_name: template_name,
-            attached_to_doctype: template_doctype
+            file_doctype: template_doctype,
+            file_name: template_name
           },
           callback: function (r) {
             if(r.message === 'Not Found' || r.message === 'System Error'){
-              frappe.msgprint('Message: Template Not Available')
+              frappe.msgprint('Message: Template Not Available');
             }
             else{
-              window.open(r.message)
+              window.open(r.message);
             }
       }})
     }}}

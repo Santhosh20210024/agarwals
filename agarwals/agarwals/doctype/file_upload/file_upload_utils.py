@@ -2,29 +2,27 @@ import frappe
 from agarwals.utils.error_handler import log_error
 
 @frappe.whitelist()
-def is_template_exist(attached_to_name, attached_to_doctype):
+def is_template_exist(file_doctype, file_name):
     """
     Check if a template exists for the given doctype.
-
-    :param attached_to_name: Name of the document the file is attached to
-    :param attached_to_doctype: Type of the document the file is attached to (default: 'DocType')
     :return: URL of the template file if found, 'Not Found' if not, 'System Error' on exception
     """
+    
     try:
-        if not attached_to_doctype:
-            attached_to_doctype = "DocType"
-        template_file = frappe.get_list(
-            "File",
-            filters={
-                "attached_to_doctype": attached_to_doctype,
-                "attached_to_name": attached_to_name,
-            },
-            pluck="file_url",
-        )
-        if len(template_file) == 1:
-            return template_file[0]
-        else:
-            return "Not Found"
+        if not file_name:
+            file_name = "File name"
+        if file_name == "Manual" :
+            file_doctype = file_doctype +".csv"
+            template_file = frappe.get_all(
+                "File",
+                filters={
+                    "file_name":file_doctype,
+                },
+                pluck="file_url"
+            )
+            if len(template_file) == 1:
+                return template_file[0]
+        return "Not Found"
     except frappe.exceptions.DoesNotExistError as e:
         log_error(str(e), "File upload")
         return "Not Found"
