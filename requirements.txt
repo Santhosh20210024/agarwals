@@ -6,5 +6,6 @@ openpyxl==3.1.0
 beautifulsoup4
 pdfplumber
 tldextract==5.1.2
+random-user-agent==1.0.1
 
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'

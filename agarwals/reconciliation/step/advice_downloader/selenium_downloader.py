@@ -409,7 +409,7 @@ class SeleniumDownloader:
         """
         software_name: str = SoftwareName.CHROME.value
         operating_system: str = OperatingSystem.LINUX.value
-        user_agent: str = UserAgent(software_names=software_name, operating_systems=operating_system).get_random_user_agent()
+        user_agent: str = UserAgent(software_names=software_name, operating_systems=operating_system,limit=1).get_random_user_agent()
         if user_agent:
             return user_agent
         else:
