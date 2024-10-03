@@ -326,6 +326,7 @@
     "website_url": "https://shpv.starhealth.in/",
     "class_name": "StarVitrayaDownloader",
     "is_date_limit": 1,
+    "use_custom_user_agent": 1,
     "date_limit_period": 29,
     "incoming_file_type": "Excel",
     "is_headless": 1

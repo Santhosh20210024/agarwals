@@ -24,6 +24,8 @@
   "section_break_nzn1j",
   "is_headless",
   "column_break_zcvtb",
+  "use_custom_user_agent",
+  "column_break_5sxjr",
   "allow_insecure_file",
   "column_break_y2lc2",
   "sandbox_mode",
@@ -160,11 +162,21 @@
    "fieldname": "captcha_retry_limit",
    "fieldtype": "Int",
    "label": "Captcha Retry Limit"
+  },
+  {
+   "default": "0",
+   "fieldname": "use_custom_user_agent",
+   "fieldtype": "Check",
+   "label": "Use Custom User Agent"
+  },
+  {
+   "fieldname": "column_break_5sxjr",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-30 16:16:41.685373",
+ "modified": "2024-10-03 11:30:24.854416",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "SA Downloader Configuration",
