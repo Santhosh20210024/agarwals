@@ -29,6 +29,7 @@ from agarwals.reconciliation.step.advice_downloader.cholas_downloader import Cho
 from agarwals.reconciliation.step.advice_downloader.cmc_eyefoundation_downloader import CMCEyeFoundationDownloader
 from agarwals.reconciliation.step.advice_downloader.cholas_pdf_downloader import CholasPdfDownloader
 from agarwals.reconciliation.step.advice_downloader.heritage_downloder import HeritageDownloader
+from agarwals.reconciliation.step.advice_downloader.md_india_online_downloader import MdIndiaOnlineDownloader
 
 
 @ChunkOrchestrator.update_chunk_status
