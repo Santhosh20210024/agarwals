@@ -58,6 +58,7 @@ class SalesInvoiceCreator:
                                         'custom_patient_name': bill_record.patient_name,
                                         'custom_ma_claim_id': bill_record.ma_claim_id,
                                         'custom_claim_id': bill_record.claim_id, 'customer': bill_record.customer,
+                                        'custom_payer_name':bill_record.payer,
                                         'entity': bill_record.entity, 'region': bill_record.region,
                                         'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
                                         'cost_center': bill_record.cost_center,
@@ -75,6 +76,7 @@ class SalesInvoiceCreator:
                 sales_invoice_record.submit()
                 if bill_record.status == 'CANCELLED':
                     sales_invoice_record.cancel()
+                    frappe.db.set_value('Sales Invoice', sales_invoice_record.name , {'outstanding_amount' : 0})
                 frappe.db.set_value('Bill', bill_number,
                                     {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                 frappe.db.commit()
