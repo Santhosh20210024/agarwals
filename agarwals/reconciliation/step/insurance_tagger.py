@@ -53,30 +53,30 @@ def claimbook_match():
         frappe.db.commit()
         print("ClaimBook Process Completed")
 
-def delete_corrs_doc(doctype_name, doc_name):
-    frappe.get_doc(doctype_name, doc_name).cancel()
-    frappe.delete_doc(doctype_name, doc_name)
-    trans = frappe.new_doc('Transaction Delete Log')
-    trans.doctype_name = 'Bank Transaction'
-    trans.message = f'{doc_name} is deleted'
-    trans.save()
-    frappe.db.commit()
+# def delete_corrs_doc(doctype_name, doc_name):
+#     frappe.get_doc(doctype_name, doc_name).cancel()
+#     frappe.delete_doc(doctype_name, doc_name)
+#     trans = frappe.new_doc('Transaction Delete Log')
+#     trans.doctype_name = 'Bank Transaction'
+#     trans.message = f'{doc_name} is deleted'
+#     trans.save()
+#     frappe.db.commit()
 
-def rm_transactions():
-    trns_list = frappe.db.sql("SELECT * FROM `tabBank Transaction` tbt INNER JOIN `tabBank Transaction Staging` tbts ON tbts.reference_number = tbt.reference_number where tag IS NULL and tbts.staging_status = 'Processed'", as_dict = 1)
-    for trns_item in trns_list:
-        if int(frappe.get_value('Bank Transaction', trns_item.reference_number, "allocated_amount")) == 0: #
-            delete_corrs_doc('Bank Transaction', trns_item.reference_number)
-            frappe.set_value('Bank Transaction Staging', trns_item.name, "staging_status", "Skipped" )
-            frappe.db.commit()
-        else:
-            bts = frappe.get_doc("Bank Transaction Staging", trns_item.name)
-            if bts.error and 'E106:' not in bts.error:
-                bts.staging_status = 'Error'
-                bts.error = 'E106: Insurance Tag is removed by user but the transaction is already reconciled'
-                bts.remarks = ''
-                bts.save()
-                frappe.db.commit()
+# def rm_transactions():
+#     trns_list = frappe.db.sql("SELECT * FROM `tabBank Transaction` tbt INNER JOIN `tabBank Transaction Staging` tbts ON tbts.reference_number = tbt.reference_number where tag IS NULL and tbts.staging_status = 'Processed'", as_dict = 1)
+#     for trns_item in trns_list:
+#         if int(frappe.get_value('Bank Transaction', trns_item.reference_number, "allocated_amount")) == 0: #
+#             delete_corrs_doc('Bank Transaction', trns_item.reference_number)
+#             frappe.set_value('Bank Transaction Staging', trns_item.name, "staging_status", "Skipped" )
+#             frappe.db.commit()
+#         else:
+#             bts = frappe.get_doc("Bank Transaction Staging", trns_item.name)
+#             if bts.error and 'E106:' not in bts.error:
+#                 bts.staging_status = 'Error'
+#                 bts.error = 'E106: Insurance Tag is removed by user but the transaction is already reconciled'
+#                 bts.remarks = ''
+#                 bts.save()
+#                 frappe.db.commit()
 
 
 @ChunkOrchestrator.update_chunk_status
@@ -92,10 +92,10 @@ def tag_insurance(doctype: str) -> str:
     try:
         if compressed_inclusion_patterns:
             # Truncate the 'TAG' column intially
-            frappe.db.sql(
-                """UPDATE `tabBank Transaction Staging` SET tag = NULL, based_on = NULL where tag = %(tag)s and based_on = %(type)s and is_fixed != 1""",
-                values={'tag': INSURANCE_TAG, 'type': 'Insurance Pattern'})
-            frappe.db.commit()
+            # frappe.db.sql(
+            #     """UPDATE `tabBank Transaction Staging` SET tag = NULL, based_on = NULL where tag = %(tag)s and based_on = %(type)s and is_fixed != 1""",
+            #     values={'tag': INSURANCE_TAG, 'type': 'Insurance Pattern'})
+            # frappe.db.commit()
             frappe.db.sql("""
                         UPDATE `tabBank Transaction Staging` SET tag = %(tag)s where search REGEXP %(compressed_inclusion_patterns)s and based_on is NULL and is_fixed != 1
                         """,
@@ -125,7 +125,7 @@ def tag_insurance(doctype: str) -> str:
         print("Exclusion Process Completed")
         advices_rfn_match()
         claimbook_match()
-        rm_transactions()
+        # rm_transactions()
     except Exception as e:
         status = "Error"
         log_error(error=str(e), doc="Bank Transaction Staging")
