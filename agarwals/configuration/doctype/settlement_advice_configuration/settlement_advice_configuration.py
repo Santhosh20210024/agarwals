@@ -6,6 +6,8 @@ import pandas as pd
 import os
 import json
 from frappe.model.document import Document
+from agarwals.utils.file_util import (
+    construct_file_url,SITE_PATH,SHELL_PATH,PROJECT_FOLDER)
 
 class SettlementAdviceConfiguration(Document):
 	def validate(self):
@@ -39,10 +41,7 @@ class SettlementAdviceConfiguration(Document):
 	def create_new_file(self, validation_columns):
 
 		validation_columns = [col for col in validation_columns if col]
-		control_panel = frappe.get_single("Control Panel")
-		home_path = "/private/files/"
-		project_path = control_panel.project_folder
-		directory_path = os.path.join(control_panel.site_path, home_path, project_path, "File Upload")
+		directory_path =construct_file_url(SITE_PATH,SHELL_PATH,PROJECT_FOLDER,"/File upload")
 		os.makedirs(directory_path, exist_ok=True)
 		if not self.file_name.endswith(('.csv','.xlsx')) :
 			self.file_name += ".csv"

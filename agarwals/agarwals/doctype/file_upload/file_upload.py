@@ -4,8 +4,8 @@ import shutil
 import zipfile
 import os
 import re
+import ast
 import pandas as pd
-import pip
 from frappe.model.document import Document
 from agarwals.agarwals.doctype.file_upload.file_upload_utils import construct_file_url
 from agarwals.utils.error_handler import log_error
@@ -334,8 +334,7 @@ class Fileupload(Document):
                                     ['columns_for_validation'])
         if not config_doc:
             frappe.throw(f"No configuration found for {configuration_doctype}.")
-        column_reference = config_doc[0].columns_for_validation[1:-1]
-        return [colname.strip()[1:-1] for colname in column_reference.split(',')]
+        return ast.literal_eval(config_doc[0].columns_for_validation) 
 
     def validate_file_header(self, fname, fid):
         try:

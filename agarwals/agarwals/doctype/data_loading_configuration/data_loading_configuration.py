@@ -1,10 +1,13 @@
 # Copyright (c) 2024, Agarwals and contributors
 # For license information, please see license.txt
+import ast
 import frappe
 import pandas as pd
 import os
 from frappe.model.document import Document
 from agarwals.utils.error_handler import log_error
+from agarwals.utils.file_util import (
+    construct_file_url,SITE_PATH,SHELL_PATH,PROJECT_FOLDER)
 
 class DataLoadingConfiguration(Document):
     
@@ -21,7 +24,7 @@ class DataLoadingConfiguration(Document):
 
     def get_config_file(self,columns_for_validation):
         try:
-            columns = eval(columns_for_validation)  # Convert the String to lilst using eval
+            columns = ast.literal_eval(columns_for_validation)  # Convert the String to lilst using eval
             return columns
         except Exception as e:
             log_error("Error parsing columns for validation: {e}","Data Loading Configuration")
@@ -29,7 +32,7 @@ class DataLoadingConfiguration(Document):
 
     def check_columns(self):
         previous_value = frappe.db.get_value("Data Loading Configuration",self.name,'columns_for_validation')
-        return previous_value == self.columns_for_validation
+        return ast.literal_eval(previous_value) == ast.literal_eval(self.columns_for_validation)
            
 
     def change_file(self,validation_columns):
@@ -38,19 +41,15 @@ class DataLoadingConfiguration(Document):
         self.create_new_file(validation_columns)
 
     def create_new_file(self, validation_columns):
-
         validation_columns = [col for col in validation_columns if col]
-        control_panel = frappe.get_single("Control Panel")
-        home_path = "/private/files/"
-        project_path = control_panel.project_folder
-        directory_path = os.path.join(control_panel.site_path , home_path , project_path , "/File Upload" )
+        directory_path =construct_file_url(SITE_PATH,SHELL_PATH,PROJECT_FOLDER,"/File upload")
         # Create the directory if it doesn't exist
         os.makedirs(directory_path, exist_ok=True)
         if not self.file_name.endswith(('.csv','.xlsx')) :
             self.file_name = self.file_name + ".csv"
         site_path = os.path.join(directory_path, self.file_name)
         df = pd.DataFrame( columns=validation_columns)
-        df.to_csv(site_path, index=False, header=True, columns=validation_columns)
+        df.to_csv(site_path, index=False, header=True, columns=validation_columns)        
 
         with open(site_path, 'rb') as f:
             file_data = f.read()
