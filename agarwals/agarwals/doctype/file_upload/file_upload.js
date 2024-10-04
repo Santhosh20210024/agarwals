@@ -206,45 +206,36 @@ frappe.ui.form.on('File upload', {
 
       switch (frm.doc.document_type) {
         case 'Debtors Report':
-          template_doctype = 'Bill File';
+          template_doctype = 'Bill';
           break;
         case 'Claim Book':
-          template_doctype = 'ClaimBook File';
+          template_doctype = 'ClaimBook';
           break;
         case 'Settlement Advice':
-          template_doctype = 'Settlement Advice File';
+          template_doctype = 'Settlement Advice';
           template_name = frm.doc.payer_type;
           break;
         case 'Bill Adjustment':
-          template_doctype = 'Bill Adjustment File';
+          template_doctype = 'Bill Adjustment';
           break;
         case 'Write Back':
-          template_doctype = 'Write Back File';
+          template_doctype = 'Write Back';
           break;
         case 'Write Off':
-          template_doctype = 'Write Off File';
+          template_doctype = 'Write Off';
           break;
         case 'Bank Statement Bulk':
-          template_doctype = 'Bank Transaction File';
+          template_doctype = 'Bank Transaction';
           break;
       }
-      if(template_doctype === null){
+      if(template_doctype === null ||(template_doctype=="Settlement Advice" && template_name != "Manual")){
         frappe.msgprint('Template Not Available')
       }
       else{
-      frappe.call({
-          method: "agarwals.agarwals.doctype.file_upload.file_upload_utils.is_template_exist",
-          args: {
-            file_doctype: template_doctype,
-            file_name: template_name
-          },
-          callback: function (r) {
-            if(r.message === 'Not Found' || r.message === 'System Error'){
-              frappe.msgprint('Message: Template Not Available');
-            }
-            else{
-              window.open(r.message);
-            }
-      }})
+        const url = frappe.urllib.get_full_url(
+          `/api/method/agarwals.agarwals.doctype.file_upload.file_upload_utils.download_template?file_doctype=${encodeURIComponent(template_doctype)}
+          &file_name=${encodeURIComponent(template_name)}`);
+      
+        window.location.href = url;
     }}}
 )
