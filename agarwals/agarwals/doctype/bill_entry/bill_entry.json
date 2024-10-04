@@ -1,114 +1,115 @@
 {
  "actions": [],
- "autoname": "naming_series:",
+ "autoname": "field:bill",
  "creation": "2024-09-18 10:55:05.879003",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "column_break_bpjgb",
-  "section_break_scdp7",
-  "bulk_bills",
-  "column_break_ufmdq",
-  "bills",
-  "section_break_nejmk",
-  "event",
+  "bill",
+  "bill_date",
+  "patient_name",
+  "payer",
+  "claim_amount",
+  "bill_status",
+  "claim_no",
+  "ma_claim_no",
+  "event_type",
   "mode_of_submission",
-  "column_break_ukm0s",
-  "date",
-  "section_break_54cqi",
-  "remarks",
-  "bill_list",
-  "naming_series"
+  "event_date",
+  "remark"
  ],
  "fields": [
   {
-   "default": "Today",
-   "fieldname": "date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Event Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "bills",
-   "fieldtype": "Table MultiSelect",
-   "label": "Bills",
-   "options": "Tracking Bill",
-   "reqd": 1
-  },
-  {
-   "fieldname": "event",
+   "fieldname": "bill",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Event",
-   "options": "Bill Event",
-   "reqd": 1
+   "label": "Bill",
+   "options": "Sales Invoice",
+   "reqd": 1,
+   "unique": 1
   },
   {
-   "fieldname": "bill_list",
-   "fieldtype": "HTML",
-   "label": "Bill List"
-  },
-  {
-   "default": "BE.-",
-   "fieldname": "naming_series",
+   "fetch_from": "bill.posting_date",
+   "fieldname": "bill_date",
    "fieldtype": "Data",
-   "hidden": 1,
-   "label": "naming_series",
+   "label": "Bill Date",
    "read_only": 1
   },
   {
-   "depends_on": "eval: doc.event === \"Bill Submitted\"",
+   "fetch_from": "bill.custom_patient_name",
+   "fieldname": "patient_name",
+   "fieldtype": "Data",
+   "label": "Patient Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bill.customer",
+   "fieldname": "payer",
+   "fieldtype": "Data",
+   "label": "Payer",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bill.total",
+   "fieldname": "claim_amount",
+   "fieldtype": "Data",
+   "label": "Claim Amount",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bill.status",
+   "fieldname": "bill_status",
+   "fieldtype": "Data",
+   "label": "Bill Status",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bill.custom_claim_id",
+   "fieldname": "claim_no",
+   "fieldtype": "Data",
+   "label": "Claim No",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bill.custom_ma_claim_id",
+   "fieldname": "ma_claim_no",
+   "fieldtype": "Data",
+   "label": "MA Claim No"
+  },
+  {
+   "fieldname": "event_type",
+   "fieldtype": "Link",
+   "label": "Event Type",
+   "options": "Bill Event"
+  },
+  {
+   "default": "Today",
+   "fieldname": "event_date",
+   "fieldtype": "Date",
+   "label": "Event Date"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Data",
+   "label": "Remark"
+  },
+  {
+   "depends_on": "eval: doc.event_type === \"Bill Submitted\"",
    "fieldname": "mode_of_submission",
    "fieldtype": "Link",
    "label": "Mode of Submission",
-   "mandatory_depends_on": "eval: doc.event === \"Bill Submitted\"",
    "options": "Bill Submission Mode"
-  },
-  {
-   "fieldname": "remarks",
-   "fieldtype": "Data",
-   "label": "Remarks"
-  },
-  {
-   "fieldname": "bulk_bills",
-   "fieldtype": "Text",
-   "label": "Bills"
-  },
-  {
-   "fieldname": "section_break_scdp7",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_ufmdq",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_nejmk",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_bpjgb",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_ukm0s",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_54cqi",
-   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-19 16:32:10.306910",
+ "modified": "2024-10-03 13:36:54.289566",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bill Entry",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
