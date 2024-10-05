@@ -1026,20 +1026,34 @@
     "doctype": "Server Script"
 
  },
+ {"name":"Bank Update",
+  "owner":"Administrator",
+  "creation":"2024-09-30 19:40:20.532380",
+  "modified":"2024-09-30 19:40:23.962754",
+  "modified_by":"Administrator",
+  "docstatus":0,
+  "idx":0,
+  "script_type":"Scheduler Event",
+  "event_frequency":"Cron",
+  "cron_format":"* * * * *",
+  "doctype_event":"Before Insert",
+  "allow_guest":0,
+  "disabled":1,
+  "script":"frappe.call(\"agarwals.reconciliation.job.run\",job_config=\"bank_update_cron\")",
+  "doctype":"Server Script"},
 {
   "name": "Reconciliation Job Executor",
   "owner": "Administrator",
   "creation": "2024-09-09 17:25:29.609226",
   "modified": "2024-09-09 18:45:23.686943",
   "modified_by": "Administrator",
-  "docstatus": 0,
-  "idx": 0,
-  "dt": "Job",
-  "view": "List",
-  "enabled": 1,
-  "script": "frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        listview.page.add_inner_button(__('Match Payments'), function() {\r\n            frappe.msgprint(\"The Process Has been Started\")\r\n            frappe.call({\r\n                method: 'agarwals.reconciliation.job.run',\r\n                args: {'job_config': 'reconciliation_cron'},\r\n                callback:function(r){\r\n                 frappe.msgprint(\"The Process Has been Completed\")\r\n                }\r\n            });\r\n        }).addClass('btn-primary');\r\n    }\r\n};\r\n",
-  "doctype": "Client Script"
-},
+  "docstatus":0,
+  "idx":0,
+  "dt":"Job",
+  "view":"List",
+  "enabled":1,
+  "script":"frappe.listview_settings['Job'] = {\r\n    refresh: function(listview) {\r\n        const addActionItem = (label, jobConfig) => {\r\n            listview.page.add_action_item(label, function() {\r\n                frappe.msgprint(\"The Process Has been Started\");\r\n                frappe.call({\r\n                    method: 'tfs.orchestration.job.run',\r\n                    args: { 'job_config': jobConfig },\r\n                    callback: function(r) {\r\n                        frappe.msgprint(\"The Process Has been Completed\");\r\n                    }\r\n                });\r\n            });\r\n        };\r\n\r\n        addActionItem(__('Match Payments'), 'manual_process_cron');\r\n        addActionItem(__('Adjust Bills'), 'adjustment_process_cron');\r\n        addActionItem(__('Bank Update'), 'bank_update_cron');\r\n    }\r\n};\r\n",
+  "doctype":"Client Script"},
   {
     "name": "Reconciliation",
     "docstatus": 0,
@@ -1081,10 +1095,10 @@
     "__last_sync_on": "2024-09-13T13:56:57.741Z"
   },
   {
-    "name": "agarwals.reconciliation.step.insurance_tagger",
+    "name": "agarwals.reconciliation.step.bank_transaction_processes.insurance_tagger",
     "docstatus": 0,
     "idx": 0,
-    "method_path": "agarwals.reconciliation.step.insurance_tagger",
+    "method_path": "agarwals.reconciliation.step.bank_transaction_processes.insurance_tagger",
     "doctype": "Orchestrator Method",
     "__last_sync_on": "2024-09-13T13:57:13.017Z"
   },
@@ -1113,10 +1127,10 @@
     "__last_sync_on": "2024-09-13T13:58:29.863Z"
   },
   {
-    "name": "agarwals.reconciliation.step.payer_match",
+    "name": "agarwals.reconciliation.step.bank_transaction_processes.payer_match",
     "docstatus": 0,
     "idx": 0,
-    "method_path": "agarwals.reconciliation.step.payer_match",
+    "method_path": "agarwals.reconciliation.step.bank_transaction_processes.payer_match",
     "doctype": "Orchestrator Method",
     "__last_sync_on": "2024-09-13T13:58:42.167Z"
   },
