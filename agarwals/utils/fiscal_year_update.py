@@ -2,9 +2,13 @@ import frappe
 from datetime import date
 from agarwals.utils.error_handler import log_error
 
+def get_fiscal_year():
+   f_date = date.today()
+   fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',f_date],'year_end_date':['>=',f_date]},fields=['name'])
+   return fiscal_year
+
 def update_fiscal_year(doc,type):
-        f_date = date.today()
-        fiscal_year = frappe.get_all('Fiscal Year', filters={'year_start_date':['<=',f_date],'year_end_date':['>=',f_date]},fields=['name'])
+        fiscal_year = get_fiscal_year()
         yearly_due_doc = frappe.new_doc ('Yearly Due')
         yearly_due_doc.parent = doc.get('name') 
         yearly_due_doc.parenttype = type
@@ -17,8 +21,7 @@ def update_fiscal_year(doc,type):
            yearly_due_doc.save()
            frappe.db.commit()
         except Exception as e:
-           log_error(str(e),type,doc.name)
-           frappe.db.commit()
+           log_error(str(e), type, doc.name)
 
     
     
