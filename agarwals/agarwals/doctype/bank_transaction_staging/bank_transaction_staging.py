@@ -6,5 +6,5 @@ from frappe.model.document import Document
 
 class BankTransactionStaging(Document):
 	def on_update(self):
-		file_records.create(file_upload=self.file_upload, transform=self.transform, reference_doc="Bank Transaction Staging",
+		file_records.create(is_commit=False, file_upload=self.file_upload, transform=self.transform, reference_doc="Bank Transaction Staging",
 							record=self.name, index = self.index)
