@@ -9,14 +9,20 @@ class ClosingBalance:
             query = frappe.get_list('Report', filters={'name' : '25. Bank Statement Balance'},pluck = 'query')[0]
             bank_accounts = frappe.db.sql(query, as_dict=True)
             for bank_account in bank_accounts:
-                doc = frappe.get_doc({
-               'doctype': 'Closing Balance',
-               'bank_account': bank_account['Bank Account'],
-               'opening_balance': bank_account['Opening Balance'],
-               'deposit': bank_account['Deposit'] ,
-               'withdrawal':bank_account['Withdrawal'],
-               'cg_closing_balance':bank_account['Closing Balance']
-				})
+                existing_doc = frappe.get_all('Closing Balance', filters={'name': bank_account['Bank Account']}, limit=1)
+        
+                if existing_doc:
+                    doc = frappe.get_doc('Closing Balance', bank_account['Bank Account'])
+                else:
+                    doc = frappe.new_doc('Closing Balance')
+                    doc.name = bank_account['Bank Account']
+        
+                doc.bank_account = bank_account['Bank Account']
+                doc.opening_balance = bank_account['Opening Balance']
+                doc.deposit = bank_account['Deposit']
+                doc.withdrawal = bank_account['Withdrawal']
+                doc.cg_closing_balance = bank_account['Closing Balance']
+        
                 doc.save()
                 frappe.db.commit()
             
@@ -53,7 +59,7 @@ class ClosingBalance:
                     <p>Regards,<br>TechFinite Systems</p>
                 """
             )
-              frappe.throw('Check the closing balance')
+              raise ValueError('Check the closing balance')
     
     def format_table(self,balance_list):
         if not balance_list:
