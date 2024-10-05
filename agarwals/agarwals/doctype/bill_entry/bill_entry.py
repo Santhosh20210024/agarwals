@@ -20,13 +20,7 @@ class BillEntry(Document):
 		self.date = datetime.now().date()
 
 	def on_update(self):
-		bill_entry_log = frappe.new_doc("Bill Entry Log")
-		bill_entry_log.set("bill",self.bill)
-		bill_entry_log.set("ma_claim_no", self.ma_claim_id)
-		bill_entry_log.set("event", self.event)
-		bill_entry_log.set("date", self.date)
-		bill_entry_log.set("mode_of_submission", self.mode_of_submission)
-		bill_entry_log.set("remark", self.remark)
+		bill_entry_log = frappe.get_doc({'doctype':"Bill Entry Log", "bill":self.bill, "ma_claim_no":self.ma_claim_id, "event":self.event, "date":self.date, "mode_of_submission": self.mode_of_submission, "remark":self.remark})
 		self.set_none_value()
-		bill_entry_log.save()
+		bill_entry_log.insert()
 		frappe.db.commit()
