@@ -1,49 +1,32 @@
 # Copyright (c) 2024, Agarwals and contributors
 # For license information, please see license.txt
 
-from frappe.model.document import Document
 import frappe
-from agarwals.utils.error_handler import log_error
+from frappe.model.document import Document
 from datetime import datetime
 
 class BillEntry(Document):
-	def validate(self):
-		current_date = datetime.now().date()
-		event_date = datetime.strptime(self.event_date, "%Y-%m-%d").date()
-		if event_date > current_date:
-			log_error(error="Future Date is Not Allowed")
-			frappe.throw("Future Date is Not Allowed.")
-		if event_date < current_date and (current_date-event_date).days > 7:
-			log_error(error="Back Date More than 7 Days is Not Allowed")
-			frappe.throw("Back Date More than 7 Days is Not Allowed.")
+	def set_none_value(self):
+		self.bill = None
+		self.bill_date = None
+		self.ma_claim_id = None
+		self.patient_name = None
+		self.payer = None
+		self.claim_amount = None
+		self.bill_status = None
+		self.claim_id = None
+		self.event = None
+		self.remark = None
+		self.date = datetime.now().date()
 
-	def update_bill_event(self, bill):
-		bill_doc = frappe.get_doc("Sales Invoice",bill)
-		if bill_doc.status != "Cancelled":
-			if self.event_type == "Bill Submitted":
-				bill_doc.set("custom_mode_of_submission",self.mode_of_submission)
-			bill_doc.append('custom_bill_tracker', {'event': self.event_type, 'date': self.event_date, 'remark':self.remarks})
-			bill_doc.submit()
-			frappe.db.commit()
-
-	def delete_bill_event(self, bill):
-		bill_tracker_list = frappe.get_all("Bill Tracker",filters={'event':self.event_type,'date':self.event_date, 'parent':bill},pluck='name')
-		for bill_tracker in bill_tracker_list:
-			if self.mode_of_submission:
-				frappe.db.set_value("Sales Invoice",bill,"custom_mode_of_submission","")
-			bill_tracker = frappe.get_doc('Bill Tracker',bill_tracker)
-			bill_tracker.cancel()
-			bill_tracker.delete(ignore_permissions=True)
-			frappe.db.commit()
-
-	def after_save(self):
-		try:
-			self.update_bill_event(self.bill)
-		except Exception as e:
-			log_error(error=e,doc="Bill Entry",doc_name= self.name)
-
-	def on_trash(self):
-		try:
-			self.delete_bill_event(self.bill)
-		except Exception as e:
-			log_error(error=e, doc="Bill Entry", doc_name=self.name)
+	def on_update(self):
+		bill_entry_log = frappe.new_doc("Bill Entry Log")
+		bill_entry_log.set("bill",self.bill)
+		bill_entry_log.set("ma_claim_no", self.ma_claim_id)
+		bill_entry_log.set("event", self.event)
+		bill_entry_log.set("date", self.date)
+		bill_entry_log.set("mode_of_submission", self.mode_of_submission)
+		bill_entry_log.set("remark", self.remark)
+		self.set_none_value()
+		bill_entry_log.save()
+		frappe.db.commit()

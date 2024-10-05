@@ -1,23 +1,34 @@
 {
  "actions": [],
- "autoname": "field:bill",
- "creation": "2024-09-18 10:55:05.879003",
+ "allow_rename": 1,
+ "creation": "2024-10-04 12:10:42.953606",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "bill",
+  "column_break_lfjmh",
+  "ma_claim_id",
+  "section_break_hdqtw",
   "bill_date",
+  "column_break_w4iia",
   "patient_name",
+  "section_break_bttqh",
   "payer",
+  "column_break_goshk",
   "claim_amount",
+  "section_break_kxbfx",
   "bill_status",
-  "claim_no",
-  "ma_claim_no",
-  "event_type",
+  "column_break_9axmh",
+  "claim_id",
+  "section_break_8tqyy",
+  "event",
+  "column_break_3hbtu",
+  "date",
+  "section_break_mpdkx",
   "mode_of_submission",
-  "event_date",
+  "column_break_7q0x9",
   "remark"
  ],
  "fields": [
@@ -26,37 +37,11 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Bill",
-   "options": "Sales Invoice",
-   "reqd": 1,
-   "unique": 1
+   "options": "Sales Invoice"
   },
   {
-   "fetch_from": "bill.posting_date",
-   "fieldname": "bill_date",
-   "fieldtype": "Data",
-   "label": "Bill Date",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "bill.custom_patient_name",
-   "fieldname": "patient_name",
-   "fieldtype": "Data",
-   "label": "Patient Name",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "bill.customer",
-   "fieldname": "payer",
-   "fieldtype": "Data",
-   "label": "Payer",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "bill.total",
-   "fieldname": "claim_amount",
-   "fieldtype": "Data",
-   "label": "Claim Amount",
-   "read_only": 1
+   "fieldname": "column_break_lfjmh",
+   "fieldtype": "Column Break"
   },
   {
    "fetch_from": "bill.status",
@@ -66,60 +51,128 @@
    "read_only": 1
   },
   {
-   "fetch_from": "bill.custom_claim_id",
-   "fieldname": "claim_no",
+   "fieldname": "section_break_hdqtw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "bill.posting_date",
+   "fieldname": "bill_date",
    "fieldtype": "Data",
-   "label": "Claim No",
+   "label": "Bill Date",
    "read_only": 1
   },
   {
-   "fetch_from": "bill.custom_ma_claim_id",
-   "fieldname": "ma_claim_no",
-   "fieldtype": "Data",
-   "label": "MA Claim No"
+   "fieldname": "column_break_w4iia",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "event_type",
+   "fetch_from": "bill.custom_patient_name",
+   "fieldname": "patient_name",
+   "fieldtype": "Data",
+   "label": "Patient Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_bttqh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "bill.customer",
+   "fieldname": "payer",
+   "fieldtype": "Data",
+   "label": "Payer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_goshk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "bill.total",
+   "fieldname": "claim_amount",
+   "fieldtype": "Data",
+   "label": "Claim Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_kxbfx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "bill.custom_claim_id",
+   "fieldname": "claim_id",
+   "fieldtype": "Data",
+   "label": "Claim ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_9axmh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ma_claim_id",
+   "fieldtype": "Data",
+   "label": "MA Claim ID"
+  },
+  {
+   "fieldname": "section_break_8tqyy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "event",
    "fieldtype": "Link",
-   "label": "Event Type",
+   "in_list_view": 1,
+   "label": "Event",
    "options": "Bill Event"
   },
   {
+   "fieldname": "column_break_3hbtu",
+   "fieldtype": "Column Break"
+  },
+  {
    "default": "Today",
-   "fieldname": "event_date",
+   "fieldname": "date",
    "fieldtype": "Date",
-   "label": "Event Date"
+   "in_list_view": 1,
+   "label": "Date"
+  },
+  {
+   "fieldname": "section_break_mpdkx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval: doc.event === \"Bill Submitted\"",
+   "fieldname": "mode_of_submission",
+   "fieldtype": "Link",
+   "label": "Mode of Submission",
+   "options": "Bill Submission Mode"
+  },
+  {
+   "fieldname": "column_break_7q0x9",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "remark",
    "fieldtype": "Data",
    "label": "Remark"
-  },
-  {
-   "depends_on": "eval: doc.event_type === \"Bill Submitted\"",
-   "fieldname": "mode_of_submission",
-   "fieldtype": "Link",
-   "label": "Mode of Submission",
-   "options": "Bill Submission Mode"
   }
  ],
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
+ "issingle": 1,
  "links": [],
- "modified": "2024-10-03 13:36:54.289566",
+ "modified": "2024-10-04 14:58:41.014026",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bill Entry",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
    "delete": 1,
    "email": 1,
-   "export": 1,
    "print": 1,
    "read": 1,
-   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1
