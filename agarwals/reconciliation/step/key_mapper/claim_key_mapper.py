@@ -24,10 +24,14 @@ class ClaimKeyMapper(KeyMapper):
             doctype = "Bill Claim Key"
             key_doc = frappe.new_doc(doctype)
             key_doc.bill = name
-        else:
+        if self.record_type == 'ClaimBook':
             doctype = "ClaimBook Claim Key"
             key_doc = frappe.new_doc(doctype)
             key_doc.claimbook = name
+        if self.record_type == 'Settlement Advice':
+            doctype = "Settlement Advice Claim Key"
+            key_doc = frappe.new_doc(doctype)
+            key_doc.settlement_advice = name
         key_doc.claim_key = claim_key	
         key_doc.save()		
         frappe.db.commit()
@@ -54,7 +58,7 @@ class ClaimKeyMapper(KeyMapper):
                             )
                             return
                         if not key: key = KeyCreator.process(key_id_variants)
-                        if self.record_type in ('Bill', 'ClaimBook'):
+                        if self.record_type in ('Bill', 'ClaimBook','Settlement Advice'):
                             self.insert_claim_keys(record["name"], key[0])
                         self.update(self.query[field], key[0], record["name"])
                         _temp[key_id] = key
@@ -116,7 +120,8 @@ class SettlementAdviceClaimKeyMapper(ClaimKeyMapper):
         super().__init__(
             records,
             "Settlement Advice",
-            {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""}
+            {'claim_key_id':"""UPDATE `tabSettlement Advice` SET claim_key = %(key)s WHERE name = %(name)s"""
+             ,'cl_key_id': """UPDATE `tabSettlement Advice` SET cl_key = %(key)s WHERE name = %(name)s"""}
         )
 
 
@@ -127,9 +132,11 @@ query_mapper = {
                 "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
                                 WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
                                 or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
-                "Settlement Advice": """SELECT name, claim_id as claim_key_id FROM `tabSettlement Advice` 
-                                        WHERE claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')"""
+                "Settlement Advice": """SELECT name, claim_id as claim_key_id ,cl_number as cl_key_id FROM `tabSettlement Advice` 
+                                        WHERE  (claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')) or
+                                        ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = ''))"""
                 }
+                                        
 @frappe.whitelist()
 def process(args={"type": "claim_key", "step_id": "", "queue": "long"}):
     args = cast_to_dic(args)
@@ -141,3 +148,4 @@ def process(args={"type": "claim_key", "step_id": "", "queue": "long"}):
     }
     ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
                                 mappers=mappers, args=args, job_name="ClaimKeyMapper")
+  
