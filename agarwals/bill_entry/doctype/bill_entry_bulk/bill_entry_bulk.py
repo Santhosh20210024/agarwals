@@ -12,7 +12,7 @@ class BillEntryBulk(Document):
 		bills = self.bills
 		for bill in bills:
 			try:
-				update_bill_event(bill.bill, self.event, self.date, self.mode_of_submission, self.remark)
+				update_bill_event(bill.bill, self.event, self.date, self.mode_of_submission, self.remarks)
 			except Exception as e:
 				log_error(error=e,doc="Bill Tracker",doc_name= self.name)
 

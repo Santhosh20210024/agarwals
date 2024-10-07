@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "field:bill",
+ "allow_import": 1,
  "creation": "2024-09-18 10:55:05.879003",
  "default_view": "List",
  "doctype": "DocType",
@@ -12,7 +12,9 @@
   "event",
   "mode_of_submission",
   "date",
-  "remark"
+  "remark",
+  "status",
+  "error_remark"
  ],
  "fields": [
   {
@@ -21,8 +23,7 @@
    "in_list_view": 1,
    "label": "Bill",
    "options": "Sales Invoice",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "ma_claim_no",
@@ -55,15 +56,30 @@
    "fieldname": "remark",
    "fieldtype": "Data",
    "label": "Remark"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "\nSuccess\nError",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.status === \"Error\"",
+   "fieldname": "error_remark",
+   "fieldtype": "Data",
+   "label": "Error Remark"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-06 15:40:57.413978",
+ "modified": "2024-10-07 11:43:47.786689",
  "modified_by": "Administrator",
  "module": "Bill Entry",
  "name": "Bill Entry Log",
- "naming_rule": "By fieldname",
+ "naming_rule": "By script",
  "owner": "Administrator",
  "permissions": [
   {
