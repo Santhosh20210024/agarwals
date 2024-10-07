@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Agarwals and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Bill Entry', {
+frappe.ui.form.on('Bill Entry Bulk', {
 	refresh: function(frm) {
         set_bill_list(frm, frm.doc.bills)
 	},
@@ -59,7 +59,7 @@ function set_bill_list(frm, bills_info){
         })
         if(bill_list.length == bills_info.length) {
             frappe.call({
-                method: "agarwals.agarwals.doctype.bill_entry.bill_entry.get_bills_info_table",
+                method: "agarwals.bill_entry.doctype.bill_entry_bulk.bill_entry_bulk.get_bills_info_table",
                 args: {
                     'bills': bill_list
                 },

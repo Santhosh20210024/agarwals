@@ -1,7 +1,7 @@
 {
  "actions": [],
  "autoname": "naming_series:",
- "creation": "2024-09-18 10:55:05.879003",
+ "creation": "2024-10-05 19:12:49.764192",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -24,12 +24,21 @@
  ],
  "fields": [
   {
-   "default": "Today",
-   "fieldname": "date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Event Date",
-   "reqd": 1
+   "fieldname": "column_break_bpjgb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_scdp7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "bulk_bills",
+   "fieldtype": "Text",
+   "label": "Bills"
+  },
+  {
+   "fieldname": "column_break_ufmdq",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "bills",
@@ -39,12 +48,45 @@
    "reqd": 1
   },
   {
+   "fieldname": "section_break_nejmk",
+   "fieldtype": "Section Break"
+  },
+  {
    "fieldname": "event",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Event",
    "options": "Bill Event",
    "reqd": 1
+  },
+  {
+   "depends_on": "eval: doc.event === \"Bill Submitted\"",
+   "fieldname": "mode_of_submission",
+   "fieldtype": "Link",
+   "label": "Mode of Submission",
+   "mandatory_depends_on": "eval: doc.event === \"Bill Submitted\"",
+   "options": "Bill Submission Mode"
+  },
+  {
+   "fieldname": "column_break_ukm0s",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Event Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_54cqi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
   },
   {
    "fieldname": "bill_list",
@@ -58,56 +100,14 @@
    "hidden": 1,
    "label": "naming_series",
    "read_only": 1
-  },
-  {
-   "depends_on": "eval: doc.event === \"Bill Submitted\"",
-   "fieldname": "mode_of_submission",
-   "fieldtype": "Link",
-   "label": "Mode of Submission",
-   "mandatory_depends_on": "eval: doc.event === \"Bill Submitted\"",
-   "options": "Bill Submission Mode"
-  },
-  {
-   "fieldname": "remarks",
-   "fieldtype": "Data",
-   "label": "Remarks"
-  },
-  {
-   "fieldname": "bulk_bills",
-   "fieldtype": "Text",
-   "label": "Bills"
-  },
-  {
-   "fieldname": "section_break_scdp7",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_ufmdq",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_nejmk",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_bpjgb",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_ukm0s",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_54cqi",
-   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-19 16:32:10.306910",
+ "modified": "2024-10-06 15:40:03.981004",
  "modified_by": "Administrator",
- "module": "Agarwals",
- "name": "Bill Entry",
+ "module": "Bill Entry",
+ "name": "Bill Entry Bulk",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [

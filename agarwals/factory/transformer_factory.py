@@ -8,7 +8,7 @@ from agarwals.reconciliation.step.transform.bank_transformer import BankBulkTran
 from agarwals.reconciliation.step.transform.advice_transformer import AdviceTransformer
 from agarwals.reconciliation.step.transform.closing_balance_transformer import ClosingBalanceTransformer
 from agarwals.reconciliation.step.transform.tpa_credentials_transformer import TpaCredentialsTransformer
-
+from agarwals.reconciliation.step.transform.bill_entry_transformer import BillEntryTransformer
 def get_transformer(type):
     try:
         if type == "debtors":
@@ -31,6 +31,8 @@ def get_transformer(type):
             return ClosingBalanceTransformer()
         elif type == "tpa_credentails":
             return TpaCredentialsTransformer()
+        elif type == "bill_entry":
+            return BillEntryTransformer()
 
     except Exception as e:
        return e

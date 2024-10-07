@@ -58,7 +58,7 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:(doc.document_type=='Closing Balance') || (doc.document_type == \"TPA Credentials\")|| (doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment') || (doc.document_type=='Settlement Advice' && doc.payer_type ==null && doc.file_format == 'ZIP') || (doc.document_type=='Bank Statement' && doc.bank_account == null && doc.file_format == 'ZIP' )||(doc.document_type == \"Write Back\"&& doc.wb_date != null)||(doc.document_type == \"Write Off\"&& doc.wo_date != null) || (doc.document_type==\"Bank Statement Bulk\")",
+   "depends_on": "eval:(doc.document_type=='Closing Balance') || (doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment') || (doc.document_type=='Settlement Advice' && doc.payer_type ==null && doc.file_format == 'ZIP') || (doc.document_type=='Bank Statement' && doc.bank_account == null && doc.file_format == 'ZIP' )||(doc.document_type == \"Write Back\"&& doc.wb_date != null)||(doc.document_type == \"Write Off\"&& doc.wo_date != null) || (doc.document_type==\"Bank Statement Bulk\") || (doc.document_type==\"Bill Entry\") || (doc.document_type==\"TPA Credentials\")",
    "fieldname": "upload",
    "fieldtype": "Attach",
    "in_preview": 1,
@@ -97,7 +97,7 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "File Type",
-   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment\nWrite Back\nWrite Off\nBank Statement Bulk\nClosing Balance\nTPA Credentials"
+   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment\nWrite Back\nWrite Off\nBank Statement Bulk\nClosing Balance\nBill Entry"
   },
   {
    "depends_on": "eval:doc.upload !=null && doc.file_format != 'ZIP'",
@@ -312,7 +312,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-24 14:07:33.356028",
+ "modified": "2024-10-07 11:45:43.013575",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",

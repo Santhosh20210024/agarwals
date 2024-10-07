@@ -5,39 +5,21 @@
 from frappe.model.document import Document
 import frappe
 from agarwals.utils.error_handler import log_error
+from agarwals.bill_entry.utils import delete_bill_event, update_bill_event
 
-class BillEntry(Document):
-	def update_bill_event(self, bill):
-		bill_doc = frappe.get_doc("Sales Invoice",bill)
-		if bill_doc.status != "Cancelled":
-			if self.event == "Bill Submitted":
-				bill_doc.set("custom_mode_of_submission",self.mode_of_submission)
-			bill_doc.append('custom_bill_tracker', {'event': self.event, 'date': self.date, 'remark':self.remarks})
-			bill_doc.submit()
-			frappe.db.commit()
-
-	def delete_bill_event(self, bill):
-		bill_tracker_list = frappe.get_all("Bill Tracker",filters={'event':self.event,'date':self.date, 'parent':bill},pluck='name')
-		for bill_tracker in bill_tracker_list:
-			if self.mode_of_submission:
-				frappe.db.set_value("Sales Invoice",bill,"custom_mode_of_submission","")
-			bill_tracker = frappe.get_doc('Bill Tracker',bill_tracker)
-			bill_tracker.cancel()
-			bill_tracker.delete(ignore_permissions=True)
-			frappe.db.commit()
-
-	def after_save(self):
+class BillEntryBulk(Document):
+	def on_update(self):
 		bills = self.bills
 		for bill in bills:
 			try:
-				self.update_bill_event(bill.bill)
+				update_bill_event(bill.bill, self.event, self.date, self.mode_of_submission, self.remarks)
 			except Exception as e:
 				log_error(error=e,doc="Bill Tracker",doc_name= self.name)
 
 	def on_trash(self):
 		for bill in self.bills:
 			try:
-				self.delete_bill_event(bill.bill)
+				delete_bill_event(bill.bill, self.event, self.date, self.mode_of_submission)
 			except Exception as e:
 				log_error(error=e, doc="Bill Tracker", doc_name=self.name)
 
