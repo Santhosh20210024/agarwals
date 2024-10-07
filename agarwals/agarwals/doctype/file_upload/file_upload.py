@@ -630,24 +630,15 @@ def process_zip_entires(fid):
 
     if fdoc.document_type == "Settlement Advice":
         if (
-                len(
-                    frappe.get_list(
-                        "Settlement Advice Mapping",
-                        filters={"parent": fid, "payer_name": ["=", ""]},
-                    )
-                )
+            frappe.db.count("Settlement Advice Mapping", filters={"parent": fid, "payer_name": ["=", ""]})
                 > 0
         ):
             frappe.throw("Please select payer for all the mapping records")
 
     if fdoc.document_type == "Bank Statement":
         if (
-                len(
-                    frappe.get_list(
-                        "Bank Account Mapping",
-                        filters={"parent": fid, "bank_account": ["=", ""]},
-                    )
-                )
+            frappe.db.count("Bank Account Mapping",
+                        filters={"parent": fid, "bank_account": ["=", ""]})
                 > 0
         ):
             frappe.throw("Please select bank account for all the mapping records")
