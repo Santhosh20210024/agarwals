@@ -478,12 +478,12 @@ class SeleniumDownloader:
                         "remarks": f"{self.file_not_found_remarks} \n {str(remarks)}"
                         }
             if status == 'Error' and retry == 0:
-                error_log = self.log_error(doctype_name='TPA Login Credentials',error_message=remarks,reference_name=self.tpa)
+                error_log = self.log_error(doctype_name='TPA Login Credentials',error_message=log_data.get(remarks),reference_name=self.tpa)
                 log_data.update({"document_reference": "Error Record Log", "reference_name": error_log.name,"status": "Error"})
             elif self.file_not_found_remarks or status == 'Info':
                 log_data.update({"status":"Info"})
             else:
-                log_data.update({"status": "Warning","remarks": remarks}) if status == 'Invalid' or retry == 1 else log_data.update({"status": "Processed"})
+                log_data.update({"status": "Warning","remarks": log_data.get(remarks)}) if status == 'Invalid' or retry == 1 else log_data.update({"status": "Processed"})
             log_doc = self.insert_run_log(log_data)
             doc.last_run_log_id = log_doc.name
             doc.save()

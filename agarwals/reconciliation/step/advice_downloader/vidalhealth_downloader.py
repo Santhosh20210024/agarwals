@@ -25,12 +25,12 @@ class VidalHealthDownloader(SeleniumDownloader):
         if is_invalid == True:
             return self.captcha_alert
         try:
-            messages = self.min_wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME,'p')))
-            for message in messages:
-                if message.text == "Dear Customer, your username/password does not match with our database, please confirm the details.":
-                    return False
-                else:
-                    return str(messages)
+            message_element = self.min_wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME,'p')))
+            messages = [message.text for message in message_element]
+            if "Dear Customer, your username/password does not match with our database, please confirm the details." in messages:
+                return False
+            else:
+                return messages
         except TimeoutException:
             return True
         except Exception as e:
