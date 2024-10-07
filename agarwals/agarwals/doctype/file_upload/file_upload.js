@@ -229,13 +229,26 @@ frappe.ui.form.on('File upload', {
           break;
       }
       if(template_doctype === null ||(template_doctype=="Settlement Advice" && template_name != "Manual")){
-        frappe.msgprint('Template Not Available')
+        frappe.msgprint('Template Not Available');
       }
-      else{
-        const url = frappe.urllib.get_full_url(
-          `/api/method/agarwals.agarwals.doctype.file_upload.file_upload_utils.download_template?file_doctype=${encodeURIComponent(template_doctype)}
-          &file_name=${encodeURIComponent(template_name)}`);
-      
-        window.location.href = url;
-    }}}
+      frappe.call({
+          method: "agarwals.agarwals.doctype.file_upload.file_upload_utils.is_template_exist",
+          args: {
+            file_doctype: template_doctype,
+            file_name: template_name
+          },
+          callback: function (r) {
+            if(r.message == 'Is Exist'){
+              const url = frappe.urllib.get_full_url(
+                `/api/method/agarwals.agarwals.doctype.file_upload.file_upload_utils.download_template?file_doctype=${encodeURIComponent(template_doctype)}
+                &file_name=${encodeURIComponent(template_name)}`);
+            
+              window.location.href = url;
+            }
+            else{ 
+              frappe.msgprint('Message: Template Not Available');
+            }
+      }})
+
+    }}
 )

@@ -325,17 +325,23 @@ class Fileupload(Document):
         if configuration_doctype == "Settlement Advice Staging" :
             sa_configure_doc = frappe.get_single("Settlement Advice Configuration")
             sa_columns = sa_configure_doc.columns_for_validation.replace("'", '"')
-            try:
-                return json.loads(sa_columns)[self.payer_type]
-            except Exception as e:
-                log_error("Error decoding JSON in Settlement Advice Configuration.", "File upload")
+            if sa_columns :
+                try:
+                    return json.loads(sa_columns)[self.payer_type]
+                except Exception as e:
+                    log_error("Error decoding JSON in Settlement Advice Configuration {e}.", "File upload")
+            return
 
         config_doc = frappe.get_all("Data Loading Configuration", {"name": configuration_doctype},
                                     ['columns_for_validation'])
+
         if not config_doc:
             frappe.throw(f"No configuration found for {configuration_doctype}.")
-        return ast.literal_eval(config_doc[0].columns_for_validation) 
-
+        columns_for_validation = config_doc[0].get('columns_for_validation', '')
+        if not columns_for_validation:
+            return
+        return ast.literal_eval(columns_for_validation)
+    
     def validate_file_header(self, fname, fid):
         try:
             if self.upload and self.file_format != "ZIP":
@@ -346,12 +352,13 @@ class Fileupload(Document):
                     self.site_path + self.upload, columns=True
                 )
                 column_list = self.get_configuration_column(configuration_doctype)
-                if upload_columns:
+                if upload_columns and column_list:
                     is_different = self.compare_header(
                         column_list, upload_columns
                     )
                     if is_different:
                         frappe.throw(is_different)
+                return 
         except Exception as e:
             self.del_file_record(fid, fname, str(e))
 
