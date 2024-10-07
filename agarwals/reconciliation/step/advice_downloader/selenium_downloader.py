@@ -1,14 +1,10 @@
 import frappe
 import time
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime,timedelta
 from agarwals.utils.error_handler import log_error as error_handler
-import os
-import shutil
 from twocaptcha import TwoCaptcha
 from PIL import Image
 import os
@@ -19,6 +15,8 @@ import glob
 from io import StringIO
 import random
 from selenium.common.exceptions import NoAlertPresentException, TimeoutException
+from random_user_agent.user_agent import UserAgent
+from random_user_agent.params import SoftwareName, OperatingSystem
 
 
 class SeleniumDownloader:
@@ -277,7 +275,7 @@ class SeleniumDownloader:
         run = True
         while run == True:
             random_number = random.randint(1000, 99999)
-            if not random_number in  self.numbers:
+            if random_number not in  self.numbers:
                 self.numbers.append(random_number)
                 run = False
         return random_number
@@ -401,6 +399,21 @@ class SeleniumDownloader:
             self.formatted_file_name = self.rename_downloaded_file(self.download_directory, self.file_name,from_date,to_date)
             self.move_file(self.download_directory,self.formatted_file_name)
 
+    def get_user_agent(self) -> str:
+        """
+        Generate a random user agent string based on specified software and operating system.
+        Returns:
+            str: A random user agent string.
+        Raises:
+            ValueError: If no user agent can be generated.
+        """
+        software_name: str = SoftwareName.CHROME.value
+        operating_system: str = OperatingSystem.LINUX.value
+        user_agent: str = UserAgent(software_names=software_name, operating_systems=operating_system,limit=1).get_random_user_agent()
+        if user_agent:
+            return user_agent
+        else:
+            raise ValueError("User Agent Not Found")
 
     def add_driver_argument(self):
         """
@@ -416,14 +429,32 @@ class SeleniumDownloader:
             self.options.add_argument('--disable-dev-shm-usage')
         if self.is_headless == True:
             self.options.add_argument("--headless=new")
+        if self.use_custom_user_agent == 1:
+            user_agent = self.get_user_agent()
+            self.options.add_argument(f'--user-agent={user_agent}')
+
         extension_path = (frappe.db.sql(f"SELECT path FROM `tabExtension Reference` WHERE parent = '{self.executing_child_class}' ",
                                   pluck='path'))
         if extension_path:
             for path in extension_path:
                 self.options.add_argument(f'--load-extension={path}')
 
+    def process_tpa_reference_update(self, retry: int, status: str) -> None:
+        """
+        Process the update of the TPA reference based on retry count and status.
 
-    def update_status_and_log(self, status: str, retry: int = 0, remarks = None):
+        Args:
+            retry (int): The retry count.
+            status (str): The status of the process.
+        """
+        if retry == 1:
+            self.update_tpa_reference('Retry')
+        elif status == 'Valid':
+            self.update_tpa_reference('Completed')
+        else:
+            self.update_tpa_reference('Error')
+
+    def update_status_and_log(self, status: str, retry: int = 0, remarks = ''):
         """
         Usage : Update the status of the TPA Login Credentials document  and log the result .
         Args:
@@ -437,27 +468,22 @@ class SeleniumDownloader:
             doc.status,doc.retry  = status,retry
             # Update Settlement Advice ui downloader if SA ui downloader enabled
             if self.is_captcha and self.enable_captcha_api ==0:
-                if retry == 1:
-                    self.update_tpa_reference('Retry')
-                elif status == 'Valid':
-                    self.update_tpa_reference('Completed')
-                else:
-                    self.update_tpa_reference('Error')
+                self.process_tpa_reference_update(retry,status)
             # logging
             log_data = {"doctype": "SA Downloader Run Log",
                         "last_executed_time": self.last_executed_time,
                         "document_reference": "TPA Login Credentials",
                         "parent1": self.credential_doc.name,
                         "tpa_name": self.credential_doc.tpa,
-                        "remarks": f"{self.file_not_found_remarks} \n {str(remarks) if remarks else ''}" or None
+                        "remarks": f"{self.file_not_found_remarks} \n {str(remarks)}"
                         }
             if status == 'Error' and retry == 0:
-                error_log = self.log_error(doctype_name='TPA Login Credentials',error_message=remarks,reference_name=self.tpa)
+                error_log = self.log_error(doctype_name='TPA Login Credentials',error_message=log_data.get(remarks),reference_name=self.tpa)
                 log_data.update({"document_reference": "Error Record Log", "reference_name": error_log.name,"status": "Error"})
             elif self.file_not_found_remarks or status == 'Info':
                 log_data.update({"status":"Info"})
             else:
-                log_data.update({"status": "Warning","remarks": remarks}) if status == 'Invalid' or retry == 1 else log_data.update({"status": "Processed"})
+                log_data.update({"status": "Warning","remarks": log_data.get(remarks)}) if status == 'Invalid' or retry == 1 else log_data.update({"status": "Processed"})
             log_doc = self.insert_run_log(log_data)
             doc.last_run_log_id = log_doc.name
             doc.save()
@@ -507,6 +533,7 @@ class SeleniumDownloader:
             self.is_date_limit = configuration_values.is_date_limit
             self.date_limit_period = configuration_values.date_limit_period
             self.allow_insecure_file = configuration_values.allow_insecure_file
+            self.use_custom_user_agent = configuration_values.use_custom_user_agent
             self.captcha_retry_limit = 0
             if args:
                 self.captcha_retry_limit = 0 if args.get('retry',None) else configuration_values.captcha_retry_limit
