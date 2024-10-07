@@ -13,9 +13,8 @@
  "fields": [
   {
    "fieldname": "settlement_advice",
-   "fieldtype": "Link",
-   "label": "Settlement Advice",
-   "options": "Settlement Advice"
+   "fieldtype": "Data",
+   "label": "Settlement Advice"
   },
   {
    "fieldname": "claim_key",
