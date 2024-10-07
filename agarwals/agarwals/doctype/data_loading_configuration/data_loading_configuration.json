@@ -19,6 +19,8 @@
   "column_to_convert_the_values_to_numeric",
   "column_to_convert_na_to_0",
   "columns_to_get_from_file",
+  "columns_for_validation",
+  "file_name",
   "columns_should_not_be_null"
  ],
  "fields": [
@@ -77,6 +79,17 @@
    "label": "Columns to get from file"
   },
   {
+
+   "fieldname": "columns_for_validation",
+   "fieldtype": "Code",
+   "label": "Columns for Validation"
+  },
+  {
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name"
+  },
+   {
    "fieldname": "columns_should_not_be_null",
    "fieldtype": "Code",
    "label": "Columns should not be Null"
@@ -84,7 +97,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-25 12:03:14.236751",
+ "modified": "2024-09-27 12:50:07.986489",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Data Loading Configuration",
