@@ -2,13 +2,17 @@ import frappe
 from agarwals.utils.error_handler import log_error
 
 class DebtorsExtracter():
-   
-    def get_attachment(self,doc):
+    
+    FILE_FORMAT = frappe.get_single('Control Panel').allowed_file_extensions.split(",")
+    
+    
+    def process_communication_files(self,doc):
         try:
             comm_doc = frappe.get_doc('Communication',doc)
             attachments =  self.get_file(comm_doc)
             for attachment in attachments:
-               create_file_upload(attachment)
+                if self.validate_extension(attachment['file_url']):
+                    create_file_upload(attachment)
             comm_doc.status = 'Closed'
             comm_doc.save()
             frappe.db.commit()
@@ -25,6 +29,9 @@ class DebtorsExtracter():
             })
         return attachment_details
     
+    def validate_extension(self,attachment):
+        return any(attachment.endswith(ext.lower()) for ext in self.FILE_FORMAT)
+        
             
 @frappe.whitelist()
 def create_file_upload(attachment):
@@ -39,5 +46,5 @@ def create_file_upload(attachment):
 def process(doc):
     doc = eval(doc)
     if doc["sent_or_received"] !='Sent':
-      DebtorsExtracter().get_attachment(doc["name"])
+      DebtorsExtracter().process_communication_files(doc["name"])
     
