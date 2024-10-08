@@ -1,7 +1,7 @@
 import frappe
 from agarwals.reconciliation.step.key_mapper.key_mapper import KeyMapper
 from agarwals.reconciliation.step.key_creator.utr_key_creator import UTRKeyCreator
-from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
+from agarwals.reconciliation.step.key_mapper.mapper_utils import enqueue_record_processing
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
 from tfs.orchestration import ChunkOrchestrator
@@ -100,11 +100,11 @@ class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
 query_mapper = {
                 "Bank Transaction": """SELECT name, reference_number as key_id FROM `tabBank Transaction`
                                     WHERE reference_number != '0' AND reference_number IS NOT NULL 
-                                    AND (custom_utr_key IS NULL or custom_utr_key = '') AND status != 'Cancelled'""",
+                                    AND (custom_utr_key IS NULL or TRIM(custom_utr_key) = '') AND status != 'Cancelled'""",
                 "ClaimBook": """SELECT name, utr_number as key_id FROM `tabClaimBook` 
-                                WHERE utr_number != '0' AND utr_number IS NOT NULL AND utr_number != '' AND (utr_key IS NULL or utr_key = '')""",
+                                WHERE utr_number != '0' AND utr_number IS NOT NULL AND TRIM(utr_number) != '' AND (utr_key IS NULL or TRIM(utr_key) = '')""",
                 "Settlement Advice": """SELECT name, utr_number as key_id FROM `tabSettlement Advice` 
-                                        WHERE utr_number != '0' AND utr_number IS NOT NULL AND utr_number != '' AND (utr_key IS NULL or utr_key = '')"""
+                                        WHERE utr_number != '0' AND utr_number IS NOT NULL AND TRIM(utr_number) != '' AND (utr_key IS NULL or TRIM(utr_key) = '')"""
                }
 
 
@@ -117,5 +117,10 @@ def process(args={"type": "utr_key", "step_id": "", "queue": "long"}):
         "ClaimBook": ClaimBookUTRKeyMapper,
         "Settlement Advice": SettlementAdviceUTRKeyMapper
     }
-    ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
-                                mappers=mappers, args=args, job_name="UTRKeyMapper")
+
+    ChunkOrchestrator().process(enqueue_record_processing, 
+                                step_id=args["step_id"], 
+                                queries=query_mapper,
+                                mappers=mappers, 
+                                args=args, 
+                                job_name="UTRKeyMapper")

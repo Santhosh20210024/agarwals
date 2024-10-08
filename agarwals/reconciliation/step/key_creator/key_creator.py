@@ -1,6 +1,9 @@
-from . import frappe, hashlib, json, unicodedata, re
-from agarwals.utils.error_handler import log_error
+import frappe
+import re
 import ast
+import hashlib 
+import unicodedata
+from agarwals.utils.error_handler import log_error
 
 
 class KeyCreator:
@@ -37,7 +40,7 @@ class KeyCreator:
         Returns:
             str: The normalized key_id.
         """
-        return unicodedata.normalize("NFKD", self.key_id).lower().strip()
+        return unicodedata.normalize("NFKD", self.key_id).lower().replace(" ", "")
 
     @staticmethod
     def get_key_configuration(doctype: str): 
@@ -141,10 +144,10 @@ class KeyCreator:
                 doc.insert(ignore_permissions=True)
             except Exception as e:
                 log_error(f"While Key Insertion Error {e}", doc = self.key_type)
-                raise Exception("Not Able To Create Key")
+                raise ValueError("Not Able To Create Key")
         try:
             frappe.db.commit()
             return [key]
         except Exception as e:
             log_error(f"Database Commit Error {e}", doc = self.key_type)
-            raise Exception("Database Commit Error")
+            raise ValueError("Database Commit Error")

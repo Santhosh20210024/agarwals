@@ -1,7 +1,7 @@
 import frappe
 from agarwals.reconciliation.step.key_mapper.key_mapper import KeyMapper
 from agarwals.reconciliation.step.key_creator.claim_key_creator import ClaimKeyCreator
-from agarwals.reconciliation.step.key_mapper.utils import enqueue_record_processing
+from agarwals.reconciliation.step.key_mapper.mapper_utils import enqueue_record_processing
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
 from tfs.orchestration import ChunkOrchestrator
@@ -50,16 +50,20 @@ class ClaimKeyMapper(KeyMapper):
                         KeyCreator = self.get_keycreator_obj(
                             ClaimKeyCreator, key_id, record["name"]
                         )
+                        
                         key_id_variants = KeyCreator.get_variants()
                         key = self.is_key_exist(key_id_variants, "Claim Key")
+                        
                         if len(key) > 1:
                             log_error(
                                 f"Multiple keys found: {str(key)}", "Claim Key", "Key Mapping"
                             )
                             return
                         if not key: key = KeyCreator.process(key_id_variants)
+                        
                         if self.record_type in ('Bill', 'ClaimBook','Settlement Advice'):
                             self.insert_claim_keys(record["name"], key[0])
+                        
                         self.update(self.query[field], key[0], record["name"])
                         _temp[key_id] = key
                     else:
@@ -126,15 +130,40 @@ class SettlementAdviceClaimKeyMapper(ClaimKeyMapper):
 
 
 query_mapper = {
-                "Bill": """SELECT name, claim_id as claim_key_id, ma_claim_id as ma_key_id FROM tabBill 
-                        WHERE ( claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '') ) 
-                        or ( ma_claim_id != '0' AND ma_claim_id != ' ' AND ma_claim_id IS NOT NULL AND (ma_claim_key is NULL or ma_claim_key = '') )""",
-                "ClaimBook": """SELECT name, al_number as al_key_id, cl_number as cl_key_id FROM `tabClaimBook` 
-                                WHERE ( al_number != '0' AND al_number != ' ' AND al_number IS NOT NULL AND (al_key is NULL or cl_key = '') )
-                                or ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = '') ) """,
-                "Settlement Advice": """SELECT name, claim_id as claim_key_id ,cl_number as cl_key_id FROM `tabSettlement Advice` 
-                                        WHERE  (claim_id != '0' AND claim_id != ' ' AND claim_id IS NOT NULL AND (claim_key is NULL or claim_key = '')) or
-                                        ( cl_number != '0' AND cl_number != ' ' AND cl_number IS NOT NULL AND (cl_key is NULL or cl_key = ''))"""
+                "Bill":"""SELECT name, 
+                        claim_id AS claim_key_id, 
+                        ma_claim_id AS ma_key_id 
+                        FROM tabBill 
+                        WHERE (claim_id IS NOT NULL AND TRIM(claim_id) != '0' 
+                              AND TRIM(claim_id) != '' 
+                              AND (claim_key IS NULL OR TRIM(claim_key) = ''))
+                        OR (ma_claim_id IS NOT NULL 
+                              AND TRIM(ma_claim_id) != '0' 
+                              AND TRIM(ma_claim_id) != '' 
+                              AND (ma_claim_key IS NULL OR TRIM(ma_claim_key) = ''))""",
+                "ClaimBook":"""SELECT name, 
+                            al_number AS al_key_id, 
+                            cl_number AS cl_key_id 
+                            FROM tabClaimBook 
+                            WHERE (al_number IS NOT NULL 
+                                  AND TRIM(al_number) != '0' 
+                                  AND TRIM(al_number) != '' 
+                                  AND (al_key IS NULL OR TRIM(al_key) = ''))
+                            OR (cl_number IS NOT NULL 
+                                AND TRIM(cl_number) != '0' 
+                                AND TRIM(cl_number) != '' 
+                                AND (cl_key IS NULL OR TRIM(cl_key) = ''))""",
+                "Settlement Advice":"""SELECT name,
+                                    claim_id as claim_key_id,
+                                    cl_number as cl_key_id FROM `tabSettlement Advice` 
+                                    WHERE (claim_id != '0' 
+                                        AND TRIM(claim_id) != '' 
+                                        AND claim_id IS NOT NULL 
+                                        AND (claim_key is NULL or TRIM(claim_key) = '')) 
+                                    OR ( cl_number != '0' 
+                                        AND cl_number != ' ' 
+                                        AND cl_number IS NOT NULL 
+                                        AND (cl_key is NULL or cl_key = ''))"""
                 }
                                         
 @frappe.whitelist()
@@ -146,6 +175,11 @@ def process(args={"type": "claim_key", "step_id": "", "queue": "long"}):
         "ClaimBook": ClaimBookClaimKeyMapper,
         "Settlement Advice": SettlementAdviceClaimKeyMapper
     }
-    ChunkOrchestrator().process(enqueue_record_processing, step_id=args["step_id"], queries=query_mapper,
-                                mappers=mappers, args=args, job_name="ClaimKeyMapper")
+
+    ChunkOrchestrator().process(enqueue_record_processing, 
+                                step_id=args["step_id"],
+                                queries=query_mapper,
+                                mappers=mappers, 
+                                args=args, 
+                                job_name="ClaimKeyMapper")
   
