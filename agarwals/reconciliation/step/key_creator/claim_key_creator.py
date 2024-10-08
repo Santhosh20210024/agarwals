@@ -69,7 +69,7 @@ class ClaimKeyCreator(KeyCreator):
             if self.is_regex_present(ClaimKeyCreator.compiled_star_health_patterns, f_key_id):
                 key_variants.add(f_key_id.split('/')[-1])
 
-            self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns)
+            key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns))
         else:
             log_error("Compiled replace pattern is not set.", doc="Claim Key")
         return key_variants

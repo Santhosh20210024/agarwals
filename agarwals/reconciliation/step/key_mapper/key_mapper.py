@@ -1,14 +1,12 @@
 import frappe
 from agarwals.utils.error_handler import log_error
 
-
 class KeyMapper:
     
     def __init__(self, records, record_type, key_type):
         self.records = records
         self.record_type = record_type
         self.key_type = key_type
-
 
     def fetch_keys(self, doctype, field, variants):
         key_field = field.replace('_variant', '_key')
@@ -31,19 +29,8 @@ class KeyMapper:
         KeyCreator = KeyCreator(key_id, self.key_type, reference_name, self.record_type)
         return KeyCreator
 
-    @DeprecationWarning
-    def get_key_id_variants(self, KeyCreator, key_id, reference_name):
-        KeyCreator = KeyCreator(key_id, self.key_type, reference_name, self.record_type)
-        return list(KeyCreator.get_variants())
-
-    @DeprecationWarning
-    def create_key(self, KeyCreator, key_id, reference_name, variant):
-        return KeyCreator(
-            key_id, self.key_type, reference_name, self.record_type
-        ).process(variant)
-
     def get_striped_key_id(self, key_id):
-        return key_id.lower().strip()
+        return key_id.lower().replace(" ", "")
 
     def get_value(self, d, key, default):
         value = d.get(key, default)

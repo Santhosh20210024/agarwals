@@ -24,7 +24,7 @@ class UTRKeyMapper(KeyMapper):
         and update the corresponding values in respective doctypes.
         """
         try:
-            key_id = self.get_striped_key_id(self.get_value(record, "key_id", ''))
+            key_id = self.get_refined_key_id(self.get_value(record, "key_id", ''))
             if key_id:
                 KeyCreator = self.get_keycreator_obj(
                     UTRKeyCreator, key_id, record["name"]
@@ -62,6 +62,14 @@ class UTRKeyMapper(KeyMapper):
                 self.record_type,
             )
             frappe.throw(f"ValidationError while processing UTR keys: {str(e)}")
+        
+        except frappe.PermissionError as e:
+            log_error(
+                f"PermissionError in map_key: {str(e)}",
+                "UTR Key",
+                self.record_type,
+            )
+            frappe.throw(f"Permission while processing UTR keys: {str(e)}")
 
         except Exception as e:
             log_error(
@@ -96,18 +104,6 @@ class SettlementAdviceUTRKeyMapper(UTRKeyMapper):
             """UPDATE `tabSettlement Advice` SET utr_key = %(key)s WHERE name = %(name)s"""
         )
 
-
-query_mapper = {
-                "Bank Transaction": """SELECT name, reference_number as key_id FROM `tabBank Transaction`
-                                    WHERE reference_number != '0' AND reference_number IS NOT NULL 
-                                    AND (custom_utr_key IS NULL or TRIM(custom_utr_key) = '') AND status != 'Cancelled'""",
-                "ClaimBook": """SELECT name, utr_number as key_id FROM `tabClaimBook` 
-                                WHERE utr_number != '0' AND utr_number IS NOT NULL AND TRIM(utr_number) != '' AND (utr_key IS NULL or TRIM(utr_key) = '')""",
-                "Settlement Advice": """SELECT name, utr_number as key_id FROM `tabSettlement Advice` 
-                                        WHERE utr_number != '0' AND utr_number IS NOT NULL AND TRIM(utr_number) != '' AND (utr_key IS NULL or TRIM(utr_key) = '')"""
-               }
-
-
 @frappe.whitelist()
 def process(args={"type": "utr_key", "step_id": "", "queue": "long"}):
     args = cast_to_dic(args)
@@ -120,7 +116,7 @@ def process(args={"type": "utr_key", "step_id": "", "queue": "long"}):
 
     ChunkOrchestrator().process(enqueue_record_processing, 
                                 step_id=args["step_id"], 
-                                queries=query_mapper,
+                                type="UTRKey",
                                 mappers=mappers, 
                                 args=args, 
                                 job_name="UTRKeyMapper")
