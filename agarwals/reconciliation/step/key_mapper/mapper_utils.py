@@ -61,6 +61,7 @@ def process_records(mapper_class: Type, records: List[Dict[str, Any]]) -> str:
     """Process records using the specified mapper class."""
     return mapper_class(records).process()
 
+@ChunkOrchestrator.update_chunk_status
 def create_keys(
         mapper_class: Type[Union[
             "BillClaimKeyMapper",
@@ -73,7 +74,8 @@ def create_keys(
         records: List[Dict[str, Any]]
     ) -> str:
         """Create keys using the given mapper class and records."""
-        return process_records(mapper_class, records)
+        chunk_status = process_records(mapper_class, records)
+        return chunk_status
 
 @ChunkOrchestrator.update_chunk_status
 def enqueue_record_processing(type: dict,
@@ -104,7 +106,7 @@ def enqueue_record_processing(type: dict,
                 records=records
             )
         except Exception as e:
-            log_error(f"Error While Enqueueing {record_type}: {str(e)}", doc="Key Mapper")
+            log_error(f"Error While Enqueueing {record_type}: {str(e)}")
             chunk_status = "Error"
 
     return chunk_status

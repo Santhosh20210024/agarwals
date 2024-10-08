@@ -29,7 +29,7 @@ class KeyMapper:
         KeyCreator = KeyCreator(key_id, self.key_type, reference_name, self.record_type)
         return KeyCreator
 
-    def get_striped_key_id(self, key_id):
+    def get_refined_key_id(self, key_id):
         return key_id.lower().replace(" ", "")
 
     def get_value(self, d, key, default):

@@ -150,4 +150,3 @@ def process(args={"type": "claim_key", "step_id": "", "queue": "long"}):
                                 mappers=mappers, 
                                 args=args, 
                                 job_name="ClaimKeyMapper")
-  
