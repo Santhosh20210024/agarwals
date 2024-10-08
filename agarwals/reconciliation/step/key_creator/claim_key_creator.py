@@ -68,7 +68,7 @@ class ClaimKeyCreator(KeyCreator):
             
             if self.is_regex_present(ClaimKeyCreator.compiled_star_health_patterns, f_key_id):
                 star_pattern = str(f_key_id.split('/')[-1]).strip()
-                if star_pattern:
+                if not self._validate_variant(star_pattern) and star_pattern:
                     key_variants.add(star_pattern)
 
             key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns))

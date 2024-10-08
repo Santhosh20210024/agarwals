@@ -110,7 +110,7 @@ class KeyCreator:
         key_variants = set()
         for regex, replacement in compiled_regex_patterns:
             variant = regex.sub(rf'{replacement}', key_id)
-            if not self._validate_variant(variant):
+            if not self._validate_variant(variant) and variant not in key_variants:
                 key_variants.add(variant)
         return key_variants
     
