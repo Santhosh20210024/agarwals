@@ -36,7 +36,6 @@ class SalesInvoiceCancellator:
             entry['branch_type'] = si.branch_type
             entry['party_type'] = "Customer"
             entry['party'] = si.customer
-
         entry['reference_type'] = reference_type
         entry['reference_name'] = reference_name
 
@@ -78,7 +77,7 @@ class SalesInvoiceCancellator:
                                                        amount=payment_entry['custom_round_off'])
 
             journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
-                                                   account="Debtors - A", entry_type='debit',
+                                                   account="Debtors - A", entry_type='debit', reference_type="Sales Invoice", reference_name=sales_invoice.name,
                                                    amount=payment_entry['paid_amount'] + payment_entry['custom_tds_amount'] + payment_entry['custom_disallowed_amount'] + payment_entry['custom_round_off'])
 
             journal_entry.save()
