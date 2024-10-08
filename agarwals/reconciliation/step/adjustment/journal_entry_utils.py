@@ -39,7 +39,7 @@ class JournalEntryUtils:
             "entity": doc.get("entity", doc.get("custom_entity", "")),
             "branch": doc.get("branch", doc.get("custom_branch", "")),
             "cost_center": doc.get("cost_center", ""),
-            "cost_center": doc.get("custom_branch_type", doc.get("branch_type", "")),
+            "branch_type": doc.get("custom_branch_type", doc.get("branch_type", "")),
         }
 
         if credit:
