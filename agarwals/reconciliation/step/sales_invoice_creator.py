@@ -2,7 +2,7 @@ import frappe
 from agarwals.agarwals.doctype import file_records
 from agarwals.reconciliation.step.cancellator.cancellator import PaymentDocumentCancellator
 from agarwals.reconciliation.step.cancellator.utils.matcher_cancellator import MatcherCancellator
-from agarwals.reconciliation import chunk
+from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.fiscal_year_update import update_fiscal_year
@@ -167,7 +167,6 @@ class SalesInvoiceCancellator:
                 MatcherCancellator().delete_matcher(sales_invoice_record)
                 sales_invoice_record.reload()
                 sales_invoice_record.cancel()
-
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
                 frappe.db.set_value('Sales Invoice', bill, {'outstanding_amount': 0})
                 frappe.db.commit()
@@ -182,7 +181,7 @@ class SalesInvoiceCancellator:
 
 class SalesInvoiceCreator:
     @ChunkOrchestrator.update_chunk_status
-    def process(self, bill_numbers, chunk_doc):
+    def process(self, bill_numbers):
         status = "Processed"
         for bill_number in bill_numbers:
             try:
@@ -202,6 +201,7 @@ class SalesInvoiceCreator:
                                         'custom_patient_name': bill_record.patient_name,
                                         'custom_ma_claim_id': bill_record.ma_claim_id,
                                         'custom_claim_id': bill_record.claim_id, 'customer': bill_record.customer,
+                                        'custom_payer_name':bill_record.payer,
                                         'entity': bill_record.entity, 'region': bill_record.region,
                                         'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
                                         'cost_center': bill_record.cost_center,
@@ -219,6 +219,7 @@ class SalesInvoiceCreator:
                 sales_invoice_record.submit()
                 if bill_record.status == 'CANCELLED':
                     sales_invoice_record.cancel()
+                    frappe.db.set_value('Sales Invoice', sales_invoice_record.name , {'outstanding_amount' : 0})
                 frappe.db.set_value('Bill', bill_number,
                                     {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                 frappe.db.commit()
@@ -231,24 +232,22 @@ class SalesInvoiceCreator:
                                     record=bill_number, index=sales_invoice_record.custom_index)
             except Exception as e:
                 status = "Error"
-                log_error(error= 'Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
-            chunk.update_status(chunk_doc, "Error")
+                log_error(error='Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
         return status
 
-    def enqueue_jobs(self, bill_number, args):
-        no_of_invoice_per_queue = int(args["chunk_size"])
-        for i in range(0, len(bill_number), no_of_invoice_per_queue):
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            frappe.enqueue(self.process, queue=args["queue"], is_async=True, timeout=18000,
-                           bill_numbers=bill_number[i:i + no_of_invoice_per_queue], chunk_doc=chunk_doc)
-        
     def get_skip_invoice_customer(self):
         return frappe.get_all('Customer',filters = {'custom_skip_invoice_creation':1},pluck = 'name')
+
 
 @ChunkOrchestrator.update_chunk_status
 def create_and_cancel_sales_invoices(args: dict, new_bills: list, cancelled_bills: list) -> str:
     try:
         ChunkOrchestrator().process(SalesInvoiceCancellator().cancel_sales_invoice, step_id=args["step_id"],
+
+@ChunkOrchestrator.update_chunk_status
+def create_and_cancel_sales_invoices(args: dict, new_bills: list, cancelled_bills: list) -> str:
+    try:
+        ChunkOrchestrator().process(SalesInvoiceCreator().cancel_sales_invoice, step_id=args["step_id"],
                                     cancelled_bills=cancelled_bills)
         ChunkOrchestrator().process(SalesInvoiceCreator().process, step_id=args["step_id"], is_enqueueable=True,
                                     chunk_size=args["chunk_size"], data_var_name="bill_numbers", queue=args["queue"],

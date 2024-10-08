@@ -1,4 +1,4 @@
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException,NoSuchElementException
 import frappe
 from agarwals.reconciliation.step.advice_downloader.selenium_downloader import SeleniumDownloader
 from selenium.webdriver.support import expected_conditions as EC
@@ -41,11 +41,21 @@ class ICICLombardDownloader(SeleniumDownloader):
         self.wait.until(EC.visibility_of_element_located((By.ID, 'username')))
         self.driver.find_element(By.ID,'username').send_keys(self.user_name)  #Username
         self.driver.find_element(By.ID,'password').send_keys(self.password) #password
-        captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
+        is_captcha_required = True
+        try:
+            captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//h5[@style ='font-size:20px;color:red;user-select:none']")))
+            is_captcha_required = False
+        except TimeoutException:
+            captcha = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//img[@title="Captcha"]')))
+        except Exception as e:
+            raise Exception(e)
         if captcha:
-            self.get_captcha_image(captcha)
-            self.captcha_value = self.get_captcha_value(captcha_type="Normal Captcha")
-            captcha_answer = self.captcha_value[0]['code'] if self.enable_captcha_api == 1 else self.captcha_value
+            if is_captcha_required:
+                self.get_captcha_image(captcha)
+                self.captcha_value = self.get_captcha_value(captcha_type="Normal Captcha")
+                captcha_answer = self.captcha_value[0]['code'] if self.enable_captcha_api == 1 else self.captcha_value
+            else:
+                captcha_answer = captcha.text.strip()
             self.driver.find_element(By.ID, 'clientCaptcha').send_keys(captcha_answer)
             self.driver.find_element(By.ID, 'btnLogin').click()
         else:

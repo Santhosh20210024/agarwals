@@ -1,10 +1,12 @@
 import frappe
 from agarwals.utils.matcher_utils import update_bill_no_separate_column
-from agarwals.reconciliation import chunk
+from tfs.orchestration import ChunkOrchestrator, chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.index_update import update_index
 from agarwals.utils.matcher_query_list import get_matcher_query
+from agarwals.reconciliation.step.key_mapper.claim_key_mapper import query_mapper as claim_key_queries
+from agarwals.reconciliation.step.key_mapper.utr_key_mapper import query_mapper as utr_key_queries
 
 """
 'Open' -> New Records.
@@ -15,17 +17,66 @@ from agarwals.utils.matcher_query_list import get_matcher_query
 'Unmatched' -> Unmatched Records For Other Queries.
 """
 
+WARNING_LOG = {
+    'W100' : 'Claim Amount should not be 0',
+    'W101' : 'Settled Amount should not be 0',
+    'W102' : 'Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount.',
+    'W103' : 'Cancelled Bill',
+    'W104' : 'Already Paid Bill',
+    'W105' : 'Reference number should be minimum of 4 digits',
+    'W106' : 'Deposit amount should be greater than 7',
+    'W107' : 'Already Reconciled',
+    'W108' : 'Cancelled Bank Transaction'
+}
+
+
+class DataIntegrityValidator:
+
+    def __check_empty_key(self, _key_type, _doctype, _query):
+        """Run Query and Check if there is any empty key present in key_type doctype."""
+        query_result = frappe.db.sql(_query, as_dict=True)
+        if query_result:
+            raise ValueError(f'{_key_type} should not be empty in {_doctype}')
+
+    def __check_key(self, key_type, key_queries):
+        """Get corresponding queries and doctype from the key_queries."""
+        for doctype, query in key_queries.items():
+            self.__check_empty_key(key_type, doctype, query)
+
+    def __check_claim_key(self):
+        """Wrapper for check_key (claim_key)."""
+        self.__check_key('Claim Key', claim_key_queries)
+
+    def __check_utr_key(self):
+        """Wrapper for check_key (utr_key)."""
+        self.__check_key('UTR Key', utr_key_queries)
+
+    def __is_match_logic_exist(self):
+        """Check if match logic is defined in the Control Panel."""
+        control_panel = frappe.get_single("Control Panel")
+        match_logics = control_panel.get('match_logic','').split(",")
+
+        if not match_logics:
+            raise ValueError('Match Logic is not defined in control panel')
+
+    def _validate(self):
+        """Check all the pre validation parts"""
+        self.__is_match_logic_exist()
+        self.__check_utr_key()
+        self.__check_claim_key()
+
 
 class MatcherValidation:
     """A class to validate matcher records before processing.
-        Methods:
-            is_valid(): Validates the record using multiple checks.
-            _validate_advice(): Validates the status of the settlement advice.
-            round_off(amount): Rounds off the provided amount to 2 decimal places.
-            _validate_amount(): Validates that the claim and settled amounts are correct.
-            _validate_bill_status(): Checks the status of the bill.
-            _validate_bank_transaction(): Validates the bank transaction details.
+    Methods:
+        is_valid(): Validates the record using multiple checks.
+        _validate_advice(): Validates the status of the settlement advice.
+        round_off(amount): Rounds off the provided amount to 2 decimal places.
+        _validate_amount(): Validates that the claim and settled amounts are correct.
+        _validate_bill_status(): Checks the status of the bill.
+        _validate_bank_transaction(): Validates the bank transaction details.
     """
+
     def __init__(self, record):
         self.record = record
 
@@ -57,7 +108,7 @@ class MatcherValidation:
 
     def _validate_amount(self):
         """
-        Validates that the claim amount is greater than 0, and that the 
+        Validates that the claim amount is greater than 0, and that the
         settled amount, TDS, and disallowance amounts are consistent.
         """
         claim_amount = MatcherValidation.round_off(self.record.claim_amount)
@@ -67,31 +118,28 @@ class MatcherValidation:
         tolerance = -1
 
         if claim_amount <= 0:
-            if self.record["advice"]:
-                Matcher.update_advice_status(
-                    self.record["advice"], "Warning", "Claim Amount should not be 0"
-                )
+            Matcher.update_status(
+                self.record, "Warning", WARNING_LOG['W100']
+            )
             return False
 
         elif settled_amount <= 0:
-            if self.record["advice"]:
-                Matcher.update_advice_status(
-                    self.record["advice"], "Warning", "Settled Amount should not be 0"
-                )
+            Matcher.update_status(
+                self.record, "Warning", WARNING_LOG['W101']
+            )
             return False
 
         elif claim_amount and (settled_amount or tds_amount or disallowed_amount):
             cumulative_amount = settled_amount + tds_amount + disallowed_amount
             difference_amount = claim_amount - cumulative_amount
-            
+
             if difference_amount != 0:
                 if difference_amount <= tolerance:
-                    if self.record["advice"]:
-                        Matcher.update_advice_status(
-                            self.record["advice"],
-                            "Warning",
-                            "Claim Amount is lesser than the sum of Settled Amount, TDS Amount and Disallowance Amount."
-                        )
+                    Matcher.update_status(
+                        self.record,
+                        "Warning",
+                        WARNING_LOG["W102"],
+                    )
                     return False
         return True
 
@@ -99,22 +147,12 @@ class MatcherValidation:
         """Checks the status of the bill to ensure it is valid for processing."""
         if frappe.get_value("Bill", self.record["bill"], "status") in [
             "CANCELLED",
-            "CANCELLED AND DELETED"
+            "CANCELLED AND DELETED",
         ]:
-            if self.record["advice"]:
-                Matcher.update_advice_status(
-                    self.record["advice"], 
-                    "Warning", 
-                    "Cancelled Bill"
-                )
+            Matcher.update_status(self.record, "Warning", WARNING_LOG["W103"])
             return False
         if frappe.get_value("Sales Invoice", self.record["bill"], "status") == "Paid":
-            if self.record["advice"]:
-                Matcher.update_advice_status(
-                    self.record["advice"],
-                    "Warning",
-                    "Already Paid Bill"
-                )
+            Matcher.update_status(self.record, "Warning", WARNING_LOG["W104"])
             return False
         return True
 
@@ -122,37 +160,41 @@ class MatcherValidation:
         """Validates the bank transaction details, ensuring reference numbers are valid and deposit amounts are sufficient."""
         if self.record.get("bank", ""):
             if len(self.record["bank"]) < 4:
-                if self.record["advice"]:
-                    Matcher.update_advice_status(
-                        self.record["advice"],
-                        "Warning",
-                        "Reference number should be minimum of 4 digits"
-                    )
+                Matcher.update_status(
+                    self.record,
+                    "Warning",
+                    WARNING_LOG["W105"],
+                )
                 return False
 
-            if (int(frappe.get_value("Bank Transaction", self.record["bank"], "deposit")) < 8):
-                if self.record["advice"]:
-                    Matcher.update_advice_status(
-                        self.record["advice"],
-                        "Warning",
-                        "Deposit amount should be greater than 7"
-                    )
+            if (
+                int(
+                    frappe.get_value("Bank Transaction", self.record["bank"], "deposit")
+                )
+                < 8
+            ):
+                Matcher.update_status(
+                    self.record, "Warning", WARNING_LOG["W106"]
+                )
                 return False
 
-            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") in ["Reconciled", "Settled"]):
-                if self.record["advice"]:
-                    Matcher.update_advice_status(
-                        self.record["advice"], "Warning", "Already Reconciled"
-                    )
+            if frappe.get_value("Bank Transaction", self.record["bank"], "status") in [
+                "Reconciled",
+                "Settled",
+            ]:
+                Matcher.update_status(self.record, "Warning", WARNING_LOG["W107"])
                 return False
-            
-            if (frappe.get_value("Bank Transaction", self.record["bank"], "status") == "Cancelled"):
-                if self.record["advice"]:
-                    Matcher.update_advice_status(
-                        self.record["advice"], "Warning", "Cancelled Bank Transaction"
-                    )
+
+            if (
+                frappe.get_value("Bank Transaction", self.record["bank"], "status")
+                == "Cancelled"
+            ):
+                Matcher.update_status(
+                    self.record, "Warning", WARNING_LOG["W108"]
+                )
+
                 return False
-            
+
         return True
 
 
@@ -164,19 +206,20 @@ class Matcher:
         update_payment_order(matcher_record, record): Updates payment order in matcher records.
         update_matcher_amount(matcher_record, record): Updates amounts in matcher records.
         get_matcher_name(_prefix, _suffix): Generates names for matcher records.
-        update_advice_status(sa_name, status, msg): Updates the status of a settlement advice.
+        update_status(sa_name,doctype, status, msg): Updates the status of a settlement advice.
         create_matcher_record(matcher_records): Processes and saves matcher records.
     """
 
-    def __init__(self, chunk_doc, match_logics):
-        self.chunk_doc = chunk_doc
+    def __init__(self, match_logics):
         self.match_logics = match_logics
-        self.matcher_delete_queury = """Delete from `tabMatcher` where match_logic not in %(match_logics)s"""
+        self.matcher_delete_queury = (
+            """Delete from `tabMatcher` where match_logic not in %(match_logics)s"""
+        )
         self.preprocess_update_queury = """UPDATE `tabSettlement Advice` SET status = 'Open', remark = NULL, matcher_id = NULL WHERE status IN ('Unmatched', 'Open')"""
         self.postprocess_update_query = """UPDATE `tabSettlement Advice` set status = 'Unmatched', remark = %(remark)s where status = 'Open'"""
         self.notprocessed_update_query = """UPDATE `tabSettlement Advice`SET status = %(status)s, matcher_id = %(matcher_id)s WHERE name = %(name)s"""
         self.status_update_query = """UPDATE `tabSettlement Advice` SET status = %(status)s, remark = %(remark)s WHERE name = %(name)s"""
-        
+
     def add_log_error(self, error, doc=None, doc_name=None):
         """Logs errors encountered during processing."""
         log_error(error=error, doc=doc, doc_name=doc_name)
@@ -199,12 +242,19 @@ class Matcher:
         return f"{_prefix}-{_suffix}"
 
     @staticmethod
-    def update_advice_status(sa_name, status, msg):
-        """Update appropriate status in settlement advice"""
-        advice_doc = frappe.get_doc("Settlement Advice", sa_name)
-        advice_doc.status = status
-        advice_doc.remark = msg
-        advice_doc.save()
+    def update_status(record, status, msg):
+        """Update appropriate status in settlement advice/ClaimBook"""
+        if record["advice"]:
+            Matcher.set_status("Settlement Advice", record["advice"], status, msg)
+        if record["claim"] and msg != WARNING_LOG['W102']:
+            Matcher.set_status("ClaimBook", record["claim"], status, msg)
+
+    @staticmethod
+    def set_status(doctype, name, status, msg):
+        doc = frappe.get_doc(doctype, name)
+        doc.status = status
+        doc.remark = msg
+        doc.save()
 
     def create_matcher_record(self, matcher_records, batch_size=100):
         """Processes and saves matcher records based on provided matcher logic."""
@@ -216,37 +266,53 @@ class Matcher:
 
             try:
                 matcher_record = frappe.new_doc("Matcher")
-                matcher_record.set('sales_invoice', record['bill'])
+                matcher_record.set("sales_invoice", record["bill"])
                 matcher_record = self.update_matcher_amount(matcher_record, record)
 
-                if record['advice']:
-                    matcher_record.set('settlement_advice', record['advice'])
+                if record["advice"]:
+                    matcher_record.set("settlement_advice", record["advice"])
 
-                if record['claim']:
-                    matcher_record.set('claimbook', record['claim'])
-                    matcher_record.set('insurance_company_name', record['insurance_name'])
+                if record["claim"]:
+                    matcher_record.set("claimbook", record["claim"])
+                    matcher_record.set(
+                        "insurance_company_name", record["insurance_name"]
+                    )
 
-                if record['logic'] in self.match_logics:
+                if record["logic"] in self.match_logics:
                     if record.payment_order:
-                        matcher_record = self.update_payment_order(matcher_record, record)
+                        matcher_record = self.update_payment_order(
+                            matcher_record, record
+                        )
 
-                if record['bank']:
-                    matcher_record.set('bank_transaction', record['bank'])
-                    matcher_record.set('name', self.get_matcher_name(record['bill'], record['bank']))
+                if record["bank"]:
+                    matcher_record.set("bank_transaction", record["bank"])
+                    matcher_record.set(
+                        "name", self.get_matcher_name(record["bill"], record["bank"])
+                    )
                 else:
-                    if record['claim']:
-                        matcher_record.set('name', self.get_matcher_name(record['bill'], record['claim']))
+                    if record["claim"]:
+                        matcher_record.set(
+                            "name",
+                            self.get_matcher_name(record["bill"], record["claim"]),
+                        )
                     else:
-                        matcher_record.set('name', self.get_matcher_name(record['bill'], record['advice']))
+                        matcher_record.set(
+                            "name",
+                            self.get_matcher_name(record["bill"], record["advice"]),
+                        )
 
-                matcher_record.set('match_logic', record['logic'])
-                matcher_record.set('status', 'Open')
+                matcher_record.set("match_logic", record["logic"])
+                matcher_record.set("status", "Open")
             except Exception as err:
-                self.add_log_error(f'{err}: create_matcher_record', "Matcher", matcher_record.get("name", "Unknown"))
+                self.add_log_error(
+                    f"{err}: create_matcher_record",
+                    "Matcher",
+                    matcher_record.get("name", "Unknown"),
+                )
 
             try:
                 matcher_record.save()
-                
+
                 if record["advice"]:
                     frappe.db.sql(
                         self.notprocessed_update_query,
@@ -254,7 +320,7 @@ class Matcher:
                             "status": "Not Processed",
                             "matcher_id": matcher_record.name,
                             "name": matcher_record.settlement_advice,
-                        }
+                        },
                     )
                 processed_count += 1
 
@@ -268,15 +334,16 @@ class Matcher:
                         values={
                             "status": "Error",
                             "remark": err,
-                            "name": matcher_record.settlement_advice
-                        }
+                            "name": matcher_record.settlement_advice,
+                        },
                     )
-                    
-        frappe.db.commit() #safe commit
+
+        frappe.db.commit()  # safe commit
+
 
 class MatcherOrchestrator(Matcher):
     """
-    A class that orchestrates the processing of matcher records, handling both 
+    A class that orchestrates the processing of matcher records, handling both
     pre-processing and post-processing tasks.
     Methods:
         preprocess_entries(): Runs pre-processing SQL queries.
@@ -284,8 +351,9 @@ class MatcherOrchestrator(Matcher):
         get_records(): Fetches records from the database for processing.
         start_process(): The main function to trigger the processing of matcher records.
     """
-    def __init__(self, chunk_doc, match_logics):
-        super().__init__(chunk_doc, match_logics)
+
+    def __init__(self, match_logics):
+        super().__init__(match_logics)
 
     def preprocess_entries(self):
         """
@@ -293,71 +361,72 @@ class MatcherOrchestrator(Matcher):
         """
         try:
             update_bill_no_separate_column()
-            frappe.db.sql(self.matcher_delete_queury, values={"match_logics": self.match_logics})
+            frappe.db.sql(
+                self.matcher_delete_queury, values={"match_logics": self.match_logics}
+            )
             frappe.db.sql(self.preprocess_update_queury)
             frappe.db.commit()
         except Exception as e:
-            self.add_log_error(f'{e}: preprocess_entries', 'Matcher')
-            frappe.throw(f'{e}: preprocess_entries (Matcher)')
+            self.add_log_error(f"{e}: preprocess_entries", "Matcher")
+            frappe.throw(f"{e}: preprocess_entries (Matcher)")
 
     def postprocess_entries(self):
         """Runs SQL queries for post-processing tasks like updating status for unmatched entries."""
         try:
-            frappe.db.sql(self.postprocess_update_query, values={"remark": "Not able to find Bill"})
+            frappe.db.sql(
+                self.postprocess_update_query,
+                values={"remark": "Not able to find Bill"},
+            )
             frappe.db.commit()
         except Exception as e:
-            self.add_log_error(f'{e}: postprocess_entries', 'Matcher')
-            frappe.throw(f'{e}: postprocess_entries (Matcher)')
+            self.add_log_error(f"{e}: postprocess_entries", "Matcher")
+            frappe.throw(f"{e}: postprocess_entries (Matcher)")
 
     def get_records(self, match_logic):
         """Fetches records from the database based on the control panel configuration."""
         try:
             return frappe.db.sql(get_matcher_query(match_logic), as_dict=True)
         except Exception as e:
-            self.add_log_error(f'{e}: get_records', 'Matcher')
-            frappe.throw(f'{e}: get_records : Matcher')
+            self.add_log_error(f"{e}: get_records", "Matcher")
+            frappe.throw(f"{e}: get_records : Matcher")
 
     def start_process(self):
         """The main function to trigger the processing of matcher records in chunks."""
+        status = "Processed"
         try:
-            chunk.update_status(self.chunk_doc, "InProgress")
             self.preprocess_entries()
             update_index()
-            
             for match_logic in self.match_logics:
                 records = self.get_records(match_logic)
                 self.create_matcher_record(records)
-                chunk.update_status(self.chunk_doc, "Processed")
         except Exception as e:
-            chunk.update_status(self.chunk_doc, "Error")
+            status="Error"
             self.add_log_error(f'{e}: start_process', 'Matcher')
-
         self.postprocess_entries()
-
-def get_control_panel_conf():
+        return status
+def get_match_logics():
     control_panel = frappe.get_single("Control Panel")
-    match_logics = control_panel.get('match_logic','').split(",") 
-
-    if not match_logics:
-        frappe.throw('Match Logic is not defined in control panel')
-
+    match_logics = control_panel.get("match_logic", "").split(",")
     return match_logics
+    
+@ChunkOrchestrator.update_chunk_status
+def validate_and_start_matcher() -> str:
+    try:
+        chunk_status = "Processed"
+        DataIntegrityValidator()._validate()
+        match_logics = get_match_logics()
+        matcher_orchestrator = MatcherOrchestrator(match_logics)
+        process_status = matcher_orchestrator.start_process()
+        chunk_status = chunk.get_status(chunk_status, process_status)
+        return chunk_status
+    except Exception as err:
+        log_error(f'{err}: process', "Matcher")
+        return "Error"
 
 @frappe.whitelist()
 def process(args):
-    try:
-        args = cast_to_dic(args)
-        step_id = args["step_id"]
-        
-        try:
-            match_logics = get_control_panel_conf()
-            chunk_doc = chunk.create_chunk(step_id)
-            
-            matcher_orcestrator = MatcherOrchestrator(chunk_doc, match_logics)
-            matcher_orcestrator.start_process()
-        except Exception as err:
-            log_error(f'{err}: process', "Matcher")
-    except Exception as err:
-        chunk_doc = chunk.create_chunk(step_id)
-        chunk.update_status(chunk_doc, "Error")
-        log_error(f'{err}: process', "Step")
+    args = cast_to_dic(args)
+    step_id = args["step_id"]
+    ChunkOrchestrator().process(validate_and_start_matcher, step_id=step_id)
+
+

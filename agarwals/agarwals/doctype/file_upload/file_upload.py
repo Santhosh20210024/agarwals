@@ -1,14 +1,13 @@
+import json
 import frappe
 import shutil
 import zipfile
 import os
 import re
+import ast
 import pandas as pd
 from frappe.model.document import Document
-from agarwals.agarwals.doctype.file_upload.file_upload_utils import (
-    is_template_exist,
-    construct_file_url,
-)
+from agarwals.agarwals.doctype.file_upload.file_upload_utils import construct_file_url
 from agarwals.utils.error_handler import log_error
 
 
@@ -77,7 +76,7 @@ class Fileupload(Document):
         return curr_timestamp.replace(" ", "-").replace(":", "-") + "_" + fname
 
     def del_file_record(
-        self, fid, fname, err
+            self, fid, fname, err
     ):  # For deleting frappe file doctype record
         self.del_private_file(
             construct_file_url(self.site_path, self.shell_path, fname)
@@ -98,7 +97,7 @@ class Fileupload(Document):
             self.status = "Zip"
 
     def validate_file_hash(
-        self, fname, fid
+            self, fname, fid
     ):  # Need to evaluate the frappe hashing concept
         """Verify Hash Content
         ( based on frappe's in-build content-hash )
@@ -120,8 +119,8 @@ class Fileupload(Document):
             """For avoiding the files hash validation"""
             for file in corres_fdoc:
                 if (
-                    frappe.get_value("File upload", file.attached_to_name, "status")
-                    != "Error"
+                        frappe.get_value("File upload", file.attached_to_name, "status")
+                        != "Error"
                 ):
                     filtered_corres_fdoc.append(file)
 
@@ -167,9 +166,9 @@ class Fileupload(Document):
             self.set("file", fname)
             self.set("is_uploaded", 1)
             if (
-                self.is_bot == 1
-                and self.file_format == "EXCEL"
-                and self.document_type == "Settlement Advice"
+                    self.is_bot == 1
+                    and self.file_format == "EXCEL"
+                    and self.document_type == "Settlement Advice"
             ):
                 self.tpa_login_id = self.extract_tpa_id(fname)
                 self.tpa_branch = self.extract_tpa_branch(fname)
@@ -283,29 +282,26 @@ class Fileupload(Document):
             return pd.DataFrame()
 
     def get_template_details(self):
-        attached_name = None
-        attached_doctype = None
-
+        configuration_doctype = None
         match self.document_type:
             case "Debtors Report":
-                attached_name = "Bill"
+                configuration_doctype = "Bill"
             case "Claim Book":
-                attached_name = "ClaimBook"
+                configuration_doctype = "ClaimBook"
             case "Settlement Advice":
-                attached_doctype = "Customer"
-                attached_name = self.payer_type
+                configuration_doctype = "Settlement Advice Staging"
             case "Bank Statement Bulk":
-                attached_name = "Bank Transaction"
+                configuration_doctype = "Bank Transaction Staging"
             case "Bill Adjustment":
-                attached_name = "Bill Adjustment"
+                configuration_doctype = "Bill Adjustment"
             case "Write Back":
-                attached_name = "Write Back"
+                configuration_doctype = "Write Back"
             case "Write Off":
-                attached_name = "Write Off"
+                configuration_doctype = "Write Off"
             case _:
-                attached_name = None
+                configuration_doctype = None
 
-        return attached_name, attached_doctype
+        return configuration_doctype
 
     def compress(self, column_list):
         compressed_list = []
@@ -325,24 +321,44 @@ class Fileupload(Document):
         else:
             return None
 
+    def get_configuration_column(self, configuration_doctype):
+        if configuration_doctype == "Settlement Advice Staging" :
+            sa_configure_doc = frappe.get_single("Settlement Advice Configuration")
+            sa_columns = sa_configure_doc.columns_for_validation.replace("'", '"')
+            if sa_columns :
+                try:
+                    return json.loads(sa_columns)[self.payer_type]
+                except Exception as e:
+                    log_error("Error decoding JSON in Settlement Advice Configuration {e}.", "File upload")
+            return
+
+        config_doc = frappe.get_all("Data Loading Configuration", {"name": configuration_doctype},
+                                    ['columns_for_validation'])
+
+        if not config_doc:
+            frappe.throw(f"No configuration found for {configuration_doctype}.")
+        columns_for_validation = config_doc[0].get('columns_for_validation', '')
+        if not columns_for_validation:
+            return
+        return ast.literal_eval(columns_for_validation)
+    
     def validate_file_header(self, fname, fid):
         try:
             if self.upload and self.file_format != "ZIP":
-                attached_name, attached_doctype = self.get_template_details()
-                template_columns = self.read_file(
-                    self.site_path + is_template_exist(attached_name, attached_doctype),
-                    columns=True,
+                configuration_doctype = self.get_template_details()
+                if (configuration_doctype == "Settlement Advice Staging" and self.payer_type != "Manual") or (configuration_doctype == None):
+                    return
+                upload_columns = self.read_file(
+                    self.site_path + self.upload, columns=True
                 )
-                if template_columns:
-                    upload_columns = self.read_file(
-                        self.site_path + self.upload, columns=True
+                column_list = self.get_configuration_column(configuration_doctype)
+                if upload_columns and column_list:
+                    is_different = self.compare_header(
+                        column_list, upload_columns
                     )
-                    if upload_columns:
-                        is_different = self.compare_header(
-                            template_columns, upload_columns
-                        )
-                        if is_different:
-                            frappe.throw(is_different)
+                    if is_different:
+                        frappe.throw(is_different)
+                return 
         except Exception as e:
             self.del_file_record(fid, fname, str(e))
 
@@ -614,25 +630,16 @@ def process_zip_entires(fid):
 
     if fdoc.document_type == "Settlement Advice":
         if (
-            len(
-                frappe.get_list(
-                    "Settlement Advice Mapping",
-                    filters={"parent": fid, "payer_name": ["=", ""]},
-                )
-            )
-            > 0
+            frappe.db.count("Settlement Advice Mapping", filters={"parent": fid, "payer_name": ["=", ""]})
+                > 0
         ):
             frappe.throw("Please select payer for all the mapping records")
 
     if fdoc.document_type == "Bank Statement":
         if (
-            len(
-                frappe.get_list(
-                    "Bank Account Mapping",
-                    filters={"parent": fid, "bank_account": ["=", ""]},
-                )
-            )
-            > 0
+            frappe.db.count("Bank Account Mapping",
+                        filters={"parent": fid, "bank_account": ["=", ""]})
+                > 0
         ):
             frappe.throw("Please select bank account for all the mapping records")
 

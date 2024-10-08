@@ -1,8 +1,7 @@
 import frappe
-from agarwals.reconciliation import chunk
+from tfs.orchestration import ChunkOrchestrator, chunk
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.str_to_dict import cast_to_dic
-from agarwals.reconciliation.step.advice_downloader.bot_uploader import SABotUploader
 from agarwals.reconciliation.step.advice_downloader.provider_ihx_api_downloader import ProviderIhx
 from agarwals.reconciliation.step.advice_downloader.tips_vidal_health_downloader import TipsVidalHealth
 from agarwals.reconciliation.step.advice_downloader.tnnhis_mdindia_downloader import TnnhisMdIndia
@@ -30,37 +29,27 @@ from agarwals.reconciliation.step.advice_downloader.cholas_downloader import Cho
 from agarwals.reconciliation.step.advice_downloader.cmc_eyefoundation_downloader import CMCEyeFoundationDownloader
 from agarwals.reconciliation.step.advice_downloader.cholas_pdf_downloader import CholasPdfDownloader
 from agarwals.reconciliation.step.advice_downloader.heritage_downloder import HeritageDownloader
+from agarwals.reconciliation.step.advice_downloader.md_india_online_downloader import MdIndiaOnlineDownloader
 
 
-
-def download_advice(tpa_doc, chunk_doc, args):
-    class_name=eval(tpa_doc.executing_method)
-    frappe.enqueue(class_name().download,queue = args["queue"], is_async = True, job_name = f"TPA_downloader_{str(tpa_doc.name)}", timeout = 3600, tpa_doc = tpa_doc, chunk_doc = chunk_doc)
-
+@ChunkOrchestrator.update_chunk_status
+def download_advice(tpa_login_doc,args):
+    chunk_status = "Processed"
+    for tpa_doc in tpa_login_doc:
+        class_name=eval(tpa_doc.executing_method)
+        process_status = class_name().download(tpa_doc,args)
+        chunk_status = chunk.get_status(chunk_status, process_status)
+    return chunk_status
 
 @frappe.whitelist()
 def process(args):
-    try:
-        args = cast_to_dic(args)
-        if args.get("retry"):
-            tpa_login_doc = frappe.db.sql("SELECT * FROM `tabTPA Login Credentials` WHERE retry = 1 ",as_dict=True)
-        else:
-            tpa_login_doc = frappe.db.sql(f"""SELECT * FROM `tabTPA Login Credentials` WHERE executing_method = '{args["executing_method"]}' AND status in ('New','Valid') """,as_dict=True)
-        if tpa_login_doc:
-            for tpa_login in tpa_login_doc:
-                if tpa_login.is_enable == 1:
-                    chunk_doc = chunk.create_chunk(args["step_id"])
-                    download_advice(tpa_login, chunk_doc, args)
-                else:
-                    chunk_doc = chunk.create_chunk(args["step_id"])
-                    chunk.update_status(chunk_doc, "Processed")
-        else:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
-    except Exception as e:
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "Error")
-        log_error(e,'Step')
+    args = cast_to_dic(args)
+    if args.get("retry"):
+        tpa_login_doc = frappe.db.sql("SELECT * FROM `tabTPA Login Credentials` WHERE retry = 1 AND is_enable = 1",as_dict=True)
+    else:
+        tpa_login_doc = frappe.db.sql(f"""SELECT * FROM `tabTPA Login Credentials` WHERE executing_method = '{args["executing_method"]}' AND status in ('New','Valid') AND is_enable = 1""",as_dict=True)
+    ChunkOrchestrator().process(download_advice, step_id=args["step_id"], is_enqueueable=True, chunk_size=1, data_var_name="tpa_login_doc", queue=args["queue"],
+                                is_async=True, timeout=3600, tpa_login_doc=tpa_login_doc,args=args)
 
 
 @frappe.whitelist()
@@ -95,10 +84,6 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             frappe.db.sql(
                 f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'Error' WHERE name = '{login_ref.name}' ")
             frappe.db.commit()
-
-@frappe.whitelist()
-def upload_sa_files():
-    SABotUploader().process()
 
 
 

@@ -34,9 +34,9 @@ class StarVitrayaDownloader(SeleniumDownloader):
         button.click()
         dropdown = self.driver.find_element(By.CSS_SELECTOR, ".dspInBlk > select")
         time.sleep(5)
-        dropdown.find_element(By.XPATH, "//option[. = 'Dashboard Report']").click()
+        dropdown.find_element(By.XPATH, "//option[contains(text(), 'Dashboard Report')]").click()
         time.sleep(10)
-        dropdown.find_element(By.XPATH, "//option[. = 'Download Reports']").click()
+        dropdown.find_element(By.XPATH, "//option[contains(text() , 'Download Reports')]").click()
 
     def download_from_web_with_date_range(self,temp_from_date,temp_to_date,logout):
         self.download_from_web(temp_from_date,temp_to_date)

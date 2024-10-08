@@ -8,7 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_hjcmp",
-  "matched_status",
+  "status",
   "ma_bill_no",
   "hospital",
   "preauth_claim_id",
@@ -76,7 +76,8 @@
   "custom_raw_bill_number",
   "file_upload",
   "transform",
-  "index"
+  "index",
+  "remark"
  ],
  "fields": [
   {
@@ -389,16 +390,6 @@
    "label": "Hash"
   },
   {
-   "bold": 1,
-   "fieldname": "matched_status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Matched Status",
-   "options": "\nMatched"
-  },
-  {
    "fieldname": "al_key",
    "fieldtype": "Data",
    "label": "AL Key",
@@ -470,11 +461,27 @@
    "fieldname": "utr_key",
    "fieldtype": "Data",
    "label": "UTR Key"
+  },
+  {
+   "bold": 1,
+   "default": "Unmatched",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Unmatched\nMatched\nWarning"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Data",
+   "label": "Error Remarks"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-17 11:56:07.441617",
+ "modified": "2024-09-17 15:03:13.137318",
  "modified_by": "Administrator",
  "module": "Claim",
  "name": "ClaimBook",
