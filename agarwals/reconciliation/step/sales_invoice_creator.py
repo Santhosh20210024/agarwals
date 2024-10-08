@@ -102,6 +102,8 @@ class SalesInvoiceCancellator:
 
     def make_reversal_entry_for_je(self,journal_entries):
         for jounal_entry in journal_entries:
+            if "Reverse" in jounal_entry or "Cancel" in jounal_entry:
+                continue
             reverse_entry = make_reverse_journal_entry(jounal_entry)
             reverse_entry.name = jounal_entry + " - Reverse"
             reverse_entry.voucher_type = "Debit Note"
