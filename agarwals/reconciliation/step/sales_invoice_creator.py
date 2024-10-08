@@ -72,7 +72,7 @@ class SalesInvoiceCancellator:
                 journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
                                                        account="Disallowance - A", entry_type='credit',
                                                        amount=payment_entry['custom_disallowed_amount'])
-            if payment_entry['custom_round_off'] != 0:
+            if payment_entry['custom_round_off'] > 0:
                 journal_entry = self.add_account_entry(je=journal_entry, si=sales_invoice,
                                                        account="Rounded Off - A", entry_type='credit',
                                                        amount=payment_entry['custom_round_off'])
@@ -145,10 +145,9 @@ class SalesInvoiceCancellator:
             self.make_reversal_entry_for_pe(payment_entry_documents)
         self.make_cancel_je(bill)
 
-
-
-
+    @ChunkOrchestrator.update_chunk_status
     def cancel_sales_invoice(self, cancelled_bills):
+        status = "Processed"
         for bill in cancelled_bills:
             try:
                 bill_record = frappe.get_doc('Bill', bill)
@@ -156,7 +155,7 @@ class SalesInvoiceCancellator:
                 if bill_period != "Current Year":
                     self.cancel_previous_period_bill(bill)
                     frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
-                    frappe.db.set_value('Sales Invoice', bill, {'status': 'Cancelled','docstatus':2})
+                    frappe.db.set_value('Sales Invoice', bill, {'status': 'Cancelled','docstatus':2, 'outstanding_amount':0})
                     frappe.db.commit()
                     continue
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
@@ -170,69 +169,71 @@ class SalesInvoiceCancellator:
                 sales_invoice_record.cancel()
 
                 frappe.db.set_value('Bill', bill, {'invoice_status': 'CANCELLED'})
-
+                frappe.db.set_value('Sales Invoice', bill, {'outstanding_amount': 0})
                 frappe.db.commit()
                 file_records.create(file_upload=sales_invoice_record.custom_file_upload,
                                     transform=sales_invoice_record.custom_transform,
                                     reference_doc=sales_invoice_record.doctype,
                                     record=bill, index=sales_invoice_record.custom_index)
             except Exception as e:
+                status = "Error"
                 log_error(error=e, doc="Bill", doc_name=bill)
+        return status
 
 class SalesInvoiceCreator:
+    @ChunkOrchestrator.update_chunk_status
     def process(self, bill_numbers, chunk_doc):
-        chunk.update_status(chunk_doc, "InProgress")
-        try:
-            for bill_number in bill_numbers:
-                try:
-                    bill_record = frappe.get_doc('Bill', bill_number)
-                    bill_record.set("region", frappe.get_doc('Branch', bill_record.branch).custom_region)
-                    bill_record.set("customer", frappe.get_doc('Payer Alias', bill_record.payer).payer_final_name)
-                    bill_record.set("branch_type", frappe.get_doc('Branch', bill_record.branch).custom_branch_type)
+        status = "Processed"
+        for bill_number in bill_numbers:
+            try:
+                bill_record = frappe.get_doc('Bill', bill_number)
+                bill_record.set("region", frappe.get_doc('Branch', bill_record.branch).custom_region)
+                bill_record.set("customer", frappe.get_doc('Payer Alias', bill_record.payer).payer_final_name)
+                bill_record.set("branch_type", frappe.get_doc('Branch', bill_record.branch).custom_branch_type)
+                bill_record.save()
+                skip_invoice_customer_list = self.get_skip_invoice_customer()
+                if bill_record.customer in skip_invoice_customer_list:
+                    bill_record.set("status","CANCELLED AND DELETED")
                     bill_record.save()
-                    skip_invoice_customer_list = self.get_skip_invoice_customer()
-                    if bill_record.customer in skip_invoice_customer_list:
-                        bill_record.set("status","CANCELLED AND DELETED")
-                        bill_record.save()
-                        frappe.db.commit()
-                        continue
-                    sales_invoice_record = frappe.new_doc('Sales Invoice')
-                    sales_invoice_params = {'custom_bill_no': bill_record.bill_no, 'custom_mrn': bill_record.mrn,
-                                            'custom_patient_name': bill_record.patient_name,
-                                            'custom_ma_claim_id': bill_record.ma_claim_id,
-                                            'custom_claim_id': bill_record.claim_id, 'customer': bill_record.customer,
-                                            'entity': bill_record.entity, 'region': bill_record.region,
-                                            'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
-                                            'cost_center': bill_record.cost_center,
-                                            'custom_patient_age' : bill_record.patient_age,
-                                            'items': [
-                                                {'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
-                                            'set_posting_time': 1, 'posting_date': bill_record.bill_date,
-                                            'due_date': bill_record.bill_date,
-                                            'custom_file_upload': bill_record.file_upload,
-                                            'custom_transform': bill_record.transform,
-                                            'custom_index': bill_record.index}
-                    for key, value in sales_invoice_params.items():
-                        sales_invoice_record.set(key, value)
-                    sales_invoice_record.save()
-                    sales_invoice_record.submit()
-                    if bill_record.status == 'CANCELLED':
-                        sales_invoice_record.cancel()
-                    frappe.db.set_value('Bill', bill_number,
-                                        {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
                     frappe.db.commit()
-                    if sales_invoice_record.status != 'Cancelled':
-                        update_fiscal_year(sales_invoice_record, 'Sales Invoice')
+                    continue
+                sales_invoice_record = frappe.new_doc('Sales Invoice')
+                sales_invoice_params = {'custom_bill_no': bill_record.bill_no, 'custom_mrn': bill_record.mrn,
+                                        'custom_patient_name': bill_record.patient_name,
+                                        'custom_ma_claim_id': bill_record.ma_claim_id,
+                                        'custom_claim_id': bill_record.claim_id, 'customer': bill_record.customer,
+                                        'entity': bill_record.entity, 'region': bill_record.region,
+                                        'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
+                                        'cost_center': bill_record.cost_center,
+                                        'custom_patient_age' : bill_record.patient_age,
+                                        'items': [
+                                            {'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
+                                        'set_posting_time': 1, 'posting_date': bill_record.bill_date,
+                                        'due_date': bill_record.bill_date,
+                                        'custom_file_upload': bill_record.file_upload,
+                                        'custom_transform': bill_record.transform,
+                                        'custom_index': bill_record.index}
+                for key, value in sales_invoice_params.items():
+                    sales_invoice_record.set(key, value)
+                sales_invoice_record.save()
+                sales_invoice_record.submit()
+                if bill_record.status == 'CANCELLED':
+                    sales_invoice_record.cancel()
+                frappe.db.set_value('Bill', bill_number,
+                                    {'invoice': sales_invoice_record.name, 'invoice_status': bill_record.status})
+                frappe.db.commit()
+                if sales_invoice_record.status != 'Cancelled':
+                    update_fiscal_year(sales_invoice_record, 'Sales Invoice')
 
-                    file_records.create(file_upload=sales_invoice_record.custom_file_upload,
-                                        transform=sales_invoice_record.custom_transform,
-                                        reference_doc=sales_invoice_record.doctype,
-                                        record=bill_number, index=sales_invoice_record.custom_index)
-                except Exception as e:
-                    log_error(error= 'Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
-            chunk.update_status(chunk_doc, "Processed")
-        except Exception as e:
+                file_records.create(file_upload=sales_invoice_record.custom_file_upload,
+                                    transform=sales_invoice_record.custom_transform,
+                                    reference_doc=sales_invoice_record.doctype,
+                                    record=bill_number, index=sales_invoice_record.custom_index)
+            except Exception as e:
+                status = "Error"
+                log_error(error= 'Unable to Create Sales Invoice: ' + str(e), doc="Bill", doc_name=bill_number)
             chunk.update_status(chunk_doc, "Error")
+        return status
 
     def enqueue_jobs(self, bill_number, args):
         no_of_invoice_per_queue = int(args["chunk_size"])
@@ -243,34 +244,27 @@ class SalesInvoiceCreator:
         
     def get_skip_invoice_customer(self):
         return frappe.get_all('Customer',filters = {'custom_skip_invoice_creation':1},pluck = 'name')
-             
+
+@ChunkOrchestrator.update_chunk_status
+def create_and_cancel_sales_invoices(args: dict, new_bills: list, cancelled_bills: list) -> str:
+    try:
+        ChunkOrchestrator().process(SalesInvoiceCancellator().cancel_sales_invoice, step_id=args["step_id"],
+                                    cancelled_bills=cancelled_bills)
+        ChunkOrchestrator().process(SalesInvoiceCreator().process, step_id=args["step_id"], is_enqueueable=True,
+                                    chunk_size=args["chunk_size"], data_var_name="bill_numbers", queue=args["queue"],
+                                    is_async=True, timeout=18000, bill_numbers=new_bills)
+        return "Processed"
+    except Exception as e:
+        log_error(error=e, doc="Bill")
+        return "Error"
 
 @frappe.whitelist()
 def process(args):
-    try:
-        args = cast_to_dic(args)
-        cancelled_bills = frappe.get_list('Bill', filters={'status': 'CANCELLED', 'invoice_status': 'RAISED'},
-                                          pluck='name')
-        cancellation_chunk_doc = chunk.create_chunk(args["step_id"])
-        if cancelled_bills:
-            chunk.update_status(cancellation_chunk_doc, "InProgress")
-            try:
-                SalesInvoiceCancellator().cancel_sales_invoice(cancelled_bills)
-                cancellation_chunk_doc_status = "Processed"
-            except Exception as e:
-                cancellation_chunk_doc_status = "Error"
-        else:
-            cancellation_chunk_doc_status = "Processed"
-        
-        new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=', 'CANCELLED AND DELETED']},
-                                    pluck='name')
-        if new_bills:
-            SalesInvoiceCreator().enqueue_jobs(new_bills, args)
-        else:
-            chunk_doc = chunk.create_chunk(args["step_id"])
-            chunk.update_status(chunk_doc, "Processed")
-        chunk.update_status(cancellation_chunk_doc, cancellation_chunk_doc_status)
-    except Exception as e:
-        chunk_doc = chunk.create_chunk(args["step_id"])
-        chunk.update_status(chunk_doc, "Error")
-        log_error(e, 'Step')
+    args = cast_to_dic(args)
+    cancelled_bills = frappe.get_list('Bill', filters={'status': 'CANCELLED', 'invoice_status': 'RAISED'},
+                                      pluck='name')
+    new_bills = frappe.get_list('Bill', filters={'invoice': '', 'status': ['!=', 'CANCELLED AND DELETED']},
+                                pluck='name')
+    ChunkOrchestrator().process(create_and_cancel_sales_invoices, step_id=args["step_id"], args=args,
+                                new_bills=new_bills,
+                                cancelled_bills=cancelled_bills)
