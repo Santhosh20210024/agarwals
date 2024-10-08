@@ -3,6 +3,9 @@
 
 # import frappe
 from frappe.model.document import Document
+from agarwals.utils.index_update import update_index
 
 class IndexUpdation(Document):
-	pass
+    
+	def before_save(self):
+            update_index(self.name)

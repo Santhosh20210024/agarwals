@@ -1,16 +1,14 @@
 import frappe
 from agarwals.utils.error_handler import log_error
-from agarwals.reconciliation.step.key_creator.utr_key_creator import UTRKeyCreator
-from agarwals.reconciliation.step.key_creator.claim_key_creator import ClaimKeyCreator
-from agarwals.reconciliation import chunk
+
 
 class KeyMapper:
     
-    def __init__(self, records, record_type, key_type, chunk_doc):
+    def __init__(self, records, record_type, key_type):
         self.records = records
         self.record_type = record_type
         self.key_type = key_type
-        self.chunk_doc = chunk_doc
+
 
     def fetch_keys(self, doctype, field, variants):
         key_field = field.replace('_variant', '_key')
@@ -56,24 +54,25 @@ class KeyMapper:
     def map_key(self, record):
         raise NotImplementedError("Subclasses should implement this method.")
 
-    def process(self):
+    def process(self) -> str:
+        chunk_status: str = "Processed"
         try:
             for record in self.records:
                 self.map_key(record)
             frappe.db.commit()
-            chunk.update_status(self.chunk_doc, "Processed")
         except frappe.ValidationError as e:
-            chunk.update_status(self.chunk_doc, "Error")
             log_error(
                 f"Validation error in Key Processing: {str(e)}", doc=self.record_type
             )
             frappe.throw(f"Error while processing keys: {str(e)}")
+            chunk_status = "Error"
         except Exception as e:
-            chunk.update_status(self.chunk_doc, "Error")
             log_error(
                 f"Unexpected error in Key Processing: {str(e)}", doc=self.record_type
             )
             frappe.throw(f"Unexpected error while processing keys: {str(e)}")
+            chunk_status = "Error"
+        return chunk_status
 
     def update(self, query, key, name):
         frappe.db.sql(query, values={"name": name, "key": key})

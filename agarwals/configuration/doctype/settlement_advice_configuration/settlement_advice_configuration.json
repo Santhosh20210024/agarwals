@@ -11,7 +11,9 @@
   "target_columns",
   "tpa",
   "calculate_settled_amount",
-  "char_to_replace_in_header"
+  "char_to_replace_in_header",
+  "columns_for_validation",
+  "file_name"
  ],
  "fields": [
   {
@@ -40,12 +42,22 @@
    "fieldtype": "Table",
    "label": "Calculate Settled Amount",
    "options": "Settled Amount Calculation Configuration"
+  },
+  {
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name"
+  },
+  {
+   "fieldname": "columns_for_validation",
+   "fieldtype": "Code",
+   "label": "Columns For Validation"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-07-30 18:05:43.489986",
+ "modified": "2024-10-01 14:07:37.389231",
  "modified_by": "Administrator",
  "module": "Configuration",
  "name": "Settlement Advice Configuration",

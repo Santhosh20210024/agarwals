@@ -11,13 +11,19 @@ class BillAdjustment(Document):
 
 	def before_save(self):
 		"""Method to handle operations before save"""
-		if self.name and self.status == 'Open':
-			sales_doc = frappe.get_doc("Sales Invoice", self.name)
+		if self.bill and self.status == 'Open':
+			sales_doc = frappe.get_doc("Sales Invoice", self.bill)
 			self._handle_invoice_status(sales_doc)
 			if self.status == 'Error':
 				return 
 			self._validate_amount(sales_doc)
 			self._set_posting_date(sales_doc)
+   
+	def autoname(self):
+		existing_adjustment_entries = frappe.get_list('Bill Adjustment'
+                                                     ,filters={'bill': self.bill})
+		self.name = self.bill + "-" + str(
+            len(existing_adjustment_entries)) if existing_adjustment_entries else self.bill
 
 	def _handle_invoice_status(self, sales_doc):
 		"""Method to handle the invoice status"""
@@ -50,7 +56,7 @@ class BillAdjustment(Document):
 			if sales_doc.status == 'Unpaid':
 				self.posting_date = update_posting_date(sales_doc.posting_date)
 			elif sales_doc.status == 'Partly Paid':
-				payment_reference = frappe.db.get_list('Payment Entry', filters={'custom_sales_invoice': self.name}, fields=['posting_date'], order_by="creation desc")
+				payment_reference = frappe.db.get_list('Payment Entry', filters={'custom_sales_invoice': self.bill}, fields=['posting_date'], order_by="creation desc")
 				if payment_reference:
 					self.posting_date = update_posting_date(payment_reference[0].posting_date)
 				else:

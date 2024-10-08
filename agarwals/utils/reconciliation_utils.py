@@ -41,7 +41,7 @@ def get_company_account(bank_account_name: str) -> str | None:
 
 @redis_cache
 def get_entity_closing_date(entity: str) -> date | None:
-    closing_date_list = frappe.get_list('Period Closure by Entity',
+    closing_date_list = frappe.get_all('Period Closure by Entity',
                                         filters={'entity': entity}
                                         , order_by='creation desc'
                                         , pluck='posting_date')
