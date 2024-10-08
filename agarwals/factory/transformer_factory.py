@@ -7,6 +7,7 @@ from agarwals.reconciliation.step.transform.writeoff_transformer import Writeoff
 from agarwals.reconciliation.step.transform.bank_transformer import BankBulkTransformer
 from agarwals.reconciliation.step.transform.advice_transformer import AdviceTransformer
 from agarwals.reconciliation.step.transform.closing_balance_transformer import ClosingBalanceTransformer
+from agarwals.reconciliation.step.transform.bank_update_transformer import BankUpdateTransformer
 
 def get_transformer(type):
     try:
@@ -28,6 +29,8 @@ def get_transformer(type):
             return BankBulkTransformer()
         elif type =="closing_balance":
             return ClosingBalanceTransformer()
+        elif type == "bank_update":
+            return BankUpdateTransformer()
 
     except Exception as e:
        return e
