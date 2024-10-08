@@ -36,9 +36,11 @@ class SalesInvoiceCancellator:
             entry['branch_type'] = si.branch_type
             entry['party_type'] = "Customer"
             entry['party'] = si.customer
-
-        entry['reference_type'] = reference_type
-        entry['reference_name'] = reference_name
+            entry['reference_type'] = "Sales Invoice"
+            entry['reference_name'] = si.name
+        else:
+            entry['reference_type'] = reference_type
+            entry['reference_name'] = reference_name
 
         je.append('accounts', entry)
         return je
