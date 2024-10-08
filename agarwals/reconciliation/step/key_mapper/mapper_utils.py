@@ -1,4 +1,5 @@
 import frappe
+import traceback
 from agarwals.utils.error_handler import log_error
 from tfs.orchestration import ChunkOrchestrator
 from typing import Type, List, Dict, Any, Union
@@ -105,8 +106,9 @@ def enqueue_record_processing(type: dict,
                 mapper_class=mapper_class,
                 records=records
             )
-        except Exception as e:
-            log_error(f"Error While Enqueueing {record_type}: {str(e)}")
-            chunk_status = "Error"
+        except:
+            raise traceback.print_exc()
+            # log_error(f"Error While Enqueueing {record_type}: {str(e)}")
+            # chunk_status = "Error"
 
     return chunk_status
