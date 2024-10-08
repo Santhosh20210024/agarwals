@@ -1,7 +1,7 @@
 import frappe
 from agarwals.utils.error_handler import log_error
 from tfs.orchestration import ChunkOrchestrator
-from typing import Type, List, Dict, Any
+from typing import Type, List, Dict, Any, Union
 
 
 utr_key_query_mapper = {
