@@ -55,7 +55,7 @@ class UTRKeyCreator(KeyCreator):
         Returns:
             bool: True if the key variant is valid, False otherwise.
         """
-        return key.isalpha() or len(key) < 4
+        return key.isalpha() or len(key.strip()) < 4
 
     def format_utr(self, utr) -> set:
         """

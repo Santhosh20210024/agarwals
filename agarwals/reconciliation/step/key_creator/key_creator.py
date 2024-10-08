@@ -40,7 +40,7 @@ class KeyCreator:
         Returns:
             str: The normalized key_id.
         """
-        return unicodedata.normalize("NFKD", self.key_id)
+        return unicodedata.normalize("NFKD", self.key_id).strip()
 
     @staticmethod
     def get_key_configuration(doctype: str): 

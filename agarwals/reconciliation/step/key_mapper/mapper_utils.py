@@ -106,9 +106,8 @@ def enqueue_record_processing(type: dict,
                 mapper_class=mapper_class,
                 records=records
             )
-        except:
-            raise traceback.print_exc()
-            # log_error(f"Error While Enqueueing {record_type}: {str(e)}")
-            # chunk_status = "Error"
+        except Exception as e:
+            log_error(f"Error While Enqueueing {record_type}: {str(e)}")
+            chunk_status = "Error"
 
     return chunk_status

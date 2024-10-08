@@ -44,7 +44,7 @@ class ClaimKeyCreator(KeyCreator):
         Return:
             bool: True or False
         """
-        return len(key) < 4
+        return len(key.strip()) < 4
 
     def get_variants(self) -> set:
         """
@@ -62,12 +62,14 @@ class ClaimKeyCreator(KeyCreator):
         key_variants.add(n_key_id)
 
         if ClaimKeyCreator.compiled_replace_pattern:
-            f_key_id = ClaimKeyCreator.compiled_replace_pattern.sub("", n_key_id)
+            f_key_id = ClaimKeyCreator.compiled_replace_pattern.sub("", n_key_id).strip()
             if not self._validate_variant(f_key_id):
                 key_variants.add(f_key_id)
             
             if self.is_regex_present(ClaimKeyCreator.compiled_star_health_patterns, f_key_id):
-                key_variants.add(f_key_id.split('/')[-1])
+                star_pattern = str(f_key_id.split('/')[-1]).strip()
+                if star_pattern:
+                    key_variants.add(star_pattern)
 
             key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns))
         else:
