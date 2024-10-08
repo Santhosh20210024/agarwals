@@ -243,11 +243,6 @@ class SalesInvoiceCreator:
 def create_and_cancel_sales_invoices(args: dict, new_bills: list, cancelled_bills: list) -> str:
     try:
         ChunkOrchestrator().process(SalesInvoiceCancellator().cancel_sales_invoice, step_id=args["step_id"],
-
-@ChunkOrchestrator.update_chunk_status
-def create_and_cancel_sales_invoices(args: dict, new_bills: list, cancelled_bills: list) -> str:
-    try:
-        ChunkOrchestrator().process(SalesInvoiceCreator().cancel_sales_invoice, step_id=args["step_id"],
                                     cancelled_bills=cancelled_bills)
         ChunkOrchestrator().process(SalesInvoiceCreator().process, step_id=args["step_id"], is_enqueueable=True,
                                     chunk_size=args["chunk_size"], data_var_name="bill_numbers", queue=args["queue"],
