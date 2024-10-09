@@ -2289,6 +2289,24 @@ class ViewCreator:
                         GROUP BY parent
                     );
         """)
+
+    def create_viewmatcher(self):
+        frappe.db.sql("""
+        CREATE OR REPLACE VIEW `viewMatcher` AS
+        select
+            `tm`.`sales_invoice` AS `sales_invoice`,
+            `tm`.`settlement_advice` AS `settlement_advice`,
+            `tm`.`match_logic` AS `match_logic`,
+            `tm`.`bank_transaction` AS `bank_transaction`
+        from
+            (`Dragarwals-db-Prod`.`tabMatcher` `tm`
+        join `Dragarwals-db-Prod`.`tabPayment Entry` `tpe` on
+            (`tm`.`sales_invoice` = `tpe`.`custom_sales_invoice`
+                and `tm`.`bank_transaction` = `tpe`.`reference_no`))
+        where
+            `tpe`.`posting_date` > '2024-03-31'
+            and `tpe`.`status` <> 'Cancelled';
+        """)
     
     def process(self):
         self.create_file_upload_mail_view()
@@ -2333,6 +2351,7 @@ class ViewCreator:
         self.create_current_year_si_checklist_view()
         self.create_sales_invoice_with_reference_view()
         self.create_bill_tracker_latest_view()
+        self.create_viewmatcher()
         
 def execute():
     ViewInstance = ViewCreator()
