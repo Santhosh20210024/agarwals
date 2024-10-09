@@ -31,7 +31,7 @@ class ClaimKeyCreator(KeyCreator):
             replace_patterns = regex_conf.get("replace_patterns", "")
             regex_patterns = regex_conf.get("regex_patterns", "")
             star_health_patterns = regex_conf.get("star_health_patterns", "")
-            cls.compiled_replace_pattern = KeyCreator.get_compiled_pattern(replace_patterns, "Replace Pattern")
+            cls.compiled_replace_patterns = KeyCreator.get_compiled_pattern(replace_patterns, "Replace Pattern")
             cls.compiled_regex_patterns = KeyCreator.compile_regex_patterns(regex_patterns)
             cls.compiled_star_health_patterns = star_health_patterns
         except Exception as e:
@@ -64,8 +64,8 @@ class ClaimKeyCreator(KeyCreator):
 
         key_variants.add(n_key_id)
 
-        if ClaimKeyCreator.compiled_replace_pattern:
-            f_key_id = self.strip_claim_key(ClaimKeyCreator.compiled_replace_pattern.sub("", n_key_id))
+        if ClaimKeyCreator.compiled_replace_patterns:
+            f_key_id = self.strip_claim_key(ClaimKeyCreator.compiled_replace_patterns.sub("", n_key_id))
             if not self._validate_variant(f_key_id):
                 key_variants.add(f_key_id)
             
