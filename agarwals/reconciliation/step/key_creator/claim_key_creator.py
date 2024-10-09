@@ -36,6 +36,9 @@ class ClaimKeyCreator(KeyCreator):
             cls.compiled_star_health_patterns = star_health_patterns
         except Exception as e:
             log_error(f"Error loading key configuration: {e}", doc="Claim Key")
+    
+    def strip_claim_key(self, key):
+        return key.strip().lstrip("-").lstrip("0").rstrip("-")
 
     @staticmethod
     def _validate_variant(key) -> bool:
@@ -62,7 +65,7 @@ class ClaimKeyCreator(KeyCreator):
         key_variants.add(n_key_id)
 
         if ClaimKeyCreator.compiled_replace_pattern:
-            f_key_id = ClaimKeyCreator.compiled_replace_pattern.sub("", n_key_id).strip()
+            f_key_id = self.strip_claim_key(ClaimKeyCreator.compiled_replace_pattern.sub("", n_key_id))
             if not self._validate_variant(f_key_id):
                 key_variants.add(f_key_id)
             
