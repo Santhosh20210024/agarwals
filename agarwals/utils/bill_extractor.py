@@ -47,6 +47,4 @@ def create_file_upload(attachment):
 
 @frappe.whitelist()
 def process(doc):
-    doc = eval(doc)
-    if doc["sent_or_received"] != "Sent":
-        DebtorsExtractor().process_communication_files(doc["name"])
+        DebtorsExtractor().process_communication_files(doc)
