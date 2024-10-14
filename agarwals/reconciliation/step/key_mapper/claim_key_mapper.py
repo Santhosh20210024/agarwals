@@ -83,14 +83,6 @@ class ClaimKeyMapper(KeyMapper):
                 self.record_type,
             )
             frappe.throw(f"DoesNotExistError while processing Claim keys: {str(e)}")
-        
-        except frappe.PermissionError as e:
-            log_error(
-                f"PermissionError in map_key: {str(e)}",
-                "UTR Key",
-                self.record_type,
-            )
-            frappe.throw(f"Permission while processing UTR keys: {str(e)}")
 
         except frappe.ValidationError as e:
             log_error(
