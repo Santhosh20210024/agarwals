@@ -56,13 +56,8 @@ class ClaimKeyCreator(KeyCreator):
         return len(key.strip()) < 4
 
     def remove_slash_patterns(self, item):
-        removed_item = self.apply_regex_patterns(item, ClaimKeyCreator.compiled_slash_patterns)
-
-        if removed_item:
-            key_id = list(removed_item)[0]
-            return key_id
-        else:
-            return item
+        result = re.sub(r'^\d+/\d{1,2}$', lambda match: match.group(0).split('/')[0], item)
+        return result
 
     def replace_item(self, item):
         item = self.strip_claim_key(ClaimKeyCreator.compiled_replace_patterns.sub("", item))
@@ -95,9 +90,11 @@ class ClaimKeyCreator(KeyCreator):
                 star_pattern = self.strip_claim_key(f_key_id.split('/')[-1])
                 if not self._validate_variant(star_pattern) and star_pattern:
                     key_variants.add(star_pattern)
-            
+
             f_key_id = self.remove_slash_patterns(f_key_id)
-            key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns, default=f_key_id))
+            key_variants.update(f_key_id)
+            key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns))
+            
         else:
             log_error("Compiled replace pattern is not set.", doc="Claim Key")
         return key_variants

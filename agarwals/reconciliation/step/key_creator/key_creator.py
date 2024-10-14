@@ -103,7 +103,7 @@ class KeyCreator:
                 compiled_patterns.append((compiled_regex_pattern, replacement))
         return compiled_patterns
     
-    def apply_regex_patterns(self, key_id: str, compiled_regex_patterns: list, default=None) -> set:
+    def apply_regex_patterns(self, key_id: str, compiled_regex_patterns: list) -> set:
         """
         Apply regex patterns to generate key variants.
         Returns:
@@ -115,9 +115,6 @@ class KeyCreator:
                 variant = regex.sub(rf'{replacement}', key_id)
                 if not self._validate_variant(variant):
                     key_variants.add(variant)
-
-        if not key_variants and default:
-            key_variants.add(default)
 
         return key_variants
 
