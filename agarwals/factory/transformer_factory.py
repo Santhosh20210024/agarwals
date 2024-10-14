@@ -9,30 +9,31 @@ from agarwals.reconciliation.step.transform.advice_transformer import AdviceTran
 from agarwals.reconciliation.step.transform.closing_balance_transformer import ClosingBalanceTransformer
 from agarwals.reconciliation.step.transform.tpa_credentials_transformer import TpaCredentialsTransformer
 from agarwals.reconciliation.step.transform.bill_entry_transformer import BillEntryTransformer
-def get_transformer(type):
-    try:
-        if type == "debtors":
-            return BillTransformer()
-        elif type == "claimbook":
-            return ClaimbookTransformer()
-        elif type == "Settlement":
-            return AdviceTransformer()
-        elif type == "transaction":
-            return BankTransformer()
-        elif type == "adjustment":
-            return AdjustmentTransformer()
-        elif type == "writeback":
-            return WritebackTransformer()
-        elif type == "writeoff":
-            return WriteoffTransformer()
-        elif type == "bank_transaction":
-            return BankBulkTransformer()
-        elif type =="closing_balance":
-            return ClosingBalanceTransformer()
-        elif type == "tpa_credentails":
-            return TpaCredentialsTransformer()
-        elif type == "bill_entry":
-            return BillEntryTransformer()
 
-    except Exception as e:
-       return e
+
+def get_transformer(transformer_type: str):
+    transformer_type = transformer_type.lower()
+    if transformer_type == "debtors":
+        return BillTransformer()
+    elif transformer_type == "claimbook":
+        return ClaimbookTransformer()
+    elif transformer_type == "settlement":
+        return AdviceTransformer()
+    elif transformer_type == "transaction":
+        return BankTransformer()
+    elif transformer_type == "adjustment":
+        return AdjustmentTransformer()
+    elif transformer_type == "writeback":
+        return WritebackTransformer()
+    elif transformer_type == "writeoff":
+        return WriteoffTransformer()
+    elif transformer_type == "bank_transaction":
+        return BankBulkTransformer()
+    elif transformer_type == "closing_balance":
+        return ClosingBalanceTransformer()
+    elif transformer_type == "tpa_credentails":
+        return TpaCredentialsTransformer()
+    elif transformer_type == "bill_entry":
+        return BillEntryTransformer()
+    else:
+        raise NotImplementedError(f"Unable to find the transformer for the type {transformer_type}")
