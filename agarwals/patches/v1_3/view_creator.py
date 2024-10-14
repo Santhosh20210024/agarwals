@@ -2261,23 +2261,52 @@ class ViewCreator:
         
     def create_current_year_si_checklist_view(self):
         # Created viewSales Invoice Current Year Breakup : Total Claim Amount - ( Total Settled + Total TDS + Total Disallowance ) < 9
-        frappe.db.sql("""CREATE OR REPLACE VIEW `viewcurrent_year_si_checklist` AS
-            select
-                `vsicyb`.`bill_number` AS `bill_number`,
-                `tfr`.`job` AS `job`,
-                `vsicyb`.`claim_amount` AS `claim_amount`,
-                `vsicyb`.`outstanding_amount` AS `outstanding_amount`,
-                `vsicyb`.`settled_amount` AS `settled_amount`,
-                `vsicyb`.`tds_amount` AS `tds_amount`,
-                `vsicyb`.`disallowed_amount` AS `disallowed_amount`,
-                `vsicyb`.`claim_amount` - (`vsicyb`.`settled_amount` + `vsicyb`.`tds_amount` + `vsicyb`.`disallowed_amount` + `vsicyb`.`outstanding_amount`) AS `diff`
-            from
-                ((`tabFile Records` `tfr`
-            join `tabPayment Entry` `tpe` on
-                (`tpe`.`name` = `tfr`.`record`))
-            join `viewSales Invoice Current Year Breakup` `vsicyb` on
-                (`vsicyb`.`bill_number` = `tpe`.`custom_sales_invoice`));
+            frappe.db.sql("""CREATE OR REPLACE VIEW `viewcurrent_year_si_checklist` AS
+                select
+                    `vsicyb`.`bill_number` AS `bill_number`,
+                    `tfr`.`job` AS `job`,
+                    `vsicyb`.`current_claim_amount` AS `claim_amount`,
+                    `vsicyb`.`outstanding_amount` AS `outstanding_amount`,
+                    `vsicyb`.`settled_amount` AS `settled_amount`,
+                    `vsicyb`.`tds_amount` AS `tds_amount`,
+                    `vsicyb`.`disallowed_amount` AS `disallowed_amount`,
+                    `vsicyb`.`current_claim_amount` - (`vsicyb`.`settled_amount` + `vsicyb`.`tds_amount` + `vsicyb`.`disallowed_amount` + `vsicyb`.`outstanding_amount`) AS `diff`
+                from
+                    ((`tabFile Records` `tfr`
+                join `tabPayment Entry` `tpe` on
+                    (`tpe`.`name` = `tfr`.`record`))
+                join `viewSales Invoice Current Year Breakup` `vsicyb` on
+                    (`vsicyb`.`bill_number` = `tpe`.`custom_sales_invoice`));
                       """)
+
+    def create_bill_tracker_latest_view(self):
+        frappe.db.sql("""CREATE OR REPLACE VIEW `viewBillTracker` AS
+                    SELECT tbt.* ,tsi.region as 'region', tsi.branch as 'branch', tsi.posting_date as 'Bill Date'
+                    FROM `tabBill Tracker` tbt join `tabSales Invoice` tsi on tsi.name = tbt.parent
+                    WHERE (tbt.parent, tbt.date) IN (
+                        SELECT parent, MAX(date)
+                        FROM `tabBill Tracker`
+                        GROUP BY parent
+                    );
+        """)
+
+    def create_viewmatcher(self):
+        frappe.db.sql("""
+        CREATE OR REPLACE VIEW `viewMatcher` AS
+        select
+            `tm`.`sales_invoice` AS `sales_invoice`,
+            `tm`.`settlement_advice` AS `settlement_advice`,
+            `tm`.`match_logic` AS `match_logic`,
+            `tm`.`bank_transaction` AS `bank_transaction`
+        from
+            (`Dragarwals-db-Prod`.`tabMatcher` `tm`
+        join `Dragarwals-db-Prod`.`tabPayment Entry` `tpe` on
+            (`tm`.`sales_invoice` = `tpe`.`custom_sales_invoice`
+                and `tm`.`bank_transaction` = `tpe`.`reference_no`))
+        where
+            `tpe`.`posting_date` > '2024-03-31'
+            and `tpe`.`status` <> 'Cancelled';
+        """)
     
     def process(self):
         self.create_file_upload_mail_view()
@@ -2321,6 +2350,8 @@ class ViewCreator:
         self.create_current_bank_report_checklist_view()
         self.create_current_year_si_checklist_view()
         self.create_sales_invoice_with_reference_view()
+        self.create_bill_tracker_latest_view()
+        self.create_viewmatcher()
         
 def execute():
     ViewInstance = ViewCreator()
