@@ -31,7 +31,7 @@ class ClaimKeyMapper(KeyMapper):
             key_doc = frappe.new_doc(doctype)
             setattr(key_doc, field_name, name)
             key_doc.claim_key = claim_key	
-            key_doc.save()		
+            key_doc.save(ignore_permissions=True)		
             frappe.db.commit()
 
     def map_key(self, record):
