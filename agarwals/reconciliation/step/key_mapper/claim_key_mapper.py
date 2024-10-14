@@ -59,9 +59,9 @@ class ClaimKeyMapper(KeyMapper):
                             return
                         if not key: key = KeyCreator.process(key_id_variants)
                         
-                        if key[0] != 'IGNORED':
-                            if self.record_type in ('Bill','ClaimBook','Settlement Advice'):
-                                self.insert_claim_keys(record["name"], key[0])
+                        # if key[0] != 'IGNORED':
+                            # if self.record_type in ('Bill','ClaimBook','Settlement Advice'):
+                            #     self.insert_claim_keys(record["name"], key[0])
                         
                         self.update(self.query[field], key[0], record["name"])
                         _temp[key_id] = key
