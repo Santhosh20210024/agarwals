@@ -1,6 +1,9 @@
-from . import frappe, hashlib, json, unicodedata, re
-from agarwals.utils.error_handler import log_error
+import frappe
+import re
 import ast
+import hashlib 
+import unicodedata
+from agarwals.utils.error_handler import log_error
 
 
 class KeyCreator:
@@ -37,7 +40,7 @@ class KeyCreator:
         Returns:
             str: The normalized key_id.
         """
-        return unicodedata.normalize("NFKD", self.key_id).lower().strip()
+        return unicodedata.normalize("NFKD", self.key_id).strip()
 
     @staticmethod
     def get_key_configuration(doctype: str): 
@@ -52,6 +55,7 @@ class KeyCreator:
                 filters={"doctype_name": doctype},
                 fields=["regex_conf"],
             )
+
             if not result:
                 raise ValueError("No key configuration found for this doctype.")
             regex_conf = result[0]["regex_conf"]
@@ -70,6 +74,7 @@ class KeyCreator:
         """
         if not _pattern:
             raise ValueError(f"{_type} is missing or empty.")
+            
         try:
             return re.compile(rf'{_pattern}',flags=re.I)
         except re.error as e:
@@ -97,8 +102,8 @@ class KeyCreator:
                 )
                 compiled_patterns.append((compiled_regex_pattern, replacement))
         return compiled_patterns
-
-    def apply_regex_patterns(self, key_id: str, compiled_regex_patterns: list) -> set: 
+    
+    def apply_regex_patterns(self, key_id: str, compiled_regex_patterns: list) -> set:
         """
         Apply regex patterns to generate key variants.
         Returns:
@@ -106,11 +111,13 @@ class KeyCreator:
         """
         key_variants = set()
         for regex, replacement in compiled_regex_patterns:
-            variant = regex.sub(rf'{replacement}', key_id)
-            if not self._validate_variant(variant):
-                key_variants.add(variant)
+            if regex.search(key_id):
+                variant = regex.sub(rf'{replacement}', key_id)
+                if not self._validate_variant(variant):
+                    key_variants.add(variant)
+
         return key_variants
-    
+
     def is_regex_present(self, regex, text):
         return re.search(rf'{regex}', text)
 
@@ -141,10 +148,10 @@ class KeyCreator:
                 doc.insert(ignore_permissions=True)
             except Exception as e:
                 log_error(f"While Key Insertion Error {e}", doc = self.key_type)
-                raise Exception("Not Able To Create Key")
+                raise ValueError("Not Able To Create Key")
         try:
             frappe.db.commit()
             return [key]
         except Exception as e:
             log_error(f"Database Commit Error {e}", doc = self.key_type)
-            raise Exception("Database Commit Error")
+            raise ValueError("Database Commit Error")

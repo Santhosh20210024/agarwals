@@ -5,8 +5,8 @@ from agarwals.utils.str_to_dict import cast_to_dic
 from agarwals.utils.error_handler import log_error
 from agarwals.utils.index_update import update_index
 from agarwals.utils.matcher_query_list import get_matcher_query
-from agarwals.reconciliation.step.key_mapper.claim_key_mapper import query_mapper as claim_key_queries
-from agarwals.reconciliation.step.key_mapper.utr_key_mapper import query_mapper as utr_key_queries
+from agarwals.reconciliation.step.key_mapper.mapper_utils import claim_key_query_mapper as claim_key_queries
+from agarwals.reconciliation.step.key_mapper.mapper_utils import utr_key_query_mapper as utr_key_queries
 
 """
 'Open' -> New Records.
