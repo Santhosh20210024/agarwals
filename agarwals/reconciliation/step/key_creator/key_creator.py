@@ -55,6 +55,7 @@ class KeyCreator:
                 filters={"doctype_name": doctype},
                 fields=["regex_conf"],
             )
+
             if not result:
                 raise ValueError("No key configuration found for this doctype.")
             regex_conf = result[0]["regex_conf"]
@@ -73,6 +74,7 @@ class KeyCreator:
         """
         if not _pattern:
             raise ValueError(f"{_type} is missing or empty.")
+            
         try:
             return re.compile(rf'{_pattern}',flags=re.I)
         except re.error as e:
@@ -100,8 +102,8 @@ class KeyCreator:
                 )
                 compiled_patterns.append((compiled_regex_pattern, replacement))
         return compiled_patterns
-
-    def apply_regex_patterns(self, key_id: str, compiled_regex_patterns: list) -> set: 
+    
+    def apply_regex_patterns(self, key_id: str, compiled_regex_patterns: list) -> set:
         """
         Apply regex patterns to generate key variants.
         Returns:
@@ -109,11 +111,13 @@ class KeyCreator:
         """
         key_variants = set()
         for regex, replacement in compiled_regex_patterns:
-            variant = regex.sub(rf'{replacement}', key_id)
-            if not self._validate_variant(variant) and variant not in key_variants:
-                key_variants.add(variant)
+            if regex.search(key_id):
+                variant = regex.sub(rf'{replacement}', key_id)
+                if not self._validate_variant(variant):
+                    key_variants.add(variant)
+
         return key_variants
-    
+
     def is_regex_present(self, regex, text):
         return re.search(rf'{regex}', text)
 

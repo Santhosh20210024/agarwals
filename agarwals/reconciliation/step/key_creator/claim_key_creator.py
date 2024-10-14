@@ -13,11 +13,15 @@ class ClaimKeyCreator(KeyCreator):
 
     compiled_replace_patterns = None
     compiled_regex_patterns = None
+    compiled_slash_patterns = None
     compiled_star_health_patterns = None
 
     def __init__(self, key_id: str, key_type: str, reference_name: str, reference_doc: str):
         super().__init__(key_id=key_id, key_type=key_type, reference_name=reference_name, reference_doc=reference_doc)
-        if ClaimKeyCreator.compiled_replace_patterns is None or ClaimKeyCreator.compiled_regex_patterns is None or ClaimKeyCreator.compiled_star_health_patterns is None:
+        if (ClaimKeyCreator.compiled_replace_patterns is None 
+            or ClaimKeyCreator.compiled_regex_patterns is None 
+            or ClaimKeyCreator.compiled_star_health_patterns is None
+            or ClaimKeyCreator.compiled_slash_patterns is None):
             ClaimKeyCreator._load_key_configuration()
 
     @classmethod
@@ -30,9 +34,11 @@ class ClaimKeyCreator(KeyCreator):
             regex_conf = KeyCreator.get_key_configuration("Claim Key")
             replace_patterns = regex_conf.get("replace_patterns", "")
             regex_patterns = regex_conf.get("regex_patterns", "")
+            slash_patterns = regex_conf.get("slash_patterns","")
             star_health_patterns = regex_conf.get("star_health_patterns", "")
             cls.compiled_replace_patterns = KeyCreator.get_compiled_pattern(replace_patterns, "Replace Pattern")
             cls.compiled_regex_patterns = KeyCreator.compile_regex_patterns(regex_patterns)
+            cls.compiled_slash_patterns = KeyCreator.compile_regex_patterns(slash_patterns)
             cls.compiled_star_health_patterns = star_health_patterns
         except Exception as e:
             log_error(f"Error loading key configuration: {e}", doc="Claim Key")
@@ -48,6 +54,19 @@ class ClaimKeyCreator(KeyCreator):
             bool: True or False
         """
         return len(key.strip()) < 4
+
+    def remove_slash_patterns(self, item):
+        removed_item = self.apply_regex_patterns(item, ClaimKeyCreator.compiled_slash_patterns)
+
+        if removed_item:
+            key_id = list(removed_item)[0]
+            return key_id
+        else:
+            return item
+
+    def replace_item(self, item):
+        item = self.strip_claim_key(ClaimKeyCreator.compiled_replace_patterns.sub("", item))
+        return item
 
     def get_variants(self) -> set:
         """
@@ -65,16 +84,19 @@ class ClaimKeyCreator(KeyCreator):
         key_variants.add(n_key_id)
 
         if ClaimKeyCreator.compiled_replace_patterns:
-            f_key_id = self.strip_claim_key(ClaimKeyCreator.compiled_replace_patterns.sub("", n_key_id))
-            if not self._validate_variant(f_key_id):
-                key_variants.add(f_key_id)
-            
+            f_key_id = self.replace_item(n_key_id)
+
+            if self._validate_variant(f_key_id):
+                return key_variants
+
+            key_variants.add(f_key_id)
+
             if self.is_regex_present(ClaimKeyCreator.compiled_star_health_patterns, f_key_id):
-                star_pattern = str(f_key_id.split('/')[-1]).strip()
+                star_pattern = self.strip_claim_key(f_key_id.split('/')[-1])
                 if not self._validate_variant(star_pattern) and star_pattern:
                     key_variants.add(star_pattern)
-
-            key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns))
+            
+            key_variants.update(self.apply_regex_patterns(self.remove_slash_patterns(f_key_id), ClaimKeyCreator.compiled_regex_patterns))
         else:
             log_error("Compiled replace pattern is not set.", doc="Claim Key")
         return key_variants
