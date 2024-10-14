@@ -96,7 +96,8 @@ class ClaimKeyCreator(KeyCreator):
                 if not self._validate_variant(star_pattern) and star_pattern:
                     key_variants.add(star_pattern)
             
-            key_variants.update(self.apply_regex_patterns(self.remove_slash_patterns(f_key_id), ClaimKeyCreator.compiled_regex_patterns))
+            f_key_id = self.remove_slash_patterns(f_key_id)
+            key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns, default=f_key_id))
         else:
             log_error("Compiled replace pattern is not set.", doc="Claim Key")
         return key_variants
