@@ -16,3 +16,4 @@ class DatabaseUtils:
         """Cancel and delete a document."""
         frappe.get_doc(doctype, name).cancel()
         frappe.delete_doc(doctype, name, ignore_permissions=True)
+        frappe.db.commit()

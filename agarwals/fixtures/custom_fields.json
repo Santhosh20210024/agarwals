@@ -22,6 +22,27 @@
   {
     "doctype": "Custom Field",
     "dt": "Bank Transaction",
+    "name": "Bank Transaction-custom_staging_id",
+    "fieldname": "custom_staging_id",
+    "fieldtype": "Link",
+    "options": "Bank Transaction Staging",
+    "label": "Staging ID",
+    "insert_after": "custom_internal_id",
+    "allow_on_submit": 1
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Bank Transaction",
+    "name": "Bank Transaction-custom_internal_id",
+    "fieldname": "custom_internal_id",
+    "fieldtype": "Data",
+    "label": "Internal ID",
+    "insert_after": "date",
+    "allow_on_submit": 1
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Bank Transaction",
     "name": "Bank Transaction-custom_utr_key",
     "fieldname": "custom_utr_key",
     "fieldtype": "Data",
@@ -1026,21 +1047,6 @@
     "doctype": "Server Script"
 
  },
- {"name":"Bank Update",
-  "owner":"Administrator",
-  "creation":"2024-09-30 19:40:20.532380",
-  "modified":"2024-09-30 19:40:23.962754",
-  "modified_by":"Administrator",
-  "docstatus":0,
-  "idx":0,
-  "script_type":"Scheduler Event",
-  "event_frequency":"Cron",
-  "cron_format":"* * * * *",
-  "doctype_event":"Before Insert",
-  "allow_guest":0,
-  "disabled":1,
-  "script":"frappe.call(\"agarwals.reconciliation.job.run\",job_config=\"bank_update_cron\")",
-  "doctype":"Server Script"},
 {
   "name": "Reconciliation Job Executor",
   "owner": "Administrator",
@@ -1085,6 +1091,14 @@
     "method_path": "agarwals.reconciliation.step.advice_creator",
     "doctype": "Orchestrator Method",
     "__last_sync_on": "2024-09-13T13:54:46.475Z"
+  },
+  {
+   "name": "agarwals.agarwals.doctype.bank_update.bank_update",
+   "docstatus":0,
+   "idx":0,
+   "method_path":"agarwals.agarwals.doctype.bank_update.bank_update",
+   "doctype":"Orchestrator Method",
+   "__last_sync_on":"2024-10-15T09:11:10.508Z"
   },
   {
     "name": "agarwals.reconciliation.step.advice_downloader",

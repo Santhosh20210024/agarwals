@@ -21,10 +21,13 @@ BANK_UPDATE_LOG = {
                     'U02': 'Error: Transaction already reconciled.',
                     'U03': 'Warning: Reference number updated in Staging.',
                     'U04': 'Warning: Reference number updated in Transaction.',
-                    'U05': 'Info: Payer name updated in Staging and Transaction.',
+                    'U05': 'Info: Payer name updated in both bank transaction staging and bank transaction.',
                     'U06': 'Info: Payer name updating while creation.',
                     'U07': 'Error: Processing error encountered.',
-                    'U08': 'Error: Reference Number Not Found in Bank Transaction'
+                    'U08': 'Error: Reference Number Not Found in Bank Transaction',
+                    'U09': 'Info: Old Bank Transaction Deleted',
+                    'U10': 'Info: No Changes Found in Bank Transaction Staging with this data',
+                    'U11': 'Info: Internal ID Updated'
                   }
 
 class BankUpdateException(CGException): 
@@ -36,17 +39,9 @@ class BankUpdate(Document):
     """Default Bank Update Document Class"""
     def autoname(self):
         if self.old_internal_id and self.staging_id is None:
-            self.set_staging_id()
+            self.set_staging_id() # Only for internal id cases, don't give staging id in file.
         self.set_name()
         self.update_records()
-        
-    def update_records(self):
-        doc = frappe.get_doc('Bank Transaction Staging',self.staging_id)
-        self.reference_number = doc.reference_number
-        self.staging_status = doc.staging_status
-        self.current_remark = doc.user_remark
-        self.deposit = doc.deposit
-        self.withdrawal = doc.withdrawal
     
     def set_staging_id(self):
         staging_ids = frappe.get_all(
@@ -64,6 +59,14 @@ class BankUpdate(Document):
             filters={'staging_id': self.staging_id}
         )
         self.name = f"{self.staging_id}-{len(existing_adjustment_entries)}" if existing_adjustment_entries else self.staging_id
+
+    def update_records(self):
+        doc = frappe.get_doc('Bank Transaction Staging', self.staging_id)
+        self.reference_number = doc.reference_number
+        self.staging_status = doc.staging_status
+        self.current_remark = doc.user_remark
+        self.deposit = doc.deposit
+        self.withdrawal = doc.withdrawal
 
 class BankUpdateUtils: 
     @staticmethod
@@ -151,6 +154,7 @@ class BankUpdateProcessor(BankUpdateUtils):
               and self.does_bank_transaction_exist(item["reference_number"])):
             self.update_staging_retry(item)
             DatabaseUtils.clear_doc(BANK_TRANSACTION_DOCTYPE, item["reference_number"])
+            return BANK_UPDATE_LOG['U09']
         else:
             return BANK_UPDATE_LOG['U08']
     
@@ -210,10 +214,8 @@ class BankUpdateProcessor(BankUpdateUtils):
 
     def handle_existing_transaction(self, item, bank_update_remark):
         """Handle an existing bank transaction."""
-        if BANK_UPDATE_LOG['U05'] in bank_update_remark:
-            self.update_item_status(item["name"], STATUS_PROCESSED, "\n".join(bank_update_remark))
-        else:
-            bank_update_remark.append(BANK_UPDATE_LOG['U07'])
+        if not bank_update_remark:
+            bank_update_remark.append(BANK_UPDATE_LOG['U10'])
             self.update_item_status(item["name"], STATUS_ERROR, "\n".join(bank_update_remark))
 
     def finalize_processing(self, item, bank_update_remark):
@@ -236,6 +238,11 @@ class BankUpdateProcessor(BankUpdateUtils):
             ])
             return STATUS_PROCESSED
         
+        if (staging_item.staging_status in [STATUS_PROCESSED, STATUS_WARNING] 
+            and BANK_UPDATE_LOG['U09'] in bank_update_remark):
+            bank_update_remark.append(BANK_UPDATE_LOG['U01'])     
+            return STATUS_PROCESSED
+
         if staging_item.staging_status == "Error":
             bank_update_remark.append(BANK_UPDATE_LOG['U07'])
             return STATUS_ERROR
@@ -316,7 +323,8 @@ class BankUpdateProcessor(BankUpdateUtils):
             DatabaseUtils.update_doc(
                     BANK_UPDATE_DOCTYPE,
                     item["name"],
-                    status=STATUS_PROCESSED
+                    status=STATUS_PROCESSED,
+                    system_remark=BANK_UPDATE_LOG["U11"]
                 )
 
     def start_inclusions(self):
