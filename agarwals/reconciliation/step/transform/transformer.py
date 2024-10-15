@@ -5,7 +5,6 @@ import frappe
 from datetime import date
 import hashlib
 from agarwals.utils.loader import Loader
-from tfs.orchestration import ChunkOrchestrator
 from agarwals.utils.error_handler import log_error as error_handler
 from typing import List, Union
 
@@ -367,7 +366,6 @@ class Transformer:
     def extract(self):
         pass
 
-    @ChunkOrchestrator.update_chunk_status
     def process(self):
         status = "Processed"
         self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)
