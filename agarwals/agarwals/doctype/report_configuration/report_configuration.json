@@ -70,6 +70,7 @@
    "fieldname": "default_fiscal_year",
    "fieldtype": "Link",
    "label": "Default Fiscal Year",
+   "mandatory_depends_on": "eval: doc.fiscal_year_report === 1",
    "options": "Fiscal Year"
   },
   {
@@ -83,7 +84,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-15 09:41:45.052771",
+ "modified": "2024-10-15 11:24:50.070654",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Report Configuration",
