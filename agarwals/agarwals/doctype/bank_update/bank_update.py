@@ -38,6 +38,15 @@ class BankUpdate(Document):
         if self.old_internal_id and self.staging_id is None:
             self.set_staging_id()
         self.set_name()
+        self.update_records()
+        
+    def update_records(self):
+        doc = frappe.get_doc('Bank Transaction Staging',self.staging_id)
+        self.reference_number = doc.reference_number
+        self.staging_status = doc.staging_status
+        self.current_remark = doc.user_remark
+        self.deposit = doc.deposit
+        self.withdrawal = doc.withdrawal
     
     def set_staging_id(self):
         staging_ids = frappe.get_all(
@@ -211,7 +220,7 @@ class BankUpdateProcessor(BankUpdateUtils):
         """Update the corresponding status in bank transaction staging."""
         staging_item = frappe.get_doc('Bank Transaction Staging', item['staging_id'])
         status = self.determine_final_status(item, staging_item, bank_update_remark)
-        self.update_item_status(item["name"], status, "\n".join(bank_update_remark))
+        self.update_item_status(item["name"], status, "\n".join([i for i in bank_update_remark if i != None]))
         frappe.db.commit()
 
     def determine_final_status(self, item, staging_item, bank_update_remark):
@@ -292,8 +301,10 @@ class BankUpdateProcessor(BankUpdateUtils):
                     DatabaseUtils.update_doc(
                                     BANK_TRANSACTION_DOCTYPE,
                                     item["reference_number"],
+                                    is_submittable=True,
                                     custom_internal_id=item['updated_internal_id']
                                 )
+                    
                 frappe.db.commit()
             except Exception as e:
                 DatabaseUtils.update_doc(
