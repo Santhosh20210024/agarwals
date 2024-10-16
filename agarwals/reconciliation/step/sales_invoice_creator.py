@@ -207,6 +207,7 @@ class SalesInvoiceCreator:
                                         'branch': bill_record.branch, 'branch_type': bill_record.branch_type,
                                         'cost_center': bill_record.cost_center,
                                         'custom_patient_age' : bill_record.patient_age,
+                                        'custom_laterality' : bill_record.laterality,
                                         'items': [
                                             {'item_code': 'Claim', 'rate': bill_record.claim_amount, 'qty': 1}],
                                         'set_posting_time': 1, 'posting_date': bill_record.bill_date,

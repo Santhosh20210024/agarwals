@@ -262,6 +262,15 @@
     "insert_after": "custom_mode_of_submission",
     "allow_on_submit": 1
   },
+   {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "name": "Sales Invoice-custom_laterality",
+    "fieldname": "custom_laterality",
+    "fieldtype": "Data",
+    "label": "Laterality",
+    "allow_on_submit": 1
+  },
   {
     "doctype": "SA Downloader Configuration",
     "name": "VidalHealthDownloader",

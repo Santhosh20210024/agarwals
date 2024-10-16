@@ -25,6 +25,7 @@
   "claim_details_sb",
   "claim_id",
   "ma_claim_id",
+  "laterality",
   "claim_status",
   "column_break_notl",
   "category",
@@ -366,6 +367,11 @@
    "fieldname": "patient_age",
    "fieldtype": "Data",
    "label": "Patient Age"
+  },
+  {
+   "fieldname": "laterality",
+   "fieldtype": "Data",
+   "label": "Laterality"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -376,7 +382,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-08-21 17:57:25.668003",
+ "modified": "2024-10-16 12:37:53.114414",
  "modified_by": "Administrator",
  "module": "Bill",
  "name": "Bill",
