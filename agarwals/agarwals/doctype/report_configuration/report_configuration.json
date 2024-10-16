@@ -10,6 +10,10 @@
  "engine": "InnoDB",
  "field_order": [
   "report_name",
+  "fiscal_year_report",
+  "column_break_igykf",
+  "default_fiscal_year",
+  "section_break_carkk",
   "filters",
   "query",
   "columns",
@@ -54,11 +58,33 @@
    "fieldname": "columns",
    "fieldtype": "Code",
    "label": "Columns"
+  },
+  {
+   "default": "0",
+   "fieldname": "fiscal_year_report",
+   "fieldtype": "Check",
+   "label": "Fiscal Year Report"
+  },
+  {
+   "depends_on": "eval: doc.fiscal_year_report === 1",
+   "fieldname": "default_fiscal_year",
+   "fieldtype": "Link",
+   "label": "Default Fiscal Year",
+   "mandatory_depends_on": "eval: doc.fiscal_year_report === 1",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "column_break_igykf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_carkk",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-26 13:29:49.229314",
+ "modified": "2024-10-15 11:24:50.070654",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Report Configuration",
