@@ -1,5 +1,6 @@
 from agarwals.reconciliation.step.key_creator.key_creator import KeyCreator
 from agarwals.utils.error_handler import log_error
+import re
 
 class ClaimKeyCreator(KeyCreator):
     """
@@ -92,7 +93,7 @@ class ClaimKeyCreator(KeyCreator):
                     key_variants.add(star_pattern)
 
             f_key_id = self.remove_slash_patterns(f_key_id)
-            key_variants.update(f_key_id)
+            key_variants.add(f_key_id)
             key_variants.update(self.apply_regex_patterns(f_key_id, ClaimKeyCreator.compiled_regex_patterns))
             
         else:
