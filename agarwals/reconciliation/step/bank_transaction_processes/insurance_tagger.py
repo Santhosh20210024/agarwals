@@ -127,7 +127,6 @@ class InsuranceTagger:
             #   self.__exclude_transactions() # it leads to unnecessary deletion
         except Exception as e:
             raise InsuranceTaggerException('__process', e)
-
     
     def __validate_required_fields(self) -> None:
         """Validate necessary fields and throw errors if appropriate conditions are not met."""
