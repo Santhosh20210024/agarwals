@@ -13,10 +13,10 @@ def get_tagger_query(tag_type: TagType) -> str:
     """Get the Insurance tagger queries based on the given tag type"""
     query_list = {
         TagType.INCLUSION: (
-            "UPDATE `tabBank Transaction Staging` "
-            "SET tag = %(tag)s, based_on = 'Insurance Pattern', staging_status = 'Open' "
-            "WHERE search REGEXP %(patterns)s "
-            "AND tag IS NULL AND staging_status in ('Skipped', 'Open')"
+            "UPDATE `tabBank Transaction Staging` tbts join `tabBank Account` tba on tbts.bank_account = tba.name "
+            "SET tbts.tag = %(tag)s, tbts.based_on = 'Insurance Pattern', tbts.staging_status = 'Open' "
+            "WHERE tbts.search REGEXP %(patterns)s AND tbts.tag IS NULL "
+            "AND tbts.staging_status in ('Skipped', 'Open') AND tba.custom_skip_insurance_pattern_tagging = 0"
         ),
         TagType.EXCLUSION: (
             "UPDATE `tabBank Transaction Staging` "

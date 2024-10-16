@@ -93,13 +93,7 @@ class InsuranceTagger:
         tag: list[dict] = frappe.get_all("Tag", filters={"name": self.INSURANCE_TAG})
         if not tag:
             raise ValueError("Credit Payment Tag does not exist in Tag Doctype.")
-    
-    def __any_empty_records(self) -> None:
-        """Check if there is any empty search records in bank staging."""
-        empty_search_records: list[dict] = frappe.get_all(BANK_TRANSACTION_STAGING_DOCTYPE, filters={"search": ["=", ""], "deposit": ['!=', None]})
-        if empty_search_records:
-            raise ValueError("One or more records have empty search field values.")
-    
+
     def __is_inclusion_exists(self) -> None:
         """Check the existence of inclusion patterns."""
         if not self.compiled_inclusion_patterns and self.compiled_inclusion_patterns == "(?:)":
@@ -141,7 +135,6 @@ class InsuranceTagger:
         self.__check_tag_exists()
         self.__is_inclusion_exists()
         self.__is_exclusion_exists()
-        self.__any_empty_records()
     
     def __update_index(self):
         for item in self.update_index_list:

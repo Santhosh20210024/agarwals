@@ -10,6 +10,15 @@
   },
   {
     "doctype": "Custom Field",
+    "dt": "Bank Account",
+    "name": "Bank Account-custom_skip_insurance_pattern_tagging",
+    "fieldname": "custom_skip_insurance_pattern_tagging",
+    "fieldtype": "Check",
+    "label": "Skip Insurance Pattern Tagging",
+    "insert_after": "is_company_account"
+  },
+  {
+    "doctype": "Custom Field",
     "dt": "Bank Transaction",
     "name": "Bank Transaction-yearly_due",
     "fieldname": "custom_yearly_due",
