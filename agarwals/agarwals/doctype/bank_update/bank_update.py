@@ -25,8 +25,8 @@ BANK_UPDATE_LOG = {
                     'U06': 'Info: Payer name updating while creation.',
                     'U07': 'Error: Processing error encountered.',
                     'U08': 'Error: Reference Number Not Found in Bank Transaction',
-                    'U09': 'Info: Old Bank Transaction Deleted',
-                    'U10': 'Info: No Changes Found in Bank Transaction Staging with this data',
+                    'U09': 'Info: Old bank transaction renamed',
+                    'U10': 'Info: No changes found in bank transaction staging with this data',
                     'U11': 'Info: Internal ID Updated'
                   }
 
@@ -137,7 +137,7 @@ class BankUpdateProcessor(BankUpdateUtils):
         if staging_payer != item["party"]:
            return self.payer_updater.update_payer(item)
 
-    def update_staging_retry(self, item):
+    def mark_staging_retry(self, item):
         DatabaseUtils.update_doc(
             BANK_TRANSACTION_STAGING_DOCTYPE,
             item["staging_id"],
@@ -148,11 +148,11 @@ class BankUpdateProcessor(BankUpdateUtils):
     def change_reference_number(self, item):
         """Manages reference number changes, including updating and clearing transactions."""
         if item['staging_status'] == STATUS_SKIPPED:
-            self.update_staging_retry(item)
+            self.mark_staging_retry(item)
             frappe.db.commit()
         elif (item['staging_status'] in [STATUS_PROCESSED, STATUS_WARNING] 
               and self.does_bank_transaction_exist(item["reference_number"])):
-            self.update_staging_retry(item)
+            self.mark_staging_retry(item)
             # DatabaseUtils.clear_doc(BANK_TRANSACTION_DOCTYPE, item["reference_number"])
             return BANK_UPDATE_LOG['U09']
         else:
@@ -172,7 +172,8 @@ class BankUpdateProcessor(BankUpdateUtils):
                 self.handle_item_with_party(item, bank_update_remark) 
                 self.handle_item_with_reference(item, bank_update_remark) 
 
-                if not BankUpdateUtils.does_bank_transaction_exist(item["reference_number"]):
+                if(not BankUpdateUtils.does_bank_transaction_exist(item["reference_number"]) 
+                   or BANK_UPDATE_LOG['U09'] in bank_update_remark):
                     self.process_new_item(item, bank_update_remark)
                 else:
                     self.handle_existing_transaction(item, bank_update_remark)
@@ -217,6 +218,12 @@ class BankUpdateProcessor(BankUpdateUtils):
         if not bank_update_remark:
             bank_update_remark.append(BANK_UPDATE_LOG['U10'])
             self.update_item_status(item["name"], STATUS_ERROR, "\n".join(bank_update_remark))
+        elif(BANK_UPDATE_LOG['U02'] in bank_update_remark 
+             or BANK_UPDATE_LOG['U07'] in bank_update_remark 
+             or BANK_UPDATE_LOG['U08'] in bank_update_remark):
+            self.update_item_status(item["name"], STATUS_ERROR, "\n".join(bank_update_remark))
+        else:
+            self.update_item_status(item["name"], STATUS_PROCESSED, "\n".join(bank_update_remark))
 
     def finalize_processing(self, item, bank_update_remark):
         """Update the corresponding status in bank transaction staging."""

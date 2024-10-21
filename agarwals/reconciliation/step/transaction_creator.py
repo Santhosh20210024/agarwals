@@ -462,9 +462,14 @@ class BankStagingProcess(TransactionCreator):
         if self.is_bank_trasaction_payments_present(staging_doc.reference_number):
             return "Error", "E103"
 
-        # self.clear_transaction_and_files(staging_doc.reference_number)
-        # self._create_transaction_doc(staging_doc)
         frappe.rename_doc("Bank Transaction", staging_doc.reference_number, staging_doc.update_reference_number)
+        self._update_staging_doc(
+            staging_doc.name,
+            reference_number=staging_doc.update_reference_number,
+            staging_status="Processed",
+            last_processed_date=today(),
+            retry=0
+        )
         frappe.db.commit()
         return "Processed", "User Generated Reference Number"
     
