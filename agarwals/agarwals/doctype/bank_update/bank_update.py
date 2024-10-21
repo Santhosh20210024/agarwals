@@ -153,7 +153,7 @@ class BankUpdateProcessor(BankUpdateUtils):
         elif (item['staging_status'] in [STATUS_PROCESSED, STATUS_WARNING] 
               and self.does_bank_transaction_exist(item["reference_number"])):
             self.update_staging_retry(item)
-            DatabaseUtils.clear_doc(BANK_TRANSACTION_DOCTYPE, item["reference_number"])
+            # DatabaseUtils.clear_doc(BANK_TRANSACTION_DOCTYPE, item["reference_number"])
             return BANK_UPDATE_LOG['U09']
         else:
             return BANK_UPDATE_LOG['U08']
