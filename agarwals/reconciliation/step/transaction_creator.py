@@ -462,8 +462,10 @@ class BankStagingProcess(TransactionCreator):
         if self.is_bank_trasaction_payments_present(staging_doc.reference_number):
             return "Error", "E103"
 
-        self.clear_transaction_and_files(staging_doc.reference_number)
-        self._create_transaction_doc(staging_doc)
+        # self.clear_transaction_and_files(staging_doc.reference_number)
+        # self._create_transaction_doc(staging_doc)
+        frappe.rename_doc("Bank Transaction", staging_doc.reference_number, staging_doc.update_reference_number)
+        frappe.db.commit()
         return "Processed", "User Generated Reference Number"
     
     def process(self, transactions):
@@ -531,4 +533,3 @@ def process_items(items) -> None:
     except Exception as e:
         error_msg = f"An error occurred while (process_items): {items} -> {e}"
         log_error(error=error_msg, doc=BANK_UPDATE_DOCTYPE)
-
