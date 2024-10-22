@@ -9,37 +9,53 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "upload_details_section",
   "file_upload",
+  "column_break_a3k22",
   "file",
-  "date",
-  "transaction_status",
-  "bank_account",
-  "company",
-  "deposit",
-  "withdrawal",
-  "currency",
-  "description",
-  "reference_number",
-  "source_reference_number",
-  "column_break_5xa6d",
-  "tag",
-  "based_on",
-  "search",
-  "staging_status",
-  "error",
-  "remarks",
-  "update_reference_number",
-  "previous_utr",
-  "retry",
-  "or_check",
-  "is_fixed",
-  "party_details_section",
-  "payer_type",
-  "payer_name",
-  "payer_group",
-  "internal_id",
+  "section_break_hews9",
+  "index",
+  "column_break_psdw5",
   "transform",
-  "index"
+  "transaction_details_section",
+  "date",
+  "bank_account",
+  "section_break_vmnoa",
+  "internal_id",
+  "company",
+  "section_break_ivfuh",
+  "deposit",
+  "column_break_lmefk",
+  "withdrawal",
+  "section_break_szcsr",
+  "description",
+  "column_break_ql7go",
+  "reference_number",
+  "tagger_details_section",
+  "tag",
+  "column_break_pwp01",
+  "based_on",
+  "section_break_nhy2a",
+  "staging_status",
+  "last_processed_date",
+  "column_break_rshln",
+  "error",
+  "update_reference_number",
+  "section_break_hbzeh",
+  "is_manual",
+  "column_break_uuwio",
+  "retry",
+  "section_break_g3snl",
+  "user_remark",
+  "column_break_xdy9r",
+  "remark",
+  "section_break_buwrz",
+  "search",
+  "source_reference_number",
+  "party_details_section",
+  "payer_name",
+  "column_break_13270",
+  "payer_group"
  ],
  "fields": [
   {
@@ -47,13 +63,9 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Date"
-  },
-  {
-   "default": "Pending",
-   "fieldname": "transaction_status",
-   "fieldtype": "Data",
-   "label": "Transaction Status"
+   "label": "Date",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "bank_account",
@@ -62,46 +74,42 @@
    "in_standard_filter": 1,
    "label": "Bank Account",
    "options": "Bank Account",
+   "read_only": 1,
    "reqd": 1
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "read_only": 1
   },
   {
    "fieldname": "deposit",
    "fieldtype": "Currency",
-   "label": "Deposit"
+   "label": "Deposit",
+   "read_only": 1
   },
   {
    "fieldname": "withdrawal",
    "fieldtype": "Currency",
-   "label": "Withdrawal"
-  },
-  {
-   "default": "INR",
-   "fieldname": "currency",
-   "fieldtype": "Data",
-   "label": "Currency"
+   "label": "Withdrawal",
+   "read_only": 1
   },
   {
    "fieldname": "description",
    "fieldtype": "Data",
-   "label": "Description"
+   "label": "Description",
+   "read_only": 1
   },
   {
+   "description": "* system extracted reference number",
    "fieldname": "reference_number",
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Reference Number"
-  },
-  {
-   "fieldname": "remarks",
-   "fieldtype": "Small Text",
-   "label": "Remarks"
+   "label": "Reference Number",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -111,32 +119,28 @@
    "label": "Retry"
   },
   {
-   "fieldname": "column_break_5xa6d",
-   "fieldtype": "Column Break",
-   "label": "Modifications"
-  },
-  {
-   "depends_on": "eval:doc.staging_status == 'Warning'",
-   "fieldname": "update_reference_number",
-   "fieldtype": "Data",
-   "label": "Update Reference Number"
-  },
-  {
    "fieldname": "tag",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Tag",
-   "options": "Tag"
+   "options": "Tag",
+   "read_only": 1
   },
   {
+   "description": "Source file reference number",
    "fieldname": "source_reference_number",
    "fieldtype": "Data",
-   "label": "Source Reference Number"
+   "hidden": 1,
+   "label": "Source Reference Number",
+   "read_only": 1
   },
   {
    "fieldname": "search",
    "fieldtype": "Small Text",
    "hidden": 1,
-   "label": "Search"
+   "label": "Search",
+   "read_only": 1
   },
   {
    "default": "Open",
@@ -145,93 +149,195 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Open\nProcessed\nError\nWarning\nWithdrawn\nSkipped\nCG.Error"
-  },
-  {
-   "depends_on": "eval:doc.staging_status == 'Warning'",
-   "fieldname": "previous_utr",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Previous utr"
+   "options": "Open\nProcessed\nError\nWarning\nSkipped",
+   "read_only": 1
   },
   {
    "fetch_from": "file_upload.file",
    "fieldname": "file",
    "fieldtype": "Data",
-   "label": "File Name"
-  },
-  {
-   "default": "0",
-   "fieldname": "or_check",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "OR Check"
+   "label": "File Name",
+   "read_only": 1
   },
   {
    "fieldname": "error",
    "fieldtype": "Data",
-   "label": "Error"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_fixed",
-   "fieldtype": "Check",
-   "label": "Is Fixed"
+
+   "label": "Error Code",
+   "read_only": 1
   },
   {
    "fieldname": "based_on",
-   "fieldtype": "Data",
-   "label": "Based On"
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Based On",
+   "options": "\nOR file\nManual\nClaimBook\nSettlement Advice\nInsurance Pattern",
+   "read_only": 1,
+   "sort_options": 1
   },
   {
    "fieldname": "party_details_section",
    "fieldtype": "Section Break",
-   "label": "Payer Details"
-  },
-  {
-   "fieldname": "payer_type",
-   "fieldtype": "Data",
-   "label": "Payer Type"
+   "label": "Party Details"
   },
   {
    "fieldname": "payer_name",
-   "fieldtype": "Data",
-   "label": "Payer Name"
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Party",
+   "options": "Customer",
+   "read_only": 1
   },
   {
    "fieldname": "payer_group",
-   "fieldtype": "Data",
-   "label": "Payer Group"
+   "fieldtype": "Link",
+   "label": "Party Group",
+   "options": "Customer Group",
+   "read_only": 1
   },
   {
    "fieldname": "internal_id",
    "fieldtype": "Data",
+   "in_standard_filter": 1,
    "label": "Internal ID"
   },
   {
    "fieldname": "transform",
    "fieldtype": "Link",
    "label": "Transform",
-   "options": "Transform",
-   "read_only": 1
+   "options": "Transform"
   },
   {
+   "bold": 1,
+   "description": "* link to file upload",
    "fieldname": "file_upload",
    "fieldtype": "Link",
-   "label": "Source File Id",
+   "in_standard_filter": 1,
+   "label": "Upload ID",
    "options": "File upload",
    "read_only": 1
   },
   {
    "fieldname": "index",
    "fieldtype": "Int",
-   "label": "File Index",
-   "read_only": 1
+   "label": "File Index"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_manual",
+   "fieldtype": "Check",
+   "label": "Is Manual"
+  },
+  {
+   "fieldname": "upload_details_section",
+   "fieldtype": "Section Break",
+   "label": "Upload Details"
+  },
+  {
+   "fieldname": "transaction_details_section",
+   "fieldtype": "Section Break",
+   "label": "Transaction Details"
+  },
+  {
+   "fieldname": "section_break_ivfuh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_lmefk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_szcsr",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tagger_details_section",
+   "fieldtype": "Section Break",
+   "label": "Tagger Details"
+  },
+  {
+   "default": " ",
+   "fieldname": "column_break_13270",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_a3k22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_vmnoa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ql7go",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_pwp01",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_g3snl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_nhy2a",
+   "fieldtype": "Section Break",
+   "label": "Processing Details"
+  },
+  {
+   "fieldname": "column_break_xdy9r",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_buwrz",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  },
+  {
+   "fieldname": "user_remark",
+   "fieldtype": "Small Text",
+   "label": "User Remark"
+  },
+  {
+   "fieldname": "last_processed_date",
+   "fieldtype": "Date",
+   "label": "Last Processed Date"
+  },
+  {
+   "fieldname": "section_break_hews9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_psdw5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_rshln",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_hbzeh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_uuwio",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "update_reference_number",
+   "fieldtype": "Data",
+   "label": "Update Reference Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-29 18:33:32.902852",
+ "modified": "2024-10-05 16:01:31.124481",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "Bank Transaction Staging",
@@ -286,5 +392,8 @@
    "color": "Red",
    "title": "Error"
   }
- ]
+ ],
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }

@@ -2,7 +2,7 @@ import frappe
 
 class PaymentEntryCancellator:
     def get_payment_reference_doctypes(self):
-        return {'Bank Transaction Payments': 'Bank Transaction', 'Sales Invoice Reference':'Sales Invoice'}
+        return {'Bank Transaction Payments': 'Bank Transaction'}
 
     def cancel_record(self, record):
         record.cancel()

@@ -55,7 +55,6 @@ class KeyCreator:
                 filters={"doctype_name": doctype},
                 fields=["regex_conf"],
             )
-
             if not result:
                 raise ValueError("No key configuration found for this doctype.")
             regex_conf = result[0]["regex_conf"]

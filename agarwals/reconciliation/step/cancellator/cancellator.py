@@ -13,5 +13,4 @@ class PaymentDocumentCancellator:
                     if journal_entry_doc:
                         JournalEntryCancellator.cancel_journal_entry(bill)
             except Exception as e:
-                log_error(e,'Payment Entry',bill)
-                frappe.db.commit()
+                log_error(e,'Payment Entry', bill)

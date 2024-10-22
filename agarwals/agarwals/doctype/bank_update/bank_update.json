@@ -1,0 +1,289 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-09-24 16:18:29.785041",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_epbbd",
+  "operation_type",
+  "column_break_04rqt",
+  "status",
+  "section_break_94ola",
+  "staging_id",
+  "column_break_3wmtw",
+  "staging_status",
+  "section_break_cgbo9",
+  "old_internal_id",
+  "column_break_rmful",
+  "updated_internal_id",
+  "section_break_oxpzp",
+  "reference_number",
+  "column_break_byhsc",
+  "update_reference_number",
+  "section_break_xvi98",
+  "deposit",
+  "column_break_rgtgd",
+  "withdrawal",
+  "column_break_mhgfa",
+  "party",
+  "column_break_k3nrw",
+  "party_group",
+  "section_break_wrrrg",
+  "remark",
+  "column_break_vk6gp",
+  "system_remark",
+  "upload_details_section",
+  "upload_id",
+  "column_break_mblik",
+  "file_name",
+  "section_break_1xqtz",
+  "transform",
+  "column_break_z2aux",
+  "index",
+  "current_remark"
+ ],
+ "fields": [
+  {
+   "fieldname": "update_reference_number",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Update Reference Number"
+  },
+  {
+   "fetch_from": "upload_id.update_type",
+   "fieldname": "operation_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Operation Type",
+   "options": "\nInclusion\nExclusion\nInternal ID"
+  },
+  {
+   "fieldname": "party",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Party",
+   "options": "Customer"
+  },
+  {
+   "fetch_from": "party.customer_group",
+   "fieldname": "party_group",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Party Group",
+   "options": "Customer Group",
+   "read_only": 1
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "read_only": 1,
+   "options": "\nOpen\nProcessed\nError"
+  },
+  {
+   "fieldname": "upload_id",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Upload ID",
+   "options": "File upload",
+   "read_only": 1
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Data",
+   "label": "Transform",
+   "read_only": 1
+  },
+  {
+   "fieldname": "index",
+   "fieldtype": "Data",
+   "label": "Index",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "User Remark"
+  },
+  {
+   "fieldname": "staging_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Staging ID",
+   "options": "Bank Transaction Staging",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "staging_id.reference_number",
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Reference Number",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "staging_id.staging_status",
+   "fieldname": "staging_status",
+   "fieldtype": "Data",
+   "label": "Staging Status",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "staging_id.user_remark",
+   "fieldname": "current_remark",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Current Remark",
+   "read_only": 1
+  },
+  {
+   "fieldname": "system_remark",
+   "fieldtype": "Small Text",
+   "label": "System Remark"
+  },
+  {
+   "fetch_from": "staging_id.deposit",
+   "fieldname": "deposit",
+   "fieldtype": "Currency",
+   "label": "Deposit",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "staging_id.withdrawal",
+   "fieldname": "withdrawal",
+   "fieldtype": "Currency",
+   "label": "Withdrawal",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mhgfa",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "upload_details_section",
+   "fieldtype": "Section Break",
+   "label": "Upload Details"
+  },
+  {
+   "fieldname": "column_break_04rqt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_epbbd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_94ola",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_3wmtw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_cgbo9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_byhsc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_xvi98",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_rgtgd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_k3nrw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_wrrrg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_vk6gp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "upload_id.file",
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mblik",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_z2aux",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_1xqtz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "old_internal_id",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Old Internal ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_rmful",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "updated_internal_id",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Updated Internal ID"
+  },
+  {
+   "fieldname": "section_break_oxpzp",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-10-05 11:39:57.803158",
+ "modified_by": "Administrator",
+ "module": "Agarwals",
+ "name": "Bank Update",
+ "naming_rule": "By script",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "staging_id",
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
+}

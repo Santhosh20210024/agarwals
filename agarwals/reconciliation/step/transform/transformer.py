@@ -365,7 +365,7 @@ class Transformer:
 
     def extract(self):
         pass
-
+    
     def process(self):
         status = "Processed"
         self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)

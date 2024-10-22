@@ -215,18 +215,11 @@ frappe.ui.form.on('File upload', {
           template_doctype = 'Settlement Advice';
           template_name = frm.doc.payer_type;
           break;
-        case 'Bill Adjustment':
-          template_doctype = 'Bill Adjustment';
-          break;
-        case 'Write Back':
-          template_doctype = 'Write Back';
-          break;
-        case 'Write Off':
-          template_doctype = 'Write Off';
-          break;
         case 'Bank Statement Bulk':
           template_doctype = 'Bank Transaction';
           break;
+        default:
+          template_doctype = frm.doc.document_type;
       }
       if(template_doctype === null ||(template_doctype=="Settlement Advice" && template_name != "Manual")){
         frappe.msgprint('Template Not Available');

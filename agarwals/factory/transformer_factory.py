@@ -7,6 +7,7 @@ from agarwals.reconciliation.step.transform.writeoff_transformer import Writeoff
 from agarwals.reconciliation.step.transform.bank_transformer import BankBulkTransformer
 from agarwals.reconciliation.step.transform.advice_transformer import AdviceTransformer
 from agarwals.reconciliation.step.transform.closing_balance_transformer import ClosingBalanceTransformer
+from agarwals.reconciliation.step.transform.bank_update_transformer import BankUpdateTransformer
 from agarwals.reconciliation.step.transform.tpa_credentials_transformer import TpaCredentialsTransformer
 from agarwals.reconciliation.step.transform.bill_entry_transformer import BillEntryTransformer
 
@@ -35,5 +36,7 @@ def get_transformer(transformer_type: str):
         return TpaCredentialsTransformer()
     elif transformer_type == "bill_entry":
         return BillEntryTransformer()
+    elif transformer_type == "bank_update":
+        return BankUpdateTransformer()
     else:
         raise NotImplementedError(f"Unable to find the transformer for the type {transformer_type}")

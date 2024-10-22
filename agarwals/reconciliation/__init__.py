@@ -1,0 +1,3 @@
+BANK_TRANSACTION_DOCTYPE = "Bank Transaction"
+BANK_TRANSACTION_STAGING_DOCTYPE = "Bank Transaction Staging"
+BANK_UPDATE_DOCTYPE = "Bank Update"

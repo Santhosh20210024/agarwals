@@ -13,6 +13,7 @@
   "document_type",
   "payer_type",
   "bank_account",
+  "update_type",
   "wb_date",
   "wo_date",
   "download_template",
@@ -58,7 +59,7 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:(doc.document_type=='Closing Balance') || (doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment') || (doc.document_type=='Settlement Advice' && doc.payer_type ==null && doc.file_format == 'ZIP') || (doc.document_type=='Bank Statement' && doc.bank_account == null && doc.file_format == 'ZIP' )||(doc.document_type == \"Write Back\"&& doc.wb_date != null)||(doc.document_type == \"Write Off\"&& doc.wo_date != null) || (doc.document_type==\"Bank Statement Bulk\") || (doc.document_type==\"Bill Entry\") || (doc.document_type==\"TPA Credentials\")",
+   "depends_on": "eval:(doc.document_type=='Closing Balance') || (doc.document_type=='Settlement Advice' && doc.payer_type !=null) || (doc.document_type=='Bank Statement' && doc.bank_account != null ) || (doc.document_type=='Claim Book') || (doc.document_type=='Debtors Report') || (doc.document_type=='Bill Adjustment') || (doc.document_type=='Settlement Advice' && doc.payer_type ==null && doc.file_format == 'ZIP') || (doc.document_type=='Bank Statement' && doc.bank_account == null && doc.file_format == 'ZIP' )||(doc.document_type == \"Write Back\"&& doc.wb_date != null)||(doc.document_type == \"Write Off\"&& doc.wo_date != null) || (doc.document_type==\"Bank Statement Bulk\") || (doc.document_type==\"Bank Update\" && (doc.update_type == 'Inclusion') || (doc.update_type =='Exclusion') || (doc.update_type == 'Internal ID')) || (doc.document_type==\"Bill Entry\") || (doc.document_type==\"TPA Credentials\")",
    "fieldname": "upload",
    "fieldtype": "Attach",
    "in_preview": 1,
@@ -97,7 +98,7 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "File Type",
-   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment\nWrite Back\nWrite Off\nBank Statement Bulk\nClosing Balance\nBill Entry"
+   "options": "\nDebtors Report\nClaim Book\nSettlement Advice\nBank Statement\nBill Adjustment\nWrite Back\nWrite Off\nBank Statement Bulk\nClosing Balance\nBank Update\nBill Entry\nTPA Credentials"
   },
   {
    "depends_on": "eval:doc.upload !=null && doc.file_format != 'ZIP'",
@@ -304,15 +305,25 @@
   },
   {
    "default": "0",
+
+   "depends_on": "eval:doc.document_type=='Settlement Advice'",
    "fieldname": "sa_mail_sent",
    "fieldtype": "Check",
    "in_preview": 1,
    "label": "SA Mail sent"
+  },
+  {
+   "depends_on": "eval:doc.document_type=='Bank Update' && doc.file_format != 'ZIP'",
+   "fieldname": "update_type",
+   "fieldtype": "Select",
+   "label": "Update Type",
+   "mandatory_depends_on": "eval:doc.document_type=='Bank Update'",
+   "options": "\nInclusion\nExclusion\nInternal ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-07 11:45:43.013575",
+ "modified": "2024-10-15 19:49:43.589482",
  "modified_by": "Administrator",
  "module": "Agarwals",
  "name": "File upload",
