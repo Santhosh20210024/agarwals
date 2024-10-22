@@ -20,8 +20,11 @@ def get_matcher_query(matcher_pattern):
                 `tabSettlement Advice` sa
                 ON bt.custom_utr_key = sa.utr_key
             JOIN 
+               `tabSettlement Advice Claim Key` sack
+               ON sack.settlement_advice = sa.name   
+            JOIN 
                 `tabClaimBook Claim Key` cck
-                ON sa.claim_key = cck.claim_key
+                ON sack.claim_key = cck.claim_key
             JOIN
                 `tabClaimBook` cb
                 ON cb.name = cck.claimbook
@@ -57,8 +60,11 @@ def get_matcher_query(matcher_pattern):
                 `tabSettlement Advice` sa
                  ON bt.custom_utr_key = sa.utr_key
             JOIN 
+               `tabSettlement Advice Claim Key` sack
+               ON sack.settlement_advice = sa.name 
+            JOIN 
                 `tabClaimBook Claim Key` cck
-                ON sa.claim_key = cck.claim_key
+                ON sack.claim_key = cck.claim_key
             JOIN
                 `tabClaimBook` cb
                 ON cb.name = cck.claimbook
@@ -90,9 +96,12 @@ def get_matcher_query(matcher_pattern):
             JOIN
                 `tabClaimBook Claim Key` cck
                 ON cb.name = cck.claimbook
+            JOIN 
+               `tabSettlement Advice Claim Key` sack
+               ON sack.claim_key = cck.claim_key
             JOIN
                 `tabSettlement Advice` sa
-                ON cck.claim_key = sa.claim_key
+                ON sa.name = sack.settlement_advice 
             JOIN
                  `tabBill Claim Key`  bck
                  ON bck.claim_key = cck.claim_key
@@ -125,9 +134,12 @@ def get_matcher_query(matcher_pattern):
             JOIN
                 `tabClaimBook Claim Key` cck
                 ON cb.name = cck.claimbook
+           JOIN 
+               `tabSettlement Advice Claim Key` sack
+               ON sack.claim_key = cck.claim_key
             JOIN
                 `tabSettlement Advice` sa
-                ON cck.claim_key = sa.claim_key
+                ON sa.name = sack.settlement_advice 
             JOIN
                 `tabBill` bi
                 ON bi.cg_formatted_bill_number = cb.cg_formatted_bill_number
@@ -267,8 +279,11 @@ def get_matcher_query(matcher_pattern):
             JOIN `tabSettlement Advice` sa 
                 ON  sa.utr_key = bt.custom_utr_key
             JOIN 
+               `tabSettlement Advice Claim Key` sack
+               ON sack.settlement_advice = sa.name 
+            JOIN 
                 `tabBill Claim Key` bck
-                ON bck.claim_key = sa.claim_key
+                ON bck.claim_key = sack.claim_key
             JOIN 
                `tabBill` bi 
                 ON (bi.name = bck.bill AND sa.cg_formatted_bill_number = bi.cg_formatted_bill_number)
@@ -322,9 +337,12 @@ def get_matcher_query(matcher_pattern):
             sa.status as status
             FROM
                 `tabSettlement Advice` sa
+            JOIN 
+               `tabSettlement Advice Claim Key` sack
+               ON sack.settlement_advice = sa.name 
             JOIN
                 `tabBill Claim Key` bck 
-                ON sa.claim_key = bck.claim_key
+                ON sack.claim_key = bck.claim_key
             JOIN
                 `tabBill` bi
                 ON bi.name = bck.bill

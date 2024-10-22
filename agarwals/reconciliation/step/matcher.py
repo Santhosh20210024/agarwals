@@ -8,6 +8,7 @@ from agarwals.utils.matcher_query_list import get_matcher_query
 from agarwals.reconciliation.step.key_mapper.claim_key_mapper import query_mapper as claim_key_queries
 from agarwals.reconciliation.step.key_mapper.utr_key_mapper import query_mapper as utr_key_queries
 
+
 """
 'Open' -> New Records.
 'Warning' -> Validation Error.
@@ -428,5 +429,3 @@ def process(args):
     args = cast_to_dic(args)
     step_id = args["step_id"]
     ChunkOrchestrator().process(validate_and_start_matcher, step_id=step_id)
-
-

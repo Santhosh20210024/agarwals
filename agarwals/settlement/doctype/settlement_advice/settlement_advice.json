@@ -49,6 +49,7 @@
   "branch_type",
   "cg_formatted_bill_number",
   "claim_key",
+  "cl_key",
   "utr_key",
   "cg_utr_number",
   "cg_formatted_utr_number",
@@ -488,10 +489,15 @@
    "fieldname": "utr_key",
    "fieldtype": "Data",
    "label": "UTR Key"
+  },
+  {
+   "fieldname": "cl_key",
+   "fieldtype": "Data",
+   "label": "CL Key"
   }
  ],
  "links": [],
- "modified": "2024-09-04 12:16:13.849330",
+ "modified": "2024-09-30 11:11:42.399459",
  "modified_by": "Administrator",
  "module": "Settlement",
  "name": "Settlement Advice",

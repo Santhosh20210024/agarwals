@@ -55,7 +55,7 @@ class UTRKeyCreator(KeyCreator):
         Returns:
             bool: True if the key variant is valid, False otherwise.
         """
-        return key.isalpha() or len(key) < 4
+        return key.isalpha() or len(key.strip()) < 4
 
     def format_utr(self, utr) -> set:
         """
@@ -75,7 +75,10 @@ class UTRKeyCreator(KeyCreator):
 
         if UTRKeyCreator.compiled_citin_pattern.match(utr):
             variants.add("citin" + utr)
-
+            
+        if utr.startswith("s") and utr[1:].isdigit():
+            variants.add(utr[1:])
+            
         if len(utr) == 9:
             variants.add("aiscn0" + utr)
 

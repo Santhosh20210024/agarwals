@@ -4,3 +4,4 @@ Claim
 Settlement
 Configuration
 Reconciliation
+Bill Entry

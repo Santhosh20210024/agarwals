@@ -162,6 +162,7 @@
   {
    "fieldname": "error",
    "fieldtype": "Data",
+
    "label": "Error Code",
    "read_only": 1
   },

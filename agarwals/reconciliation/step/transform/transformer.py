@@ -7,7 +7,6 @@ import hashlib
 from agarwals.utils.loader import Loader
 from agarwals.utils.error_handler import log_error as error_handler
 from typing import List, Union
-from tfs.orchestration import ChunkOrchestrator
 
 control_panel = frappe.get_single('Control Panel')
 SITE_PATH = control_panel.site_path
@@ -366,8 +365,6 @@ class Transformer:
 
     def extract(self):
         pass
-    
-    @ChunkOrchestrator.update_chunk_status
     def process(self):
         status = "Processed"
         self.loading_configuration = frappe.get_doc("Data Loading Configuration", self.document_type)

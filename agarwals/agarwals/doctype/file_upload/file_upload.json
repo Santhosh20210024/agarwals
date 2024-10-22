@@ -305,6 +305,7 @@
   },
   {
    "default": "0",
+
    "depends_on": "eval:doc.document_type=='Settlement Advice'",
    "fieldname": "sa_mail_sent",
    "fieldtype": "Check",

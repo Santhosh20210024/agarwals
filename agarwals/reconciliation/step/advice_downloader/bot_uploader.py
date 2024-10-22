@@ -4,6 +4,8 @@ import shutil
 import os
 from tfs.api_utils import login, create_document, create_file
 from agarwals.utils.error_handler import log_error
+from tfs.orchestration import ChunkOrchestrator, chunk
+from agarwals.utils.str_to_dict import cast_to_dic
 
 
 class SABotUploader:
@@ -177,6 +179,8 @@ class SABotUploader:
             if os.path.exists(self.zip_folder_path):
                 shutil.rmtree(self.zip_folder_path)
 
+
+    @ChunkOrchestrator.update_chunk_status
     def process(self) -> None:
         """
         Usage:
@@ -193,5 +197,19 @@ class SABotUploader:
                 self.generate_notification()
             if self.delete_folders_without_zip == 1 or self.delete_folders_with_zip == 1:
                 self.delete_backend_file()
+            return "Processed"
         except Exception as e:
             log_error(error=e, doc_name="SA Bot Uploader")
+            return "Error"
+
+
+@frappe.whitelist()
+def process(args):
+    try:
+        args = cast_to_dic(args)
+        bot_uploader = SABotUploader()
+        ChunkOrchestrator().process(bot_uploader.process, step_id=args["step_id"], is_enqueueable=True,
+                                    queue=args["queue"],
+                                    is_async=True, timeout=3600)
+    except Exception as e:
+        log_error(error=e,doc_name='SA Bot Uploader')

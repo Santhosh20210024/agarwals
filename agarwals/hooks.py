@@ -14,6 +14,7 @@ required_apps = ["frappe/tfs"]
 # include js, css files in header of desk.html
 # app_include_css = "/assets/agarwals/css/agarwals.css"
 # app_include_js = "/assets/agarwals/js/agarwals.js"
+app_include_js = "/assets/agarwals/js/report_skeleton.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/agarwals/css/agarwals.css"
@@ -24,6 +25,7 @@ required_apps = ["frappe/tfs"]
 
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
+
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
 # include js in page
@@ -31,6 +33,8 @@ required_apps = ["frappe/tfs"]
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+
+# doctype_js = {"Report" : "public/js/report.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}

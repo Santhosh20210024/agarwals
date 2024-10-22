@@ -1,6 +1,7 @@
 import os
 import frappe
 from agarwals.utils.error_handler import log_error
+import shutil
 from agarwals.utils.file_util import (
     SUB_DIR,
     SHELL_PATH,
@@ -104,33 +105,3 @@ def create_project_folders():
         frappe.throw(f"Error: {e}")
 
 
-@frappe.whitelist()
-def create_sa_folders():
-    path = os.path.join(SITE_PATH, SHELL_PATH, PROJECT_FOLDER, "Settlement Advice")
-        
-    
-    
-    already_exists = False
-    try:
-        if os.path.exists(path):
-            folder_names = set(
-                frappe.db.sql(
-                    "SELECT tpa FROM `tabTPA Login Credentials` WHERE is_enable = 1",
-                    pluck="tpa",
-                )
-            )
-            for name in folder_names:
-                folder = path + "/" + name
-                if not os.path.exists(folder):
-                    os.mkdir(folder)
-                else:
-                    log_error(error=f"Folder {name} Already Exists")
-                    already_exists = True
-            return (
-                "folder created" if already_exists == False else "folder already exists"
-            )
-        else:
-            return "path not found"
-    except Exception as e:
-        log_error(error=e)
-        return "unexpected error occurs"

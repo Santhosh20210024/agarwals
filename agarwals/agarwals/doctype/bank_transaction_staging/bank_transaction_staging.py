@@ -1,7 +1,7 @@
 # Copyright (c) 2024, Agarwals and contributors
 # For license information, please see license.txt
 from agarwals.agarwals.doctype import file_records
-# import frappe
+import frappe
 from frappe.model.document import Document
 
 class BankTransactionStaging(Document):
