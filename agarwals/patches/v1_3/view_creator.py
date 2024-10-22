@@ -147,6 +147,7 @@ class ViewCreator:
                 `tbt`.`custom_branch_type` AS `Branch_Type`,
                 `tbt`.`status` AS `Status`,
                 `tbt`.`bank_account` AS `Bank_Account`,
+                `tbt`.`custom_ns_ledger_code` AS `NS_Ledger_Code`,
                 `tbt`.`description` AS `Description`,
                 `tbt`.`reference_number` AS `Reference_Number`,
                 `tbt`.`custom_internal_id` AS `Internal_Id`,
@@ -1910,39 +1911,40 @@ class ViewCreator:
     def create_sorted_current_bank_transaction_view(self):
         frappe.db.sql("""CREATE OR REPLACE VIEW `viewSorted Current Brank Transaction` AS
             select
-                `cbt`.`Entity` AS `Entity`,
-                `cbt`.`Region` AS `Region`,
-                `cbt`.`Party_Group` AS `Party_Group`,
-                `cbt`.`Insurance` AS `Insurance`,
-                `cbt`.`UTR_Number` AS `UTR_Number`,
-                `cbt`.`UTR_Date` AS `UTR_Date`,
-                `cbt`.`Current_Allocated_Amount` AS `Current_Allocated_Amount`,
-                `cbt`.`Current_UnAllocated` AS `Current_UnAllocated`,
-                `cbt`.`Current_Deposit` AS `Current_Deposit`,
-                `cbt`.`Branch_Type` AS `Branch_Type`,
-                `cbt`.`Status` AS `Status`,
-                `cbt`.`Bank_Account` AS `Bank_Account`,
-                `cbt`.`Description` AS `Description`,
-                `cbt`.`Reference_Number` AS `Reference_Number`,
-                `cbt`.`Internal_Id` AS `Internal_Id`,
-                `cbt`.`Based_On` AS `Based_On`,
-                `cbt`.`Allocated_Amount(Payment_Entries)` AS `Allocated_Amount(Payment_Entries)`,
-                `cbt`.`Payment_Document(Payment_Entries)` AS `Payment_Document(Payment_Entries)`,
-                `cbt`.`Payment_Entry(Payment_Entries)` AS `Payment_Entry(Payment_Entries)`,
-                `cbt`.`Bill_Region(Payment_Entries)` AS `Bill_Region(Payment_Entries)`,
-                `cbt`.`Creation_Date(Payment_Entries)` AS `Creation_Date(Payment_Entries)`,
-                `cbt`.`Posting_Date(Payment_Entries)` AS `Posting_Date(Payment_Entries)`,
-                `cbt`.`Bill_Date(Payment_Entries)` AS `Bill_Date(Payment_Entries)`,
-                `cbt`.`Bill_Branch(Payment_Entries)` AS `Bill_Branch(Payment_Entries)`,
-                `cbt`.`Bill_Entity(Payment_Entries)` AS `Bill_Entity(Payment_Entries)`,
-                `cbt`.`Bill_Branch_Type(Payment_Entries)` AS `Bill_Branch_Type(Payment_Entries)`,
-                row_number() over ( partition by `cbt`.`Reference_Number`
-            order by
-                `cbt`.`Reference_Number`) AS `row_count`
-            from
-                `current_bank_transaction` `cbt`
-            where
-                `cbt`.`Current_Deposit` > 0;
+    `cbt`.`Entity` AS `Entity`,
+    `cbt`.`Region` AS `Region`,
+    `cbt`.`Party_Group` AS `Party_Group`,
+    `cbt`.`Insurance` AS `Insurance`,
+    `cbt`.`UTR_Number` AS `UTR_Number`,
+    `cbt`.`UTR_Date` AS `UTR_Date`,
+    `cbt`.`Current_Allocated_Amount` AS `Current_Allocated_Amount`,
+    `cbt`.`Current_UnAllocated` AS `Current_UnAllocated`,
+    `cbt`.`Current_Deposit` AS `Current_Deposit`,
+    `cbt`.`Branch_Type` AS `Branch_Type`,
+    `cbt`.`Status` AS `Status`,
+    `cbt`.`Bank_Account` AS `Bank_Account`,
+    `cbt`.`NS_Ledger_Code` AS `NS_Ledger_Code`,
+    `cbt`.`Description` AS `Description`,
+    `cbt`.`Reference_Number` AS `Reference_Number`,
+    `cbt`.`Internal_Id` AS `Internal_Id`,
+    `cbt`.`Based_On` AS `Based_On`,
+    `cbt`.`Allocated_Amount(Payment_Entries)` AS `Allocated_Amount(Payment_Entries)`,
+    `cbt`.`Payment_Document(Payment_Entries)` AS `Payment_Document(Payment_Entries)`,
+    `cbt`.`Payment_Entry(Payment_Entries)` AS `Payment_Entry(Payment_Entries)`,
+    `cbt`.`Bill_Region(Payment_Entries)` AS `Bill_Region(Payment_Entries)`,
+    `cbt`.`Creation_Date(Payment_Entries)` AS `Creation_Date(Payment_Entries)`,
+    `cbt`.`Posting_Date(Payment_Entries)` AS `Posting_Date(Payment_Entries)`,
+    `cbt`.`Bill_Date(Payment_Entries)` AS `Bill_Date(Payment_Entries)`,
+    `cbt`.`Bill_Branch(Payment_Entries)` AS `Bill_Branch(Payment_Entries)`,
+    `cbt`.`Bill_Entity(Payment_Entries)` AS `Bill_Entity(Payment_Entries)`,
+    `cbt`.`Bill_Branch_Type(Payment_Entries)` AS `Bill_Branch_Type(Payment_Entries)`,
+    row_number() over ( partition by `cbt`.`Reference_Number`
+order by
+    `cbt`.`Reference_Number`) AS `row_count`
+from
+    `Dragarwals-db-Prod`.`current_bank_transaction` `cbt`
+where
+    `cbt`.`Current_Deposit` > 0;
             """)
         
     def create_cancelled_bills_view(self):
