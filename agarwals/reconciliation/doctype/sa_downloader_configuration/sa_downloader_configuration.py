@@ -1,7 +1,6 @@
 # Copyright (c) 2024, Agarwals and contributors
 # For license information, please see license.txt
 
-
 import frappe
 from frappe.model.document import Document
 from agarwals.reconciliation.doctype.sa_downloader_configuration import create_pattern,is_pattern_exists
@@ -23,3 +22,6 @@ class SADownloaderConfiguration(Document):
 
 	def before_save(self):
 		self.validate_url_pattern_update()
+
+
+

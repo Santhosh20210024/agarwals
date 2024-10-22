@@ -84,3 +84,10 @@ def download_captcha_settlement_advice(captcha_tpa_doc):
             frappe.db.sql(
                 f"UPDATE `tabSettlement Advice Downloader UI Logins` SET status = 'Error' WHERE name = '{login_ref.name}' ")
             frappe.db.commit()
+
+
+
+
+
+
+

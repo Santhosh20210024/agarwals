@@ -7,7 +7,6 @@ from agarwals.utils.error_handler import log_error
 from tfs.orchestration import ChunkOrchestrator, chunk
 from agarwals.utils.str_to_dict import cast_to_dic
 
-
 class SABotUploader:
     def __init__(self):
         self.set_configuration_values()
@@ -179,7 +178,6 @@ class SABotUploader:
             if os.path.exists(self.zip_folder_path):
                 shutil.rmtree(self.zip_folder_path)
 
-
     @ChunkOrchestrator.update_chunk_status
     def process(self) -> None:
         """
@@ -213,3 +211,4 @@ def process(args):
                                     is_async=True, timeout=3600)
     except Exception as e:
         log_error(error=e,doc_name='SA Bot Uploader')
+

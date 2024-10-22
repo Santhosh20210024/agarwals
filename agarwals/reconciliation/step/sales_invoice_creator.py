@@ -159,7 +159,6 @@ class SalesInvoiceCancellator:
                     frappe.db.set_value('Sales Invoice', bill, {'status': 'Cancelled','docstatus':2, 'outstanding_amount':0})
                     frappe.db.commit()
                     continue
-
                 sales_invoice_record = frappe.get_doc('Sales Invoice', bill)
                 sales_invoice_record.custom_file_upload = bill_record.file_upload
                 sales_invoice_record.custom_transform = bill_record.transform
