@@ -1,179 +1,156 @@
-<!-- <template>
-  <div class="min-h-screen bg-white flex">
-	<div class="mx-auto w-full max-w-sm lg:w-96">
-	  <form @submit.prevent="login" class="space-y-6">
-		<label for="email"> Username: </label>
-		<input type="text" v-model="email" />
-		<br />
-		<label for="password"> Password: </label>
-		<input type="password" v-model="password" />
-
-		<button
-		  class="bg-blue-500 block text-white p-2 hover:bg-blue-700"
-		  type="submit"
-		>
-		  Sign in
-		</button>
-	  </form>
-	</div>
-  </div>
-</template>
-<script>
-export default {
-  data() {
-	return {
-	  email: null,
-	  password: null,
-	};
-  },
-  inject: ["$auth"],
-  async mounted() {
-	if (this.$route?.query?.route) {
-	  this.redirect_route = this.$route.query.route;
-	  this.$router.replace({ query: null });
-	}
-  },
-  methods: {
-	async login() {
-	  if (this.email && this.password) {
-		let res = await this.$auth.login(this.email, this.password);
-		if (res) {
-		  this.$router.push({ name: "Home" });
-		}
-	  }
-	},
-  },
-};
-</script> -->
-vue
 <template>
-  <div class="login-container">
-    <div class="login-card">
-       <img src="./assets/agarwals/billtracker/vite.svg" alt="Logo" class="logo" /> 
-      <h2>Login to Agarwals-Claimgenie</h2>
-      <form @submit.prevent="login">
-        <div class="input-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
+  <div class="min-h-screen bg-gray-100 flex sm:p-6 md:p-8 lg:p-10 xl:p-12">
+    <div class="mx-auto w-full max-w-sm lg:w-112 my-auto bg-white p-4 drop-shadow rounded-md" :class="{ shake: shakeEffect }">
+      <div class="text-center mb-2 pb-3 text-lg font-medium">
+        <img src="../img/logo.svg" width="100px" alt="Logo" class="mx-auto py-6" />
+        Login to Bill Tracker
+      </div>
+     
+      <form @submit.prevent="login" class="space-y-6 mx-auto py-2">
+        <div class="form-group">
+          <FormControl
             id="email"
+            type="text"
             v-model="email"
+            :required="true"
+            size="md"
             placeholder="jane@example.com"
-            required
+            variant="subtle"
+            :class="{ warningClass: wrongInput }"
+          >
+          <template #prefix>
+          <FeatherIcon
+                class="w-4"
+                name="mail"
+              />
+          </template>
+          </FormControl>
+        </div>
+
+        <div class="form-group">
+          <FormControl
+            id="password"
+            type="password"
+            v-model="password"
+            :required="true"
+            size="md"
+            placeholder="Password"
+            :class="{ warningClass: wrongInput }"
+          >
+          <template #prefix>
+          <FeatherIcon
+              class="w-4"
+              name="lock"
+              />
+          </template>
+          </FormControl>
+        </div>
+
+        <p class="text-2xs font-light text-right mx-5">
+          <a href="#">Forgot password?</a>
+        </p>
+
+        <div class="flex justify-center pb-4">
+          <Button
+            variant="solid"
+            theme="blue"
+            size="sm"
+            :label="label"
+            :loading="loading"
+            loadingText="Verifying"
+            :disabled="loading"
+            class="w-80"
+            type="submit"
           />
         </div>
-        <div class="input-group">
-          <label for="password">Password</label>
-          <div class="password-group">
-            <input
-              type="password"
-              id="password"
-              v-model="password"
-              required
-            />
-            <button type="button" @click="togglePasswordVisibility">
-              {{ showPassword ? 'Hide' : 'Show' }}
-            </button>
-          </div>
-        </div>
-        <button type="submit" class="login-button">Login</button>
       </form>
-      <a href="#" class="forgot-password">Forgot Password?</a>
     </div>
   </div>
 </template>
- 
+
 <script>
+import { FormControl,FeatherIcon, Button } from 'frappe-ui';
+
 export default {
+  components: {
+    FormControl,
+    FeatherIcon,
+    Button,
+  },
+
   data() {
-	return {
-	  email: null,
-	  password: null,
-	};
+    return {
+      email: '',            
+      password: '',        
+      redirectRoute: null,  
+      wrongInput: false,    
+      loading: false,      
+      label: "Login",      
+      shakeEffect: false,
+    };
   },
-  inject: ["$auth"],
+
+  inject: ["$auth"],  
+
   async mounted() {
-	if (this.$route?.query?.route) {
-	  this.redirect_route = this.$route.query.route;
-	  this.$router.replace({ query: null });
-	}
+   
+    const routeQuery = this.$route?.query?.route;
+    if (routeQuery) {
+      this.redirectRoute = routeQuery;
+      this.$router.replace({ query: null });  
+    }
   },
+
   methods: {
-	async login() {
-	  if (this.email && this.password) {
-		let res = await this.$auth.login(this.email, this.password);
-		if (res) {
-		  this.$router.push({ name: "Home" });
-		}
-	  }
-	},},}</script>
- 
+    async login() {
+      try {
+          this.loading = true;  
+        if (this.email && this.password) {  
+          const response = await this.$auth.login(this.email, this.password);
+          if (response) {
+            this.$router.push({ name: "Home" });  
+          }
+        }
+      } catch (error) {
+        this.handleLoginError();  
+      } finally {
+        this.loading = false;  
+      }
+    },
+
+    handleLoginError() {
+      this.wrongInput = true;          
+      this.label = "Invalid Login. Try Again";
+      this.shakeEffect = true;          
+      setTimeout(() => {
+        this.shakeEffect = false;      
+      }, 1500);
+    },
+  },
+};
+</script>
+
+
 <style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
+.form-group {
+  margin: 0 auto;
+  padding: 0 0.75rem;
 }
- 
-.login-card {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 300px;
-  text-align: center;
+
+.warningClass {
+  border: 1px solid red;
+  border-radius: 8px;
 }
- 
-.logo {
-  width: 50px; /* Adjust according to your logo size */
-  margin-bottom: 20px;
+
+.shake {
+  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(0, 0, 0);
 }
- 
-.input-group {
-  margin-bottom: 15px;
-  text-align: left;
-}
- 
-.password-group {
-  display: flex;
-  align-items: center;
-}
- 
-.password-group input {
-  flex: 1;
-}
- 
-.login-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-}
- 
-.login-button:hover {
-  background-color: #0056b3;
-}
- 
-.forgot-password {
-  display: block;
-  margin-top: 10px;
-  color: #007bff;
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 </style>
- 
-
-
-
-
-
-
-
-
-
-
-

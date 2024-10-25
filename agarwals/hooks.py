@@ -240,3 +240,6 @@ fixtures = [
     "Data Import Mapping",
     "Settlement Advice Configuration"
 ]
+
+website_route_rules = [
+	{"from_route": "/billtracker/<path:app_path>", "to_route": "billtracker"}]

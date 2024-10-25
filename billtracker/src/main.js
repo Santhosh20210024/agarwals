@@ -1,28 +1,59 @@
 import { createApp, reactive } from "vue";
-import { FrappeUI } from "frappe-ui";
 import App from "./App.vue";
-
 import router from './router';
 import resourceManager from "../../../doppio/libs/resourceManager";
 import call from "../../../doppio/libs/controllers/call";
 import socket from "../../../doppio/libs/controllers/socket";
 import Auth from "../../../doppio/libs/controllers/auth";
-import './index.css'
+import './assets/css/app.css'
+
+import {
+	FrappeUI,
+	Button,
+	Input,
+	TextInput,
+	FormControl,
+	ErrorMessage,
+	Dialog,
+	Alert,
+	Badge,
+	setConfig,
+	frappeRequest,
+	FeatherIcon,
+	ListView
+  } from 'frappe-ui'
+
 
 const app = createApp(App);
 const auth = reactive(new Auth());
+
+let globalComponents = {
+	Button,
+	TextInput,
+	Input,
+	FormControl,
+	ErrorMessage,
+	Dialog,
+	Alert,
+	Badge,
+	FeatherIcon,
+	ListView
+  }
+
+for (let key in globalComponents) {
+	app.component(key, globalComponents[key])
+}
+
+setConfig('resourceFetcher', frappeRequest)
 
 // Plugins
 app.use(router);
 app.use(FrappeUI);
 app.use(resourceManager);
 
-// Global Properties,
-// components can inject this
 app.provide("$auth", auth);
 app.provide("$call", call);
 app.provide("$socket", socket);
-
 
 // Configure route gaurds
 router.beforeEach(async (to, from, next) => {
