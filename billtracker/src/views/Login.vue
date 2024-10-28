@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-100 flex sm:p-6 md:p-8 lg:p-10 xl:p-12">
     <div class="mx-auto w-full max-w-sm lg:w-112 my-auto bg-white p-4 drop-shadow rounded-md" :class="{ shake: shakeEffect }">
       <div class="text-center mb-2 pb-3 text-lg font-medium">
-        <img src="../img/logo.svg" width="100px" alt="Logo" class="mx-auto py-6" />
+        <img src="../assets/bill_tracker.svg" width="100px" alt="Logo" class="mx-auto py-6" />
         Login to Bill Tracker
       </div>
      
@@ -47,7 +47,7 @@
         </div>
 
         <p class="text-2xs font-light text-right mx-5">
-          <a href="#">Forgot password?</a>
+        <a href="#">Forgot password?</a>
         </p>
 
         <div class="flex justify-center pb-4">

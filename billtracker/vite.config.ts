@@ -23,25 +23,25 @@ export default defineConfig({
 				theme_color: "#ffffff",
 				icons: [
 					{
-						src: "/assets/agarwals/billtracker/vite.svg",
+						src: "/assets/agarwals/billtracker/bill_tracker.svg",
 						sizes: "192x192",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "/assets/agarwals/billtracker/vite.svg",
+						src: "/assets/agarwals/billtracker/bill_tracker.svg",
 						sizes: "192x192",
 						type: "image/png",
 						purpose: "maskable",
 					},
 					{
-						src: "/assets/agarwals/billtracker/vite.svg",
+						src: "/assets/agarwals/billtracker/bill_tracker.svg",
 						sizes: "512x512",
 						type: "image/png",
 						purpose: "any",
 					},
 					{
-						src: "/assets/agarwals/billtracker/vite.svg",
+						src: "/assets/agarwals/billtracker/bill_tracker.svg",
 						sizes: "512x512",
 						type: "image/png",
 						purpose: "maskable",
