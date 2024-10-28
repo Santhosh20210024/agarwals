@@ -12,7 +12,7 @@
 				label="EY"
 				size="6xl"
 			/>
-			<h3 class="font-bold text-lg md:text-xl lg:text-2xl mt-2 text-center">Santhoshsivan Vallatharasu</h3>
+			<h3 class="font-bold text-lg md:text-xl lg:text-2xl mt-2 text-center">{{ username.data }}</h3>
 		</div>
 	</div>
 	<div class="px-[50px] h-[calc(100vh-200px)] bg-white-800 py-[20px]">
@@ -96,7 +96,8 @@ function toggleSidebar(){
 }
 
 let username = createResource({
-	url: 'agarwals.api.get_user_name',
+	url: '/api/method/agarwals.api.get_user_name',
+	method:'GET',
 })
 username.fetch()
 console.log(username)
